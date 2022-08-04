@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:showIn="nav_view">
+
+    <item
+        android:id="@+id/menu_shop_create"
+        android:iconTint="@color/black"
+        android:title="Shop Create" />
+  <item
+      android:id="@+id/menu_route_list"
+      android:iconTint="@color/black"
+      android:title="Route List" />
+  <item
+      android:id="@+id/menu_offer_list"
+      android:iconTint="@color/black"
+      android:title="Offer List" />
+  <item
+      android:id="@+id/menu_order_history"
+      android:iconTint="@color/black"
+      android:title="Order History" />
+  <item
+      android:id="@+id/menu_attendance"
+      android:iconTint="@color/black"
+      android:title="Attendance " />
+  <item
+      android:id="@+id/menu_logout"
+      android:iconTint="@color/black"
+      android:title="Logout" />
+
+</menu>

@@ -1,0 +1,18 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:state_checked="true"
+        android:bottom="8dp"
+        android:left="8dp"
+        android:right="8dp"
+        android:top="8dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="5dp" />
+            <solid android:color="@color/teal_700" />
+            <size android:height="20dp" />
+        </shape>
+
+    </item>
+    <item android:drawable="@color/teal_200" android:state_checked="false" />
+
+</selector>
