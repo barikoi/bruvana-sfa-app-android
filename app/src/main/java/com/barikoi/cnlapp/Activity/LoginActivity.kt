@@ -1,6 +1,7 @@
 package com.barikoi.cnlapp.Activity
 
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -11,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
@@ -68,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun login() {
         if (!validate()) {
-            onLoginFailed()
+            //onLoginFailed()
             return
         }
         val email = etSRCode!!.text.toString().replace(" ", "");
@@ -82,26 +84,27 @@ class LoginActivity : AppCompatActivity() {
             Response.Listener { response ->
                 try {
                     val responsedata = JSONObject(response)
-                    token = responsedata.getString("token")
-                    val userObj = responsedata.getJSONObject("user")
-                    val prefs = PreferenceManager.getDefaultSharedPreferences(
-                        applicationContext
-                    )
-                    val editor = prefs.edit()
-                    editor.putString(Api.EMAIL, userObj.getString("email"))
-                    editor.putString(Api.NAME, userObj.getString("name"))
-                    editor.putString(Api.USER_ID, userObj.getString("id"))
-                    editor.putString(Api.PHONE, userObj.getString("phone"))
-                    editor.putString(Api.SR_CODE, userObj.getString("sr_code"))
-                    editor.putString(Api.TOKEN, token)
-                    editor.commit()
+                    if(responsedata.has("token")) {
+                        token = responsedata.getString("token")
+                        val userObj = responsedata.getJSONObject("user")
+                        val prefs = PreferenceManager.getDefaultSharedPreferences(
+                            applicationContext
+                        )
+                        val editor = prefs.edit()
+                        editor.putString(Api.EMAIL, userObj.getString("email"))
+                        editor.putString(Api.NAME, userObj.getString("name"))
+                        editor.putString(Api.USER_ID, userObj.getString("id"))
+                        editor.putString(Api.PHONE, userObj.getString("phone"))
+                        editor.putString(Api.SR_CODE, userObj.getString("sr_code"))
+                        editor.putString(Api.TOKEN, token)
+                        editor.commit()
 
-                    /*val user_name = userObj.getString("name")
+                        /*val user_name = userObj.getString("name")
                     val user_email = userObj.getString("email")
                     val user_phone = userObj.getString("phone")
                     val user_id = userObj.getString("id")*/
 
-                    /*SentryAndroid.init(this) { options: SentryAndroidOptions ->
+                        /*SentryAndroid.init(this) { options: SentryAndroidOptions ->
                         // Add a callback that will be used before the event is sent to Sentry.
                         // With this callback, you can modify the event or, when returning null, also discard the event.
                         options.beforeSend =
@@ -115,9 +118,13 @@ class LoginActivity : AppCompatActivity() {
                             }
                     }*/
 
-                    routeToAppropriatePage(2)
-                    //OneSignal.setEmail(email);
-                    pd!!.dismiss()
+                        routeToAppropriatePage(2)
+                        //OneSignal.setEmail(email);
+                        pd!!.dismiss()
+                    }else if(responsedata.has("message")){
+                        pd!!.dismiss()
+                        showDialog( responsedata.getString("message"))
+                    }
 
                     // onLoginFailed();
                 } catch (e: JSONException) {
@@ -130,11 +137,7 @@ class LoginActivity : AppCompatActivity() {
                 pd!!.dismiss()
                 //NetworkcallUtils.handleResponse(error, getApplicationContext());
                 if (error is NoConnectionError) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Login failed,check your internet connection and try again",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showDialog("Login failed,check your internet connection and try again")
                 }
                 if (error != null && error.networkResponse != null) {
                     try {
@@ -143,11 +146,7 @@ class LoginActivity : AppCompatActivity() {
                         Log.d("Verify", "message: $s")
                         val data = JSONObject(s)
                         Log.d("Verify", "message: " + data.getString("message"))
-                        Toast.makeText(
-                            applicationContext,
-                            ""+data.getString("message"),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showDialog(""+data.getString("message"))
                         throw Exception(data.getString("message"))
                     } catch (e: UnsupportedEncodingException) {
                         e.printStackTrace()
@@ -184,7 +183,17 @@ class LoginActivity : AppCompatActivity() {
         queue.add(request)
     }
 
+    fun showDialog(message: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+                dialog.cancel()
+            })
+        val alert = builder.create()
+        alert.show()
 
+    }
 
     override fun onBackPressed() {
         // disable going back to the MainActivity
@@ -192,11 +201,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun onLoginFailed() {
-        Toast.makeText(
-            applicationContext,
-            "Login failed,check if phone number is correct",
-            Toast.LENGTH_LONG
-        ).show()
+        showDialog("Login failed,check if SR Code and password is correct",)
 
     }
 
@@ -217,6 +222,12 @@ class LoginActivity : AppCompatActivity() {
             valid = false
         } else {
             etSRCode!!.setError(null)
+        }
+        if (etPassword!!.text.toString().length < 6) {
+            etPassword!!.error = "Enter a valid password (minimum 6 characters)"
+            valid = false
+        } else {
+            etPassword!!.error = null
         }
         return valid
     }

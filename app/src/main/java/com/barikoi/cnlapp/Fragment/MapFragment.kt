@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
@@ -17,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -361,6 +363,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             locationEngine!!.requestLocationUpdates()
         }
     }
+
+
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
 
