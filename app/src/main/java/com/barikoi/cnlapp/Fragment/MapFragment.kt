@@ -49,6 +49,7 @@ import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.*
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerOptions
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
@@ -56,6 +57,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import org.json.JSONException
 import org.json.JSONObject
+import timber.log.Timber
 import java.io.UnsupportedEncodingException
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, PermissionsListener {
@@ -235,8 +237,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 .icon(icon)
                 .title(shopname)
         )
-        placemarkermap!![p.shop_code] = m
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 15.0))
+//        placemarkermap!![p.shop_code] = m
+//        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 15.0))
     }
     @SuppressLint("MissingPermission")
     override fun onMapReady(mapboxMap: MapboxMap?) {
@@ -250,7 +252,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         //setTaskDetails()
         //getShopList(userId!!)
 
-        fab?.setOnClickListener(View.OnClickListener {
+        fab.setOnClickListener(View.OnClickListener {
             if (locationEngine != null) {
                 val lastLocation = locationEngine!!.lastLocation
                 if (lastLocation != null) {
@@ -267,20 +269,34 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>,
                                         view: View, position: Int, id: Long) {
-                placemarkermap!!.clear()
-                val shops: ArrayList<Shops> = ArrayList()
-                if (shopList!!.size > 0){
+//                placemarkermap!!.clear()
+                val shoplocs: ArrayList<LatLng> = ArrayList()
+                if (shopList!!.size > 0) {
                     mMap!!.clear()
-                    Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
-                    Log.d("RouteList", "all shops "+ shopList!!.size.toString())
                     for (j in 0 until shopList!!.size) {
-                        Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
+                        Log.d("RouteList", "all shops for " + shopList!![j].route_code)
                         if (shopList!![j].route_code.equals(routesList!![position])) {
                             //shops.add(shopList!![i])
                             plotMarker(shopList!![j])
+                            shoplocs.add(LatLng(shopList!![j].latitude, shopList!![j].longitude))
                         }
 
                     }
+                    if (shoplocs.size > 1) {
+                        mMap?.moveCamera(
+                            CameraUpdateFactory.newLatLngBounds(
+                                LatLngBounds.Builder()
+                                    .includes(shoplocs).build(),
+                                100
+                            )
+                        )
+                    } else mMap?.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            shoplocs.first(),
+                            15.0
+                        )
+                    )
+
                 }
 
                 /*val adapter = ShopListAdapter(shops)
@@ -314,8 +330,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         if (locationPlugin == null) {
             locationPlugin = LocationLayerPlugin(mapView!!, mMap!!, locationEngine, LocationLayerOptions.builder(mContext!!).maxZoom(25.0).build())
             locationPlugin!!.setLocationLayerEnabled(true)
-            locationPlugin!!.renderMode = RenderMode.COMPASS
-            locationPlugin!!.setCameraMode(CameraMode.TRACKING)
+            locationPlugin!!.renderMode = RenderMode.NORMAL
+            locationPlugin!!.setCameraMode(CameraMode.NONE)
             Log.d("Search", "getLastLatLon 2: " + locationPlugin!!.lastKnownLocation)
             //mMap!!.animateCamera(CameraUpdateFactory.zoomTo(15.0))
         }
