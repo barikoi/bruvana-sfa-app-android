@@ -17,4 +17,5 @@ object Api {
     val loginurl = base_url + "login"
     var logouturl = base_url + "logout"
     val route_outlet_list = base_url+"route-list"
+    val verified_shop_list = base_url+"verified-outlets"
 }

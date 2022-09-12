@@ -1,26 +1,22 @@
 package com.barikoi.cnlapp.Fragment
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CompoundButton
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
 import com.android.volley.Request
@@ -28,7 +24,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
@@ -62,10 +57,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     var routesList: ArrayList<String>? = ArrayList()
     var allRouteList: ArrayList<Routes>? = ArrayList()
     var shopList: ArrayList<Shops>? = ArrayList()
+    var verifiedShopList: ArrayList<Shops>? = ArrayList()
     var recylerView: RecyclerView? = null
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var spinner : MoreSpinner? = null
+    var cbVerified: AppCompatCheckBox? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
 
@@ -76,6 +73,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     private var locationPlugin: LocationLayerPlugin? = null
     private var permissionsManager: PermissionsManager? = null
     private var userId: String? = ""
+    private var routeId: String? = ""
     internal lateinit var icon: Icon
     private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
     lateinit var ACTIVITY: MainActivity
@@ -94,6 +92,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         Mapbox.getInstance(ACTIVITY.applicationContext, getString(R.string.mapbox_access_token))
         val view = inflater.inflate(R.layout.fragment_map, container, false)
         fab = view.findViewById(R.id.fab)
+        cbVerified = view.findViewById(R.id.isVerified)
         Telemetry.disableOnUserRequest();
         mapView = view.findViewById(R.id.mapview)
         mapView!!.setStyleUrl(getString(R.string.map_view_styleUrl))
@@ -101,33 +100,74 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         mapView!!.getMapAsync(this)
         spinner = view.findViewById(R.id.spinnerRoutes)
 
-
         return view
     }
-    fun getShopList(userId: String){
+    fun getShopList(url: String){
         allRouteList!!.clear()
         queue = RequestQueueSingleton.getInstance(mContext).getRequestQueue()
-        routesList!!.clear()
+        //routesList!!.clear()
         val request = StringRequest(
             Request.Method.GET,
-            Api.route_outlet_list+"?sr_id="+userId,
+            url,
             { response ->
                 //success
                 Log.d("RouteFrag", response)
                 try {
+                    shopList!!.clear()
+                    verifiedShopList!!.clear()
+                    //allRouteList!!.clear()
                     val data = JSONObject(response)
-                    val routesArray = data.getJSONArray("so-routes")
-                    for (i in 0 until routesArray.length()){
-                        val route = routesArray.getJSONObject(i)
-                        val route_id = route.getString("id")
-                        val route_name = route.getString("route_name")
-                        val route_code = route.getString("route_code")
-                        val territory_name = route.getString("territory_name")
-                        routesList!!.add(route_name)
-                        //shopList!!.clear()
-                        val route_outlet_list = route.getJSONArray("outlets")
-                        for (j in 0 until route_outlet_list.length()) {
-                            val outlet = route_outlet_list.getJSONObject(j)
+                    if (data.has("so-routes")){
+                        routesList!!.clear()
+                        val routesArray = data.getJSONArray("so-routes")
+                        for (i in 0 until routesArray.length()){
+                            val route = routesArray.getJSONObject(i)
+                            val route_id = route.getString("id")
+                            val route_name = route.getString("route_name")
+                            val route_code = route.getString("route_code")
+                            val territory_name = route.getString("territory_name")
+                            routesList!!.add(route_name)
+                            //shopList!!.clear()
+                            val route_outlet_list = route.getJSONArray("outlets")
+                            for (j in 0 until route_outlet_list.length()) {
+                                val outlet = route_outlet_list.getJSONObject(j)
+                                val outlet_id = outlet.getString("id")
+                                val outlet_name = outlet.getString("outlet_name")
+                                val outlet_status = outlet.getString("outlets_status")
+                                val outlet_address = outlet.getString("address")
+                                val outlet_code = outlet.getString("outlet_code")
+                                val outlet_type = outlet.getString("store_type")
+                                val distributor_office = outlet.getString("distributor_office")
+                                val latitude = outlet.getDouble("latitude")
+                                val longitude = outlet.getDouble("longitude")
+
+                                shopList!!.add(
+                                    Shops(
+                                        outlet_id,
+                                        outlet_name,
+                                        outlet_status,
+                                        outlet_address,
+                                        outlet_code,
+                                        outlet_type,
+                                        distributor_office,
+                                        territory_name,
+                                        latitude,
+                                        longitude,
+                                        route_id,
+                                        route_name
+                                    )
+                                )
+                            }
+                            Log.d("RouteList", "all 1 "+ shopList!!.size.toString())
+                            allRouteList!!.add(Routes(route_id, route_code, route_name, "", "", "", shopList!!))
+                            for (k in 0 until allRouteList!!.size) {
+                                Log.d("RouteList", "all 2 "+ allRouteList!![k].route_name+" "+ allRouteList!![k].shopList.size.toString())
+                            }
+                        }
+                    }else if (data.has("verified_outlet")){
+                        val routesOutletArray = data.getJSONArray("verified_outlet")
+                        for (i in 0 until routesOutletArray.length()){
+                            val outlet = routesOutletArray.getJSONObject(i)
                             val outlet_id = outlet.getString("id")
                             val outlet_name = outlet.getString("outlet_name")
                             val outlet_status = outlet.getString("outlets_status")
@@ -137,8 +177,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                             val distributor_office = outlet.getString("distributor_office")
                             val latitude = outlet.getDouble("latitude")
                             val longitude = outlet.getDouble("longitude")
+                            val route_id = outlet.getString("route_id")
+                            val route_name = outlet.getString("route_name")
+                            val territory_name = outlet.getString("territory_name")
 
-                            shopList!!.add(
+                            verifiedShopList!!.add(
                                 Shops(
                                     outlet_id,
                                     outlet_name,
@@ -150,19 +193,32 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                     territory_name,
                                     latitude,
                                     longitude,
+                                    route_id,
                                     route_name
                                 )
                             )
-                        }
-                        Log.d("RouteList", "all 1 "+ shopList!!.size.toString())
-                        allRouteList!!.add(Routes(route_id, route_code, route_name, "", "", "", shopList!!))
-                        for (i in 0 until allRouteList!!.size) {
-                            Log.d("RouteList", "all 2 "+ allRouteList!![i].route_name+" "+ allRouteList!![i].shopList.size.toString())
-                        }
+
+                            /*if (allRouteList!!.size >0){
+                                for (i in 0 until allRouteList!!.size){
+                                    if (!route_id.equals(allRouteList!![i].route_code)){
+                                        allRouteList!!.add(Routes(route_id, route_id, route_name, "", "", "", verifiedShopList!!))
+                                    }
+                                }
+                            }else{
+                                allRouteList!!.add(Routes(route_id, route_id, route_name, "", "", "", verifiedShopList!!))
+                            }*/
+                            }
+                        Log.d("RouteList", "all verified 1 "+ verifiedShopList!!.size.toString())
+                        Log.d("RouteList", "all verified 1 "+ allRouteList!!.size.toString())
+                        /*for (k in 0 until allRouteList!!.size) {
+                            Log.d("RouteList", "all verified 2 "+ allRouteList!![k].route_name+" "+ allRouteList!![k].shopList.size.toString())
+                        }*/
+
                     }
+
                     if (spinner != null) {
-                        for (i in 0 until allRouteList!!.size) {
-                            Log.d("RouteList", "all 3 "+ allRouteList!![i].route_name+" "+ allRouteList!![i].shopList.size.toString())
+                        for (l in 0 until allRouteList!!.size) {
+                            Log.d("RouteList", "all 3 "+ allRouteList!![l].route_name+" "+ allRouteList!![l].shopList.size.toString())
                         }
                         val adapter = ArrayAdapter(
                             mContext!!,
@@ -218,7 +274,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         user_id = prefs.getString("user_id", "")*/
         mContext = context
         userId = prefs!!.getString(Api.USER_ID, "")
-        getShopList(userId!!)
+        //mMap!!.clear()
+        getShopList(Api.route_outlet_list+"?sr_id="+userId)
     }
     fun setTaskDetails(){
         icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker)
@@ -227,8 +284,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(taskLat!!, taskLon!!), 15.0))*/
     }
 
-    private fun plotMarker(p: Shops) {
-        icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker)
+    private fun plotMarker(p: Shops, icon: Icon) {
+
         val shopname: String = p.shop_name
         val m = mMap!!.addMarker(
             MarkerOptions().position(LatLng(p.latitude, p.longitude))
@@ -250,7 +307,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         //setTaskDetails()
         //getShopList(userId!!)
 
-        fab?.setOnClickListener(View.OnClickListener {
+        fab.setOnClickListener(View.OnClickListener {
             if (locationEngine != null) {
                 val lastLocation = locationEngine!!.lastLocation
                 if (lastLocation != null) {
@@ -268,26 +325,36 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             override fun onItemSelected(parent: AdapterView<*>,
                                         view: View, position: Int, id: Long) {
                 placemarkermap!!.clear()
-                val shops: ArrayList<Shops> = ArrayList()
+                //val shops: ArrayList<Shops> = ArrayList()
                 if (shopList!!.size > 0){
                     mMap!!.clear()
                     Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
                     Log.d("RouteList", "all shops "+ shopList!!.size.toString())
                     for (j in 0 until shopList!!.size) {
                         Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
-                        if (shopList!![j].route_code.equals(routesList!![position])) {
+                        if (shopList!![j].route_name.equals(routesList!![position])) {
                             //shops.add(shopList!![i])
-                            plotMarker(shopList!![j])
+                            routeId = shopList!![j].route_code
+                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
+                            plotMarker(shopList!![j], icon)
+                        }
+
+                    }
+                }else if(verifiedShopList!!.size > 0){
+                    mMap!!.clear()
+                    Log.d("RouteList", "all verified routelist "+ routesList!!.size.toString()+" position"+position)
+                    Log.d("RouteList", "all verified shops "+ verifiedShopList!!.size.toString())
+                    for (j in 0 until verifiedShopList!!.size) {
+                        Log.d("RouteList", "all verified shops for "+ verifiedShopList!![j].route_code)
+                        if (verifiedShopList!![j].route_name.equals(routesList!![position])) {
+                            //shops.add(shopList!![i])
+                            routeId = verifiedShopList!![j].route_code
+                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
+                            plotMarker(verifiedShopList!![j], icon)
                         }
 
                     }
                 }
-
-                /*val adapter = ShopListAdapter(shops)
-                recylerView!!.setAdapter(adapter)
-                adapter.notifyDataSetChanged()*/
-
-
 
             }
 
@@ -295,7 +362,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 // write code to perform some action
             }
         }
+
+        cbVerified!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+            if (isChecked) {
+                mMap!!.clear()
+                getShopList(Api.verified_shop_list+"?route_id="+routeId)
+            } else {
+                mMap!!.clear()
+                getShopList(Api.route_outlet_list+"?sr_id="+userId)
+            }
+        })
     }
+
     private fun enableLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
             // Create an instance of LOST location engine

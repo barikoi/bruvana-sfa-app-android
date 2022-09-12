@@ -87,7 +87,7 @@ class ShopListFragment : Fragment() {
                 }*/
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
-                    if (shopList!![i].route_code == routesList!![position]) {
+                    if (shopList!![i].route_name == routesList!![position]) {
                         shops.add(shopList!![i])
                     }
 
@@ -118,7 +118,7 @@ class ShopListFragment : Fragment() {
                 if (s!!.length == 0) {
                     val shops: ArrayList<Shops> = ArrayList()
                     for (i in 0 until shopList!!.size) {
-                        if (shopList!![i].route_code == routesList!![spinner!!.selectedItemPosition]) {
+                        if (shopList!![i].route_name == routesList!![spinner!!.selectedItemPosition]) {
                             shops.add(shopList!![i])
                         }
 
@@ -197,6 +197,7 @@ class ShopListFragment : Fragment() {
                                         territory_name,
                                         latitude,
                                         longitude,
+                                        route_id,
                                         route_name
                                     )
                                 )

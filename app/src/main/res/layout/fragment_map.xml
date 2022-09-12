@@ -6,7 +6,7 @@
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
-        android:id="@+id/spinnerLayout"
+        android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
@@ -15,9 +15,19 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="16dp"
         android:layout_gravity="center_vertical"
-        android:visibility="visible"
-        android:background="@drawable/rounded_stroke_bg">
-
+        android:visibility="visible">
+        <RelativeLayout
+            android:id="@+id/spinnerLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/isVerified"
+            android:layout_alignParentLeft="true"
+            android:padding="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_gravity="center_vertical"
+            android:visibility="visible"
+            android:background="@drawable/rounded_stroke_bg">
         <com.barikoi.cnlapp.Utils.MoreSpinner
             android:id="@+id/spinnerRoutes"
             android:layout_width="match_parent"
@@ -27,7 +37,20 @@
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
         </com.barikoi.cnlapp.Utils.MoreSpinner>
+        </RelativeLayout>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/isVerified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:button="@null"
+            android:visibility="visible"
+            android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
+            android:text="Verified"
+            android:textStyle="bold"
+            android:layout_alignParentRight="true" />
     </RelativeLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -51,9 +74,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/spinnerLayout"
+        android:layout_below="@+id/topLayout"
         app:layout_behavior=".Utils.CollapseBehavior">
-
 
         <com.mapbox.mapboxsdk.maps.MapView
             android:id="@+id/mapview"
@@ -64,10 +86,6 @@
             app:mapbox_uiAttributionMarginLeft="5dp"
             app:mapbox_uiLogo="false">
         </com.mapbox.mapboxsdk.maps.MapView>
-
-
-
-
     </RelativeLayout>
 
 </RelativeLayout>
