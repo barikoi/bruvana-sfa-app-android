@@ -13,26 +13,21 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.android.volley.NoConnectionError
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
-import com.barikoi.cnlapp.Fragment.ShopListFragment.Companion.progressBar2
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import kotlinx.android.synthetic.main.fragment_shop_list.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
-import java.text.ParseException
 
 class ShopListFragment : Fragment() {
     //private var queue: RequestQueue? = null
@@ -57,7 +52,8 @@ class ShopListFragment : Fragment() {
         spinner = view.findViewById(R.id.spinnerRoutes)
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
-
+        adapter = ShopListAdapter( ArrayList<Shops>())
+        recylerView!!.adapter = adapter
         /*swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         swipeRefreshLayout.setOnRefreshListener(OnRefreshListener {
@@ -71,6 +67,7 @@ class ShopListFragment : Fragment() {
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>,
                                         view: View, position: Int, id: Long) {
+
                 /*Toast.makeText(mContext,
                     getString(R.string.selected_item) + " " +
                             "" + languages[position], Toast.LENGTH_SHORT).show()*/
@@ -92,8 +89,7 @@ class ShopListFragment : Fragment() {
                     }
 
                 }
-                adapter = ShopListAdapter(shops)
-                recylerView!!.setAdapter(adapter)
+                adapter!!.shopList=shops
                 adapter!!.notifyDataSetChanged()
 
             }
@@ -123,8 +119,7 @@ class ShopListFragment : Fragment() {
                         }
 
                     }
-                    adapter = ShopListAdapter(shops)
-                    recylerView!!.setAdapter(adapter)
+                    adapter!!.shopList=shops
                     adapter!!.notifyDataSetChanged()
                 }
 
@@ -164,6 +159,8 @@ class ShopListFragment : Fragment() {
                         progressBar2!!.visibility = View.GONE
                         val data = JSONObject(response)
                         val routesArray = data.getJSONArray("so-routes")
+                        shopList!!.clear()
+                        routesList!!.clear()
                         for (i in 0 until routesArray.length()){
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")
@@ -171,7 +168,7 @@ class ShopListFragment : Fragment() {
                             val route_code = route.getString("route_code")
                             val territory_name = route.getString("territory_name")
                             routesList!!.add(route_name)
-                            //shopList!!.clear()
+
                             val route_outlet_list = route.getJSONArray("outlets")
                             for (j in 0 until route_outlet_list.length()) {
                                 val outlet = route_outlet_list.getJSONObject(j)
