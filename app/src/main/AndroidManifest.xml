@@ -25,6 +25,7 @@
         <activity
             android:name=".Activity.RouteActivity"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <activity
@@ -37,6 +38,7 @@
         <activity
             android:name=".Activity.SplashActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,6 +49,7 @@
 
         <activity
             android:name=".Activity.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:exported="true">
             <!--<intent-filter>

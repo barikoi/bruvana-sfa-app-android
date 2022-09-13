@@ -11,10 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -54,7 +51,8 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, PermissionsListener {
-    var routesList: ArrayList<String>? = ArrayList()
+    var routesList: ArrayList<Pair<String, String>>? = ArrayList()
+    var routeNameList: ArrayList<String>? = ArrayList()
     var allRouteList: ArrayList<Routes>? = ArrayList()
     var shopList: ArrayList<Shops>? = ArrayList()
     var verifiedShopList: ArrayList<Shops>? = ArrayList()
@@ -75,6 +73,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     private var userId: String? = ""
     private var routeId: String? = ""
     internal lateinit var icon: Icon
+    private var loading: ProgressBar? = null
     private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
     lateinit var ACTIVITY: MainActivity
 
@@ -93,6 +92,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         val view = inflater.inflate(R.layout.fragment_map, container, false)
         fab = view.findViewById(R.id.fab)
         cbVerified = view.findViewById(R.id.isVerified)
+        loading = view.findViewById(R.id.progressBar1)
         Telemetry.disableOnUserRequest();
         mapView = view.findViewById(R.id.mapview)
         mapView!!.setStyleUrl(getString(R.string.map_view_styleUrl))
@@ -103,6 +103,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         return view
     }
     fun getShopList(url: String){
+        loading!!.visibility = View.VISIBLE
         allRouteList!!.clear()
         queue = RequestQueueSingleton.getInstance(mContext).getRequestQueue()
         //routesList!!.clear()
@@ -113,12 +114,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 //success
                 Log.d("RouteFrag", response)
                 try {
-                    shopList!!.clear()
+                    loading!!.visibility = View.GONE
                     verifiedShopList!!.clear()
                     //allRouteList!!.clear()
                     val data = JSONObject(response)
                     if (data.has("so-routes")){
+                        shopList!!.clear()
                         routesList!!.clear()
+                        routeNameList!!.clear()
                         val routesArray = data.getJSONArray("so-routes")
                         for (i in 0 until routesArray.length()){
                             val route = routesArray.getJSONObject(i)
@@ -126,7 +129,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                             val route_name = route.getString("route_name")
                             val route_code = route.getString("route_code")
                             val territory_name = route.getString("territory_name")
-                            routesList!!.add(route_name)
+                            routesList!!.add(Pair(route_id, route_name))
+                            routeNameList!!.add(route_name)
                             //shopList!!.clear()
                             val route_outlet_list = route.getJSONArray("outlets")
                             for (j in 0 until route_outlet_list.length()) {
@@ -159,10 +163,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                 )
                             }
                             Log.d("RouteList", "all 1 "+ shopList!!.size.toString())
-                            allRouteList!!.add(Routes(route_id, route_code, route_name, "", "", "", shopList!!))
-                            for (k in 0 until allRouteList!!.size) {
+                            //allRouteList!!.add(Routes(route_id, route_code, route_name, "", "", "", shopList!!))
+                            /*for (k in 0 until allRouteList!!.size) {
                                 Log.d("RouteList", "all 2 "+ allRouteList!![k].route_name+" "+ allRouteList!![k].shopList.size.toString())
-                            }
+                            }*/
                         }
                     }else if (data.has("verified_outlet")){
                         val routesOutletArray = data.getJSONArray("verified_outlet")
@@ -181,23 +185,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                             val route_name = outlet.getString("route_name")
                             val territory_name = outlet.getString("territory_name")
 
-                            verifiedShopList!!.add(
-                                Shops(
-                                    outlet_id,
-                                    outlet_name,
-                                    outlet_status,
-                                    outlet_address,
-                                    outlet_code,
-                                    outlet_type,
-                                    distributor_office,
-                                    territory_name,
-                                    latitude,
-                                    longitude,
-                                    route_id,
-                                    route_name
-                                )
+                            val shops = Shops(
+                                outlet_id,
+                                outlet_name,
+                                outlet_status,
+                                outlet_address,
+                                outlet_code,
+                                outlet_type,
+                                distributor_office,
+                                territory_name,
+                                latitude,
+                                longitude,
+                                route_id,
+                                route_name
                             )
-
+                            verifiedShopList!!.add(shops)
+                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
+                            plotMarker(shops, icon)
                             /*if (allRouteList!!.size >0){
                                 for (i in 0 until allRouteList!!.size){
                                     if (!route_id.equals(allRouteList!![i].route_code)){
@@ -217,14 +221,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                     }
 
                     if (spinner != null) {
-                        for (l in 0 until allRouteList!!.size) {
+                        /*for (l in 0 until allRouteList!!.size) {
                             Log.d("RouteList", "all 3 "+ allRouteList!![l].route_name+" "+ allRouteList!![l].shopList.size.toString())
+                        }*/
+                        if (spinner!!.adapter == null){
+                            val adapter = ArrayAdapter(
+                                mContext!!,
+                                android.R.layout.simple_spinner_item, routeNameList!!
+                            )
+                            spinner!!.adapter = adapter
                         }
-                        val adapter = ArrayAdapter(
-                            mContext!!,
-                            android.R.layout.simple_spinner_item, routesList!!
-                        )
-                        spinner!!.adapter = adapter
+                        /*if (spinner!!.adapter.count == 0) {
+
+                        }*/
 
                     }
 
@@ -236,6 +245,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             { error ->
                 //error
                 Log.d("error", error.toString())
+                loading!!.visibility = View.GONE
                 if (error is TimeoutError) {
                     //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
                     Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
@@ -275,7 +285,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         mContext = context
         userId = prefs!!.getString(Api.USER_ID, "")
         //mMap!!.clear()
-        getShopList(Api.route_outlet_list+"?sr_id="+userId)
+        //getShopList(Api.route_outlet_list+"?sr_id="+userId)
     }
     fun setTaskDetails(){
         icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker)
@@ -306,6 +316,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
 
         //setTaskDetails()
         //getShopList(userId!!)
+        getShopList(Api.route_outlet_list+"?sr_id="+userId)
 
         fab.setOnClickListener(View.OnClickListener {
             if (locationEngine != null) {
@@ -325,22 +336,29 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             override fun onItemSelected(parent: AdapterView<*>,
                                         view: View, position: Int, id: Long) {
                 placemarkermap!!.clear()
+                //loading!!.visibility = View.VISIBLE
+                routeId = routesList!!.get(position).first
                 //val shops: ArrayList<Shops> = ArrayList()
-                if (shopList!!.size > 0){
+                if (cbVerified!!.isChecked){
                     mMap!!.clear()
-                    Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
-                    Log.d("RouteList", "all shops "+ shopList!!.size.toString())
-                    for (j in 0 until shopList!!.size) {
-                        Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
-                        if (shopList!![j].route_name.equals(routesList!![position])) {
-                            //shops.add(shopList!![i])
-                            routeId = shopList!![j].route_code
-                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
-                            plotMarker(shopList!![j], icon)
-                        }
+                    getShopList(Api.verified_shop_list+"?route_id="+routeId)
+                }else{
+                    if (shopList!!.size > 0){
+                        mMap!!.clear()
+                        Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
+                        Log.d("RouteList", "all shops "+ shopList!!.size.toString())
+                        for (j in 0 until shopList!!.size) {
+                            Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
+                            if (shopList!![j].route_name.equals(routesList!![position].second)) {
+                                //shops.add(shopList!![i])
+                                icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
+                                plotMarker(shopList!![j], icon)
+                            }
 
+                        }
                     }
-                }else if(verifiedShopList!!.size > 0){
+                }
+                /*else if(verifiedShopList!!.size > 0){
                     mMap!!.clear()
                     Log.d("RouteList", "all verified routelist "+ routesList!!.size.toString()+" position"+position)
                     Log.d("RouteList", "all verified shops "+ verifiedShopList!!.size.toString())
@@ -354,7 +372,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                         }
 
                     }
-                }
+                }*/
 
             }
 
@@ -369,7 +387,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 getShopList(Api.verified_shop_list+"?route_id="+routeId)
             } else {
                 mMap!!.clear()
-                getShopList(Api.route_outlet_list+"?sr_id="+userId)
+                //getShopList(Api.route_outlet_list+"?sr_id="+userId)
+                if (shopList!!.size > 0){
+                    mMap!!.clear()
+                    Log.d("RouteList", "spinner selected "+ spinner!!.selectedItem)
+                    Log.d("RouteList", "all shops "+ shopList!!.size.toString())
+                    for (j in 0 until shopList!!.size) {
+                        Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
+                        if (shopList!![j].route_name.equals(spinner!!.selectedItem)) {
+                            //shops.add(shopList!![i])
+                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
+                            plotMarker(shopList!![j], icon)
+                        }
+
+                    }
+                }
             }
         })
     }

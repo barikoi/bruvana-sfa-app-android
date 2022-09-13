@@ -50,7 +50,6 @@
             android:textStyle="bold"
             android:layout_alignParentRight="true" />
     </RelativeLayout>
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -87,5 +86,13 @@
             app:mapbox_uiLogo="false">
         </com.mapbox.mapboxsdk.maps.MapView>
     </RelativeLayout>
-
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar1"
+        style="@style/SpinKitView.Large.ThreeBounce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/colorPrimary" />
 </RelativeLayout>
