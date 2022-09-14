@@ -71,6 +71,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     private var locationPlugin: LocationLayerPlugin? = null
     private var permissionsManager: PermissionsManager? = null
     private var userId: String? = ""
+    private var srCode: String? = ""
     private var routeId: String? = ""
     internal lateinit var icon: Icon
     private var loading: ProgressBar? = null
@@ -284,6 +285,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         user_id = prefs.getString("user_id", "")*/
         mContext = context
         userId = prefs!!.getString(Api.USER_ID, "")
+        srCode = prefs!!.getString(Api.SR_CODE, "")
         //mMap!!.clear()
         //getShopList(Api.route_outlet_list+"?sr_id="+userId)
     }
@@ -341,7 +343,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 //val shops: ArrayList<Shops> = ArrayList()
                 if (cbVerified!!.isChecked){
                     mMap!!.clear()
-                    getShopList(Api.verified_shop_list+"?route_id="+routeId)
+                    getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
                 }else{
                     if (shopList!!.size > 0){
                         mMap!!.clear()
@@ -384,7 +386,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         cbVerified!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
                 mMap!!.clear()
-                getShopList(Api.verified_shop_list+"?route_id="+routeId)
+                getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
             } else {
                 mMap!!.clear()
                 //getShopList(Api.route_outlet_list+"?sr_id="+userId)
