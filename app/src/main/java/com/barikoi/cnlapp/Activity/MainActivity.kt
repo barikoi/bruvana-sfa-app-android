@@ -29,6 +29,7 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -184,11 +185,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             )*/
                         } catch (e: JSONException) {
                             e.printStackTrace()
-                            //Sentry.captureException(e)
+                            Sentry.captureException(e)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        //Sentry.captureException(e)
+                        Sentry.captureException(e)
                     }
                 }
                 val home = Intent(context, SplashActivity::class.java)

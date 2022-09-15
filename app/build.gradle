@@ -54,4 +54,6 @@ dependencies {
 
     /*progressbar*/
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
+    implementation 'io.sentry:sentry-android:6.4.1'
 }

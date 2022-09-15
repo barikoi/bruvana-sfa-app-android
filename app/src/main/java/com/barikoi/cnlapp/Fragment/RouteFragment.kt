@@ -22,6 +22,7 @@ import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -100,6 +101,7 @@ class RouteFragment : Fragment() {
                         val adapter = RouteListAdapter(arrayList!!)
                         recylerView!!.setAdapter(adapter)
                     }catch (e: JSONException) {
+                        Sentry.captureException(e)
                         e.printStackTrace()
                     }
 
@@ -126,8 +128,10 @@ class RouteFragment : Fragment() {
                             Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
                         } catch (e: UnsupportedEncodingException) {
                             e.printStackTrace()
+                            Sentry.captureException(e)
                         } catch (e: JSONException) {
                             //mListerner.onFailure(e.message)
+                            Sentry.captureException(e)
                             Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
                             e.printStackTrace()
                         }

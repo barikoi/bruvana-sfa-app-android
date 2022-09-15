@@ -19,6 +19,12 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import io.sentry.Sentry
+import io.sentry.SentryEvent
+import io.sentry.SentryOptions
+import io.sentry.android.core.SentryAndroid
+import io.sentry.android.core.SentryAndroidOptions
+import io.sentry.protocol.User
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -99,25 +105,19 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString(Api.TOKEN, token)
                         editor.commit()
 
-                        /*val user_name = userObj.getString("name")
-                    val user_email = userObj.getString("email")
-                    val user_phone = userObj.getString("phone")
-                    val user_id = userObj.getString("id")*/
-
-                        /*SentryAndroid.init(this) { options: SentryAndroidOptions ->
-                        // Add a callback that will be used before the event is sent to Sentry.
-                        // With this callback, you can modify the event or, when returning null, also discard the event.
-                        options.beforeSend =
-                            SentryOptions.BeforeSendCallback { event: SentryEvent, hint: Any? ->
-                                val userSentry = User()
-                                userSentry.id = user_id
-                                userSentry.email = user_email
-                                userSentry.username = user_name
-                                event.user = userSentry
-                                event
-                            }
-                    }*/
-
+                        SentryAndroid.init(this) { options: SentryAndroidOptions ->
+                            // Add a callback that will be used before the event is sent to Sentry.
+                            // With this callback, you can modify the event or, when returning null, also discard the event.
+                            options.beforeSend =
+                                SentryOptions.BeforeSendCallback { event: SentryEvent, hint: Any? ->
+                                    val userSentry = User()
+                                    userSentry.id = userObj.getString("sr_code")
+                                    userSentry.email = email
+                                    userSentry.username = userObj.getString("name")
+                                    event.user = userSentry
+                                    event
+                                }
+                        }
                         routeToAppropriatePage(2)
                         //OneSignal.setEmail(email);
                         pd!!.dismiss()
@@ -129,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
                     // onLoginFailed();
                 } catch (e: JSONException) {
                     pd!!.dismiss()
-                    //Sentry.captureException(e)
+                    Sentry.captureException(e)
                     Toast.makeText(applicationContext,"Error" +e.message, Toast.LENGTH_LONG).show()
                 }
             },
@@ -152,10 +152,10 @@ class LoginActivity : AppCompatActivity() {
                         e.printStackTrace()
                     } catch (e: JSONException) {
                         e.printStackTrace()
-                        //Sentry.captureException(e)
+                        Sentry.captureException(e)
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        //Sentry.captureException(e)
+                        Sentry.captureException(e)
                     }
                 }
             }
