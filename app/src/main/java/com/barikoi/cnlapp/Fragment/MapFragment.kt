@@ -436,7 +436,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             //mMap!!.animateCamera(CameraUpdateFactory.zoomTo(15.0))
         }
         locationEngine!!.addLocationEngineListener(this)
-        locationEngine!!.requestLocationUpdates()
+        //locationEngine!!.requestLocationUpdates()
         Log.d("Search", "getLastLatLon 2: " + locationEngine!!.lastLocation)
 
         val lastLocation = locationEngine!!.lastLocation
@@ -464,7 +464,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
 
     @SuppressLint("MissingPermission")
     override fun onConnected() {
-        locationEngine!!.requestLocationUpdates()
+        //locationEngine!!.requestLocationUpdates()
     }
 
     @SuppressLint("MissingPermission")
@@ -476,7 +476,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             /*IntentDataCheck()*/
                 locationEngine!!.removeLocationEngineListener(this)
         } else {
-            locationEngine!!.requestLocationUpdates()
+            //locationEngine!!.requestLocationUpdates()
         }
     }
 
@@ -493,7 +493,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     override fun onStart() {
         super.onStart()
         if (locationEngine != null) {
-            locationEngine!!.requestLocationUpdates()
+            //locationEngine!!.requestLocationUpdates()
         }
         if (locationPlugin != null) {
             locationPlugin!!.onStart()

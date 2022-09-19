@@ -109,7 +109,7 @@ class SplashActivity : AppCompatActivity() {
         } */
         else {
             Log.d("Splash", "request permission if list not empty")
-            Handler().postDelayed(Runnable { init() }, 2000)
+            Handler().postDelayed(Runnable { init() }, 1000)
         }
         return true
     }
@@ -126,7 +126,7 @@ class SplashActivity : AppCompatActivity() {
                 val editor = prefs.edit()
                 editor.putBoolean("isFirst", false)
                 editor.commit()
-                routeToAppropriatePage(0)
+                routeToAppropriatePage(1)
             } else {
                 hideProgress()
                 //Toast.makeText(this, getString(R.string.no_auth_token), Toast.LENGTH_SHORT).show()
@@ -219,6 +219,7 @@ class SplashActivity : AppCompatActivity() {
                                 init()
                             }
                         }*/
+                        //init()
                     }
                     // Show permissionsDenied
                     //sendLocation();

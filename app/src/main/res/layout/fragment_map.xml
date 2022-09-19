@@ -66,6 +66,7 @@
         app:borderWidth="0dp"
         app:elevation="6dp"
         app:fabSize="normal"
+        android:visibility="gone"
         app:layout_anchorGravity="top|end"
         app:layout_dodgeInsetEdges="bottom"
         app:pressedTranslationZ="12dp" />
