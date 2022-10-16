@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment.so_view.ShopSelectFragment">
+
+    <TextView
+        android:id="@+id/selectedShop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="center_horizontal"
+        android:text="Jalil General Store, Manik Nagar"
+        android:textSize="15sp"
+        android:textColor="@color/color_gray_medium"
+        android:textStyle="bold">
+
+    </TextView>
+    <AutoCompleteTextView
+        android:id="@+id/editTextBlock"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="8dp"
+        android:padding="4dp"
+        android:layout_gravity="center_vertical"
+        android:ems="10"
+        android:drawableRight="@drawable/ic_search"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/color_gray"
+        android:hint="Search by product name"
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:background="@drawable/stroke_background"
+        android:textSize="12sp"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shoplist"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:scrollbars="vertical"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_below="@+id/topLayout"
+        android:scrollbarThumbVertical="@color/black"
+        android:background="@color/white"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/single_product_select_view" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:background="@drawable/cardview_bg"
+        android:backgroundTint="@color/light_blue">
+        <TextView
+            android:id="@+id/totalItemCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginRight="8dp"
+            android:textColor="@color/black"
+            android:text="2Items"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:layout_alignParentLeft="true" />
+        <View
+            android:id="@+id/dash"
+            android:layout_width="1dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:layout_centerVertical="true"
+            android:background="@color/black"
+            android:layout_toRightOf="@+id/totalItemCount">
+
+        </View>
+        <TextView
+            android:id="@+id/totalAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@+id/dash"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:text="Total 448.20 "
+            android:textSize="12sp"/>
+        <TextView
+            android:id="@+id/saveOrder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/black"
+            android:text="Save Order"
+            android:textStyle="bold"
+            android:textSize="12sp"/>
+    </RelativeLayout>
+</LinearLayout>
