@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragment.so_view.ShopSelectFragment">
-    <com.barikoi.cnlapp.Utils.MoreSpinner
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    <!--<com.barikoi.cnlapp.Utils.MoreSpinner
         android:id="@+id/spinnerRoutes"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_margin="8dp"
-        android:background="@drawable/stroke_background"
         android:theme="@style/spinnerItemStyle"
         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-    </com.barikoi.cnlapp.Utils.MoreSpinner>
+    </com.barikoi.cnlapp.Utils.MoreSpinner>-->
+        <RelativeLayout
+            android:id="@+id/spinnerLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:layout_margin="8dp"
+            android:layout_gravity="center_vertical"
+            android:visibility="visible"
+            android:background="@drawable/stroke_background">
+            <com.barikoi.cnlapp.Utils.MoreSpinner
+                android:id="@+id/spinnerRoutes"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+
+                android:theme="@style/spinnerItemStyle"
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+            </com.barikoi.cnlapp.Utils.MoreSpinner>
+        </RelativeLayout>
     <AutoCompleteTextView
-        android:id="@+id/editTextBlock"
+        android:id="@+id/editTextSearchShop"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:padding="4dp"
+        android:padding="6dp"
         android:layout_gravity="center_vertical"
         android:ems="10"
         android:drawableRight="@drawable/ic_search"
@@ -46,5 +67,14 @@
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
         tools:listitem="@layout/single_shop_select_list" />
-
 </LinearLayout>
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar"
+        style="@style/SpinKitView.Large.ThreeBounce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/colorPrimary" />
+</RelativeLayout>

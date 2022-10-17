@@ -5,6 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Fragment.so_view.CreateOrderFragment">
+    <FrameLayout
+        android:id="@+id/fragmentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 
 

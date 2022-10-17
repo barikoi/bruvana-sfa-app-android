@@ -143,6 +143,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
                                 val outlet_type = outlet.getString("store_type")
+                                val owner_name = outlet.getString("owner_name")
                                 val distributor_office = outlet.getString("distributor_office")
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
@@ -155,6 +156,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                         outlet_address,
                                         outlet_code,
                                         outlet_type,
+                                        owner_name,
                                         distributor_office,
                                         territory_name,
                                         latitude,
@@ -180,6 +182,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                             val outlet_address = outlet.getString("address")
                             val outlet_code = outlet.getString("outlet_code")
                             val outlet_type = outlet.getString("store_type")
+                            val owner_name = outlet.getString("owner_name")
                             val distributor_office = outlet.getString("distributor_office")
                             val latitude = outlet.getDouble("latitude")
                             val longitude = outlet.getDouble("longitude")
@@ -194,6 +197,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                 outlet_address,
                                 outlet_code,
                                 outlet_type,
+                                owner_name,
                                 distributor_office,
                                 territory_name,
                                 latitude,
@@ -260,7 +264,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 if (error != null && error.networkResponse != null) {
                     try {
                         val s = String(error.networkResponse.data)
-                        Log.d("Verify", "message: $s")
+                        Log.d("Map", "message: $s")
                         val data = JSONObject(s)
                         //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
                         //mListerner.onFailure(data.getString("message"))

@@ -24,6 +24,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Fragment.HomeFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
+import com.barikoi.cnlapp.Fragment.so_view.CreateOrderFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
         tvTitle!!.text = "Map"
-        setCurrentFragment(MapFragment(), this@MainActivity)
+        setCurrentFragment(CreateOrderFragment(), this@MainActivity)
 
         val header = navigationDrawer!!.getHeaderView(0)
         tvUserName = header.findViewById<TextView>(R.id.textView_username)
