@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,18 +13,20 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:gravity="center_horizontal"
+        android:layout_alignParentTop="true"
         android:text="Jalil General Store, Manik Nagar"
-        android:textSize="15sp"
+        android:textSize="17sp"
         android:textColor="@color/color_gray_medium"
         android:textStyle="bold">
 
     </TextView>
     <AutoCompleteTextView
-        android:id="@+id/editTextBlock"
+        android:id="@+id/editTextSearchShop"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_margin="8dp"
-        android:padding="4dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="6dp"
+        android:layout_below="@+id/selectedShop"
         android:layout_gravity="center_vertical"
         android:ems="10"
         android:drawableRight="@drawable/ic_search"
@@ -36,23 +38,28 @@
         android:background="@drawable/stroke_background"
         android:textSize="12sp"
         />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/shoplist"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:scrollbars="vertical"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/orderSummary"
+        android:layout_below="@+id/editTextSearchShop"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_below="@+id/topLayout"
-        android:scrollbarThumbVertical="@color/black"
+        android:layout_marginBottom="30dp"
         android:background="@color/white"
+        android:scrollbarThumbVertical="@color/black"
+        android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/single_product_select_view" />
 
     <RelativeLayout
+        android:id="@+id/orderSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="4dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
         android:background="@drawable/cardview_bg"
         android:backgroundTint="@color/light_blue">
         <TextView
@@ -105,4 +112,4 @@
             android:textStyle="bold"
             android:textSize="12sp"/>
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

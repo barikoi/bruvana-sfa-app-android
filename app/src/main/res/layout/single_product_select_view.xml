@@ -16,7 +16,7 @@
                 android:layout_margin="8dp"
                 android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/tvShopName"
+                    android:id="@+id/tvProductName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
@@ -81,12 +81,14 @@
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/layoutQty"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_margin="8dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:visibility="gone"
             android:background="@drawable/cardview_bg"
             android:backgroundTint="@color/colorprimarytemp"
             android:orientation="horizontal">
@@ -103,19 +105,20 @@
                 android:textStyle="bold">
 
             </TextView>
-            <TextView
+            <EditText
                 android:id="@+id/tvCount"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="null"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:text="2"
+                android:text="0"
                 android:textSize="12sp">
 
-            </TextView>
+            </EditText>
             <TextView
-                android:id="@+id/tvPlus"
+                android:id="@+id/tvAdd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -128,5 +131,31 @@
             </TextView>
 
         </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layoutAdd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="8dp"
+        android:layout_weight="1"
+        android:gravity="center"
+
+        android:background="@drawable/cardview_bg"
+        android:backgroundTint="@color/colorprimarytemp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textColor="@color/black"
+            android:text="Add"
+            android:textStyle="bold"
+            android:textSize="12sp">
+
+        </TextView>
+
+    </LinearLayout>
 
 </LinearLayout>

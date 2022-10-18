@@ -18,6 +18,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Adapter.so_view.ShopSelectAdapter
 import com.barikoi.cnlapp.Fragment.RouteFragment
@@ -28,31 +29,31 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.callback.OnSelectListener
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
-class ShopSelectFragment : Fragment() {
+class ShopSelectFragment : Fragment(), OnSelectListener {
     var recylerView: RecyclerView? = null
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var spinner : MoreSpinner? = null
     var user_id : String? = null
+    var listener: OnSelectListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ShopSelectAdapter? = null
-    var routeList: ArrayList<Routes>? = ArrayList()
+    //var routeList: ArrayList<Routes>? = ArrayList()
     var shopList: ArrayList<Shops>? = ArrayList()
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var loading: ProgressBar? = null
+    lateinit var ACTIVITY: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
     }
 
     override fun onCreateView(
@@ -65,7 +66,7 @@ class ShopSelectFragment : Fragment() {
         loading = view.findViewById(R.id.progressBar)
         spinner = view.findViewById(R.id.spinnerRoutes)
         et_search = view.findViewById(R.id.editTextSearchShop)
-        adapter = ShopSelectAdapter( ArrayList<Shops>())
+        adapter = ShopSelectAdapter( ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
 
@@ -136,14 +137,6 @@ class ShopSelectFragment : Fragment() {
 
                             for(i in 0 until routesArray.length()){
                                 val routeObj = routesArray.getJSONObject(i)
-                                /*val route = Routes(routeObj.getString("id"),
-                                    routeObj.getString("route_code"),
-                                    routeObj.getString("route_name"),
-                                    routeObj.getString("territory_name"),
-                                    routeObj.getString("area_name"),
-                                    "",
-                                    ArrayList<Shops>()
-                                )*/
 
                                 routeNameList!!.add(Pair(routeObj.getString("id"), routeObj.getString("route_name")))
                                 routesList.add(routeObj.getString("route_name"))
@@ -155,7 +148,7 @@ class ShopSelectFragment : Fragment() {
                                 if (spinner!!.adapter == null){
                                     val adapter = ArrayAdapter(
                                         mContext!!,
-                                        android.R.layout.simple_spinner_item, routesList!!
+                                        android.R.layout.simple_spinner_item, routesList
                                     )
                                     spinner!!.adapter = adapter
                                 }
@@ -249,7 +242,7 @@ class ShopSelectFragment : Fragment() {
                                 }
 
                                 if (shopList!!.size > 0){
-                                    val adapter = ShopSelectAdapter(shopList!!)
+                                    val adapter = ShopSelectAdapter(shopList!!, listener!!)
                                     recylerView!!.adapter = adapter
                                     adapter.notifyDataSetChanged()
                                 }
@@ -313,7 +306,12 @@ class ShopSelectFragment : Fragment() {
         //token = prefs.getString("token", "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         mContext = context
+        listener = mContext as OnSelectListener
 
         getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
+    }
+
+    override fun onShopSelected(shop: Shops) {
+        TODO("Not yet implemented")
     }
 }

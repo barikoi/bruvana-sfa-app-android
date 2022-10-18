@@ -8,7 +8,7 @@
     android:layout_marginBottom="4dp">
 
     <ImageView
-        android:id="@+id/imagePerson"
+        android:id="@+id/imageShop"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="8dp"
@@ -17,17 +17,19 @@
         android:background="@drawable/stroke_background"
         android:src="@drawable/ic_shop" />
     <LinearLayout
+        android:id="@+id/shopLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="4"
         android:layout_marginEnd="4dp"
         android:layout_marginStart="4dp"
+        android:gravity="center_vertical"
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
         <TextView
             android:id="@+id/tvShopName"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/black"
             android:text="Shop Name"
@@ -36,7 +38,7 @@
         <TextView
             android:id="@+id/tvShopOwnerName"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/black"
             tools:text="Owner name"
