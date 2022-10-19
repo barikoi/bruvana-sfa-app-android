@@ -21,7 +21,7 @@
 
     </TextView>
     <AutoCompleteTextView
-        android:id="@+id/editTextSearchShop"
+        android:id="@+id/editTextSearchProduct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -40,11 +40,11 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/shoplist"
+        android:id="@+id/productlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/orderSummary"
-        android:layout_below="@+id/editTextSearchShop"
+        android:layout_below="@+id/editTextSearchProduct"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="30dp"
         android:background="@color/white"
@@ -71,7 +71,7 @@
             android:paddingRight="8dp"
             android:layout_marginRight="8dp"
             android:textColor="@color/black"
-            android:text="2Items"
+            android:text="0Items"
             android:textStyle="bold"
             android:textSize="12sp"
             android:layout_alignParentLeft="true" />
@@ -85,19 +85,20 @@
             android:layout_toRightOf="@+id/totalItemCount">
 
         </View>
+
         <TextView
             android:id="@+id/totalAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
             android:layout_marginRight="8dp"
             android:layout_toRightOf="@+id/dash"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="Total 0.0 "
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:text="Total 448.20 "
-            android:textSize="12sp"/>
+            android:textSize="12sp"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/saveOrder"
             android:layout_width="wrap_content"
@@ -112,4 +113,14 @@
             android:textStyle="bold"
             android:textSize="12sp"/>
     </RelativeLayout>
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar"
+        style="@style/SpinKitView.Large.ThreeBounce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/colorPrimary" />
 </RelativeLayout>

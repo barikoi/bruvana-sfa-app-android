@@ -28,6 +28,7 @@ import com.barikoi.cnlapp.Fragment.so_view.CreateOrderFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.callback.OnBackPressedListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             )
         })
 
-        tvTitle!!.text = "Map"
+        tvTitle!!.text = "Create Order"
         setCurrentFragment(CreateOrderFragment(), this@MainActivity)
 
         val header = navigationDrawer!!.getHeaderView(0)
@@ -207,6 +208,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         queue.add(request)
+    }
+
+    override fun onBackPressed() {
+        /*val fragment = this.supportFragmentManager.findFragmentById(R.id.createOrder)
+        (fragment as? OnBackPressedListener)?.onBackPressed()?.not()?.let {
+            super.onBackPressed()
+        }*/
     }
 
 }

@@ -10,6 +10,8 @@ object Api {
     val EMAIL = "email"
     val TOKEN = "token"
 
+    val SELECTED_SHOP = "selected_shop"
+
     val ROUTE_PAGE_SELECTED = "route_page_selected"
 
     val base_url = "http://cnl.bkoih3.ml:7000/api/v1/"
@@ -19,4 +21,5 @@ object Api {
     val route_outlet_list = base_url+"route-list"
     val verified_shop_list = base_url+"verified-outlets"
     val routes_withfilter = base_url+"routes"
+    val all_product_list = base_url+"products"
 }

@@ -10,8 +10,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.callback.OnBackPressedListener
 
-class CreateOrderFragment : Fragment() {
+class CreateOrderFragment : Fragment(), OnBackPressedListener{
     lateinit var ACTIVITY: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,4 +41,28 @@ class CreateOrderFragment : Fragment() {
         fragmentTransaction.commit()
         //fragmentManager.executePendingTransactions()
     }
+
+    companion object{
+        fun startFragmentWithValue(key: String, value: String, fragmentName: Fragment, activity: Activity){
+            val bundle = Bundle()
+            bundle.putString(key, value) // Put anything what you want
+
+            val fragment = fragmentName
+            fragment.setArguments(bundle)
+            val fragmentManager = (activity as FragmentActivity).supportFragmentManager
+            fragmentManager.beginTransaction()
+                .replace(R.id.fragmentLayout, fragment)
+                .commit()
+        }
+    }
+
+    override fun onBackPressed() {
+        /*val fragment =
+            this.supportFragmentManager.findFragmentById(R.id.main_container)
+        (fragment as? IOnBackPressed)?.onBackPressed()?.not()?.let {
+
+        }*/
+    }
+
+
 }

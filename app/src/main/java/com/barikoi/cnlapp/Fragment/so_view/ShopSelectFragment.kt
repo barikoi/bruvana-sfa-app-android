@@ -7,11 +7,11 @@ import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
 import com.android.volley.Request
@@ -19,11 +19,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Adapter.so_view.ShopSelectAdapter
-import com.barikoi.cnlapp.Fragment.RouteFragment
-import com.barikoi.cnlapp.Fragment.ShopListFragment
-import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
@@ -306,12 +302,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         //token = prefs.getString("token", "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         mContext = context
-        listener = mContext as OnSelectListener
+        listener = this
+
+        ACTIVITY = context as MainActivity
 
         getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
     }
 
     override fun onShopSelected(shop: Shops) {
-        TODO("Not yet implemented")
+        CreateOrderFragment.startFragmentWithValue(Api.SELECTED_SHOP, shop.shop_name, ProductSelectFragment(), ACTIVITY)
     }
 }

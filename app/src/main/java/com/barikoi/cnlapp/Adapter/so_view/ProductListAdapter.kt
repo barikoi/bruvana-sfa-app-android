@@ -1,5 +1,7 @@
 package com.barikoi.cnlapp.Adapter.so_view
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +11,16 @@ import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnSelectListener
+import com.barikoi.cnlapp.callback.OnValueChangeListener
+import java.text.DecimalFormat
 import java.util.*
 
-class ProductListAdapter(var mValues: List<Products>, mListener: OnSelectListener): RecyclerView.Adapter<ProductListAdapter.ViewHolder>(),
+class ProductListAdapter(var mValues: List<Products>, mListener: OnValueChangeListener): RecyclerView.Adapter<ProductListAdapter.ViewHolder>(),
 Filterable{
 
     var productList: List<Products> = mValues
-    var mListener: OnSelectListener = mListener
+    var mListener: OnValueChangeListener = mListener
+    var dformat = DecimalFormat("#.##")
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductListAdapter.ViewHolder {
@@ -43,9 +48,53 @@ Filterable{
 
         holder.productUnit.text = productList[position].unit_name
 
-        val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+        /*try {
+            val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+            holder.tvSubtoal.text = subtotal.toString()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }*/
+        holder.productCount.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
-        holder.tvSubtoal.text = subtotal.toString()
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                holder.tvSubtoal.text = dformat.format(subtotal).toString()
+                mListener.onValueChanged()
+
+                if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
+                    holder.layoutQty.visibility = View.GONE
+                    holder.layoutAdd.visibility = View.VISIBLE
+                    holder.tvSubtoal.text = "0"
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+
+        })
+
+        holder.tvAdd.setOnClickListener {
+            val qtyValue = holder.productCount.text.toString().toInt() + 1
+            holder.productCount.setText(qtyValue.toString())
+            /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+            holder.tvSubtoal.text = subtotal.toString()*/
+        }
+
+        holder.tvMinus.setOnClickListener {
+            val qtyValue = holder.productCount.text.toString().toInt() - 1
+            holder.productCount.setText(qtyValue.toString())
+            /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+            holder.tvSubtoal.text = subtotal.toString()*/
+        }
+
+
+
+
+
 
 
     }
