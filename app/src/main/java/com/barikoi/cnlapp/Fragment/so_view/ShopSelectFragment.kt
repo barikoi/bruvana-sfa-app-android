@@ -74,6 +74,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 Log.d("RouteList", "position: "+p2)
                 Log.d("RouteList", "size: "+routeNameList!!.size)
                 val route_id = routeNameList!![p2].first
+                editor!!.putString(Api.SELECTED_ROUTE_ID, route_id)
+                editor!!.commit()
                 getShopListbyRoute(Api.routes_withfilter+"?with_geometry=0&with_outlets=1&route_id="+route_id+"&sr_id="+user_id)
             }
 
@@ -227,6 +229,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("store_type"),
                                         outletObj.getString("owner_name"),
                                         outletObj.getString("distributor_office"),
+                                        outletObj.getString("distributor_office_code"),
                                         routeObj.getString("territory_name"),
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
@@ -310,6 +313,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     }
 
     override fun onShopSelected(shop: Shops) {
-        CreateOrderFragment.startFragmentWithValue(Api.SELECTED_SHOP, shop.shop_name, ProductSelectFragment(), ACTIVITY)
+        CreateOrderFragment.startFragmentWithValue(Api.SELECTED_SHOP, shop, ProductSelectFragment(), ACTIVITY)
     }
 }

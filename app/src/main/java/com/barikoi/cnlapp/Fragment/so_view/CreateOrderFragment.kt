@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnBackPressedListener
 
@@ -43,9 +44,9 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
     }
 
     companion object{
-        fun startFragmentWithValue(key: String, value: String, fragmentName: Fragment, activity: Activity){
+        fun startFragmentWithValue(key: String, value: Shops, fragmentName: Fragment, activity: Activity){
             val bundle = Bundle()
-            bundle.putString(key, value) // Put anything what you want
+            bundle.putSerializable(key, value) // Put anything what you want
 
             val fragment = fragmentName
             fragment.setArguments(bundle)

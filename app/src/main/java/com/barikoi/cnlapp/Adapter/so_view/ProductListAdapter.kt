@@ -62,7 +62,7 @@ Filterable{
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = dformat.format(subtotal).toString()
-                mListener.onValueChanged()
+                mListener.onValueChanged(productList[position])
 
                 if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
                     holder.layoutQty.visibility = View.GONE

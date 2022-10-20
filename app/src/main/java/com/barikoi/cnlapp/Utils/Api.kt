@@ -6,11 +6,13 @@ object Api {
     val USER_TYPE = "user_type"
     val NAME = "name"
     val SR_CODE = "sr_code"
+    val EMPLOYEE_ID = "employee_id"
     val PHONE = "phone"
     val EMAIL = "email"
     val TOKEN = "token"
 
     val SELECTED_SHOP = "selected_shop"
+    val SELECTED_ROUTE_ID = "selected_route_id"
 
     val ROUTE_PAGE_SELECTED = "route_page_selected"
 

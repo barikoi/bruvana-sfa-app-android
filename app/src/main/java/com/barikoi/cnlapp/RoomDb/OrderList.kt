@@ -1,0 +1,20 @@
+package com.barikoi.cnlapp.RoomDb
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.barikoi.cnlapp.Model.Products
+import java.io.Serializable
+
+@Entity
+data class OrderList (
+        @PrimaryKey(autoGenerate = true) var id: Int?,
+        @ColumnInfo(name = "OutletId") var outletId: Int,
+        @ColumnInfo(name = "RouteId") var routeId: String,
+        @ColumnInfo(name = "DistributorOfficeCode") var distOfficeCode: String,
+        @ColumnInfo(name = "GrandTotal") var grandTotal: String,
+        @ColumnInfo(name = "Latitude") var latitude: String,
+        @ColumnInfo(name = "Longitude") var longitude: String,
+        @TypeConverters(DataConvertor::class) var brands_array: ArrayList<Products>
+        )

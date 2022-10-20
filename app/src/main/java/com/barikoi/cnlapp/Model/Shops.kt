@@ -3,7 +3,7 @@ package com.barikoi.cnlapp.Model
 import java.io.Serializable
 
 class Shops(
-    var id: String,
+    var shop_id: String,
     val shop_name: String,
     val state: String,
     val address: String,
@@ -11,6 +11,7 @@ class Shops(
     val shop_type: String,
     val shop_owner: String,
     val distributor_office: String,
+    val distributor_office_code: String,
     val territory_name: String,
     val latitude: Double,
     val longitude: Double,

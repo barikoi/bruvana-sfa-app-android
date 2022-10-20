@@ -181,6 +181,7 @@ class ShopListFragment : Fragment() {
                                 val outlet_type = outlet.getString("store_type")
                                 val owner_name = outlet.getString("owner_name")
                                 val distributor_office = outlet.getString("distributor_office")
+                                val distributor_office_code = outlet.getString("distributor_office_code")
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
 
@@ -194,6 +195,7 @@ class ShopListFragment : Fragment() {
                                         outlet_type,
                                         owner_name,
                                         distributor_office,
+                                        distributor_office_code,
                                         territory_name,
                                         latitude,
                                         longitude,

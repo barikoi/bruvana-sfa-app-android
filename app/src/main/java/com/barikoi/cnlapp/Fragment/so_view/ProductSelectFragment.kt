@@ -19,12 +19,12 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Adapter.so_view.ProductListAdapter
-import com.barikoi.cnlapp.Adapter.so_view.ShopSelectAdapter
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.RoomDb.AppDatabase
+import com.barikoi.cnlapp.RoomDb.OrderList
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnValueChangeListener
@@ -42,9 +42,13 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var totalItemCount: TextView? = null
     var tvgrandTotal: TextView? = null
     var saveOrder: TextView? = null
+    var totalAmount : String? =  null
+    var latitude: Double? = 0.0
+    var longitude: Double? = 0.0
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var user_id : String? = null
+    var selectedShop : Shops? =  null
     var shopName : String? =  null
     var listener: OnValueChangeListener? = null
     var et_search: AutoCompleteTextView? = null
@@ -54,6 +58,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private var editor: SharedPreferences.Editor? = null
     private var loading: ProgressBar? = null
     lateinit var ACTIVITY: MainActivity
+    private var appDatabase: AppDatabase? = null
+    private var addedProducts: ArrayList<Products>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +67,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val bundle = this.arguments
 
         if (bundle != null) {
-            shopName = bundle.getString(Api.SELECTED_SHOP)
+            selectedShop = bundle.getSerializable(Api.SELECTED_SHOP) as Shops?
+            shopName = selectedShop!!.shop_name
         }
 
     }
@@ -104,7 +111,13 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
+            appDatabase!!.orderListDao().insertAll(OrderList(null,
+                selectedShop!!.shop_id.toInt(),
+                selectedShop!!.route_code,
+                selectedShop!!.distributor_office_code, totalAmount!!,
+                latitude.toString(), longitude.toString(), addedProducts!!))
 
+            //setCurrentFragment(ShopSelectFragment(), ACTIVITY)
         }
 
         return view
@@ -147,7 +160,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val products = Products(
                                     productObj.getString("id"),
                                     productName, productCode, brandId, brandName, price, discount, image, unitName, categoryName,
-                                    qtyLastMonth, availableStock)
+                                    qtyLastMonth, availableStock, 0, 0.0)
 
                                 productsList!!.add(products)
                             }
@@ -205,15 +218,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         editor = prefs!!.edit()
         //token = prefs.getString("token", "")
         user_id = prefs!!.getString(Api.USER_ID, "")
+        appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this
     }
 
-    override fun onValueChanged() {
+    override fun onValueChanged(products: Products) {
         var dformat = DecimalFormat("#.##")
         var itemCount = 0
         var grandTotal = 0.0
         try {
+            addedProducts!!.clear()
             for (i in 0 until recylerView!!.adapter!!.itemCount) {
                 val viewItem: View = recylerView!!.getChildAt(i)
                 val etCount = viewItem.findViewById<View>(R.id.tvCount) as EditText
@@ -221,14 +236,23 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                 val tvGrandTotal = viewItem.findViewById<TextView>(R.id.tvTotalPrice) as TextView
                 grandTotal = grandTotal + tvGrandTotal.text.toString().toDouble()
+                addedProducts!!.add(
+                    Products(
+                    products.product_id, products.product_name,
+                    products.product_code, products.brand_id,
+                    products.brand_name, products.unit_price,
+                    products.discount, products.imageUrl,
+                    products.unit_name, products.category_name,
+                    products.quantity_last_month,
+                    products.stock_available, etCount.text.toString().toInt(), tvGrandTotal.text.toString().toDouble()
+                ))
             }
         }catch (e:Exception){
             e.printStackTrace()
         }
-
-
         totalItemCount!!.setText(itemCount.toString()+"Items")
         tvgrandTotal!!.setText("Total "+dformat.format(grandTotal).toString())
+        totalAmount = dformat.format(grandTotal).toString()
 
     }
 
