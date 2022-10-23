@@ -26,6 +26,8 @@
         <!--<item name="fontFamily">@font/montserratfamily</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>-->
         <item name="colorSurface">@color/white</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+        <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
     </style>
     <style name="spinnerItemStyle">
         <item name="android:textSize">20sp</item>

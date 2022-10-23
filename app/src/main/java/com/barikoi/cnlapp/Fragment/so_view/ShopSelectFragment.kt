@@ -313,6 +313,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     }
 
     override fun onShopSelected(shop: Shops) {
+        editor!!.putString(Api.SELECTED_SHOP_ID, shop.shop_id)
+        editor!!.commit()
         CreateOrderFragment.startFragmentWithValue(Api.SELECTED_SHOP, shop, ProductSelectFragment(), ACTIVITY)
     }
 }

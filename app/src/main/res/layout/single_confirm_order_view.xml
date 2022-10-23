@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="8dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvShopName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/black"
+        android:text="Shop Name"
+        android:textStyle="bold"
+        android:textSize="17sp"
+        android:layout_marginRight="16dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:nestedScrollingEnabled="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/single_confirm_order_product_listview">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/layoutSubTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:gravity="center|end"
+        android:visibility="visible"
+        android:background="@drawable/cardview_bg"
+        android:backgroundTint="@color/colorprimarytemp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvSubTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/black"
+            android:text="Sub Total"
+            android:textSize="12sp"
+            android:textStyle="bold">
+
+        </TextView>
+
+    </LinearLayout>
+
+</LinearLayout>

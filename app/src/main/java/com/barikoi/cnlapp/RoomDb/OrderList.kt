@@ -11,6 +11,7 @@ import java.io.Serializable
 data class OrderList (
         @PrimaryKey(autoGenerate = true) var id: Int?,
         @ColumnInfo(name = "OutletId") var outletId: Int,
+        @ColumnInfo(name = "OutletName") var outletName: String,
         @ColumnInfo(name = "RouteId") var routeId: String,
         @ColumnInfo(name = "DistributorOfficeCode") var distOfficeCode: String,
         @ColumnInfo(name = "GrandTotal") var grandTotal: String,

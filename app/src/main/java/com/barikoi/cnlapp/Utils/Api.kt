@@ -12,6 +12,7 @@ object Api {
     val TOKEN = "token"
 
     val SELECTED_SHOP = "selected_shop"
+    val SELECTED_SHOP_ID = "selected_shop_id"
     val SELECTED_ROUTE_ID = "selected_route_id"
 
     val ROUTE_PAGE_SELECTED = "route_page_selected"
@@ -24,4 +25,5 @@ object Api {
     val verified_shop_list = base_url+"verified-outlets"
     val routes_withfilter = base_url+"routes"
     val all_product_list = base_url+"products"
+    val confirm_order = base_url+"create-order"
 }

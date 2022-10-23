@@ -35,13 +35,13 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         super.onAttach(context)
     }
 
-    fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
+    /*fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
         val fragmentManager = (activity as FragmentActivity).supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentLayout, fragment!!)
         fragmentTransaction.commit()
         //fragmentManager.executePendingTransactions()
-    }
+    }*/
 
     companion object{
         fun startFragmentWithValue(key: String, value: Shops, fragmentName: Fragment, activity: Activity){
@@ -54,6 +54,14 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
             fragmentManager.beginTransaction()
                 .replace(R.id.fragmentLayout, fragment)
                 .commit()
+        }
+
+        fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
+            val fragmentManager = (activity as FragmentActivity).supportFragmentManager
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentLayout, fragment!!)
+            fragmentTransaction.commit()
+            //fragmentManager.executePendingTransactions()
         }
     }
 

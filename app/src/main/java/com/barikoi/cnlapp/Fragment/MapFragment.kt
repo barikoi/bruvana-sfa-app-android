@@ -145,6 +145,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                 val outlet_type = outlet.getString("store_type")
                                 val owner_name = outlet.getString("owner_name")
                                 val distributor_office = outlet.getString("distributor_office")
+                                val distributor_office_code = outlet.getString("distributor_office_code")
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
 
@@ -158,6 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                         outlet_type,
                                         owner_name,
                                         distributor_office,
+                                        distributor_office_code,
                                         territory_name,
                                         latitude,
                                         longitude,
@@ -184,6 +186,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                             val outlet_type = outlet.getString("store_type")
                             val owner_name = outlet.getString("owner_name")
                             val distributor_office = outlet.getString("distributor_office")
+                            val distributor_office_code = outlet.getString("distributor_office_code")
                             val latitude = outlet.getDouble("latitude")
                             val longitude = outlet.getDouble("longitude")
                             val route_id = outlet.getString("route_id")
@@ -199,6 +202,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                                 outlet_type,
                                 owner_name,
                                 distributor_office,
+                                distributor_office_code,
                                 territory_name,
                                 latitude,
                                 longitude,

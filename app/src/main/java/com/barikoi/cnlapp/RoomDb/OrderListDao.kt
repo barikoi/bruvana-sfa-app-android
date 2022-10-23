@@ -8,8 +8,8 @@ import androidx.room.Query
 @Dao
 interface OrderListDao {
 
-    @Query("SELECT * FROM OrderList")
-    fun getOrdersDB(id: Int?): List<OrderList>?
+    @Query("SELECT * FROM OrderList WHERE OutletId =:shopId")
+    fun getOrdersDB(shopId: String): List<OrderList>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg orders: OrderList?)

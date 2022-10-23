@@ -13,19 +13,22 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_margin="4dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
                 <TextView
                     android:id="@+id/tvProductName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="180dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black"
-                    android:text="Product Name"
+                    android:text="Nucella chocolate spread - 230"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:layout_marginRight="16dp" />
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:layout_marginRight="8dp" />
                 <TextView
                     android:id="@+id/tvStockAvailable"
                     android:layout_width="wrap_content"
@@ -64,7 +67,7 @@
                     android:background="@drawable/cardview_bg"
                     android:backgroundTint="@color/light_yellow"
                     android:textColor="@color/black"
-                    android:text="Per Unit"
+                    android:text="0.0"
                     android:textSize="12sp"/>
                 <TextView
                     android:id="@+id/tvTotalPrice"
@@ -76,7 +79,7 @@
                     android:background="@drawable/cardview_bg"
                     android:backgroundTint="@color/light_yellow"
                     android:textColor="@color/black"
-                    android:text="Total"
+                    android:text="0.0"
                     android:textSize="12sp"/>
             </LinearLayout>
         </LinearLayout>

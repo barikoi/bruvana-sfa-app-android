@@ -59,7 +59,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private var loading: ProgressBar? = null
     lateinit var ACTIVITY: MainActivity
     private var appDatabase: AppDatabase? = null
-    private var addedProducts: ArrayList<Products>? = null
+    private var addedProducts: ArrayList<Products>? = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,11 +113,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         saveOrder!!.setOnClickListener {
             appDatabase!!.orderListDao().insertAll(OrderList(null,
                 selectedShop!!.shop_id.toInt(),
+                selectedShop!!.shop_name,
                 selectedShop!!.route_code,
                 selectedShop!!.distributor_office_code, totalAmount!!,
                 latitude.toString(), longitude.toString(), addedProducts!!))
 
-            //setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+            CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
         }
 
         return view
@@ -221,6 +222,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this
+
+        addedProducts!!.clear()
+
+        ACTIVITY = context as MainActivity
     }
 
     override fun onValueChanged(products: Products) {
@@ -228,7 +233,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         var itemCount = 0
         var grandTotal = 0.0
         try {
-            addedProducts!!.clear()
             for (i in 0 until recylerView!!.adapter!!.itemCount) {
                 val viewItem: View = recylerView!!.getChildAt(i)
                 val etCount = viewItem.findViewById<View>(R.id.tvCount) as EditText
@@ -236,18 +240,46 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                 val tvGrandTotal = viewItem.findViewById<TextView>(R.id.tvTotalPrice) as TextView
                 grandTotal = grandTotal + tvGrandTotal.text.toString().toDouble()
-                addedProducts!!.add(
-                    Products(
-                    products.product_id, products.product_name,
-                    products.product_code, products.brand_id,
-                    products.brand_name, products.unit_price,
-                    products.discount, products.imageUrl,
-                    products.unit_name, products.category_name,
-                    products.quantity_last_month,
-                    products.stock_available, etCount.text.toString().toInt(), tvGrandTotal.text.toString().toDouble()
-                ))
+                if (addedProducts!!.size > 0){
+                    for (i in 0 until addedProducts!!.size){
+                        if (addedProducts!![i].product_id.equals(products.product_id)){
+                            addedProducts!!.removeAt(i)
+                            addedProducts!!.add(Products(
+                                products.product_id, products.product_name,
+                                products.product_code, products.brand_id,
+                                products.brand_name, products.unit_price,
+                                products.discount, products.imageUrl,
+                                products.unit_name, products.category_name,
+                                products.quantity_last_month,
+                                products.stock_available, etCount.text.toString().toInt(), grandTotal
+                            ))
+                        }else{
+                            addedProducts!!.add(Products(
+                                products.product_id, products.product_name,
+                                products.product_code, products.brand_id,
+                                products.brand_name, products.unit_price,
+                                products.discount, products.imageUrl,
+                                products.unit_name, products.category_name,
+                                products.quantity_last_month,
+                                products.stock_available, etCount.text.toString().toInt(), grandTotal
+                            ))
+                        }
+                    }
+                }else{
+                    addedProducts!!.add(Products(
+                        products.product_id, products.product_name,
+                        products.product_code, products.brand_id,
+                        products.brand_name, products.unit_price,
+                        products.discount, products.imageUrl,
+                        products.unit_name, products.category_name,
+                        products.quantity_last_month,
+                        products.stock_available, etCount.text.toString().toInt(), grandTotal
+                    ))
+                }
+
             }
         }catch (e:Exception){
+            Log.d("Product", "exception: "+e.message)
             e.printStackTrace()
         }
         totalItemCount!!.setText(itemCount.toString()+"Items")
