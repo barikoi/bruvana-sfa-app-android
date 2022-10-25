@@ -3,15 +3,12 @@ package com.barikoi.cnlapp.Adapter.so_view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.OrderList
 
-class ConfirmOrderList(var mValues: List<OrderList>): RecyclerView.Adapter<ConfirmOrderList.ViewHolder>() {
+class ConfirmOrderListAdapter(var mValues: List<OrderList>): RecyclerView.Adapter<ConfirmOrderListAdapter.ViewHolder>() {
     var orderList: List<OrderList> = mValues
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -24,7 +21,7 @@ class ConfirmOrderList(var mValues: List<OrderList>): RecyclerView.Adapter<Confi
         holder.subTotal.text = orderList[position].grandTotal
 
         if (orderList[position].brands_array.size > 0){
-            val adapter = ConfirmOrderProductList(orderList[position].brands_array)
+            val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
             holder.productList.adapter = adapter
             adapter!!.notifyDataSetChanged()
         }

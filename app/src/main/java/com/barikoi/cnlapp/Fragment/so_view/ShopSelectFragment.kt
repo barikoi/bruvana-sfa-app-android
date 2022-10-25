@@ -1,8 +1,14 @@
 package com.barikoi.cnlapp.Fragment.so_view
 
+import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,6 +17,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
@@ -26,6 +34,7 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnSelectListener
+import com.google.android.gms.location.*
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
@@ -47,6 +56,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     private var editor: SharedPreferences.Editor? = null
     private var loading: ProgressBar? = null
     lateinit var ACTIVITY: MainActivity
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
+    private var mLocationCallback: LocationCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +127,9 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             }
 
         })
+
+        //getLocation2()
+
         return view
     }
 
@@ -190,6 +204,51 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             })
         queue!!.add(request)
 
+    }
+
+    fun getLocation2(){
+        val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
+            val mLocationRequest = LocationRequest()
+            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            Log.d("ConfirmOrder", "Location: "+mLocationRequest)
+            mLocationCallback = object : LocationCallback() {
+                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+                override fun onLocationResult(locationResult: LocationResult) {
+                    val location = locationResult.lastLocation
+                    if (location != null) {
+                        if (!location.isFromMockProvider) {
+                            Log.d("ConfirmOrder", "Location: "+location)
+                        } else {
+                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    } else {
+                        Toast.makeText(
+                            mContext!!.applicationContext,
+                            "Location not available $location", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
+            if (ActivityCompat.checkSelfPermission(
+                    mContext!!,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    mContext!!, Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+
+            }
+            mFusedLocationClient!!.requestLocationUpdates(
+                mLocationRequest, mLocationCallback!!,
+                Looper.myLooper()!!
+            )
+        } else {
+            //showGPSDisabledAlertToUser()
+        }
     }
 
     private fun getShopListbyRoute(url: String) {

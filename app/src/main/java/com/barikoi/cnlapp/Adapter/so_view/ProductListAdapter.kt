@@ -29,6 +29,7 @@ Filterable{
     }
 
     override fun onBindViewHolder(holder: ProductListAdapter.ViewHolder, position: Int) {
+        holder.setIsRecyclable(false)
         holder.productName.text = productList[position].product_name
         holder.productUnit.text = productList[position].unit_name
         holder.perUnitPrice.text = productList[position].unit_price.toString()
@@ -62,7 +63,7 @@ Filterable{
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = dformat.format(subtotal).toString()
-                mListener.onValueChanged(productList[position])
+                mListener.onValueChanged(productList[position], position)
 
                 if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
                     holder.layoutQty.visibility = View.GONE

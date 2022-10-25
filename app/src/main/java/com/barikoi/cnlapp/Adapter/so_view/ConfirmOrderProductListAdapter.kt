@@ -4,25 +4,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.R
 
-class ConfirmOrderProductList(var mValues: List<Products>):RecyclerView.Adapter<ConfirmOrderProductList.ViewHolder>() {
+class ConfirmOrderProductListAdapter(var mValues: List<Products>):RecyclerView.Adapter<ConfirmOrderProductListAdapter.ViewHolder>() {
 
     var productList: List<Products> = mValues
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ConfirmOrderProductList.ViewHolder {
+    ): ConfirmOrderProductListAdapter.ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_confirm_order_product_listview, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ConfirmOrderProductList.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ConfirmOrderProductListAdapter.ViewHolder, position: Int) {
 
         holder.productName.text = productList[position].product_name
         holder.addedProduct.text = productList[position].ordered_quantity.toString()

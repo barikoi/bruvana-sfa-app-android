@@ -10,6 +10,7 @@
         <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_shop_select.xml" value="0.1286231884057971" />
         <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/single_product_select_view.xml" value="0.67" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/cardview_bg.xml" value="0.1295" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/dialog_popup.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_gps.xml" value="0.149" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_menu.xml" value="0.149" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/rounded_corner_lightgray.xml" value="0.1295" />
@@ -20,6 +21,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_route.xml" value="0.25" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_splash.xml" value="0.15625" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/appcontent_main.xml" value="0.25690021231422505" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/dialog_popup.xml" value="0.75" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_confirm_order.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_create_order.xml" value="0.42296511627906974" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_home.xml" value="0.1358695652173913" />
@@ -29,7 +31,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/nav_header_main.xml" value="0.15625" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_confirm_order_product_listview.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_confirm_order_view.xml" value="0.1" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_product_select_view.xml" value="1.1" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_product_select_view.xml" value="0.2222222222222222" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_route_list.xml" value="0.15625" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_shop_list.xml" value="0.25" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
