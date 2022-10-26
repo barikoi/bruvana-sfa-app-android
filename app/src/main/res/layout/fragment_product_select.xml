@@ -38,13 +38,45 @@
         android:background="@drawable/stroke_background"
         android:textSize="12sp"
         />
+    <LinearLayout
+        android:id="@+id/sortingLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginRight="8dp"
+        android:layout_below="@+id/editTextSearchProduct"
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal"
+        android:layout_alignParentRight="true">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_sortby"
+            android:layout_marginStart="4dp"
+            app:tint="@color/black_light">
+
+        </ImageView>
+
+        <TextView
+            android:id="@+id/sortTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="@color/black_light"
+            android:text="Sort by"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp">
+
+        </TextView>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/orderSummary"
-        android:layout_below="@+id/editTextSearchProduct"
+        android:layout_below="@+id/sortingLayout"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="30dp"
         android:background="@color/white"

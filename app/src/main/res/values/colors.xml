@@ -10,6 +10,7 @@
     <color name="red">#F51D1D</color>
     <color name="light_yellow">#F4D566</color>
     <color name="btn_color">#1DC9A0</color>
+    <color name="black_light">#73000000</color>
 
     <color name="colorPrimary">#00DE97</color>
     <color name="colorPrimaryDark">#00B56F</color>

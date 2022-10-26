@@ -14,6 +14,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -50,6 +51,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     var recylerView: RecyclerView? = null
     var shopTitle: TextView? = null
+    var sortTitle: TextView? = null
     var totalItemCount: TextView? = null
     var tvgrandTotal: TextView? = null
     var saveOrder: TextView? = null
@@ -102,6 +104,68 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         tvgrandTotal = view.findViewById(R.id.totalAmount)
         saveOrder = view.findViewById(R.id.saveOrder)
         loading = view.findViewById(R.id.progressBar)
+        sortTitle = view.findViewById(R.id.sortTitle)
+
+        sortTitle!!.setOnClickListener {
+            val popup = PopupMenu(mContext, sortTitle)
+            popup.menuInflater.inflate(R.menu.sort_menu, popup.menu)
+            popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
+                PopupMenu.OnMenuItemClickListener {
+                override fun onMenuItemClick(item: MenuItem?): Boolean {
+                    when(item!!.itemId){
+                        R.id.menu_ztoa->{
+                            productsList!!.sortByDescending {
+                                it.product_name
+                            }
+                            if (productsList!!.size > 0){
+                                adapter = ProductListAdapter(productsList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+
+                            sortTitle!!.setText(resources.getString(R.string.ztoa))
+                        }
+                        R.id.menu_atoz->{
+                            productsList!!.sortBy {
+                                it.product_name
+                            }
+                            if (productsList!!.size > 0){
+                                adapter = ProductListAdapter(productsList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+                            sortTitle!!.setText(resources.getString(R.string.atoz))
+                        }
+                        R.id.menu_mostfrequent->{
+                            productsList!!.sortByDescending {
+                                    it.quantity_last_month
+                            }
+                            if (productsList!!.size > 0){
+                                adapter = ProductListAdapter(productsList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+
+                            sortTitle!!.setText(resources.getString(R.string.most_frequent))
+                        }
+                        R.id.menu_lowstock->{
+                            productsList!!.sortBy {
+                                it.stock_available
+                            }
+                            if (productsList!!.size > 0){
+                                adapter = ProductListAdapter(productsList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+                            sortTitle!!.setText(resources.getString(R.string.low_stock))
+                        }
+                    }
+                    return true
+                }
+
+            })
+            popup.show()
+        }
 
         //adapter = ProductListAdapter(ArrayList(), listener!!)
 
@@ -232,7 +296,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val unitName = if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
                                 val categoryName = if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
                                 val qtyLastMonth = if (!productObj.isNull("quantity_last_month")) productObj.getInt("quantity_last_month") else 0
-                                val availableStock = if (!productObj.isNull("current_available_stock")) productObj.getInt("current_available_stock") else 0
+                                //val availableStock = if (!productObj.isNull("current_available_stock")) productObj.getInt("current_available_stock") else 0
+                                val availableStock = productArray.length() -i
                                 var price = 0.0
                                 if (!productObj.isNull("price")) {
                                     price = productObj.getDouble("price")
@@ -248,6 +313,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                             if (productsList!!.size > 0){
+                                productsList!!.sortBy { it.product_name }
+                                sortTitle!!.setText(resources.getString(R.string.atoz))
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 recylerView!!.adapter = adapter
                                 adapter!!.notifyDataSetChanged()

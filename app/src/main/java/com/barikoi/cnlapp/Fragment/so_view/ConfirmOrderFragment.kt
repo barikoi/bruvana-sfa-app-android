@@ -101,7 +101,7 @@ class ConfirmOrderFragment : Fragment() {
                 val orderObj = JSONObject()
                 orderObj.put("outlet_id", orderList[i].outletId)
                 orderObj.put("sr_id", user_id)
-                orderObj.put("ordered_at", "2022-10-25 09:22:00")
+                //orderObj.put("ordered_at", "2022-10-25 09:22:00")
                 orderObj.put("distributor_office_code", orderList[i].distOfficeCode)
                 orderObj.put("grand_total", orderList[i].grandTotal)
                 orderObj.put("longitude", orderList[i].longitude)
