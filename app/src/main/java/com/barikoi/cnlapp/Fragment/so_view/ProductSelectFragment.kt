@@ -34,6 +34,7 @@ import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.RoomDb.OrderList
+import com.barikoi.cnlapp.RoomDb.SaveOrder
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
@@ -296,8 +297,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val unitName = if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
                                 val categoryName = if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
                                 val qtyLastMonth = if (!productObj.isNull("quantity_last_month")) productObj.getInt("quantity_last_month") else 0
-                                //val availableStock = if (!productObj.isNull("current_available_stock")) productObj.getInt("current_available_stock") else 0
-                                val availableStock = productArray.length() -i
+                                val availableStock = if (!productObj.isNull("current_available_stock")) productObj.getInt("current_available_stock") else 0
                                 var price = 0.0
                                 if (!productObj.isNull("price")) {
                                     price = productObj.getDouble("price")
@@ -384,7 +384,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }*/
         var itemCount = 0
         var grandTotal = 0.0
-        val viewItem: View = recylerView!!.getChildAt(position)
+        /*val viewItem: View = recylerView!!.getChildAt(position)
         val etCount = viewItem.findViewById<View>(R.id.tvCount) as EditText
         //val tvUnitPrice = viewItem.findViewById<View>(R.id.tvPerUnit) as TextView
         //itemCount = itemCount + etCount.text.toString().toInt()
@@ -392,66 +392,118 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val tvSubTotal = viewItem.findViewById<TextView>(R.id.tvTotalPrice) as TextView
         //grandTotal = grandTotal + tvUnitPrice.text.toString().toDouble()
         try {
-
             for (i in 0 until recylerView!!.adapter!!.itemCount) {
                 Log.d("Product", "all Item: "+adapter!!.itemCount)
                 Log.d("Product", "view Item: "+i)
-                val viewItem1: View = recylerView!!.getChildAt(i)
+                *//*val viewItem1: View = recylerView!!.getChildAt(i)
                 val etCount1 = viewItem1.findViewById<View>(R.id.tvCount) as EditText
                 val tvUnitPrice1 = viewItem1.findViewById<View>(R.id.tvPerUnit) as TextView
                 itemCount = itemCount + etCount1.text.toString().toInt()
 
                 val tvSubTotal1 = viewItem1.findViewById<TextView>(R.id.tvTotalPrice) as TextView
+                grandTotal = grandTotal + tvSubTotal1.text.toString().toDouble()*//*
+
+                val viewItem1: RecyclerView.ViewHolder? = adapter!!.mRecyclerView.findViewHolderForAdapterPosition(i)
+                val itemView: View = viewItem1!!.itemView
+                val etCount1 = itemView.findViewById<View>(R.id.tvCount) as EditText
+                val tvUnitPrice1 = itemView.findViewById<View>(R.id.tvPerUnit) as TextView
+                itemCount = itemCount + etCount1.text.toString().toInt()
+
+                val tvSubTotal1 = itemView.findViewById<TextView>(R.id.tvTotalPrice) as TextView
                 grandTotal = grandTotal + tvSubTotal1.text.toString().toDouble()
             }
-
-
 
         }catch (e:Exception){
             Log.d("Product", "exception: "+e.message+" "+position)
             e.printStackTrace()
         }
-        if (addedProducts!!.size > 0){
-            for (j in 0 until addedProducts!!.size){
-                if (addedProducts!![j].product_id.equals(products.product_id)){
-                    addedProducts!!.removeAt(j)
-                    /*addedProducts!!.add(Products(
-                        products.product_id, products.product_name,
-                        products.product_code, products.brand_id,
-                        products.brand_name, products.unit_price,
-                        products.discount, products.imageUrl,
-                        products.unit_name, products.category_name,
-                        products.quantity_last_month,
-                        products.stock_available, etCount.text.toString().toInt(), dformat.format(tvSubTotal.text.toString().toDouble()).toDouble()
-                    ))*/
-                }else{
-                    addedProducts!!.add(Products(
-                        products.product_id, products.product_name,
-                        products.product_code, products.brand_id,
-                        products.brand_name, products.unit_price,
-                        products.discount, products.imageUrl,
-                        products.unit_name, products.category_name,
-                        products.quantity_last_month,
-                        products.stock_available, etCount.text.toString().toInt(), dformat.format(tvSubTotal.text.toString().toDouble()).toDouble()
-                    ))
+        try{
+            if (addedProducts!!.size > 0){
+                for (j in 0 until addedProducts!!.size){
+                    if (addedProducts!![j].product_id.equals(products.product_id)){
+                        addedProducts!!.removeAt(j)
+                        *//*addedProducts!!.add(Products(
+                            products.product_id, products.product_name,
+                            products.product_code, products.brand_id,
+                            products.brand_name, products.unit_price,
+                            products.discount, products.imageUrl,
+                            products.unit_name, products.category_name,
+                            products.quantity_last_month,
+                            products.stock_available, etCount.text.toString().toInt(), dformat.format(tvSubTotal.text.toString().toDouble()).toDouble()
+                        ))*//*
+                    }else{
+                        addedProducts!!.add(Products(
+                            products.product_id, products.product_name,
+                            products.product_code, products.brand_id,
+                            products.brand_name, products.unit_price,
+                            products.discount, products.imageUrl,
+                            products.unit_name, products.category_name,
+                            products.quantity_last_month,
+                            products.stock_available, etCount.text.toString().toInt(), dformat.format(tvSubTotal.text.toString().toDouble()).toDouble()
+                        ))
+                    }
                 }
+            }else{
+                addedProducts!!.add(Products(
+                    products.product_id, products.product_name,
+                    products.product_code, products.brand_id,
+                    products.brand_name, products.unit_price,
+                    products.discount, products.imageUrl,
+                    products.unit_name, products.category_name,
+                    products.quantity_last_month,
+                    products.stock_available, etCount.text.toString().toInt(), dformat.format(grandTotal).toDouble()
+                ))
             }
+        }catch (e: Exception){
+            Log.d("Product", "exception 2: "+e.message+" "+position)
+            e.printStackTrace()
+        }*/
+        val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+        itemCount = prodList!![0].itemsCount
+        grandTotal = prodList[0].totalPrice
+        if (itemCount == 1 || itemCount == 0){
+            totalItemCount!!.setText(itemCount.toString()+"Item")
         }else{
-            addedProducts!!.add(Products(
-                products.product_id, products.product_name,
-                products.product_code, products.brand_id,
-                products.brand_name, products.unit_price,
-                products.discount, products.imageUrl,
-                products.unit_name, products.category_name,
-                products.quantity_last_month,
-                products.stock_available, etCount.text.toString().toInt(), dformat.format(grandTotal).toDouble()
-            ))
+            totalItemCount!!.setText(itemCount.toString()+"Items")
         }
-        totalItemCount!!.setText(itemCount.toString()+"Items")
+        try{
+            if (addedProducts!!.size > 0){
+                for (j in 0 until addedProducts!!.size){
+                    if (addedProducts!![j].product_id.equals(products.product_id)){
+                        addedProducts!!.removeAt(j)
+
+                    }else{
+                        addedProducts!!.add(Products(
+                            products.product_id, products.product_name,
+                            products.product_code, products.brand_id,
+                            products.brand_name, products.unit_price,
+                            products.discount, products.imageUrl,
+                            products.unit_name, products.category_name,
+                            products.quantity_last_month,
+                            products.stock_available, products.ordered_quantity, products.ordered_total_price
+                        ))
+                    }
+                }
+            }else{
+                addedProducts!!.add(Products(
+                    products.product_id, products.product_name,
+                    products.product_code, products.brand_id,
+                    products.brand_name, products.unit_price,
+                    products.discount, products.imageUrl,
+                    products.unit_name, products.category_name,
+                    products.quantity_last_month,
+                    products.stock_available, products.ordered_quantity, products.ordered_total_price
+                ))
+            }
+        }catch (e: Exception){
+            Log.d("Product", "exception 2: "+e.message+" "+position)
+            e.printStackTrace()
+        }
         tvgrandTotal!!.setText("Total "+dformat.format(grandTotal).toString())
         totalAmount = dformat.format(grandTotal).toString()
 
     }
+
 
 
 }

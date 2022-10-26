@@ -103,7 +103,7 @@
             android:paddingRight="8dp"
             android:layout_marginRight="8dp"
             android:textColor="@color/black"
-            android:text="0Items"
+            android:text="0Item"
             android:textStyle="bold"
             android:textSize="12sp"
             android:layout_alignParentLeft="true" />

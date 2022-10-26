@@ -15,6 +15,6 @@ class Products(
     val category_name: String,
     val quantity_last_month: Int,
     val stock_available: Int,
-    val ordered_quantity: Int,
-    val ordered_total_price: Double
+    var ordered_quantity: Int,
+    var ordered_total_price: Double
 ): Serializable

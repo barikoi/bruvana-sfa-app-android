@@ -8,11 +8,12 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 
-@Database(entities = {OrderList.class}, version = 1, exportSchema = false)
+@Database(entities = {OrderList.class, SaveOrder.class}, version = 2, exportSchema = false)
 @TypeConverters(DataConvertor.class)
 public abstract class AppDatabase extends RoomDatabase {
 
 	public abstract OrderListDao orderListDao();
+	public abstract SaveOrderDao saveOrderDao();
 
 	public static AppDatabase INSTANCE;
 	private static final Object sLock = new Object();
