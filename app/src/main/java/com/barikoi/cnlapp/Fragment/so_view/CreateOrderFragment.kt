@@ -12,6 +12,7 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnBackPressedListener
+import java.io.Serializable
 
 class CreateOrderFragment : Fragment(), OnBackPressedListener{
     lateinit var ACTIVITY: MainActivity
@@ -44,8 +45,9 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
     }*/
 
     companion object{
-        fun startFragmentWithValue(key: String, value: Shops, fragmentName: Fragment, activity: Activity){
+        fun startFragmentWithValue(key: String, value: Serializable, fragmentName: Fragment, activity: Activity){
             val bundle = Bundle()
+            bundle.putString("from", key)
             bundle.putSerializable(key, value) // Put anything what you want
 
             val fragment = fragmentName

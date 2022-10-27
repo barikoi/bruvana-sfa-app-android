@@ -19,4 +19,7 @@ interface OrderListDao {
 
     @Query("DELETE FROM OrderList WHERE OutletId =:shopId")
     fun deleteByShop(shopId: String)
+
+    @Query("DELETE FROM OrderList")
+    fun deleteALL()
 }

@@ -18,4 +18,4 @@ data class OrderList (
         @ColumnInfo(name = "Latitude") var latitude: String,
         @ColumnInfo(name = "Longitude") var longitude: String,
         @TypeConverters(DataConvertor::class) var brands_array: ArrayList<Products>
-        )
+        ):Serializable

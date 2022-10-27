@@ -84,21 +84,28 @@ Filterable{
             /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
             holder.tvSubtoal.text = subtotal.toString()*/
             val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
-            if (prodList!!.size > 0){
-                appDatabase.saveOrderDao().update(
-                    prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                    prodList[0].itemsCount+1, prodList[0].totalPrice+productObj.unit_price
-                )
-            }else{
-                appDatabase.saveOrderDao().insertAll(
-                    SaveOrder(
-                        null,
+            try {
+                if (prodList!!.size > 0){
+                    Log.d("Product", "item count add: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
+                    appDatabase.saveOrderDao().update(
                         prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                        holder.productCount.text.toString().toInt(),
-                        holder.tvSubtoal.text.toString().toDouble()
+                        prodList[0].itemsCount + 1,
+                        prodList[0].totalPrice+productObj.unit_price
                     )
-                )
+                }else{
+                    appDatabase.saveOrderDao().insertAll(
+                        SaveOrder(
+                            null,
+                            prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
+                            holder.productCount.text.toString().toInt(),
+                            holder.tvSubtoal.text.toString().toDouble()
+                        )
+                    )
+                }
+            }catch (e:Exception){
+                Log.d("Product", "exception: "+e.message)
             }
+
 
             mListener.onValueChanged(productList[position], position)
         }
@@ -110,9 +117,11 @@ Filterable{
             holder.tvSubtoal.text = subtotal.toString()*/
             val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
             if (prodList!!.size > 0){
+                Log.d("Product", "item count minus: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
                 appDatabase.saveOrderDao().update(
                     prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                    prodList[0].itemsCount-1, prodList[0].totalPrice-productObj.unit_price
+                    prodList[0].itemsCount-1,
+                    prodList[0].totalPrice-productObj.unit_price
                 )
             }else{
                 appDatabase.saveOrderDao().insertAll(

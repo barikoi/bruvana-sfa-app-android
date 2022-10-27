@@ -38,6 +38,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.Utils.ViewUtils.showGPSDisabledAlertToUser
 import com.barikoi.cnlapp.callback.DialogListener
+import com.barikoi.cnlapp.callback.OnEditOrderListener
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import org.json.JSONArray
@@ -46,7 +47,7 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 
-class ConfirmOrderFragment : Fragment() {
+class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
     var recylerView: RecyclerView? = null
     lateinit var ACTIVITY: MainActivity
@@ -60,6 +61,7 @@ class ConfirmOrderFragment : Fragment() {
     var allorderList: List<OrderList> ? = null
     private var mFusedLocationClient: FusedLocationProviderClient? = null
     private var mLocationCallback: LocationCallback? = null
+    private var listener: OnEditOrderListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +139,8 @@ class ConfirmOrderFragment : Fragment() {
             { response ->
                 try {
                     Log.d("ConfirmOrder", "response api: "+response)
+                    appDatabase!!.orderListDao().deleteALL()
+                    appDatabase!!.saveOrderDao().deleteALL()
                     CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -177,7 +181,7 @@ class ConfirmOrderFragment : Fragment() {
         //allorderList = appDatabase!!.orderListDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
         allorderList = appDatabase!!.orderListDao().getAllOrders()
         if (allorderList!!.size > 0){
-            val adapter = ConfirmOrderListAdapter(allorderList!!)
+            val adapter = ConfirmOrderListAdapter(allorderList!!, listener!!)
             recylerView!!.adapter = adapter
             adapter.notifyDataSetChanged()
         }
@@ -235,9 +239,13 @@ class ConfirmOrderFragment : Fragment() {
         user_id = prefs!!.getString(Api.USER_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
-
+        listener = this
         ACTIVITY = context as MainActivity
 
+    }
+
+    override fun onEdit(order: OrderList) {
+        CreateOrderFragment.startFragmentWithValue("Order", order, ProductSelectFragment(), ACTIVITY)
     }
 
 }

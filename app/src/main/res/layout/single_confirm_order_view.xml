@@ -7,18 +7,37 @@
     android:layout_margin="8dp"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvShopName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/black"
-        android:text="Shop Name"
-        android:textStyle="bold"
-        android:textSize="17sp"
-        android:layout_marginRight="16dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvShopName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="8dp"
+            android:maxWidth="250dp"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:textColor="@color/black"
+            android:text="Jalil General Store"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginRight="4dp" />
+        <ImageView
+            android:id="@+id/btn_edit"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/tvShopName"
+            android:src="@drawable/ic_edit_button"
+            android:layout_marginStart="4dp">
+
+        </ImageView>
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productlist"
         android:layout_width="match_parent"
@@ -29,7 +48,17 @@
         tools:listitem="@layout/single_confirm_order_product_listview">
 
     </androidx.recyclerview.widget.RecyclerView>
-
+    <TextView
+        android:id="@+id/tvAddMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/red"
+        android:text="Add more item"
+        android:textStyle="bold"
+        android:textSize="12sp"
+        android:layout_marginRight="8dp" />
     <LinearLayout
         android:id="@+id/layoutSubTotal"
         android:layout_width="wrap_content"

@@ -20,7 +20,10 @@ interface SaveOrderDao {
     @Query("DELETE FROM SaveOrder WHERE OutletId =:shopId")
     fun deleteByShop(shopId: String)
 
-    @Query("UPDATE SaveOrder SET Items=:count AND TotalPrice=:price WHERE OutletId =:shopId")
+    @Query("DELETE FROM SaveOrder")
+    fun deleteALL()
+
+    @Query("UPDATE SaveOrder SET Items=:count, TotalPrice=:price WHERE OutletId =:shopId")
     fun update(shopId: String?, count: Int?, price: Double?)
 
 }

@@ -63,6 +63,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var queue: RequestQueue? = null
     var user_id : String? = null
     var selectedShop : Shops? =  null
+    var selectedOrder : OrderList? =  null
     var shopName : String? =  null
     var listener: OnValueChangeListener? = null
     var et_search: AutoCompleteTextView? = null
@@ -85,8 +86,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val bundle = this.arguments
 
         if (bundle != null) {
-            selectedShop = bundle.getSerializable(Api.SELECTED_SHOP) as Shops?
-            shopName = selectedShop!!.shop_name
+            if (bundle.containsKey("from")){
+                if (bundle.getString("from").equals("Shop")){
+                    selectedShop = bundle.getSerializable("Shop") as Shops?
+                    shopName = selectedShop!!.shop_name
+                    addedProducts!!.clear()
+                }else if (bundle.getString("from").equals("Order")){
+                    selectedOrder = bundle.getSerializable("Order") as OrderList?
+                    shopName = selectedOrder!!.outletName
+                    addedProducts!!.clear()
+                }
+            }
+
         }
 
     }
@@ -221,7 +232,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 selectedShop!!.shop_name,
                 selectedShop!!.route_code,
                 selectedShop!!.distributor_office_code, totalAmount!!,
-                latitude.toString(), longitude.toString(), addedProducts!!))
+                location.latitude.toString(), location.longitude.toString(), addedProducts!!))
         }
 
         CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
@@ -285,8 +296,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         if (productArray.length() > 0){
                             productsList!!.clear()
                             for (i in 0 until productArray.length()) {
+                                var orderedQty = 0
+                                var orderedTotalPrice = 0.0
                                 val productObj = productArray.getJSONObject(i)
-
+                                val productId = productObj.getString("id")
                                 val productName = if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
                                 val productCode = if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
                                 val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
@@ -304,10 +317,23 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 } else {
                                     price = 0.0
                                 }
+                                if (selectedOrder != null){
+                                    var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
+                                    if (orderlistDB!!.size > 0){
+                                        val exist = orderlistDB[0].brands_array.find {
+                                            it.product_id == productId
+                                        }
+
+                                        if (exist != null){
+                                            orderedQty = exist.ordered_quantity
+                                            orderedTotalPrice = exist.ordered_total_price
+                                        }
+                                    }
+                                }
                                 val products = Products(
-                                    productObj.getString("id"),
+                                    productId,
                                     productName, productCode, brandId, brandName, price, discount, image, unitName, categoryName,
-                                    qtyLastMonth, availableStock, 0, 0.0)
+                                    qtyLastMonth, availableStock, orderedQty, orderedTotalPrice)
 
                                 productsList!!.add(products)
                             }
@@ -371,93 +397,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         mContext = context
         listener = this
 
-        addedProducts!!.clear()
+
 
         ACTIVITY = context as MainActivity
     }
 
     override fun onValueChanged(products: Products, position: Int) {
         var dformat = DecimalFormat("#.##")
-        Log.d("Product", "item: "+recylerView!!.adapter!!.itemCount)
-        /*for (i in 0 until recylerView!!.adapter!!.itemCount) {
-
-        }*/
         var itemCount = 0
         var grandTotal = 0.0
-        /*val viewItem: View = recylerView!!.getChildAt(position)
-        val etCount = viewItem.findViewById<View>(R.id.tvCount) as EditText
-        //val tvUnitPrice = viewItem.findViewById<View>(R.id.tvPerUnit) as TextView
-        //itemCount = itemCount + etCount.text.toString().toInt()
-
-        val tvSubTotal = viewItem.findViewById<TextView>(R.id.tvTotalPrice) as TextView
-        //grandTotal = grandTotal + tvUnitPrice.text.toString().toDouble()
-        try {
-            for (i in 0 until recylerView!!.adapter!!.itemCount) {
-                Log.d("Product", "all Item: "+adapter!!.itemCount)
-                Log.d("Product", "view Item: "+i)
-                *//*val viewItem1: View = recylerView!!.getChildAt(i)
-                val etCount1 = viewItem1.findViewById<View>(R.id.tvCount) as EditText
-                val tvUnitPrice1 = viewItem1.findViewById<View>(R.id.tvPerUnit) as TextView
-                itemCount = itemCount + etCount1.text.toString().toInt()
-
-                val tvSubTotal1 = viewItem1.findViewById<TextView>(R.id.tvTotalPrice) as TextView
-                grandTotal = grandTotal + tvSubTotal1.text.toString().toDouble()*//*
-
-                val viewItem1: RecyclerView.ViewHolder? = adapter!!.mRecyclerView.findViewHolderForAdapterPosition(i)
-                val itemView: View = viewItem1!!.itemView
-                val etCount1 = itemView.findViewById<View>(R.id.tvCount) as EditText
-                val tvUnitPrice1 = itemView.findViewById<View>(R.id.tvPerUnit) as TextView
-                itemCount = itemCount + etCount1.text.toString().toInt()
-
-                val tvSubTotal1 = itemView.findViewById<TextView>(R.id.tvTotalPrice) as TextView
-                grandTotal = grandTotal + tvSubTotal1.text.toString().toDouble()
-            }
-
-        }catch (e:Exception){
-            Log.d("Product", "exception: "+e.message+" "+position)
-            e.printStackTrace()
-        }
-        try{
-            if (addedProducts!!.size > 0){
-                for (j in 0 until addedProducts!!.size){
-                    if (addedProducts!![j].product_id.equals(products.product_id)){
-                        addedProducts!!.removeAt(j)
-                        *//*addedProducts!!.add(Products(
-                            products.product_id, products.product_name,
-                            products.product_code, products.brand_id,
-                            products.brand_name, products.unit_price,
-                            products.discount, products.imageUrl,
-                            products.unit_name, products.category_name,
-                            products.quantity_last_month,
-                            products.stock_available, etCount.text.toString().toInt(), dformat.format(tvSubTotal.text.toString().toDouble()).toDouble()
-                        ))*//*
-                    }else{
-                        addedProducts!!.add(Products(
-                            products.product_id, products.product_name,
-                            products.product_code, products.brand_id,
-                            products.brand_name, products.unit_price,
-                            products.discount, products.imageUrl,
-                            products.unit_name, products.category_name,
-                            products.quantity_last_month,
-                            products.stock_available, etCount.text.toString().toInt(), dformat.format(tvSubTotal.text.toString().toDouble()).toDouble()
-                        ))
-                    }
-                }
-            }else{
-                addedProducts!!.add(Products(
-                    products.product_id, products.product_name,
-                    products.product_code, products.brand_id,
-                    products.brand_name, products.unit_price,
-                    products.discount, products.imageUrl,
-                    products.unit_name, products.category_name,
-                    products.quantity_last_month,
-                    products.stock_available, etCount.text.toString().toInt(), dformat.format(grandTotal).toDouble()
-                ))
-            }
-        }catch (e: Exception){
-            Log.d("Product", "exception 2: "+e.message+" "+position)
-            e.printStackTrace()
-        }*/
         val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
         itemCount = prodList!![0].itemsCount
         grandTotal = prodList[0].totalPrice
@@ -467,23 +415,24 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             totalItemCount!!.setText(itemCount.toString()+"Items")
         }
         try{
-            if (addedProducts!!.size > 0){
-                for (j in 0 until addedProducts!!.size){
-                    if (addedProducts!![j].product_id.equals(products.product_id)){
-                        addedProducts!!.removeAt(j)
+            Log.d("Product", "addedProducts size: "+addedProducts!!.size)
+            //val exists = products.product_id in arrayOf(addedProducts)
+            val exists = addedProducts?.find {
+                it.product_id == products.product_id
+            }
+            Log.d("Product", "addedProducts size: "+exists)
+            if (exists != null){
+                addedProducts!!.remove(exists)
+                addedProducts!!.add(Products(
+                    products.product_id, products.product_name,
+                    products.product_code, products.brand_id,
+                    products.brand_name, products.unit_price,
+                    products.discount, products.imageUrl,
+                    products.unit_name, products.category_name,
+                    products.quantity_last_month,
+                    products.stock_available, products.ordered_quantity, products.ordered_total_price
+                ))
 
-                    }else{
-                        addedProducts!!.add(Products(
-                            products.product_id, products.product_name,
-                            products.product_code, products.brand_id,
-                            products.brand_name, products.unit_price,
-                            products.discount, products.imageUrl,
-                            products.unit_name, products.category_name,
-                            products.quantity_last_month,
-                            products.stock_available, products.ordered_quantity, products.ordered_total_price
-                        ))
-                    }
-                }
             }else{
                 addedProducts!!.add(Products(
                     products.product_id, products.product_name,
