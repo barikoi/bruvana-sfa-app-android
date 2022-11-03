@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Fragment.so_view
+package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.Manifest
 import android.content.Context
@@ -28,18 +28,17 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Adapter.so_view.ProductListAdapter
+import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.RoomDb.OrderList
-import com.barikoi.cnlapp.RoomDb.SaveOrder
+import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import com.barikoi.cnlapp.callback.DialogListener
-import com.barikoi.cnlapp.callback.OnValueChangeListener
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import org.json.JSONException
@@ -202,7 +201,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
-            ViewUtils.viewDialog(mContext!!, "Are you sure want to save "+shopName+"'s order?", object : DialogListener{
+            ViewUtils.viewDialog(mContext!!, "Are you sure want to save "+shopName+"'s order?", object :
+                DialogListener {
                 override fun onConfirmed() {
                     getLocation()
                 }
@@ -220,19 +220,23 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val orderListDB = appDatabase!!.orderListDao().getOrdersDB(selectedShop!!.shop_id)
         if (orderListDB!!.size > 0){
             appDatabase!!.orderListDao().deleteByShop(selectedShop!!.shop_id)
-            appDatabase!!.orderListDao().insertAll(OrderList(null,
+            appDatabase!!.orderListDao().insertAll(
+                OrderList(null,
                 selectedShop!!.shop_id.toInt(),
                 selectedShop!!.shop_name,
                 selectedShop!!.route_code,
                 selectedShop!!.distributor_office_code, totalAmount!!,
-                location.latitude.toString(), location.longitude.toString(), addedProducts!!))
+                location.latitude.toString(), location.longitude.toString(), addedProducts!!)
+            )
         }else{
-            appDatabase!!.orderListDao().insertAll(OrderList(null,
+            appDatabase!!.orderListDao().insertAll(
+                OrderList(null,
                 selectedShop!!.shop_id.toInt(),
                 selectedShop!!.shop_name,
                 selectedShop!!.route_code,
                 selectedShop!!.distributor_office_code, totalAmount!!,
-                location.latitude.toString(), location.longitude.toString(), addedProducts!!))
+                location.latitude.toString(), location.longitude.toString(), addedProducts!!)
+            )
         }
 
         CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
@@ -423,7 +427,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             Log.d("Product", "addedProducts size: "+exists)
             if (exists != null){
                 addedProducts!!.remove(exists)
-                addedProducts!!.add(Products(
+                addedProducts!!.add(
+                    Products(
                     products.product_id, products.product_name,
                     products.product_code, products.brand_id,
                     products.brand_name, products.unit_price,
@@ -431,10 +436,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     products.unit_name, products.category_name,
                     products.quantity_last_month,
                     products.stock_available, products.ordered_quantity, products.ordered_total_price
-                ))
+                )
+                )
 
             }else{
-                addedProducts!!.add(Products(
+                addedProducts!!.add(
+                    Products(
                     products.product_id, products.product_name,
                     products.product_code, products.brand_id,
                     products.brand_name, products.unit_price,
@@ -442,7 +449,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     products.unit_name, products.category_name,
                     products.quantity_last_month,
                     products.stock_available, products.ordered_quantity, products.ordered_total_price
-                ))
+                )
+                )
             }
         }catch (e: Exception){
             Log.d("Product", "exception 2: "+e.message+" "+position)

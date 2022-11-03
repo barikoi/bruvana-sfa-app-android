@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Adapter.so_view
+package com.barikoi.cnlapp.Order_Create.Adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.RoomDb.OrderList
-import com.barikoi.cnlapp.callback.OnEditOrderListener
+import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
+import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 
 class ConfirmOrderListAdapter(mValues: List<OrderList>, var mListener: OnEditOrderListener): RecyclerView.Adapter<ConfirmOrderListAdapter.ViewHolder>() {
     var orderList: List<OrderList> = mValues

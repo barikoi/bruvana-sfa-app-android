@@ -1,10 +1,9 @@
-package com.barikoi.cnlapp.Fragment.so_view
+package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -27,13 +26,13 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Adapter.so_view.ShopSelectAdapter
+import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.callback.OnSelectListener
+import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import org.json.JSONException

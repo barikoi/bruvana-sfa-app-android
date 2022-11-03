@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Adapter.so_view
+package com.barikoi.cnlapp.Order_Create.Adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -16,12 +16,12 @@ class ConfirmOrderProductListAdapter(var mValues: List<Products>):RecyclerView.A
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ConfirmOrderProductListAdapter.ViewHolder {
+    ): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_confirm_order_product_listview, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ConfirmOrderProductListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.productName.text = productList[position].product_name
         holder.addedProduct.text = productList[position].ordered_quantity.toString()

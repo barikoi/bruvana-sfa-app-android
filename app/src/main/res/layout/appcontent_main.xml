@@ -98,7 +98,7 @@
         android:padding="4dp"
         app:itemBackground="@drawable/bottom_nav_bg"
         app:itemIconSize="12dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:itemTextColor="@drawable/bottom_nav_style"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />

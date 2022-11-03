@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Adapter.so_view
+package com.barikoi.cnlapp.Order_Create.Adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +8,9 @@ import android.widget.Filterable
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.callback.OnSelectListener
+import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import java.util.*
 
 class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): RecyclerView.Adapter<ShopSelectAdapter.ViewHolder>(),
@@ -21,12 +20,12 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
     var mListener: OnSelectListener = mListener
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopSelectAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_shop_select_list, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ShopSelectAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.shopName.text= shopList[position].shop_name
         holder.ownerName.text = shopList[position].shop_owner
 

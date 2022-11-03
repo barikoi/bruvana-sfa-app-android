@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragment.so_view.ShopSelectFragment">
+    tools:context=".Order_Create.Fragment.ShopSelectFragment">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

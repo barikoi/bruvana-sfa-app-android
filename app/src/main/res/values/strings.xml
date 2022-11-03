@@ -2,8 +2,10 @@
     <string name="app_name">CNL App</string>
 
     <string name="title_home">Home</string>
-    <string name="title_map">Map</string>
+    <string name="title_route">Route</string>
+    <string name="title_attendance">Attendance</string>
     <string name="title_order">Order</string>
+    <string name="title_chat">Chat</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="mapbox_access_token" translatable="false">pk.test</string>

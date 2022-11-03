@@ -9,7 +9,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.callback.DialogListener
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 
 object ViewUtils {
 

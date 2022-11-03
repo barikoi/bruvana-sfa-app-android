@@ -3,13 +3,28 @@
 
     <item
         android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home_cnl"
+        android:icon="@drawable/ic_home"
         android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_map"
-        android:icon="@drawable/map"
-        android:title="@string/title_map" />
+        android:id="@+id/navigation_route"
+        android:icon="@drawable/ic_route"
+        android:title="@string/title_route" />
+
+    <item
+        android:id="@+id/navigation_order"
+        android:icon="@drawable/ic_order_collect"
+        android:title="@string/title_order" />
+    <item
+        android:id="@+id/navigation_chat"
+        android:icon="@drawable/ic_message"
+        android:title="@string/title_chat" />
+    <item
+        android:id="@+id/navigation_attendance"
+        android:icon="@drawable/ic_attendance"
+        android:title="@string/title_attendance" />
+
+
 
     <!--<item
         android:id="@+id/navigation_announcement"

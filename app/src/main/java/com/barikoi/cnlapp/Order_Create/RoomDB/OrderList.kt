@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.RoomDb
+package com.barikoi.cnlapp.Order_Create.RoomDB
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

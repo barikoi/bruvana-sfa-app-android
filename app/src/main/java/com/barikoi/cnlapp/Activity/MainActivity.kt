@@ -24,11 +24,10 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Fragment.HomeFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
-import com.barikoi.cnlapp.Fragment.so_view.CreateOrderFragment
+import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.callback.OnBackPressedListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
@@ -94,9 +93,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     setCurrentFragment(HomeFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
-                R.id.navigation_map -> {
+                R.id.navigation_route -> {
                     tvTitle!!.text = "Map"
-                    setCurrentFragment(MapFragment(), this@MainActivity)
+                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_order -> {
+                    tvTitle!!.text = "Map"
+                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_chat -> {
+                    tvTitle!!.text = "Map"
+                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_attendance -> {
+                    tvTitle!!.text = "Map"
+                    //setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 /*R.id.navigation_announcement -> {

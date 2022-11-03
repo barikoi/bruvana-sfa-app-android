@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Fragment.so_view
+package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.app.Activity
 import android.content.Context
@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnBackPressedListener
 import java.io.Serializable
@@ -45,16 +44,20 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
     }*/
 
     companion object{
-        fun startFragmentWithValue(key: String, value: Serializable, fragmentName: Fragment, activity: Activity){
+        fun startFragmentWithValue(
+            key: String,
+            value: Serializable,
+            fragmentName: Fragment,
+            activity: Activity
+        ) {
             val bundle = Bundle()
             bundle.putString("from", key)
             bundle.putSerializable(key, value) // Put anything what you want
 
-            val fragment = fragmentName
-            fragment.setArguments(bundle)
+            fragmentName.arguments = bundle
             val fragmentManager = (activity as FragmentActivity).supportFragmentManager
             fragmentManager.beginTransaction()
-                .replace(R.id.fragmentLayout, fragment)
+                .replace(R.id.fragmentLayout, fragmentName)
                 .commit()
         }
 

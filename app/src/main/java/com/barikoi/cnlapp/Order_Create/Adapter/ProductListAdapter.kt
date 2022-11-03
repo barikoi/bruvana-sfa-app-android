@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Adapter.so_view
+package com.barikoi.cnlapp.Order_Create.Adapter
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
@@ -12,13 +12,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.RoomDb.SaveOrder
+import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
 import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.callback.OnSelectListener
-import com.barikoi.cnlapp.callback.OnValueChangeListener
+import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
 import java.text.DecimalFormat
 import java.util.*
 
@@ -32,12 +30,12 @@ Filterable{
     private var prefs: SharedPreferences? = null
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductListAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_product_select_view, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ProductListAdapter.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         holder.setIsRecyclable(false)
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
         prefs = PreferenceManager.getDefaultSharedPreferences(holder.itemView.context)

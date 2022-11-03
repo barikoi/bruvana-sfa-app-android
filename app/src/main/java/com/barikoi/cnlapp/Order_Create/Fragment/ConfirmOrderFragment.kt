@@ -1,24 +1,20 @@
-package com.barikoi.cnlapp.Fragment.so_view
+package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.preference.PreferenceManager
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -29,16 +25,16 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Adapter.so_view.ConfirmOrderListAdapter
+import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.RoomDb.OrderList
+import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.Utils.ViewUtils.showGPSDisabledAlertToUser
-import com.barikoi.cnlapp.callback.DialogListener
-import com.barikoi.cnlapp.callback.OnEditOrderListener
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import org.json.JSONArray
@@ -79,7 +75,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         recylerView = view.findViewById(R.id.orderList)
 
         confirmOrder!!.setOnClickListener {
-            ViewUtils.viewDialog(mContext!!, "Are your sure want to confirm today's Order?", object : DialogListener {
+            ViewUtils.viewDialog(mContext!!, "Are your sure want to confirm today's Order?", object :
+                DialogListener {
                 override fun onConfirmed() {
                     createOrder()
                 }
@@ -245,7 +242,12 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     }
 
     override fun onEdit(order: OrderList) {
-        CreateOrderFragment.startFragmentWithValue("Order", order, ProductSelectFragment(), ACTIVITY)
+        CreateOrderFragment.startFragmentWithValue(
+            "Order",
+            order,
+            ProductSelectFragment(),
+            ACTIVITY
+        )
     }
 
 }
