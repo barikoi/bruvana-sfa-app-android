@@ -23,6 +23,7 @@ object Api {
     var logouturl = base_url + "logout"
     val route_outlet_list = base_url+"route-list"
     val verified_shop_list = base_url+"verified-outlets"
+
     val routes_withfilter = base_url+"routes"
     val all_product_list = base_url+"products"
     val confirm_order = base_url+"create-order"

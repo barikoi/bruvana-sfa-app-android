@@ -22,6 +22,8 @@ import androidx.fragment.app.FragmentActivity
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.cnlapp.Attendance.Fragment.AttendanceFragment
+import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
 import com.barikoi.cnlapp.Fragment.HomeFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
@@ -31,6 +33,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.appcontent_main.*
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -57,9 +60,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")
         userName = prefs!!.getString(Api.NAME, "")
-        tvTitle = findViewById(R.id.tvTitle)
+        //tvTitle = findViewById(R.id.tvTitle)
         nav_view = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
         //nav_view!!.setSelectedItemId(R.id.navigation_map)
+
+        nav_view!!.background = null
+        nav_view!!.menu.getItem(2).isEnabled = false
+        nav_view!!.menu.getItem(2).isVisible = false
 
         navigationDrawer = findViewById(R.id.nav_view)
         navigationDrawer!!.setNavigationItemSelectedListener(this)
@@ -77,40 +84,43 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             )
         })
 
-        tvTitle!!.text = "Create Order"
-        setCurrentFragment(CreateOrderFragment(), this@MainActivity)
+        //tvTitle!!.text = "Create Order"
+        setCurrentFragment(HomeFragment(), this@MainActivity)
 
         val header = navigationDrawer!!.getHeaderView(0)
         tvUserName = header.findViewById<TextView>(R.id.textView_username)
         tvUserName!!.text = userName
 
         //setCurrentFragment(HomeFragment(), this@MainActivity)
+        fab_order.setOnClickListener {
+            setCurrentFragment(CreateOrderFragment(), this@MainActivity)
+        }
 
         nav_view!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    tvTitle!!.text = "Home"
+                    //tvTitle!!.text = "Home"
                     setCurrentFragment(HomeFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_route -> {
-                    tvTitle!!.text = "Map"
+                    //tvTitle!!.text = "Map"
                     //setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_order -> {
-                    tvTitle!!.text = "Map"
+                    //tvTitle!!.text = "Map"
                     //setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_chat -> {
-                    tvTitle!!.text = "Map"
-                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                    //tvTitle!!.text = "Map"
+                    setCurrentFragment(ChatFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_attendance -> {
-                    tvTitle!!.text = "Map"
-                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                    //tvTitle!!.text = "Map"
+                    setCurrentFragment(AttendanceFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 /*R.id.navigation_announcement -> {

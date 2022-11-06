@@ -12,10 +12,16 @@
     <color name="btn_color">#1DC9A0</color>
     <color name="black_light">#73000000</color>
 
+    <color name="background_app">#F3F3F3</color>
+    <color name="fab_icon">#9DB2CE</color>
+
     <color name="colorPrimary">#00DE97</color>
     <color name="colorPrimaryDark">#00B56F</color>
     <color name="colorprimarytemp">#43bc5d</color>
     <color name="colorAccent">#3cee83</color>
+
+    <color name="cnl_color_1">#F79A59</color>
+    <color name="cnl_color_2">#0D9347</color>
 
     <color name="color_gray_depp">#6D8890</color>
     <color name="color_gray_medium">#4F7270</color>
