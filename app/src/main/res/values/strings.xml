@@ -10,6 +10,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="mapbox_access_token" translatable="false">pk.test</string>
 
+    <string name="current_location">Current Location</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="todays_route">Today\'s Route</string>
+    <string name="remarks_late_reason">Remarks/ Late Reason</string>
+    <string name="type_your_reason_here">Type your reason here...</string>
+
     <string name="most_frequent">Most Frequent</string>
     <string name="low_stock">Low Stock</string>
     <string name="atoz">A to Z</string>
@@ -23,6 +29,10 @@
 
     <string name="confirm">Confirm</string>
     <string name="no">No</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+
+    <!--imageCapture-->
+    <string name="take_image">Take Image</string>
 </resources>

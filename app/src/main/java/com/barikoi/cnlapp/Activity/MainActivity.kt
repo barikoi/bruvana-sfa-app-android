@@ -22,10 +22,9 @@ import androidx.fragment.app.FragmentActivity
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Attendance.Fragment.AttendanceFragment
+import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
 import com.barikoi.cnlapp.Fragment.HomeFragment
-import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api

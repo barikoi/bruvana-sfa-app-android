@@ -7,7 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.barikoi.cnlapp.R
 
-class AttendanceFragment : Fragment() {
+
+class HistoryFragment : Fragment() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +23,7 @@ class AttendanceFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_attendance, container, false)
+        return inflater.inflate(R.layout.fragment_history, container, false)
     }
 
 }

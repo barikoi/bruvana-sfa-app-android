@@ -14,6 +14,9 @@
 
     <color name="background_app">#F3F3F3</color>
     <color name="fab_icon">#9DB2CE</color>
+    <color name="text_title">#CC1E1E1E</color>
+    <color name="text_title_2">#801E1E1E</color>
+    <color name="card_color">#80D4D4D4</color>
 
     <color name="colorPrimary">#00DE97</color>
     <color name="colorPrimaryDark">#00B56F</color>

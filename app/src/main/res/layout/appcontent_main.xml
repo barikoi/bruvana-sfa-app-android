@@ -123,7 +123,7 @@
             android:layout_marginEnd="0dp"
             android:background="@android:color/transparent"
             app:itemIconSize="16dp"
-            app:itemIconTint="@color/fab_icon"
+            app:itemIconTint="@drawable/bottom_nav_style"
             app:itemTextColor="@drawable/bottom_nav_style"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu" />
