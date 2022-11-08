@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.imagecapture.Model.ImageList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.imagecapture.RoomDb.AppDatabase
-import com.barikoi.cnlapp.imagecapture.Utils.Api
+import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import java.io.File
 
@@ -59,7 +59,7 @@ class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private v
             btnDelete.setOnClickListener { view1: View? ->
                 removeAt(holder.adapterPosition)
                 File(item.selectedPath).delete()
-                editor.putString(Api.IMAGE_PATH, "")
+                editor.putString(ApiCall.IMAGE_PATH, "")
                 //editor.putString(Api.FILE_NAME, "")
                 editor.apply()
                 Log.d("ImageAdapter", "selected pos: " +item.selectedPos)
@@ -83,12 +83,12 @@ class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private v
                 Log.d("ImageAdapter", "update pos i: " +i)
                 AppDatabase.getInstance(context)!!.imagesDao()!!.updatePosition(imagesList[i].filePath, i + 1)
                 if (i + 1 ==  imagesList.size) {
-                    editor.putInt(Api.IMAGE_POSITION, i + 1)
+                    editor.putInt(ApiCall.IMAGE_POSITION, i + 1)
                     editor.apply()
                 }
             }
         } else {
-            editor.putInt(Api.IMAGE_POSITION, 0)
+            editor.putInt(ApiCall.IMAGE_POSITION, 0)
             editor.apply()
         }
 

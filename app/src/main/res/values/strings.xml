@@ -33,6 +33,17 @@
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
 
+    <!--attendance history-->
+    <string name="market">Market: </string>
+    <string name="in">In</string>
+    <string name="out">Out</string>
+    <string name="date_range">Date Range</string>
+
+    <!--attendance summary-->
+    <string name="present">Present</string>
+    <string name="absent">Absent</string>
+    <string name="late">Late</string>
+
     <!--imageCapture-->
     <string name="take_image">Take Image</string>
 </resources>

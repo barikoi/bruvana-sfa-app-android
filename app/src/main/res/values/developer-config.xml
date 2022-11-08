@@ -19,10 +19,10 @@
 
     <!--<string name="map_view_styleUrl" translatable="false">https://map.barikoi.com/styles/osm-liberty/style.json</string>-->
     <!--<string name="map_view_styleUrl" translatable="false">https://geoserver.barikoi.com/styles/osm-liberty/style.json</string>-->
-    <string name="map_view_styleUrl" translatable="false">https://map.barikoi.com/styles/osm-liberty/style.json?key=MTU4NTpUQVk4WURFU1ZD</string>
-    <string name="map_view_bangla_styleUrl" translatable="false">https://map.barikoi.com/styles/barikoi-bangla/style.json?key=MTU4NTpUQVk4WURFU1ZD</string>
+    <string name="map_view_styleUrl" translatable="false">https://map.barikoi.com/styles/osm-liberty/style.json?key=NDI5MzpIQzBBRjZFQ1ZF</string>
+    <string name="map_view_bangla_styleUrl" translatable="false">https://map.barikoi.com/styles/barikoi-bangla/style.json?key=NDI5MzpIQzBBRjZFQ1ZF</string>
     <!-- The "day" style used for navigation -->
-    <string name="navigation_guidance_day" translatable="false">https://map.barikoi.com/styles/barikoi-bangla/style.json?key=MTU4NTpUQVk4WURFU1ZD</string>
+    <string name="navigation_guidance_day" translatable="false">https://map.barikoi.com/styles/barikoi-bangla/style.json?key=NDI5MzpIQzBBRjZFQ1ZF</string>
     <!-- The "night" style used for navigation -->
-    <string name="navigation_guidance_night" translatable="false">https://map.barikoi.com/styles/barikoi-bangla/style.json?key=MTU4NTpUQVk4WURFU1ZD</string>
+    <string name="navigation_guidance_night" translatable="false">https://map.barikoi.com/styles/barikoi-bangla/style.json?key=NDI5MzpIQzBBRjZFQ1ZF</string>
 </resources>

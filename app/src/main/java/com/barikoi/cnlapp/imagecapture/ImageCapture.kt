@@ -33,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.imagecapture.Model.ImageList
 import com.barikoi.cnlapp.imagecapture.RoomDb.AppDatabase
-import com.barikoi.cnlapp.imagecapture.Utils.Api
+import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import io.sentry.Sentry
 import java.io.File
 import java.io.IOException
@@ -168,8 +168,8 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         try {
             bitmap = getRotateImage(mCurrentPhotoPath)
             //Sentry.captureMessage("Add Image Clicked pos: "+position+" "+bitmap)
-            val lt = ImageList(bitmap, prefs.getString(Api.IMAGE_PATH, "")!!, position,
-                "captured_image", prefs.getString(Api.IMAGE_PATH, "")!!)
+            val lt = ImageList(bitmap, prefs.getString(ApiCall.IMAGE_PATH, "")!!, position,
+                "captured_image", prefs.getString(ApiCall.IMAGE_PATH, "")!!)
             imageItems.add(lt)
             imageRecyclerAdapter = ImageRecyclerAdapter(imageItems, taskId!!)
             mRecyclerView.adapter = imageRecyclerAdapter
@@ -491,7 +491,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
 
         Log.d("ImagePicker", "Image: $image")
         mCurrentPhotoPath = image.absolutePath
-        editor.putString(Api.IMAGE_PATH, mCurrentPhotoPath)
+        editor.putString(ApiCall.IMAGE_PATH, mCurrentPhotoPath)
         editor.apply()
         Log.d("ImagePicker", mCurrentPhotoPath)
         return image

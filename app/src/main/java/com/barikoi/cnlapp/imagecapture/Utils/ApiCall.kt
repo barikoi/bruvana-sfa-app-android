@@ -1,6 +1,6 @@
 package com.barikoi.cnlapp.imagecapture.Utils
 
-object Api {
+object ApiCall {
 
     val IMAGE_PATH = "image_path"
     val IMAGE_FILENAME = "image_filename"

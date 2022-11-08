@@ -167,7 +167,7 @@
                 android:text="@string/remarks_late_reason">
             </TextView>
             <EditText
-                android:id="@+id/editTextMessage"
+                android:id="@+id/editTextReason"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:ems="10"
@@ -198,7 +198,10 @@
         android:id="@+id/btnSubmit"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/cardview_bg"
         android:backgroundTint="@color/cnl_color_1"

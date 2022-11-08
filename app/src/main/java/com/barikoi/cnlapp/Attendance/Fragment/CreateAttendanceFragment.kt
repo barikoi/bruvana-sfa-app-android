@@ -1,35 +1,47 @@
 package com.barikoi.cnlapp.Attendance.Fragment
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.android.volley.NoConnectionError
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.TimeoutError
+import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.*
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.imagecapture.RoomDb.AppDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
-import com.barikoi.cnlapp.imagecapture.Utils.Api
+import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
+import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
 import java.io.UnsupportedEncodingException
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -47,9 +59,14 @@ class CreateAttendanceFragment : Fragment() {
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var user_id : String? = null
+    var token : String? = null
     var appDatabase: AppDatabase? = null
     private var isImageAdded = false
     private val CAMERA = 4
+    var selectedRoute: String = ""
+    var route_id: Int? = null
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
+    private var mLocationCallback: LocationCallback? = null
 
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
 
@@ -82,12 +99,13 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.setMainactivity(ACTIVITY)
         imagepicker.setFragmetnt(this)
 
-        //setDateFilter()
         getAllRoutes(com.barikoi.cnlapp.Utils.Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
 
         spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                val route_id = routeNameList!![p2].first
+                route_id = routeNameList!![p2].first.toInt()
+                selectedRoute = routeNameList!![p2].second
+
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -96,13 +114,149 @@ class CreateAttendanceFragment : Fragment() {
 
         }
 
+        getLocation("reversegeo")
+        imgRefresh.setOnClickListener {
+            rotateAnimation(imgRefresh, 0f, 380f)
+            getLocation("reversegeo")
+        }
         btnSubmit.setOnClickListener {
-            submitAttendance()
+            if (selectedRoute.length > 0 && isImageAdded){
+                getLocation("submit")
+            }else{
+                if (!isImageAdded){
+                    Toast.makeText(mContext, "Upload image for attendance", Toast.LENGTH_SHORT).show()
+                }
+                if (selectedRoute.length == 0){
+                    Toast.makeText(mContext, "Select route for attendance", Toast.LENGTH_SHORT).show()
+                }
+            }
+
         }
     }
 
-    private fun submitAttendance() {
+    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
+        // Create an animation instance
+        val an: Animation = RotateAnimation(
+            fromDegrees, toDegrees, (v.width / 2).toFloat(),
+            (v.height / 2).toFloat()
+        )
+        an.setDuration(500)
+        an.setFillAfter(true)
+        an.repeatMode = Animation.RESTART
+        //v.clearAnimation();
+        v.startAnimation(an)
+    }
 
+    fun submitAttendance(location: Location){
+        val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = java.util.HashMap()
+        var imagesList = ArrayList<Images>()
+        imagesList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images>
+        if (imagesList.size > 0) {
+            /*for (i in imagesList.indices) {
+                val fileExist = File(imagesList[i].filePath).canRead()
+                if (fileExist) {
+                    val imagename = imagesList[i].filePath.substring(
+                        imagesList[i].filePath.lastIndexOf("/")
+                    )
+                    byteparams["image"] = VolleyMultipartRequest.DataPart(
+                        imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
+                    )
+                }
+            }*/
+            val fileExist = File(imagesList[0].filePath).canRead()
+            if (fileExist) {
+                val imagename = imagesList[0].filePath.substring(
+                    imagesList[0].filePath.lastIndexOf("/")
+                )
+                byteparams["image"] = VolleyMultipartRequest.DataPart(
+                    imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
+                )
+            }
+        }
+        val params: MutableMap<String, String> = java.util.HashMap()
+        params["type"] = "checkin"
+        params["latitude"] = location.latitude.toString()
+        params["longitude"] = location.longitude.toString()
+        params["route_id"] = route_id.toString()
+        if(editTextReason.text.toString().length > 0) params["late_reason"] = editTextReason.text.toString()
+
+        ApiServices.apiPOSTMultipart(Api.create_attendance, mQueue!!, token!!, params, byteparams, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                appDatabase!!.imagesDao()!!.deleteAllImages()
+                val data = JSONObject(String(response.data))
+                val message = data.getString("message")
+                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+            }
+
+            @RequiresApi(Build.VERSION_CODES.KITKAT)
+            override fun onResponseFailure(error: VolleyError) {
+                val s = String(
+                    error.networkResponse.data,
+                    StandardCharsets.UTF_8
+                )
+                val data = JSONObject(s)
+                val message = data.getString("message")
+                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onException(e: Exception) {
+                Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+            }
+
+        })
+    }
+
+    fun getLocation(choice: String){
+        val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
+            val mLocationRequest = LocationRequest()
+            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            mLocationCallback = object : LocationCallback() {
+                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+                override fun onLocationResult(locationResult: LocationResult) {
+                    val location = locationResult.lastLocation
+                    if (!location.latitude.isNaN()) {
+                        if (!location.isFromMockProvider) {
+                            if (choice.equals("submit")){
+                                submitAttendance(location)
+                            }else if(choice.equals("reversegeo")){
+                                reverseGeoAddress(mContext!!, location.latitude, location.longitude)
+                            }
+
+                        } else {
+                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    } else {
+                        Toast.makeText(
+                            mContext!!.applicationContext,
+                            "Location not available $location", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
+            if (ActivityCompat.checkSelfPermission(
+                    mContext!!,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    mContext!!, Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+
+            }
+            mFusedLocationClient!!.requestLocationUpdates(
+                mLocationRequest, mLocationCallback!!,
+                Looper.myLooper()!!
+            )
+        } else {
+            ViewUtils.showGPSDisabledAlertToUser(mContext!!)
+        }
     }
 
     private fun getAllRoutes(url: String) {
@@ -175,83 +329,84 @@ class CreateAttendanceFragment : Fragment() {
         mQueue!!.add(request)
 
     }
-    /*private fun setDateFilter() {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -7)
-        val end = Calendar.getInstance().time
-        val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val StartDate = df.format(start)
-        val EndDate = df.format(end)
 
-        tvfilterDate.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
-        editor!!.putString(Api.STARTDATEAnnouncement, StartDate)
-        editor!!.putString(Api.ENDDATEAnnouncement, EndDate)
-        editor!!.commit()
-
-        val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
-        materialDateBuilder.setTitleText("SELECT A DATE")
-
-        val materialDatePicker = materialDateBuilder.build()
-
-        filter_layout.setOnClickListener(View.OnClickListener {
-            materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            filter_layout.setEnabled(false)
-        })
-
-        materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            filter_layout.setEnabled(true)
-            val s_date = Date(selection.first!!)
-            val e_date = Date(selection.second!!)
-            if (s_date.compareTo(e_date) == 0) {
-                tvfilterDate.setText(simpleFormat.format(s_date))
-                editor!!.putString(Api.STARTDATEAnnouncement, simpleFormat2.format(s_date))
-                editor!!.putString(Api.ENDDATEAnnouncement, simpleFormat2.format(s_date))
-                editor!!.commit()
-            } else {
-                tvfilterDate.setText(
-                    simpleFormat.format(s_date) + " - " + simpleFormat.format(
-                        e_date
-                    )
-                )
-                editor!!.putString(Api.STARTDATEAnnouncement, simpleFormat2.format(s_date))
-                editor!!.putString(Api.ENDDATEAnnouncement, simpleFormat2.format(e_date))
-                editor!!.commit()
+    fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
+        try {
+            val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
+            val request: StringRequest = object : StringRequest(
+                Method.GET,
+                Api.reverseGeo + "?key=" +Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+                Response.Listener { response: String? ->
+                    try {
+                        val data = JSONObject(response)
+                        val place = JSONObject(data.getString("place"))
+                        val address = place.getString("address")
+                        val city = place.getString("city")
+                        val area = place.getString("area")
+                        //address[0] = jsonArray.getJSONObject(0).getString("Address");
+                        tvLocation.text = address+", "+area+", "+city
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        Sentry.captureException(e)
+                    }
+                },
+                Response.ErrorListener { error: VolleyError ->
+                    Sentry.captureException(error)
+                    Log.d("MainActivity", "Error: " + error.message)
+                }) {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params: MutableMap<String, String> = HashMap()
+                    params["Accept"] = "application/json"
+                    return params
+                }
             }
-            *//*StartDate = df.format(s_date)
-            EndDate = df.format(e_date)
-            val titles = arrayOf("All", "Individual")
-            val fragments = java.util.ArrayList<Fragment>()
-            fragments.add(FragmentAll())
-            fragments.add(FragmentIndividual())
-            viewPager.adapter = ViewPagerAdapter(parentFragmentManager, lifecycle, fragments)
-            // attaching tab mediator
-            TabLayoutMediator(
-                tabLayout, viewPager
-            ) { tab: TabLayout.Tab, position: Int ->
-                tab.text = titles[position]
-            }.attach()
-            if (prefs!!.getInt(Api.ANNOUNCEMENT_PAGE_SELECTED, 0) == 0) {
-                viewPager.currentItem = 0
-            } else if (prefs!!.getInt(Api.ANNOUNCEMENT_PAGE_SELECTED, 0) == 1) {
-                viewPager.currentItem = 1
-            }
-            viewPager.isUserInputEnabled = false*//*
+            queue.add(request)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Sentry.captureException(e)
         }
+    }
 
-        materialDatePicker.addOnNegativeButtonClickListener { filter_layout.setEnabled(true) }
-    }*/
+    fun getErrorResponse(error: VolleyError){
+        if (error is TimeoutError) {
+            //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
+            Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+        }
+        if (error is NoConnectionError) {
+            //mListerner.onFailure("Turn on your internet connection and Try again")
+            Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+        }
+        if (error != null && error.networkResponse != null) {
+            try {
+                val s = String(error.networkResponse.data)
+                Log.d("Routes", "message: $s")
+                val data = JSONObject(s)
+                //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
+                //mListerner.onFailure(data.getString("message"))
+                Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
+            } catch (e: UnsupportedEncodingException) {
+                Sentry.captureException(e)
+                e.printStackTrace()
+            } catch (e: JSONException) {
+                //mListerner.onFailure(e.message)
+                Sentry.captureException(e)
+                Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+            }
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val filePath = prefs!!.getString(Api.IMAGE_PATH, "")
+        val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
 
         if (resultCode == Activity.RESULT_CANCELED) {
             if (filePath != null) {
                 //bottomSheetBehaviorinput.setState(BottomSheetBehavior.STATE_EXPANDED)
                 Log.d("Image", "Canceled: $filePath")
                 imagepicker.deleteFileLocal(filePath)
-                editor!!.putString(Api.IMAGE_PATH, "")
+                editor!!.putString(ApiCall.IMAGE_PATH, "")
                 editor!!.apply()
             }
             return
@@ -271,7 +426,7 @@ class CreateAttendanceFragment : Fragment() {
             try {
                 val placeImage = Images(
                     null, imagePosition,
-                    prefs!!.getString(Api.IMAGE_PATH, "")!!
+                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
                 )
                 isImageAdded = true
                 if (imagePosition > 0) {
@@ -279,7 +434,7 @@ class CreateAttendanceFragment : Fragment() {
                     Executors.newSingleThreadExecutor().execute {
                         appDatabase!!.imagesDao()!!.insertAll(placeImage)
                     }
-                    editor!!.putString(Api.IMAGE_PATH, "")
+                    editor!!.putString(ApiCall.IMAGE_PATH, "")
                     editor!!.apply()
                 }
             } catch (e: java.lang.Exception) {
@@ -297,6 +452,7 @@ class CreateAttendanceFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         user_id = prefs!!.getString(com.barikoi.cnlapp.Utils.Api.USER_ID, "")
+        token = prefs!!.getString(Api.TOKEN, "")
         ACTIVITY = context as MainActivity
         appDatabase = AppDatabase.getInstance(mContext!!)
     }
