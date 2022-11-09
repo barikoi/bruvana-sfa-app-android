@@ -29,8 +29,6 @@ import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineListener
-import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -42,16 +40,12 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.*
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerOptions
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, PermissionsListener {
+class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var routesList: ArrayList<Pair<String, String>>? = ArrayList()
     var routeNameList: ArrayList<String>? = ArrayList()
     var allRouteList: ArrayList<Routes>? = ArrayList()
@@ -69,7 +63,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     private var mapView: MapView? = null
     lateinit var fab: FloatingActionButton
     private var locationEngine: LocationEngine? = null
-    private var locationPlugin: LocationLayerPlugin? = null
+    //private var locationPlugin: LocationLayerPlugin? = null
     private var permissionsManager: PermissionsManager? = null
     private var userId: String? = ""
     private var srCode: String? = ""
@@ -90,16 +84,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        Mapbox.getInstance(ACTIVITY.applicationContext, getString(R.string.mapbox_access_token))
+        Mapbox.getInstance(mContext!!, null)
         val view = inflater.inflate(R.layout.fragment_map, container, false)
+        mapView = view.findViewById(R.id.mapview)
+        mapView!!.onCreate(savedInstanceState)
+        mapView!!.getMapAsync(this)
         fab = view.findViewById(R.id.fab)
         cbVerified = view.findViewById(R.id.isVerified)
         loading = view.findViewById(R.id.progressBar1)
-        Telemetry.disableOnUserRequest();
-        mapView = view.findViewById(R.id.mapview)
-        mapView!!.setStyleUrl(getString(R.string.map_view_styleUrl))
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync(this)
+        //Telemetry.disableOnUserRequest();
+
+        //mapView!!.setStyleUrl(getString(R.string.map_view_styleUrl))
+
+
         spinner = view.findViewById(R.id.spinnerRoutes)
 
         return view
@@ -319,7 +316,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         placemarkermap!![p.shop_code] = m
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 15.0))
     }
-    @SuppressLint("MissingPermission")
+    /*@SuppressLint("MissingPermission")
     override fun onMapReady(mapboxMap: MapboxMap?) {
         mMap = mapboxMap
         //mMap!!.setStyle(Style.MAPBOX_STREETS)
@@ -343,6 +340,240 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
             } else {
                 enableLocation()
             }
+        })
+
+        spinner!!.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View, position: Int, id: Long) {
+                placemarkermap!!.clear()
+                //loading!!.visibility = View.VISIBLE
+                routeId = routesList!!.get(position).first
+                //val shops: ArrayList<Shops> = ArrayList()
+                if (cbVerified!!.isChecked){
+                    mMap!!.clear()
+                    getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
+                }else{
+                    if (shopList!!.size > 0){
+                        mMap!!.clear()
+                        Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
+                        Log.d("RouteList", "all shops "+ shopList!!.size.toString())
+                        for (j in 0 until shopList!!.size) {
+                            Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
+                            if (shopList!![j].route_name.equals(routesList!![position].second)) {
+                                //shops.add(shopList!![i])
+                                icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
+                                plotMarker(shopList!![j], icon)
+                            }
+
+                        }
+                    }
+                }
+                *//*else if(verifiedShopList!!.size > 0){
+                    mMap!!.clear()
+                    Log.d("RouteList", "all verified routelist "+ routesList!!.size.toString()+" position"+position)
+                    Log.d("RouteList", "all verified shops "+ verifiedShopList!!.size.toString())
+                    for (j in 0 until verifiedShopList!!.size) {
+                        Log.d("RouteList", "all verified shops for "+ verifiedShopList!![j].route_code)
+                        if (verifiedShopList!![j].route_name.equals(routesList!![position])) {
+                            //shops.add(shopList!![i])
+                            routeId = verifiedShopList!![j].route_code
+                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
+                            plotMarker(verifiedShopList!![j], icon)
+                        }
+
+                    }
+                }*//*
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // write code to perform some action
+            }
+        }
+
+        cbVerified!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+            if (isChecked) {
+                mMap!!.clear()
+                getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
+            } else {
+                mMap!!.clear()
+                //getShopList(Api.route_outlet_list+"?sr_id="+userId)
+                if (shopList!!.size > 0){
+                    mMap!!.clear()
+                    Log.d("RouteList", "spinner selected "+ spinner!!.selectedItem)
+                    Log.d("RouteList", "all shops "+ shopList!!.size.toString())
+                    for (j in 0 until shopList!!.size) {
+                        Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
+                        if (shopList!![j].route_name.equals(spinner!!.selectedItem)) {
+                            //shops.add(shopList!![i])
+                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
+                            plotMarker(shopList!![j], icon)
+                        }
+
+                    }
+                }
+            }
+        })
+    }*/
+
+    private fun enableLocation() {
+        if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
+            // Create an instance of LOST location engine
+            //initializeLocationEngine()
+        } else {
+            permissionsManager = PermissionsManager(this)
+            permissionsManager!!.requestLocationPermissions(Activity())
+        }
+    }
+   /* @SuppressLint("MissingPermission")
+    private fun initializeLocationEngine() {
+        val locationEngineProvider = LocationEngineProvider(mContext!!.applicationContext)
+        locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable()
+        locationEngine!!.priority = LocationEnginePriority.HIGH_ACCURACY
+        locationEngine!!.activate()
+        if (locationPlugin == null) {
+            locationPlugin = LocationLayerPlugin(mapView!!, mMap!!, locationEngine, LocationLayerOptions.builder(mContext!!).maxZoom(25.0).build())
+            locationPlugin!!.setLocationLayerEnabled(true)
+            locationPlugin!!.renderMode = RenderMode.COMPASS
+            locationPlugin!!.setCameraMode(CameraMode.TRACKING)
+            Log.d("Search", "getLastLatLon 2: " + locationPlugin!!.lastKnownLocation)
+            //mMap!!.animateCamera(CameraUpdateFactory.zoomTo(15.0))
+        }
+        locationEngine!!.addLocationEngineListener(this)
+        //locationEngine!!.requestLocationUpdates()
+        Log.d("Search", "getLastLatLon 2: " + locationEngine!!.lastLocation)
+
+        val lastLocation = locationEngine!!.lastLocation
+        if (lastLocation != null) {
+            //setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
+            locationEngine!!.removeLocationUpdates()
+        } else {
+            //Log.d("Search", "getLastLatLon: " +lastLocation.toString())
+            locationEngine!!.addLocationEngineListener(this)
+        }
+
+    }*/
+
+    private fun setCameraPosition(location: LatLng, zoom: Double?) {
+        mMap?.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    location.latitude,
+                    location.longitude
+                ), zoom!!
+            )
+        )
+    }
+
+
+    /*@SuppressLint("MissingPermission")
+    override fun onConnected() {
+        //locationEngine!!.requestLocationUpdates()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onLocationChanged(location: Location?) {
+        if (location != null) {
+            *//*taskerLat = location.latitude
+            taskerLon = location.longitude*//*
+            if (mMap != null)
+            *//*IntentDataCheck()*//*
+                locationEngine!!.removeLocationEngineListener(this)
+        } else {
+            //locationEngine!!.requestLocationUpdates()
+        }
+    }*/
+
+
+
+    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
+
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        enableLocation()
+    }
+    @SuppressLint("MissingPermission")
+    override fun onStart() {
+        super.onStart()
+        /*if (locationEngine != null) {
+            //locationEngine!!.requestLocationUpdates()
+        }
+        if (locationPlugin != null) {
+            locationPlugin!!.onStart()
+        }*/
+
+        mapView!!.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        /*if (locationEngine != null) {
+            locationEngine!!.removeLocationUpdates()
+        }
+        if (locationPlugin != null) {
+            locationPlugin!!.onStop()
+        }*/
+        mapView!!.onStop()
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        /*if (locationEngine != null) {
+            locationEngine!!.deactivate()
+        }*/
+        mapView!!.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView!!.onLowMemory()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView!!.onResume()
+        Log.d("Verify", "onResume")
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView!!.onPause()
+        Log.d("Verify", "onPause")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView!!.onSaveInstanceState(outState)
+    }
+
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        mMap = mapboxMap
+        //mMap!!.setStyle(Style.MAPBOX_STREETS)
+        mMap!!.setStyle(Style.Builder().fromUrl(getString(R.string.map_view_styleUrl)))
+        enableLocation()
+
+        val uiSettings: UiSettings = mapboxMap!!.uiSettings
+        uiSettings.setCompassEnabled(false)
+
+        //setTaskDetails()
+        //getShopList(userId!!)
+        getShopList(Api.route_outlet_list+"?sr_id="+userId)
+
+        fab.setOnClickListener(View.OnClickListener {
+            /*if (locationEngine != null) {
+                val lastLocation = locationEngine!!.lastLocation
+                if (lastLocation != null) {
+                    setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
+                } else {
+                    locationEngine!!.requestLocationUpdates()
+                }
+            } else {
+                enableLocation()
+            }*/
         })
 
         spinner!!.onItemSelectedListener = object :
@@ -418,138 +649,5 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
                 }
             }
         })
-    }
-
-    private fun enableLocation() {
-        if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
-            // Create an instance of LOST location engine
-            initializeLocationEngine()
-        } else {
-            permissionsManager = PermissionsManager(this)
-            permissionsManager!!.requestLocationPermissions(Activity())
-        }
-    }
-    @SuppressLint("MissingPermission")
-    private fun initializeLocationEngine() {
-        val locationEngineProvider = LocationEngineProvider(mContext!!.applicationContext)
-        locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable()
-        locationEngine!!.priority = LocationEnginePriority.HIGH_ACCURACY
-        locationEngine!!.activate()
-        if (locationPlugin == null) {
-            locationPlugin = LocationLayerPlugin(mapView!!, mMap!!, locationEngine, LocationLayerOptions.builder(mContext!!).maxZoom(25.0).build())
-            locationPlugin!!.setLocationLayerEnabled(true)
-            locationPlugin!!.renderMode = RenderMode.COMPASS
-            locationPlugin!!.setCameraMode(CameraMode.TRACKING)
-            Log.d("Search", "getLastLatLon 2: " + locationPlugin!!.lastKnownLocation)
-            //mMap!!.animateCamera(CameraUpdateFactory.zoomTo(15.0))
-        }
-        locationEngine!!.addLocationEngineListener(this)
-        //locationEngine!!.requestLocationUpdates()
-        Log.d("Search", "getLastLatLon 2: " + locationEngine!!.lastLocation)
-
-        val lastLocation = locationEngine!!.lastLocation
-        if (lastLocation != null) {
-            //setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
-            locationEngine!!.removeLocationUpdates()
-        } else {
-            //Log.d("Search", "getLastLatLon: " +lastLocation.toString())
-            locationEngine!!.addLocationEngineListener(this)
-        }
-
-    }
-
-    private fun setCameraPosition(location: LatLng, zoom: Double?) {
-        mMap?.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    location.latitude,
-                    location.longitude
-                ), zoom!!
-            )
-        )
-    }
-
-
-    @SuppressLint("MissingPermission")
-    override fun onConnected() {
-        //locationEngine!!.requestLocationUpdates()
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun onLocationChanged(location: Location?) {
-        if (location != null) {
-            /*taskerLat = location.latitude
-            taskerLon = location.longitude*/
-            if (mMap != null)
-            /*IntentDataCheck()*/
-                locationEngine!!.removeLocationEngineListener(this)
-        } else {
-            //locationEngine!!.requestLocationUpdates()
-        }
-    }
-
-
-
-    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-
-    }
-
-    override fun onPermissionResult(granted: Boolean) {
-        enableLocation()
-    }
-    @SuppressLint("MissingPermission")
-    override fun onStart() {
-        super.onStart()
-        if (locationEngine != null) {
-            //locationEngine!!.requestLocationUpdates()
-        }
-        if (locationPlugin != null) {
-            locationPlugin!!.onStart()
-        }
-
-        mapView!!.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (locationEngine != null) {
-            locationEngine!!.removeLocationUpdates()
-        }
-        if (locationPlugin != null) {
-            locationPlugin!!.onStop()
-        }
-        mapView!!.onStop()
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (locationEngine != null) {
-            locationEngine!!.deactivate()
-        }
-        mapView!!.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView!!.onLowMemory()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView!!.onResume()
-        Log.d("Verify", "onResume")
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView!!.onPause()
-        Log.d("Verify", "onPause")
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
     }
 }

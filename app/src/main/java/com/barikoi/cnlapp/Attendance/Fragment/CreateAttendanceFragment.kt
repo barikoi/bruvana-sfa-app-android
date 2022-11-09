@@ -31,7 +31,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.imagecapture.RoomDb.AppDatabase
+import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.google.android.gms.location.*
@@ -60,7 +60,7 @@ class CreateAttendanceFragment : Fragment() {
     var mQueue: RequestQueue? = null
     var user_id : String? = null
     var token : String? = null
-    var appDatabase: AppDatabase? = null
+    var appDatabase: ImageDatabase? = null
     private var isImageAdded = false
     private val CAMERA = 4
     var selectedRoute: String = ""
@@ -454,6 +454,6 @@ class CreateAttendanceFragment : Fragment() {
         user_id = prefs!!.getString(com.barikoi.cnlapp.Utils.Api.USER_ID, "")
         token = prefs!!.getString(Api.TOKEN, "")
         ACTIVITY = context as MainActivity
-        appDatabase = AppDatabase.getInstance(mContext!!)
+        appDatabase = ImageDatabase.getInstance(mContext!!)
     }
 }

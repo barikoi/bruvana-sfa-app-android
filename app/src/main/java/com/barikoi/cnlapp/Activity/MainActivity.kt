@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.icu.text.MessageFormat
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -121,21 +123,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
                 R.id.navigation_route -> {
                     //tvTitle!!.text = "Map"
-                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                    userLayout.visibility = View.GONE
+                    setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_order -> {
                     //tvTitle!!.text = "Map"
                     //setCurrentFragment(MapFragment(), this@MainActivity)
+                    userLayout.visibility = View.GONE
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_chat -> {
                     //tvTitle!!.text = "Map"
                     setCurrentFragment(ChatFragment(), this@MainActivity)
+                    userLayout.visibility = View.GONE
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_attendance -> {
                     tvTitle.text = "Attendance"
+                    tvTitle.visibility = View.VISIBLE
                     userLayout.visibility = View.GONE
                     setCurrentFragment(AttendanceFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
@@ -161,6 +167,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             if (userObj.has("so_ranking") && !userObj.isNull("so_ranking")){
                                 rankLayout.visibility = View.VISIBLE
                                 tvRank.setText(userObj.getInt("so_ranking").toString())
+                                rank_suffix.setText(toOrdinal(userObj.getInt("so_ranking")))
                             }else{
                                 tvRank.setText("0")
                             }
@@ -212,6 +219,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
     }
+
+    /*fun toOrdinal(day: Int): String {
+        *//*val formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            MessageFormat("{0,ordinal}", Locale.getDefault())
+        } else {
+            TODO("VERSION.SDK_INT < N")
+        }
+        return formatter.format(arrayOf(day))*//*
+
+        var ordinal=""
+        when(day % 20){
+            1 -> ordinal = "st"
+            2 -> ordinal = "nd"
+            3 -> ordinal = "rd"
+            else -> ordinal = day > 30 > "st":"th"
+        }
+
+        switch (day % 20) {
+            case 1:
+            ordinal = "st";
+            break;
+            case 2:
+            ordinal = "nd";
+            break;
+            case 3:
+            ordinal = "rd";
+            break;
+            default:
+            ordinal = day > 30 > "st" : "th";
+        }
+        return ordinal;
+    }*/
+        fun toOrdinal(day: Int) =
+            if (day % 100 / 10 == 1) "th"
+            else when (day % 10) { 1 -> "st" 2 -> "nd" 3 -> "rd" else -> "th" }
 
     fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
         val fragmentManager = (activity as FragmentActivity).supportFragmentManager

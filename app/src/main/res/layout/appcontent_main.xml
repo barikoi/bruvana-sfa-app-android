@@ -151,7 +151,7 @@
 
                         </TextView>
                         <TextView
-                            android:id="@+id/rankth"
+                            android:id="@+id/rank_suffix"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toRightOf="@+id/tvRank"
@@ -164,7 +164,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/rankth"
+                            android:layout_toRightOf="@+id/rank_suffix"
                             android:gravity="center"
                             android:textStyle="bold"
                             android:textSize="12sp"

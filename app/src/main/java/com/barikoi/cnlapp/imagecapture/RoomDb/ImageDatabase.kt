@@ -9,11 +9,11 @@ import java.util.concurrent.Executors
 
 
 @Database(entities = [Images::class], version = 1, exportSchema = false)
-abstract class AppDatabase() : RoomDatabase() {
+abstract class ImageDatabase() : RoomDatabase() {
     abstract fun imagesDao(): ImagesDao?
 
     companion object {
-        var INSTANCE: AppDatabase? = null
+        var INSTANCE: ImageDatabase? = null
         private val sLock = Any()
         private val NUMBER_OF_THREADS = 4
         val databaseWriteExecutor = Executors.newFixedThreadPool(
@@ -28,13 +28,13 @@ abstract class AppDatabase() : RoomDatabase() {
             }
         }*/
 
-        fun getInstance(context: Context): AppDatabase? {
+        fun getInstance(context: Context): ImageDatabase? {
             synchronized(sLock) {
                 if (INSTANCE == null) {
                     Log.d("Room", "getInstance")
                     INSTANCE = Room.databaseBuilder(
                         context.getApplicationContext(),
-                        AppDatabase::class.java, "ImageCapture.db"
+                        ImageDatabase::class.java, "ImageCapture.db"
                     )
                         .fallbackToDestructiveMigration()
                         .allowMainThreadQueries()

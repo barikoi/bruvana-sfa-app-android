@@ -29,13 +29,13 @@
     </TextView>
 
     <Button
+        android:id="@+id/btnIvClose"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/ic_close"
-        app:backgroundTint="@color/fab_icon"
-        android:id="@+id/btnIvClose"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" />
+        android:background="@android:drawable/ic_menu_close_clear_cancel"
+        app:backgroundTint="@color/fab_icon" />
     <Button
         android:layout_width="50dp"
         android:layout_height="50dp"

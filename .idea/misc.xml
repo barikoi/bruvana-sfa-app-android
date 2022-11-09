@@ -3,80 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_blank.xml" value="0.1286231884057971" />
-        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_create_order.xml" value="0.20416666666666666" />
-        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_product_select.xml" value="0.33" />
-        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_shop_list.xml" value="0.1286231884057971" />
-        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_shop_select.xml" value="0.1286231884057971" />
-        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/single_product_select_view.xml" value="0.67" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/bottom_nav_bg.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/bottom_nav_style.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/card_bg_small.xml" value="0.143" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/cardview_bg.xml" value="0.1295" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/dialog_popup.xml" value="0.1" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_absent.xml" value="0.1135" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_attendance.xml" value="0.1135" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_camera.xml" value="0.1125" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_delete.xml" value="0.1125" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_edit_button.xml" value="0.191" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_gps.xml" value="0.149" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_home.xml" value="0.1135" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_location.xml" value="0.1125" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_menu.xml" value="0.149" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_message.xml" value="0.1135" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_order_collect.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_present.xml" value="0.15" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_route.xml" value="0.1" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_sortby.xml" value="0.1975" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/line_stroke.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/rounded_corner_lightgray.xml" value="0.1295" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/rounded_stroke_bg.xml" value="0.1875" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/stroke_background.xml" value="0.1295" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_indication_bg.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_indicator_bg.xml" value="0.1125" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_selected.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_unselected.xml" value="0.1375" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_login.xml" value="0.8823529411764706" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_main.xml" value="0.15625" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_route.xml" value="0.715625" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_splash.xml" value="0.15625" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/appcontent_main.xml" value="0.14150943396226415" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/dialog_popup.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_attendance.xml" value="0.715625" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_chat.xml" value="0.3145833333333333" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_confirm_order.xml" value="0.1" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_create_attendance.xml" value="0.7448559670781894" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_create_order.xml" value="0.42296511627906974" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_history.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_home.xml" value="0.1358695652173913" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_map.xml" value="0.2264041690793283" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_product_select.xml" value="1.25" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_route.xml" value="0.15625" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_shop_list.xml" value="0.19309462915601022" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_shop_select.xml" value="0.41569767441860467" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_summary.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/imagecapture.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/nav_header_main.xml" value="0.15625" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/preview_image_withdelete.xml" value="0.6215277777777778" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_attendance_history.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_attendance_reason_view.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_confirm_order_product_listview.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_confirm_order_view.xml" value="1.25" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_image_view.xml" value="0.41569767441860467" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_product_select_view.xml" value="0.2222222222222222" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_route_list.xml" value="0.75" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_shop_list.xml" value="0.25" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_shop_select_list.xml" value="0.41569767441860467" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/mainactivity_drawer_menu.xml" value="0.8145833333333333" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/sort_menu.xml" value="0.8145833333333333" />
+        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/appcontent_main.xml" value="0.20416666666666666" />
+        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/fragment_map.xml" value="0.20416666666666666" />
+        <entry key="..\:/Barikoi/cnl_app/app/src/main/res/layout/preview_image_withdelete.xml" value="0.25" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/build/classes" />
-  </component>
-  <component name="ProjectType">
-    <option name="id" value="Android" />
-  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
 </project>

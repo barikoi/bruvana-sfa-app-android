@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.imagecapture.Model.ImageList
-import com.barikoi.cnlapp.imagecapture.RoomDb.AppDatabase
+import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import io.sentry.Sentry
 import java.io.File
@@ -62,7 +62,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     private var titleTakeImage: TextView? = null
     private val prefs: SharedPreferences
     private val editor: SharedPreferences.Editor
-    private var appDatabase: AppDatabase? = null
+    private var appDatabase: ImageDatabase? = null
     private var imageRecyclerAdapter: ImageRecyclerAdapter? = null
     private val mRecyclerView: RecyclerView
     private val imageItems: ArrayList<ImageList> = ArrayList<ImageList>()
@@ -536,7 +536,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         mRecyclerView = findViewById(R.id.recyclerImage)
         mRecyclerView.layoutManager = layoutManager
-        appDatabase = AppDatabase.getInstance(context!!)
+        appDatabase = ImageDatabase.getInstance(context!!)
         layoutImagePick.setOnClickListener {
             checksCameraPermission()
         }

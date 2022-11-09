@@ -59,9 +59,10 @@ dependencies {
     kapt "androidx.room:room-runtime:2.2.4"
 
     /*map*/
-    implementation 'com.graphhopper:graphhopper-navigation-android-ui:0.1.0-SNAPSHOT'
-    implementation 'com.graphhopper:directions-api-client:0.10.1-4'
+    /*implementation 'com.graphhopper:graphhopper-navigation-android-ui:0.1.0-SNAPSHOT'
+    implementation 'com.graphhopper:directions-api-client:0.10.1-4'*/
     implementation 'com.google.android.gms:play-services-location:19.0.1'
+    implementation 'org.maplibre.gl:android-sdk:9.2.1'
 
     /*progressbar*/
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'

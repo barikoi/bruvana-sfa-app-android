@@ -15,7 +15,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.imagecapture.Model.ImageList
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.imagecapture.RoomDb.AppDatabase
+import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import java.io.File
@@ -63,7 +63,7 @@ class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private v
                 //editor.putString(Api.FILE_NAME, "")
                 editor.apply()
                 Log.d("ImageAdapter", "selected pos: " +item.selectedPos)
-                AppDatabase.getInstance(holder.mView.context)!!.imagesDao()!!.deleteImage(item.selectedPos)
+                ImageDatabase.getInstance(holder.mView.context)!!.imagesDao()!!.deleteImage(item.selectedPos)
                 updateAt(holder.mView.context, item.selectedPos)
 
                 nagDialog.dismiss()
@@ -76,12 +76,12 @@ class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private v
     }
 
     fun updateAt(context: Context, position: Int){
-        val imagesList: List<Images> = AppDatabase.getInstance(context)!!.imagesDao()!!.getImageDBPos(position) as List<Images>
+        val imagesList: List<Images> = ImageDatabase.getInstance(context)!!.imagesDao()!!.getImageDBPos(position) as List<Images>
         Log.d("ImageAdapter", "update pos: " + imagesList.size)
         if ( imagesList.size > 0) {
             for (i in 0 until  imagesList.size) {
                 Log.d("ImageAdapter", "update pos i: " +i)
-                AppDatabase.getInstance(context)!!.imagesDao()!!.updatePosition(imagesList[i].filePath, i + 1)
+                ImageDatabase.getInstance(context)!!.imagesDao()!!.updatePosition(imagesList[i].filePath, i + 1)
                 if (i + 1 ==  imagesList.size) {
                     editor.putInt(ApiCall.IMAGE_POSITION, i + 1)
                     editor.apply()
