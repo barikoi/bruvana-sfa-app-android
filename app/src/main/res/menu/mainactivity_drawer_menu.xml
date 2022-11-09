@@ -5,25 +5,33 @@
     tools:showIn="nav_view">
 
     <item
-        android:id="@+id/menu_shop_create"
+        android:id="@+id/menu_shop_route"
         android:iconTint="@color/black"
-        android:title="Shop Create" />
+        android:title="@string/title_shop_route" />
   <item
-      android:id="@+id/menu_route_list"
+      android:id="@+id/menu_order_summary"
       android:iconTint="@color/black"
-      android:title="Route List" />
+      android:title="@string/title_order_summary" />
   <item
-      android:id="@+id/menu_offer_list"
+      android:id="@+id/menu_notice"
       android:iconTint="@color/black"
-      android:title="Offer List" />
+      android:title="@string/title_notice" />
   <item
-      android:id="@+id/menu_order_history"
+      android:id="@+id/menu_trade_offers"
       android:iconTint="@color/black"
-      android:title="Order History" />
+      android:title="@string/title_trade_offers" />
   <item
-      android:id="@+id/menu_attendance"
+      android:id="@+id/menu_product_summary"
       android:iconTint="@color/black"
-      android:title="Attendance " />
+      android:title="@string/title_product_summary" />
+  <item
+      android:id="@+id/menu_product_stock_update"
+      android:iconTint="@color/black"
+      android:title="@string/title_product_stock_update" />
+  <item
+      android:id="@+id/menu_incentive"
+      android:iconTint="@color/black"
+      android:title="@string/title_incentive" />
   <item
       android:id="@+id/menu_logout"
       android:iconTint="@color/black"

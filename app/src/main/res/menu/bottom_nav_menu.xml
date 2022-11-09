@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/navigation_order"
-        android:icon="@drawable/ic_order_collect"
+        android:icon="@drawable/ic_order_create"
         android:title="@string/title_order" />
     <item
         android:id="@+id/navigation_chat"

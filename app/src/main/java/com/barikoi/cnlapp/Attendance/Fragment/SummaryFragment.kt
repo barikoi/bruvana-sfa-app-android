@@ -4,22 +4,31 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.android.volley.NetworkResponse
-import com.android.volley.RequestQueue
-import com.android.volley.VolleyError
+import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.Attendance.Adapter.HistoryListAdapter
+import com.barikoi.cnlapp.Attendance.Adapter.ReasonListAdapter
+import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.datepicker.MaterialDatePicker
+import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_history.*
+import kotlinx.android.synthetic.main.fragment_history.dateRangeLayout
+import kotlinx.android.synthetic.main.fragment_history.tvDateRange
+import kotlinx.android.synthetic.main.fragment_summary.*
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,6 +42,7 @@ class SummaryFragment : Fragment() {
     var mQueue: RequestQueue? = null
     var user_id : String? = null
     var token : String? = null
+    var reasonList : ArrayList<Pair<String, String>> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +87,7 @@ class SummaryFragment : Fragment() {
             Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate,
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
-                    //getHistoryList(response)
+                    getHistoryList(response)
                 }
 
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
@@ -85,7 +95,7 @@ class SummaryFragment : Fragment() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    //getErrorResponse(error)
+                    getErrorResponse(error)
                 }
 
                 override fun onException(e: Exception) {
@@ -120,11 +130,11 @@ class SummaryFragment : Fragment() {
                 editor!!.commit()
             }
 
-            /*ApiServices.apiGET(
-                Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(s_date),
+            ApiServices.apiGET(
+                Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date),
                 mQueue!!, token!!, object : ApiServiceListener {
                     override fun onResponseSuccess(response: String) {
-                        //getHistoryList(response)
+                        getHistoryList(response)
                     }
 
                     override fun onNetworkResponseSuccess(response: NetworkResponse) {
@@ -132,17 +142,94 @@ class SummaryFragment : Fragment() {
                     }
 
                     override fun onResponseFailure(error: VolleyError) {
-                        //getErrorResponse(error)
+                        getErrorResponse(error)
                     }
 
                     override fun onException(e: Exception) {
                         Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
                     }
 
-                })*/
+                })
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+    }
+
+    fun getHistoryList(response: String){
+        try {
+            if (response != null){
+                val obj = JSONObject(response)
+                val attedanceArray = obj.getJSONArray("attendances")
+                var absent = 0
+                var present = 0
+                var late= 0
+                reasonList.clear()
+                if (attedanceArray.length() >0){
+                    for (i in 0 until attedanceArray.length()) {
+                        val attendanceObj = attedanceArray.getJSONObject(i)
+                        if (!attendanceObj.getString("late_reason").isNullOrEmpty() && attendanceObj.getString("late_reason").length > 0){
+                            reasonList.add(Pair(attendanceObj.getString("enter_time"),
+                                attendanceObj.getString("late_reason")))
+                        }
+
+                        if (attendanceObj.getInt("is_late") == 1) late += 1
+                        if (attendanceObj.getInt("is_absent") == 1) absent +=1
+                    }
+
+                    present = attedanceArray.length() - absent
+
+                    editor!!.putInt(Api.TOTAL_PRESENT, present)
+                    editor!!.putInt(Api.TOTAL_LATE, late)
+                    editor!!.putInt(Api.TOTAL_ABSENT, absent)
+                    editor!!.commit()
+
+                    /*if (reasonList.size > 0){
+                        val adapter = ReasonListAdapter(reasonList)
+                        summaryListView.adapter = adapter
+                        adapter.notifyDataSetChanged()
+                    }*/
+                }
+
+                val adapter = ReasonListAdapter(reasonList)
+                summaryListView.adapter = adapter
+                adapter.notifyDataSetChanged()
+
+                presentCount.setText(present.toString())
+                lateCount.setText(late.toString())
+                absentCount.setText(absent.toString())
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
+    }
+
+    fun getErrorResponse(error: VolleyError){
+        if (error is TimeoutError) {
+            //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
+            Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+        }
+        if (error is NoConnectionError) {
+            //mListerner.onFailure("Turn on your internet connection and Try again")
+            Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+        }
+        if (error != null && error.networkResponse != null) {
+            try {
+                val s = String(error.networkResponse.data)
+                Log.d("Routes", "message: $s")
+                val data = JSONObject(s)
+                //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
+                //mListerner.onFailure(data.getString("message"))
+                Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
+            } catch (e: UnsupportedEncodingException) {
+                Sentry.captureException(e)
+                e.printStackTrace()
+            } catch (e: JSONException) {
+                //mListerner.onFailure(e.message)
+                Sentry.captureException(e)
+                Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+            }
+        }
     }
 
     override fun onAttach(context: Context) {

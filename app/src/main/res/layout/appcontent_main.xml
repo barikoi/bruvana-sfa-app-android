@@ -9,13 +9,17 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp"
             android:background="@color/background_app">
 
             <!--<LinearLayout
@@ -55,20 +59,123 @@
                     android:id="@+id/drawer"
                     android:layout_width="50dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
                     android:src="@drawable/ic_menu">
 
                 </ImageView>
-                <!--<TextView
+                <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textStyle="bold"
                     android:textSize="17sp"
+                    android:visibility="gone"
                     android:textColor="@color/black"
                     android:text="">
 
-                </TextView>-->
+                </TextView>
+
+                <LinearLayout
+                    android:id="@+id/userLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/drawer"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="end"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:text="welcome">
+
+                    </TextView>
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:textSize="17sp"
+                        android:textColor="@color/black"
+                        android:text="Shohel Rana">
+
+                    </TextView>
+                    <RelativeLayout
+                        android:id="@+id/rankLayout"
+                        android:layout_width="wrap_content"
+                        android:visibility="gone"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:id="@+id/starLayout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginEnd="4dp"
+                            android:layout_centerVertical="true">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_star"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_star"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_star"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_star"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_star"/>
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/tvRank"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/starLayout"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="@color/black"
+                            android:text="">
+
+                        </TextView>
+                        <TextView
+                            android:id="@+id/rankth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/tvRank"
+                            android:textStyle="bold"
+                            android:textSize="8sp"
+                            android:textColor="@color/black"
+                            android:text="">
+
+                        </TextView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/rankth"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="@color/black"
+                            android:text="@string/rank">
+
+                        </TextView>
+
+                    </RelativeLayout>
+                </LinearLayout>
+
             </RelativeLayout>
 
         </androidx.appcompat.widget.Toolbar>
@@ -139,7 +246,7 @@
         app:borderWidth="0dp"
         app:elevation="6dp"
         app:fabSize="normal"
-        android:src="@drawable/ic_order_collect"
+        android:src="@drawable/ic_order_create"
         app:tint="@color/fab_icon"
         app:layout_anchor="@id/bottomAppBar" />
 

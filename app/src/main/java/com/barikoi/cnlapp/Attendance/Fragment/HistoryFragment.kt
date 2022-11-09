@@ -40,6 +40,7 @@ class HistoryFragment : Fragment() {
     var user_id : String? = null
     var token : String? = null
     var historyList : ArrayList<HistoryList> = ArrayList()
+    var adapter: HistoryListAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +56,10 @@ class HistoryFragment : Fragment() {
 
     private fun init() {
         setDateFilter()
+
+        adapter = HistoryListAdapter(historyList)
+        historyListView.adapter = adapter
+        //adapter!!.notifyDataSetChanged()
     }
 
     override fun onCreateView(
@@ -126,7 +131,7 @@ class HistoryFragment : Fragment() {
                 editor!!.commit()
             }
 
-            ApiServices.apiGET(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(s_date),
+            ApiServices.apiGET(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date),
                 mQueue!!, token!!, object : ApiServiceListener{
                     override fun onResponseSuccess(response: String) {
                         getHistoryList(response)
@@ -155,8 +160,11 @@ class HistoryFragment : Fragment() {
             if (response != null){
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
+                var absent = 0
+                var present = 0
+                var late= 0
+                historyList.clear()
                 if (attedanceArray.length() >0){
-                    historyList.clear()
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
                         historyList.add(
@@ -175,13 +183,27 @@ class HistoryFragment : Fragment() {
                                 attendanceObj.getString("route_name")
                         )
                         )
+                        if (attendanceObj.getInt("is_late") == 1) late += 1
+                        if (attendanceObj.getInt("is_absent") == 1) absent +=1
                     }
-                    if (attedanceArray.length() > 0){
-                        val adapter = HistoryListAdapter(historyList)
+
+                    present = attedanceArray.length() - absent
+
+                    /*editor!!.putInt(Api.TOTAL_PRESENT, present)
+                    editor!!.putInt(Api.TOTAL_LATE, late)
+                    editor!!.putInt(Api.TOTAL_ABSENT, absent)
+                    editor!!.commit()*/
+
+                    /*if (historyList.size > 0){
+                        adapter = HistoryListAdapter(historyList)
                         historyListView.adapter = adapter
-                        adapter.notifyDataSetChanged()
-                    }
+                        adapter!!.notifyDataSetChanged()
+                    }*/
                 }
+
+                adapter = HistoryListAdapter(historyList)
+                historyListView.adapter = adapter
+                adapter!!.notifyDataSetChanged()
             }
         }catch (e:Exception){
             e.printStackTrace()

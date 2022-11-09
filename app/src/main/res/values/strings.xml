@@ -1,11 +1,29 @@
 <resources>
     <string name="app_name">CNL App</string>
 
+    <!--bottom_nav-->
     <string name="title_home">Home</string>
     <string name="title_route">Route</string>
     <string name="title_attendance">Attendance</string>
     <string name="title_order">Order</string>
     <string name="title_chat">Chat</string>
+    <!--drawer_menu-->
+    <string name="title_shop_route">Shop &amp; Route List</string>
+    <string name="title_order_summary">Order Summary</string>
+    <string name="title_notice">Notice</string>
+    <string name="title_trade_offers">Trade Offers</string>
+    <string name="title_product_summary">Product Wise Summary</string>
+    <string name="title_product_stock_update">Product Wise Stock Update</string>
+    <string name="title_incentive">Incentive</string>
+
+    <!--home-->
+    <string name="welcome">welcome</string>
+    <string name="rank">Rank</string>
+    <string name="st">st</string>
+    <string name="nd">nd</string>
+    <string name="rd">rd</string>
+    <string name="th">th</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="mapbox_access_token" translatable="false">pk.test</string>

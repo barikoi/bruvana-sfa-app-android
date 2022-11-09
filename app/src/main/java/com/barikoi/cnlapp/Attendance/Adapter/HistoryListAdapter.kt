@@ -1,7 +1,5 @@
 package com.barikoi.cnlapp.Attendance.Adapter
 
-import android.graphics.BitmapFactory
-import android.provider.ContactsContract.CommonDataKinds.Website.URL
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +10,6 @@ import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,6 +47,22 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
         }else{
             holder.marketName.setText("")
         }
+        /*Thread {
+            try {
+                if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
+                    *//*val newurl = URL(Api.base_url+java.net.URLEncoder.encode(mItem.imageLink, "UTF-8"))
+                    val bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream())
+                    holder.imageUser.setImageBitmap(bitmap)*//*
+                    Glide.with(holder.itemView.context)
+                        .load(Api.base_url+mItem.imageLink)
+                        .into(holder.imageUser)
+                }else{
+                    holder.imageUser.visibility = View.GONE
+                }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }.start()*/
 
         if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
             /*val newurl = URL(Api.base_url+java.net.URLEncoder.encode(mItem.imageLink, "UTF-8"))
@@ -62,6 +74,7 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
         }else{
             holder.imageUser.visibility = View.GONE
         }
+
 
         if (!mItem.checkInAddress.isNullOrEmpty() && !mItem.checkInAddress.equals("null")){
             holder.inAddress.setText(mItem.checkInAddress)

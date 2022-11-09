@@ -9,13 +9,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.NetworkResponse
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
 import com.barikoi.cnlapp.Attendance.Fragment.HistoryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SummaryFragment
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
@@ -87,9 +93,32 @@ class AttendanceFragment : Fragment() {
             }
         })
 
+        //getAttendanceHistory()
 
     }
 
+    /*private fun getAttendanceHistory() {
+        ApiServices.apiGET(
+            Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate,
+            mQueue, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    getHistoryList(response)
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    getErrorResponse(error)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
+    }*/
 
 
     override fun onAttach(context: Context) {
