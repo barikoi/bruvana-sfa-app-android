@@ -17,6 +17,8 @@
     <color name="text_title">#CC1E1E1E</color>
     <color name="text_title_2">#801E1E1E</color>
     <color name="card_color">#80D4D4D4</color>
+    <color name="card_blue">#7328EFBB</color>
+    <color name="progress_track">#CC4E7471</color>
 
     <color name="colorPrimary">#00DE97</color>
     <color name="colorPrimaryDark">#00B56F</color>
@@ -25,6 +27,10 @@
 
     <color name="cnl_color_1">#F79A59</color>
     <color name="cnl_color_2">#0D9347</color>
+
+    <color name="btn_color_light">#F89B59</color>
+    <color name="btn_color_dark">#F57921</color>
+    <color name="btn_gray_light">#DADADA</color>
 
     <color name="color_gray_depp">#6D8890</color>
     <color name="color_gray_medium">#4F7270</color>
@@ -37,4 +43,5 @@
     <color name="active_green">#50FD95</color>
     <color name="color_brown">#D4B782</color>
     <color name="color_light_brown">#F0DBB1</color>
+
 </resources>

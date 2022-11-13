@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.icu.text.MessageFormat
-import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -25,7 +23,7 @@ import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
-import com.barikoi.cnlapp.Fragment.HomeFragment
+import com.barikoi.cnlapp.StatisticsHome.Fragment.HomeFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
 import com.barikoi.cnlapp.R
@@ -118,12 +116,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (item.itemId) {
                 R.id.navigation_home -> {
                     //tvTitle!!.text = "Home"
+                    tvTitle.text = ""
+                    tvTitle.visibility = View.GONE
+                    userLayout.visibility = View.VISIBLE
                     setCurrentFragment(HomeFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_route -> {
                     //tvTitle!!.text = "Map"
                     userLayout.visibility = View.GONE
+                    tvTitle.text = ""
+                    tvTitle.visibility = View.VISIBLE
                     setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
@@ -131,12 +134,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     //tvTitle!!.text = "Map"
                     //setCurrentFragment(MapFragment(), this@MainActivity)
                     userLayout.visibility = View.GONE
+                    tvTitle.text = ""
+                    tvTitle.visibility = View.VISIBLE
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_chat -> {
                     //tvTitle!!.text = "Map"
                     setCurrentFragment(ChatFragment(), this@MainActivity)
                     userLayout.visibility = View.GONE
+                    tvTitle.text = ""
+                    tvTitle.visibility = View.VISIBLE
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_attendance -> {

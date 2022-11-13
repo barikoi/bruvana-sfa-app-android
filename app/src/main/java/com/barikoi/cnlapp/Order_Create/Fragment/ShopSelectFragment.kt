@@ -285,6 +285,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("address"),
                                         outletObj.getString("outlet_code"),
                                         outletObj.getString("store_type"),
+                                        outletObj.getString("category"),
                                         outletObj.getString("owner_name"),
                                         outletObj.getString("distributor_office"),
                                         outletObj.getString("distributor_office_code"),
@@ -292,7 +293,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
                                         routeObj.getString("route_code"),
-                                        routeObj.getString("route_name")
+                                        routeObj.getString("route_name"),
+                                        outletObj.getString("order_delivery_date")
                                     )
 
                                     shopList!!.add(shops)

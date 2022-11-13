@@ -186,6 +186,8 @@ class CreateAttendanceFragment : Fragment() {
             }
 
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                editor!!.commit()
                 appDatabase!!.imagesDao()!!.deleteAllImages()
                 val data = JSONObject(String(response.data))
                 val message = data.getString("message")
@@ -365,35 +367,6 @@ class CreateAttendanceFragment : Fragment() {
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
             Sentry.captureException(e)
-        }
-    }
-
-    fun getErrorResponse(error: VolleyError){
-        if (error is TimeoutError) {
-            //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-            Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
-        }
-        if (error is NoConnectionError) {
-            //mListerner.onFailure("Turn on your internet connection and Try again")
-            Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
-        }
-        if (error != null && error.networkResponse != null) {
-            try {
-                val s = String(error.networkResponse.data)
-                Log.d("Routes", "message: $s")
-                val data = JSONObject(s)
-                //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                //mListerner.onFailure(data.getString("message"))
-                Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
-            } catch (e: UnsupportedEncodingException) {
-                Sentry.captureException(e)
-                e.printStackTrace()
-            } catch (e: JSONException) {
-                //mListerner.onFailure(e.message)
-                Sentry.captureException(e)
-                Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                e.printStackTrace()
-            }
         }
     }
 

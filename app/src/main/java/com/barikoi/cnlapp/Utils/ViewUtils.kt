@@ -5,11 +5,19 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import com.android.volley.NoConnectionError
+import com.android.volley.TimeoutError
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import io.sentry.Sentry
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.UnsupportedEncodingException
 
 object ViewUtils {
 
@@ -63,5 +71,34 @@ object ViewUtils {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
+    }
+
+    fun getErrorResponse(error: VolleyError, mContext: Context){
+        if (error is TimeoutError) {
+            //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
+            Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+        }
+        if (error is NoConnectionError) {
+            //mListerner.onFailure("Turn on your internet connection and Try again")
+            Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+        }
+        if (error != null && error.networkResponse != null) {
+            try {
+                val s = String(error.networkResponse.data)
+                Log.d("Routes", "message: $s")
+                val data = JSONObject(s)
+                //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
+                //mListerner.onFailure(data.getString("message"))
+                Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
+            } catch (e: UnsupportedEncodingException) {
+                Sentry.captureException(e)
+                e.printStackTrace()
+            } catch (e: JSONException) {
+                //mListerner.onFailure(e.message)
+                Sentry.captureException(e)
+                Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+            }
+        }
     }
 }

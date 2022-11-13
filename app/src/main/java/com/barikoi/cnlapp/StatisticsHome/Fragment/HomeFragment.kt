@@ -1,0 +1,312 @@
+package com.barikoi.cnlapp.StatisticsHome.Fragment
+
+import android.content.Context
+import android.content.SharedPreferences
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.preference.PreferenceManager
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.core.view.setMargins
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.*
+import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
+import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
+import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_history.*
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_home.tvDateRange
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.UnsupportedEncodingException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+
+
+class HomeFragment : Fragment() {
+
+    private var prefs: SharedPreferences? = null
+    private var editor: SharedPreferences.Editor? = null
+    var mContext: Context? = null
+    var mQueue: RequestQueue? = null
+    val dots: ArrayList<ImageView> = ArrayList()
+    var srId: String ? = ""
+    var routeId: String ? = ""
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+
+        }
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_home, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
+    }
+
+    private fun init() {
+        val c = Calendar.getInstance()
+        //c.add(Calendar.DAY_OF_WEEK, -7)
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        val end = Calendar.getInstance().time
+        val start = c.time
+        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
+        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        val StartDate = df.format(start)
+        val EndDate = df.format(end)
+
+        val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
+        materialDateBuilder.setTitleText("SELECT A DATE")
+
+        val materialDatePicker = materialDateBuilder.build()
+
+        dateRangeLayoutHome.setOnClickListener(View.OnClickListener {
+            materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
+            dateRangeLayoutHome.setEnabled(false)
+        })
+
+        materialDatePicker.addOnPositiveButtonClickListener { selection ->
+            dateRangeLayoutHome.setEnabled(true)
+            val s_date = Date(selection.first!!)
+            val e_date = Date(selection.second!!)
+            if (s_date.compareTo(e_date) == 0) {
+                tvDateRange.setText(simpleFormat.format(s_date))
+                editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
+                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
+                editor!!.commit()
+            } else {
+                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
+                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
+                editor!!.commit()
+            }
+
+            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&sr_id="+srId+"&route_id="+routeId)
+        }
+
+        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
+
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&sr_id="+srId+"&route_id="+routeId)
+        setSecondPartSummary()
+        setThirdPartSummary()
+
+
+    }
+
+    private fun getSummaryTargets(url: String) {
+        var total_target = ""
+        var total_target_completed = ""
+        var lpc = ""
+        var lpc_completed = ""
+        var bpc = ""
+        var bpc_completed = ""
+        var aiv = ""
+        var aiv_completed = ""
+
+        ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+                try {
+                    if (response != null){
+                        val obj = JSONObject(response)
+                        val targetsArray = obj.getJSONArray("targets")
+                        val completedArray = obj.getJSONArray("target_completed")
+                        if (targetsArray.length() > 0){
+                            for (i in 0 until targetsArray.length()){
+                                val targetObj =targetsArray.getJSONObject(i)
+                                total_target = targetObj.getString("target_amount")
+                                bpc = targetObj.getString("target_sku_per_memo")
+                                lpc = targetObj.getString("target_number_of_memo")
+                                aiv = targetObj.getString("target_aiv")
+                            }
+                        }
+                        if (completedArray.length() > 0){
+                            for (i in 0 until completedArray.length()){
+                                val targetObj =completedArray.getJSONObject(i)
+                                total_target_completed = targetObj.getString("revenue")
+                                bpc_completed = targetObj.getString("bpc")
+                                lpc_completed = targetObj.getString("lpc")
+                                aiv_completed = targetObj.getString("aiv")
+                            }
+                        }
+
+                        val itemList: ArrayList<TargetValue> = ArrayList()
+                        itemList.add(TargetValue(resources.getString(R.string.total_target), total_target, total_target_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
+
+                        val adapter = TargetAdapter(itemList)
+                        targetListView.adapter = adapter
+                        adapter.notifyDataSetChanged()
+
+
+                    }
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
+
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, mContext!!)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+    }
+
+    private fun setSecondPartSummary() {
+        val titles = arrayOf(resources.getString(R.string.summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category))
+        val fragments = ArrayList<Fragment>()
+        fragments.add(LastWeekSummaryFragment())
+        fragments.add(LastWeekProductFragment())
+        fragments.add(LastWeekCategoryFragment())
+        addDots(fragments.size)
+        viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        // attaching tab mediator
+        TabLayoutMediator(viewpagertab, viewPager,
+            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
+                tab.text = titles[position]
+            }).attach()
+        viewPager.setCurrentItem(0);
+
+        //viewPager.setUserInputEnabled(false)
+        for (i in 0 until viewpagertab.getTabCount()) {
+            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+            val p = tab.layoutParams as ViewGroup.MarginLayoutParams
+            p.setMargins(12, 12, 8, 12)
+            tab.requestLayout()
+        }
+        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                Log.d("Fragment", "viewpager tab pos: $position")
+                selectDot(position, fragments.size)
+                if (position == 0) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
+                    editor!!.commit()*/
+                } else if (position == 1) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
+                    editor!!.commit()*/
+                }
+                else if (position == 2) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
+                    editor!!.commit()*/
+                }
+            }
+        })
+    }
+
+    private fun setThirdPartSummary() {
+        val titles = arrayOf(resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
+        val fragments = ArrayList<Fragment>()
+        fragments.add(LastWeekDeliveryFragment())
+        fragments.add(LastWeekBounceFragment())
+        viewPagerSecond.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        // attaching tab mediator
+        TabLayoutMediator(viewpagertabSecond, viewPagerSecond,
+            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
+                tab.text = titles[position]
+            }).attach()
+        viewPagerSecond.setCurrentItem(0);
+
+        viewPagerSecond.setUserInputEnabled(false)
+        for (i in 0 until viewpagertabSecond.getTabCount()) {
+            val tab = (viewpagertabSecond.getChildAt(0) as ViewGroup).getChildAt(i)
+            val p = tab.layoutParams as ViewGroup.MarginLayoutParams
+            p.setMargins(15, 15, 10, 15)
+            tab.requestLayout()
+        }
+        Log.d("Fragment", "viewpager current Item: " + viewPagerSecond.getCurrentItem())
+        viewPagerSecond.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                Log.d("Fragment", "viewpager tab pos: $position")
+                if (position == 0) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
+                    editor!!.commit()*/
+                } else if (position == 1) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
+                    editor!!.commit()*/
+                }
+                else if (position == 2) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
+                    editor!!.commit()*/
+                }
+            }
+        })
+    }
+
+    fun addDots(dotCount: Int) {
+
+        for (i in 0 until dotCount) {
+            val dot = ImageView(mContext)
+            dot.setImageDrawable(resources.getDrawable(R.drawable.ic_dot_unselected))
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(2)
+            dotsLayout.addView(dot, params)
+            dots.add(dot)
+        }
+    }
+    fun selectDot(idx: Int, dotCount: Int) {
+        val res: Resources = resources
+        for (i in 0 until dots.size) {
+            val drawableId: Int =
+                if (i == idx) com.barikoi.cnlapp.R.drawable.ic_dot_selected else com.barikoi.cnlapp.R.drawable.ic_dot_unselected
+            val drawable: Drawable = res.getDrawable(drawableId)
+            dots.get(i).setImageDrawable(drawable)
+        }
+    }
+
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        editor = prefs!!.edit()
+        mContext = context
+        mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        srId = prefs!!.getString(Api.SR_CODE, "")
+        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+    }
+}

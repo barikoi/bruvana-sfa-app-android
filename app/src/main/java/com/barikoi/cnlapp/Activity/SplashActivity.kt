@@ -112,17 +112,10 @@ class SplashActivity : AppCompatActivity() {
         } */
         else {
             Log.d("Splash", "request permission if list not empty")
-            Handler().postDelayed(Runnable {
-                init() }, 1000)
+            /*Handler().postDelayed(Runnable {
+                init() }, 1000)*/
+            init()
 
-            /*val handler =  Handler()
-            val myRunnable = Runnable() {
-                fun run() {
-                    init()
-                }
-            };
-            handler.postDelayed(myRunnable,1000);
-            handler.removeCallbacks(myRunnable);*/
         }
         return true
     }

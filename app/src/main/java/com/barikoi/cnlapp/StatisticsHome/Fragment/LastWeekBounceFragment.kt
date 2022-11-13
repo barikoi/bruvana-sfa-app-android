@@ -1,0 +1,142 @@
+package com.barikoi.cnlapp.StatisticsHome.Fragment
+
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.preference.PreferenceManager
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
+import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
+import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
+import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
+import kotlinx.android.synthetic.main.fragment_last_week_delivery.*
+import org.json.JSONObject
+
+class LastWeekBounceFragment : Fragment() {
+    private var prefs: SharedPreferences? = null
+    private var editor: SharedPreferences.Editor? = null
+    var mContext: Context? = null
+    var mQueue: RequestQueue? = null
+    var srId: String ? = ""
+    var routeId: String ? = ""
+
+    var itemList : ArrayList<OutletStatistics> = ArrayList()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+
+        }
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
+    }
+
+    private fun init() {
+        //getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
+        getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_bounce=1&with_last_week_order=1")
+    }
+
+    private fun getLastBounceItems(url: String) {
+
+        ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener {
+            override fun onResponseSuccess(response: String) {
+                try {
+                    if (response != null){
+                        itemList.clear()
+                        val productList: ArrayList<ProductStatistics> = ArrayList()
+                        val obj = JSONObject(response)
+                        val outletssArray = obj.getJSONArray("outlets")
+                        if (outletssArray.length() > 0){
+                            for (i in 0 until outletssArray.length()){
+                                val outletObj = outletssArray.getJSONObject(i)
+                                val brandArray = outletObj.getJSONArray("brands")
+                                if (brandArray.length() >0){
+                                    for (j in 0 until brandArray.length()){
+                                        val brandObj = brandArray.getJSONObject(j)
+                                        productList.add(
+                                            ProductStatistics(
+                                                brandObj.getString("product_id"),
+                                                brandObj.getString("product"),
+                                                /*brandObj.getString("type"),*/
+                                                "Jar/box",
+                                                brandObj.getString("brand_id"),
+                                                brandObj.getDouble("unit_price"),
+                                                brandObj.getInt("quantity"),
+                                                brandObj.getDouble("total_price")
+                                            )
+                                        )
+                                    }
+                                }
+                                itemList.add(
+                                    OutletStatistics(
+                                        outletObj.getString("outlet_id"),
+                                        outletObj.getString("outlet_name"),
+                                        outletObj.getString("outlet_code"),
+                                        outletObj.getString("outlet_category"),
+                                        outletObj.getString("order_delivery_date"),
+                                        productList
+                                    ))
+                            }
+                        }
+
+                        val adapter = OutletAdapter(itemList, "bounce")
+                        listView.adapter = adapter
+                        adapter.notifyDataSetChanged()
+
+
+                    }
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
+
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, mContext!!)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+    }
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_last_week_bounce, container, false)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        editor = prefs!!.edit()
+        mContext = context
+        mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        srId = prefs!!.getString(Api.SR_CODE, "")
+        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+    }
+}

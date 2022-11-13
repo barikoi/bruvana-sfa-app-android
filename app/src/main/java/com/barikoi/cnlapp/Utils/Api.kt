@@ -42,9 +42,8 @@ object Api {
     val create_attendance = base_url+"api/v1/attendance"
     val get_attendance = base_url+"api/v1/get-attendance"
 
-    val get_summary = base_url+"api/v1/get-overview-stats?start_date=2022-04-09 00:00:00&end_date=2022-10-30 23:59:59&sr_id=3316"
-    val get_last_week_products = base_url+"api/v1/products?start_date=2022-04-01&end_date=2022-10-31&so_id=3721&route_id=2"
-    val get_last_week_category = base_url+"api/v1/get-categories?start_date=2022-03-01&end_date=2022-03-30&sr_id=4105&route_id=20"
-    val get_last_week_delivery = base_url+"api/v1/get-delivered-outlets?start_date=2022-04-01 00:00:00&end_date=2022-11-30 23:59:59&sr_id=3185&route_id=310"
-    val get_last_week_bounce = base_url+""
+    val get_summary = base_url+"api/v1/get-overview-stats"
+    val get_last_week_products = base_url+"api/v1/products"
+    val get_last_week_category = base_url+"api/v1/get-category-outlets"
+    val get_last_week_delivery_bounce = base_url+"api/v1/get-delivered-bounce-outlets"
 }

@@ -1,13 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.HomeFragment">
-    <TextView
+    android:background="@color/background_app"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".StatisticsHome.Fragment.HomeFragment">
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Home" />
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_centerVertical="true"
+            android:gravity="start"
+            android:text="@string/summary"
+            android:textStyle="bold"
+            android:textColor="@color/text_title"
+            android:textSize="14sp"
+            android:layout_alignParentLeft="true">
+        </TextView>
 
-</FrameLayout>
+        <LinearLayout
+            android:id="@+id/dateRangeLayoutHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/stroke_background"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvDateRange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:drawableLeft="@drawable/ic_date_range"
+                android:drawablePadding="4dp"
+                android:gravity="start"
+                android:text="Oct 23-Nov 21"
+                android:textColor="@color/text_title_2"
+                android:textSize="14sp">
+
+            </TextView>
+        </LinearLayout>
+
+    </RelativeLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/targetListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layoutManager="LinearLayoutManager"
+        android:orientation="horizontal"
+        tools:listitem="@layout/single_summary_view">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner_lightgray"
+        android:backgroundTint="@color/white">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/viewpagertab"
+            style="@style/TabLayoutStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            android:fillViewport="false"
+            android:layout_alignParentTop="true"
+            app:tabBackground="@drawable/tab_indicator_bg_gray"
+            app:tabMinWidth="120dp"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/text_title" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:layout_below="@+id/viewpagertab"
+            />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/dotsLayout"
+            />
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner_lightgray"
+        android:backgroundTint="@color/white">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/viewpagertabSecond"
+            style="@style/TabLayoutStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/stroke_background"
+            app:tabIndicatorHeight="0dp"
+            app:tabIndicatorGravity="stretch"
+            app:tabIndicator="@drawable/tab_selected"
+            android:fillViewport="false"
+            android:layout_alignParentTop="true"
+            app:tabMinWidth="120dp"
+            app:tabMode="auto"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/text_title" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPagerSecond"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:layout_below="@+id/viewpagertabSecond"
+            />
+
+    </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

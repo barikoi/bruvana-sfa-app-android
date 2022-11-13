@@ -56,12 +56,37 @@
     <string name="in">In</string>
     <string name="out">Out</string>
     <string name="date_range">Date Range</string>
+    <string name="attendance">Attendance</string>
+    <string name="history">History</string>
 
     <!--attendance summary-->
     <string name="present">Present</string>
     <string name="absent">Absent</string>
     <string name="late">Late</string>
 
+    <!--Home View-->
+    <string name="last_week_summary">Last Week Summary</string>
+    <string name="last_week_product">Last Week Product</string>
+    <string name="last_week_category">Last Week Category</string>
+    <string name="last_week_delivery">Last Week Delivery</string>
+    <string name="bounce_list">Bounce List</string>
+
+    <string name="summary">Summary</string>
+    <string name="total_order_value">Total Order Value</string>
+    <string name="sku_per_memo">SKU Per Memo</string>
+    <string name="visit_ratio">Visit Ratio</string>
+    <string name="number_of_memo">Number of Memo</string>
+    <string name="aiv">AIV</string>
+
+    <string name="total_target">Total Target</string>
+    <string name="details">Details</string>
+    <string name="total">Total-</string>
+    <string name="last_order_date">Last order date- </string>
+    <string name="items">Items</string>
+
+
     <!--imageCapture-->
     <string name="take_image">Take Image</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

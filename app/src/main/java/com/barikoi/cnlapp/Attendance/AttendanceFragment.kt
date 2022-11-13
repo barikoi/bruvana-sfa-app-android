@@ -58,7 +58,7 @@ class AttendanceFragment : Fragment() {
     }
 
     private fun init() {
-        val titles = arrayOf("Attendance", "History", "Summary")
+        val titles = arrayOf(resources.getString(R.string.attendance), resources.getString(R.string.history), resources.getString(R.string.summary))
         val fragments = ArrayList<Fragment>()
         fragments.add(CreateAttendanceFragment())
         fragments.add(HistoryFragment())
@@ -93,33 +93,7 @@ class AttendanceFragment : Fragment() {
             }
         })
 
-        //getAttendanceHistory()
-
     }
-
-    /*private fun getAttendanceHistory() {
-        ApiServices.apiGET(
-            Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate,
-            mQueue, token!!, object : ApiServiceListener {
-                override fun onResponseSuccess(response: String) {
-                    getHistoryList(response)
-                }
-
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onResponseFailure(error: VolleyError) {
-                    getErrorResponse(error)
-                }
-
-                override fun onException(e: Exception) {
-                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
-                }
-
-            })
-    }*/
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

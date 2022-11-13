@@ -19,6 +19,7 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_history.*
@@ -96,7 +97,7 @@ class HistoryFragment : Fragment() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    getErrorResponse(error)
+                    ViewUtils.getErrorResponse(error, mContext!!)
                 }
 
                 override fun onException(e: Exception) {
@@ -142,7 +143,7 @@ class HistoryFragment : Fragment() {
                     }
 
                     override fun onResponseFailure(error: VolleyError) {
-                        getErrorResponse(error)
+                        ViewUtils.getErrorResponse(error, mContext!!)
                     }
 
                     override fun onException(e: Exception) {
@@ -207,35 +208,6 @@ class HistoryFragment : Fragment() {
             }
         }catch (e:Exception){
             e.printStackTrace()
-        }
-    }
-
-    fun getErrorResponse(error: VolleyError){
-        if (error is TimeoutError) {
-            //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-            Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
-        }
-        if (error is NoConnectionError) {
-            //mListerner.onFailure("Turn on your internet connection and Try again")
-            Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
-        }
-        if (error != null && error.networkResponse != null) {
-            try {
-                val s = String(error.networkResponse.data)
-                Log.d("Routes", "message: $s")
-                val data = JSONObject(s)
-                //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                //mListerner.onFailure(data.getString("message"))
-                Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
-            } catch (e: UnsupportedEncodingException) {
-                Sentry.captureException(e)
-                e.printStackTrace()
-            } catch (e: JSONException) {
-                //mListerner.onFailure(e.message)
-                Sentry.captureException(e)
-                Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                e.printStackTrace()
-            }
         }
     }
 
