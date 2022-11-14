@@ -31,6 +31,7 @@
     <color name="btn_color_light">#F89B59</color>
     <color name="btn_color_dark">#F57921</color>
     <color name="btn_gray_light">#DADADA</color>
+    <color name="btn_no_order">#FFB7A7</color>
 
     <color name="color_gray_depp">#6D8890</color>
     <color name="color_gray_medium">#4F7270</color>

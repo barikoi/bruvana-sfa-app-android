@@ -20,6 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -56,7 +57,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var sortTitle: TextView? = null
     var totalItemCount: TextView? = null
     var tvgrandTotal: TextView? = null
-    var saveOrder: TextView? = null
+    var saveOrder: AppCompatButton? = null
+    var noOrder: AppCompatButton? = null
     var totalAmount : String? =  null
     var latitude: Double? = 0.0
     var longitude: Double? = 0.0
@@ -124,7 +126,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         recylerView = view.findViewById(R.id.productlist)
         totalItemCount = view.findViewById(R.id.totalItemCount)
         tvgrandTotal = view.findViewById(R.id.totalAmount)
-        saveOrder = view.findViewById(R.id.saveOrder)
+        saveOrder = view.findViewById(R.id.save_order)
+        noOrder = view.findViewById(R.id.no_order)
         loading = view.findViewById(R.id.progressBar)
         sortTitle = view.findViewById(R.id.sortTitle)
 
@@ -222,6 +225,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
             })
+        }
+
+        noOrder!!.setOnClickListener {
+
         }
 
         return view
