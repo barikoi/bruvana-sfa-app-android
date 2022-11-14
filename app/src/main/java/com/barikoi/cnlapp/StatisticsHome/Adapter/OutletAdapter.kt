@@ -31,6 +31,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
 
     override fun onBindViewHolder(holder: OutletAdapter.ViewHolder, position: Int) {
         val item = outlets[position]
+        holder.divider.visibility = View.VISIBLE
         if (!item.category.equals("null") && item.category.length> 0){
             holder.tvCategory.visibility = View.VISIBLE
             holder.tvCategory.setText(item.category)
@@ -38,7 +39,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
             holder.tvCategory.visibility = View.GONE
         }
 
-        holder.marketName.setText(item.shop_name)
+        holder.shopName.setText(item.shop_name)
         if (!item.lastOrderDate.equals("null")){
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
@@ -105,17 +106,19 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
     }
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val tvCategory: TextView
-        internal val marketName: TextView
+        internal val shopName: TextView
         internal val lastOrderDate: TextView
         internal val imageShop:ImageView
+        internal val divider: View
         internal val btnDetails: AppCompatButton
 
         init {
             tvCategory = itemView.findViewById(R.id.tvcategory)
-            marketName = itemView.findViewById(R.id.marketName)
+            shopName = itemView.findViewById(R.id.shopName)
             imageShop = itemView.findViewById(R.id.imageShop)
             lastOrderDate = itemView.findViewById(R.id.orderDate)
             btnDetails = itemView.findViewById(R.id.btnDetails)
+            divider = itemView.findViewById(R.id.divider)
         }
     }
 

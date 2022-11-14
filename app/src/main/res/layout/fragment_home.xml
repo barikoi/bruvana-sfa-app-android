@@ -12,7 +12,7 @@
         android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -75,7 +75,7 @@
         tools:listitem="@layout/single_summary_view">
 
     </androidx.recyclerview.widget.RecyclerView>
-
+            <!--summary, product, category-->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -114,9 +114,10 @@
             />
 
     </RelativeLayout>
+            <!--delivery and bounce-->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="500dp"
         android:layout_margin="8dp"
         android:orientation="vertical"
         android:background="@drawable/rounded_corner_lightgray"
@@ -131,10 +132,9 @@
             app:tabIndicatorHeight="0dp"
             app:tabIndicatorGravity="stretch"
             app:tabIndicator="@drawable/tab_selected"
-            android:fillViewport="false"
             android:layout_alignParentTop="true"
             app:tabMinWidth="120dp"
-            app:tabMode="auto"
+            app:tabMode="fixed"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/text_title" />
 

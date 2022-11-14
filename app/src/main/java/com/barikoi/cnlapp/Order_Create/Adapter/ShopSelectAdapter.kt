@@ -3,10 +3,8 @@ package com.barikoi.cnlapp.Order_Create.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
@@ -21,15 +19,28 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_shop_select_list, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_satistics, parent, false)
         return ViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.itemView.background = holder.itemView.resources.getDrawable(R.drawable.cardview_bg)
+        holder.btnDetails.text = holder.itemView.resources.getString(R.string.select)
+        holder.ownerName.visibility = View.VISIBLE
+
         holder.shopName.text= shopList[position].shop_name
         holder.ownerName.text = shopList[position].shop_owner
+        holder.lastOrderDate.text = shopList[position].lastOrderDate
+        holder.tvCategory.text = shopList[position].category
 
-        holder.shopLayout.setOnClickListener {
+        if (shopList[position].isOrdered == 1){
+            holder.isOrdered.visibility = View.VISIBLE
+        }else{
+            holder.isOrdered.visibility = View.GONE
+        }
+
+
+        holder.btnDetails.setOnClickListener {
             mListener.onShopSelected(shopList[position])
         }
     }
@@ -51,10 +62,7 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.shop_name.toLowerCase()
-                                .contains(charString.lowercase(Locale.getDefault())) || row.shop_name
-                                .contains(charString)
-                        ) {
+                        if (row.shop_name.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
                             filteredList.add(row)
                         }
                     }
@@ -75,11 +83,19 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val shopName: TextView
         internal val ownerName: TextView
-        internal val shopLayout: LinearLayout
+        internal val tvCategory: TextView
+        internal val lastOrderDate: TextView
+        internal val imageShop: ImageView
+        internal val isOrdered: ImageView
+        internal val btnDetails: AppCompatButton
         init {
-            shopName = itemView.findViewById(R.id.tvShopName)
-            ownerName = itemView.findViewById(R.id.tvShopOwnerName)
-            shopLayout = itemView.findViewById(R.id.shopLayout)
+            ownerName = itemView.findViewById(R.id.ownerName)
+            tvCategory = itemView.findViewById(R.id.tvcategory)
+            shopName = itemView.findViewById(R.id.shopName)
+            imageShop = itemView.findViewById(R.id.imageShop)
+            lastOrderDate = itemView.findViewById(R.id.orderDate)
+            btnDetails = itemView.findViewById(R.id.btnDetails)
+            isOrdered = itemView.findViewById(R.id.isOrderView)
 
         }
     }

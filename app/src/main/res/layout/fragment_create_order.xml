@@ -3,11 +3,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:id="@+id/createOrder"
     tools:context=".Order_Create.Fragment.CreateOrderFragment">
-    <FrameLayout
-        android:id="@+id/fragmentLayout"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:orientation="vertical"
+        android:background="@color/background_app">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/viewpagertab"
+            style="@style/TabLayoutStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/stroke_background"
+            app:tabIndicatorHeight="0dp"
+            app:tabIndicatorGravity="stretch"
+            app:tabIndicator="@drawable/tab_selected"
+            android:layout_alignParentTop="true"
+            app:tabMinWidth="120dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/text_title" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/viewpagertab"
+            />
+
+    </RelativeLayout>
 </LinearLayout>

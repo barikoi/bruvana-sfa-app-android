@@ -4,13 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/background_app"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Order_Create.Fragment.ShopSelectFragment">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <!--<com.barikoi.cnlapp.Utils.MoreSpinner
+        <!--<com.barikoi.cnlapp.Utils.MoreSpinner
         android:id="@+id/spinnerRoutes"
         android:layout_width="match_parent"
         android:layout_height="30dp"
@@ -23,51 +25,144 @@
             android:id="@+id/spinnerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
-            android:visibility="visible"
-            android:background="@drawable/stroke_background">
+            android:layout_margin="8dp"
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:padding="4dp"
+            android:visibility="visible">
+
             <com.barikoi.cnlapp.Utils.MoreSpinner
                 android:id="@+id/spinnerRoutes"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-
                 android:theme="@style/spinnerItemStyle"
                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
             </com.barikoi.cnlapp.Utils.MoreSpinner>
         </RelativeLayout>
-    <AutoCompleteTextView
-        android:id="@+id/editTextSearchShop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:padding="6dp"
-        android:layout_gravity="center_vertical"
-        android:ems="10"
-        android:drawableRight="@drawable/ic_search"
-        android:drawablePadding="8dp"
-        android:drawableTint="@color/color_gray"
-        android:hint="Search shop"
-        android:imeOptions="actionNext"
-        android:inputType="textCapWords"
-        android:background="@drawable/stroke_background"
-        android:textSize="12sp"
-        />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/shoplist"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_below="@+id/topLayout"
-        android:scrollbarThumbVertical="@color/black"
-        android:background="@color/white"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="2"
-        tools:listitem="@layout/single_shop_select_list" />
-</LinearLayout>
+
+        <AutoCompleteTextView
+            android:id="@+id/editTextSearchShop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:drawableRight="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/color_gray"
+            android:ems="10"
+            android:hint="@string/search_shop"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
+            android:padding="6dp"
+            android:textSize="12sp" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/createShop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/create_shop"
+            android:textSize="12sp"
+            android:textColor="@color/cnl_color_2"
+            android:textAllCaps="false"
+            android:background="@drawable/button_whitebg_stroke">
+
+        </androidx.appcompat.widget.AppCompatButton>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/filterLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="@drawable/cardview_bg"
+                android:padding="4dp"
+                android:layout_marginRight="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/filterTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_title"
+                    android:text="@string/filter"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginLeft="8dp">
+
+                </TextView>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_filter"
+                    android:layout_marginStart="4dp"
+                    app:tint="@color/text_title"
+                    android:layout_marginRight="8dp">
+
+                </ImageView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sortingLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="@drawable/cardview_bg"
+                android:padding="4dp"
+                android:layout_marginRight="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/sortTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_title"
+                    android:text="@string/sort_by"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="4dp">
+
+                </TextView>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_sortby"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="4dp"
+                    app:tint="@color/text_title">
+
+                </ImageView>
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/shoplist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/topLayout"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/background_app"
+            android:scrollbarThumbVertical="@color/black"
+            android:scrollbars="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/single_outlet_satistics" />
+    </LinearLayout>
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar"
         style="@style/SpinKitView.Large.ThreeBounce"

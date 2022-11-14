@@ -18,5 +18,6 @@ class Shops(
     val longitude: Double,
     val route_code: String,
     val route_name: String,
-    val lastOrderDate: String
+    val lastOrderDate: String,
+    val isOrdered: Int
 ): Serializable

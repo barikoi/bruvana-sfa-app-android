@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -41,6 +42,7 @@ import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
 import com.google.android.gms.location.*
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_product_select.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -99,6 +101,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         }
 
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val gd = GradientDrawable()
+        gd.setColor(mContext!!.resources.getColor(R.color.white))
+        gd.cornerRadius = 5f
+        gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
+        previous_order.setBackgroundDrawable(gd)
     }
 
     override fun onCreateView(

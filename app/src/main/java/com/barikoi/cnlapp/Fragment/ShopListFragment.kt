@@ -179,7 +179,7 @@ class ShopListFragment : Fragment() {
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
                                 val outlet_type = outlet.getString("store_type")
-                                val outlet_category = outlet.getString("category")
+                                val outlet_category = outlet.getString("outlet_category")
                                 val owner_name = outlet.getString("owner_name")
                                 val distributor_office = outlet.getString("distributor_office")
                                 val distributor_office_code = outlet.getString("distributor_office_code")
@@ -204,7 +204,8 @@ class ShopListFragment : Fragment() {
                                         longitude,
                                         route_id,
                                         route_name,
-                                        last_order_date
+                                        last_order_date,
+                                        0
                                     )
                                 )
                             }

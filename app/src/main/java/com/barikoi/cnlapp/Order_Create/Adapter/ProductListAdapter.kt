@@ -31,7 +31,7 @@ Filterable{
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_product_select_view, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_product_view, parent, false)
         return ViewHolder(v)
     }
 
@@ -40,13 +40,14 @@ Filterable{
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
         prefs = PreferenceManager.getDefaultSharedPreferences(holder.itemView.context)
         val productObj = mValues.get(position)
+        holder.stockAvailable.visibility = View.VISIBLE
         holder.productName.text = productList[position].product_name
         holder.productUnit.text = productList[position].unit_name
         holder.perUnitPrice.text = productList[position].unit_price.toString()
 
         if (productObj.ordered_quantity > 0) {
-            holder.layoutQty.visibility = View.VISIBLE
-            holder.layoutAdd.visibility = View.GONE
+            /*holder.layoutQty.visibility = View.VISIBLE
+            holder.layoutAdd.visibility = View.GONE*/
             holder.productCount.setText(productObj.ordered_quantity.toString())
         }
 
@@ -55,10 +56,10 @@ Filterable{
         }
 
 
-        holder.layoutAdd.setOnClickListener {
+        /*holder.layoutAdd.setOnClickListener {
             holder.layoutQty.visibility = View.VISIBLE
             holder.layoutAdd.visibility = View.GONE
-        }
+        }*/
 
         if (productList[position].stock_available > 0){
             holder.stockAvailable.text = productList[position].stock_available.toString()+ " in stock"
@@ -149,8 +150,8 @@ Filterable{
 
                 if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
                     holder.tvMinus.isEnabled = false
-                    holder.layoutQty.visibility = View.GONE
-                    holder.layoutAdd.visibility = View.VISIBLE
+                    /*holder.layoutQty.visibility = View.GONE
+                    holder.layoutAdd.visibility = View.VISIBLE*/
                     holder.tvSubtoal.text = "0"
                 }else{
                     holder.tvMinus.isEnabled = true
@@ -217,23 +218,23 @@ Filterable{
         internal val productUnit : TextView
         internal val perUnitPrice : TextView
         internal val tvSubtoal : TextView
-        internal val tvMinus : TextView
-        internal val tvAdd : TextView
+        internal val tvMinus : LinearLayout
+        internal val tvAdd : LinearLayout
         internal val productCount: EditText
-        internal val layoutQty : LinearLayout
-        internal val layoutAdd : LinearLayout
+        /*internal val layoutQty : LinearLayout
+        internal val layoutAdd : LinearLayout*/
 
         init {
-            productName = itemView.findViewById(R.id.tvProductName)
+            productName = itemView.findViewById(R.id.productName)
             stockAvailable = itemView.findViewById(R.id.tvStockAvailable)
             productUnit = itemView.findViewById(R.id.tvProductVariation)
             perUnitPrice = itemView.findViewById(R.id.tvPerUnit)
-            tvSubtoal = itemView.findViewById(R.id.tvTotalPrice)
-            tvMinus = itemView.findViewById(R.id.tvMinus)
-            tvAdd = itemView.findViewById(R.id.tvAdd)
+            tvSubtoal = itemView.findViewById(R.id.tvSubTotal)
+            tvMinus = itemView.findViewById(R.id.layoutMinus)
+            tvAdd = itemView.findViewById(R.id.layoutPlus)
             productCount = itemView.findViewById(R.id.tvCount)
-            layoutQty = itemView.findViewById(R.id.layoutQty)
-            layoutAdd = itemView.findViewById(R.id.layoutAdd)
+            /*layoutQty = itemView.findViewById(R.id.layoutQty)
+            layoutAdd = itemView.findViewById(R.id.layoutAdd)*/
 
 
 

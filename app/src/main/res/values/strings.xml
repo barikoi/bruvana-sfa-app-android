@@ -84,6 +84,20 @@
     <string name="last_order_date">Last order date- </string>
     <string name="items">Items</string>
 
+    <!--Create Order-->
+    <string name="order_collection">Order Collection</string>
+    <string name="selec_dokan">Select Dokan</string>
+    <string name="confirm_order">Confirm Order</string>
+    <string name="select">Select</string>
+    <string name="sort_by">Sort by</string>
+    <string name="filter">Filter</string>
+    <string name="search_shop">Search shop</string>
+    <string name="select_route">Select Route</string>
+    <string name="create_shop">Create New Shop</string>
+    <string name="previous_order">Previous Order</string>
+    <string name="search_product">Search by product name</string>
+    <string name="no_order">No Order</string>
+    <string name="save_order">Save Order</string>
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>

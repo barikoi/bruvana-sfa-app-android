@@ -109,6 +109,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //setCurrentFragment(HomeFragment(), this@MainActivity)
         fab_order.setOnClickListener {
+            userLayout.visibility = View.GONE
+            tvTitle.text = resources.getString(R.string.order_collection)
+            tvTitle.visibility = View.VISIBLE
             setCurrentFragment(CreateOrderFragment(), this@MainActivity)
         }
 
@@ -147,7 +150,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_attendance -> {
-                    tvTitle.text = "Attendance"
+                    tvTitle.text = resources.getString(R.string.attendance)
                     tvTitle.visibility = View.VISIBLE
                     userLayout.visibility = View.GONE
                     setCurrentFragment(AttendanceFragment(), this@MainActivity)

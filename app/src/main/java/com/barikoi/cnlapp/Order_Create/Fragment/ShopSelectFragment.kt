@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.drawable.GradientDrawable
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -26,18 +27,20 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Model.Shops
+import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
+import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.google.android.gms.location.*
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+
 
 class ShopSelectFragment : Fragment(), OnSelectListener {
     var recylerView: RecyclerView? = null
@@ -60,6 +63,16 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val gd = GradientDrawable()
+        gd.setColor(mContext!!.resources.getColor(R.color.white))
+        gd.cornerRadius = 5f
+        gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
+        createShop.setBackgroundDrawable(gd)
     }
 
     override fun onCreateView(
@@ -285,7 +298,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("address"),
                                         outletObj.getString("outlet_code"),
                                         outletObj.getString("store_type"),
-                                        outletObj.getString("category"),
+                                        outletObj.getString("outlet_category"),
                                         outletObj.getString("owner_name"),
                                         outletObj.getString("distributor_office"),
                                         outletObj.getString("distributor_office_code"),
@@ -294,7 +307,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getDouble("longitude"),
                                         routeObj.getString("route_code"),
                                         routeObj.getString("route_name"),
-                                        outletObj.getString("order_delivery_date")
+                                        outletObj.getString("order_delivery_date"),
+                                        1
                                     )
 
                                     shopList!!.add(shops)

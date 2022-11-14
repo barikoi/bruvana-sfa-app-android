@@ -32,6 +32,7 @@
     <style name="spinnerItemStyle">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/black</item>
+        <!--<item name="android:hint">@string/select_route</item>-->
     </style>
     <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">12sp</item>
