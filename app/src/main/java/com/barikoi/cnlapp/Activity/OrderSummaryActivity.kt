@@ -1,0 +1,214 @@
+package com.barikoi.cnlapp.Activity
+
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.preference.PreferenceManager
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Model.Products
+import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
+import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
+import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
+import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
+import com.google.android.material.datepicker.MaterialDatePicker
+import kotlinx.android.synthetic.main.activity_order_summary.*
+import kotlinx.android.synthetic.main.activity_order_summary.tvRouteName
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
+
+class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
+
+    var user_id : String? = null
+    var sr_id : String? = null
+    var route_id: String? = null
+    private var prefs: SharedPreferences? = null
+    private var editor: SharedPreferences.Editor? = null
+    var queue: RequestQueue? = null
+    var listener : OnEditOrderListener? =null
+    private var adapter: ConfirmOrderListAdapter? = null
+    var StartDate: String? = null
+    var EndDate: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_order_summary)
+
+        queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
+        prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        editor = prefs!!.edit()
+        user_id = prefs!!.getString(Api.USER_ID, "")
+        sr_id = prefs!!.getString(Api.SR_CODE, "")
+        route_id = prefs!!.getString(Api.ORDERED_ROUTE_ID, "")
+
+        listener = this
+        setDateFilter()
+
+        editTextSearchShop.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+            override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                adapter!!.filter.filter(s)
+                if (s!!.length == 0){
+                    getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date="+StartDate+"&end_date="+EndDate)
+                }
+            }
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+
+        })
+    }
+
+    private fun setDateFilter() {
+        val c = Calendar.getInstance()
+        c.add(Calendar.DAY_OF_WEEK, -7)
+        val end = Calendar.getInstance().time
+        val start = c.time
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+        StartDate = df.format(start)
+        EndDate = df.format(end)
+
+        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+
+
+        val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
+        materialDateBuilder.setTitleText("SELECT A DATE")
+
+        val materialDatePicker = materialDateBuilder.build()
+
+        dateRangeLayout.setOnClickListener(View.OnClickListener {
+            materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
+            dateRangeLayout.setEnabled(false)
+        })
+
+        materialDatePicker.addOnPositiveButtonClickListener { selection ->
+            dateRangeLayout.setEnabled(true)
+            val s_date = Date(selection.first!!)
+            val e_date = Date(selection.second!!)
+            if (s_date.compareTo(e_date) == 0) {
+                tvDateRange.setText(simpleFormat.format(s_date))
+                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
+                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
+                editor!!.commit()*/
+            } else {
+                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
+                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
+                editor!!.commit()*/
+            }
+            getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
+
+        }
+
+        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+
+        getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date="+StartDate+"&end_date="+EndDate)
+    }
+
+    private fun getAllOrders(url: String) {
+
+        ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+                try {
+                    if (response != null){
+                        val itemList: ArrayList<OrderList> = ArrayList()
+                        var productItems: ArrayList<Products> = ArrayList()
+                        val obj = JSONObject(response)
+                        val orderArray = obj.getJSONArray("orders")
+                        if (orderArray.length() > 0){
+                            for (i in 0 until orderArray.length()){
+                                productItems.clear()
+                                val orderObj = orderArray.getJSONObject(i)
+                                val brandArray = orderObj.getJSONArray("brands")
+                                tvRouteName.setText(orderObj.getString("route_name"))
+                                if (brandArray.length() > 0){
+                                    for (j in 0 until brandArray.length()){
+                                        val brandObj = brandArray.getJSONObject(j)
+                                        productItems.add(
+                                            Products(
+                                                brandObj.getString("product_id"),
+                                                brandObj.getString("product"),
+                                                "",
+                                                brandObj.getString("brand_id"),
+                                                "",
+                                                brandObj.getDouble("unit_price"),
+                                                0.0,"",
+                                                brandObj.getString("unit_name"),
+                                                "",0,0,
+                                                brandObj.getInt("quantity"),
+                                                brandObj.getDouble("total_price")
+                                            )
+                                        )
+                                    }
+
+                                }
+                                itemList.add(
+                                    OrderList(
+                                        null,
+                                        orderObj.getString("order_no"),
+                                        orderObj.getString("orders_status"),
+                                        orderObj.getString("outlet_id"),
+                                        orderObj.getString("outlet_name"),
+                                        orderObj.getString("route_id"),
+                                        orderObj.getString("route_name"),
+                                        orderObj.getString("distributor_office_code"),
+                                        orderObj.getString("grand_total"),
+                                        orderObj.getString("latitude"),
+                                        orderObj.getString("longitude"),
+                                        productItems
+                                    )
+                                )
+                            }
+                        }
+
+
+                        adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
+                        orderList.adapter = adapter
+                        adapter!!.notifyDataSetChanged()
+
+
+                    }
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, applicationContext)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
+
+    override fun onEdit(order: OrderList) {
+        TODO("Not yet implemented")
+    }
+
+}

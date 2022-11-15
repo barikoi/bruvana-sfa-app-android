@@ -92,6 +92,10 @@ class HistoryFragment : Fragment() {
                     getHistoryList(response)
                 }
 
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
                     TODO("Not yet implemented")
                 }
@@ -136,6 +140,10 @@ class HistoryFragment : Fragment() {
                 mQueue!!, token!!, object : ApiServiceListener{
                     override fun onResponseSuccess(response: String) {
                         getHistoryList(response)
+                    }
+
+                    override fun onJSONResponseSuccess(response: JSONObject) {
+                        TODO("Not yet implemented")
                     }
 
                     override fun onNetworkResponseSuccess(response: NetworkResponse) {

@@ -48,6 +48,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     var queue: RequestQueue? = null
     var spinner : MoreSpinner? = null
     var user_id : String? = null
+    var sr_id : String? = null
     var listener: OnSelectListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ShopSelectAdapter? = null
@@ -99,7 +100,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 val route_id = routeNameList!![p2].first
                 editor!!.putString(Api.SELECTED_ROUTE_ID, route_id)
                 editor!!.commit()
-                getShopListbyRoute(Api.routes_withfilter+"?with_geometry=0&with_outlets=1&route_id="+route_id+"&sr_id="+user_id)
+                getShopListbyRoute(Api.shops_byroutes+"?route_id="+route_id+"&sr_id="+sr_id)
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -218,51 +219,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
     }
 
-    fun getLocation2(){
-        val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
-            val mLocationRequest = LocationRequest()
-            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            Log.d("ConfirmOrder", "Location: "+mLocationRequest)
-            mLocationCallback = object : LocationCallback() {
-                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val location = locationResult.lastLocation
-                    if (location != null) {
-                        if (!location.isFromMockProvider) {
-                            Log.d("ConfirmOrder", "Location: "+location)
-                        } else {
-                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    } else {
-                        Toast.makeText(
-                            mContext!!.applicationContext,
-                            "Location not available $location", Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-
-            if (ActivityCompat.checkSelfPermission(
-                    mContext!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    mContext!!, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-
-            }
-            mFusedLocationClient!!.requestLocationUpdates(
-                mLocationRequest, mLocationCallback!!,
-                Looper.myLooper()!!
-            )
-        } else {
-            //showGPSDisabledAlertToUser()
-        }
-    }
-
     private fun getShopListbyRoute(url: String) {
         loading!!.visibility = View.VISIBLE
         val request = StringRequest(Request.Method.GET, url,
@@ -272,21 +228,10 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     loading!!.visibility = View.GONE
 
                     val data = JSONObject(response)
-                    if (data.has("routes") && !data.isNull("routes")){
-                        val routesArray = data.getJSONArray("routes")
-                        if (routesArray.length() > 0){
+                    if (data.has("fetch_outlets") && !data.isNull("fetch_outlets")){
+                        val outletsArray = data.getJSONArray("fetch_outlets")
+                        if (outletsArray.length() > 0){
                             shopList!!.clear()
-                            val routeObj = routesArray.getJSONObject(0)
-                            /*val route = Routes(routeObj.getString("id"),
-                                routeObj.getString("route_code"),
-                                routeObj.getString("route_name"),
-                                routeObj.getString("territory_name"),
-                                routeObj.getString("area_name"),
-                                "",
-                                ArrayList<Shops>()
-                            )*/
-
-                            val outletsArray = routeObj.getJSONArray("outlets")
                             if (outletsArray.length()>0){
 
                                 for (i in 0 until outletsArray.length()){
@@ -302,13 +247,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("owner_name"),
                                         outletObj.getString("distributor_office"),
                                         outletObj.getString("distributor_office_code"),
-                                        routeObj.getString("territory_name"),
+                                        "",
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
-                                        routeObj.getString("route_code"),
-                                        routeObj.getString("route_name"),
-                                        outletObj.getString("order_delivery_date"),
-                                        1
+                                        outletObj.getString("route_code"),
+                                        outletObj.getString("route_name"),
+                                        outletObj.getString("last_delivered_at"),
+                                        outletObj.getInt("ordered_today")
                                     )
 
                                     shopList!!.add(shops)
@@ -378,6 +323,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         editor = prefs!!.edit()
         //token = prefs.getString("token", "")
         user_id = prefs!!.getString(Api.USER_ID, "")
+        sr_id = prefs!!.getString(Api.SR_CODE, "")
         mContext = context
         listener = this
 

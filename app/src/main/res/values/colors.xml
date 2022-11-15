@@ -13,6 +13,7 @@
     <color name="black_light">#73000000</color>
 
     <color name="background_app">#F3F3F3</color>
+    <color name="background_card">#E4E4E4</color>
     <color name="fab_icon">#9DB2CE</color>
     <color name="text_title">#CC1E1E1E</color>
     <color name="text_title_2">#801E1E1E</color>

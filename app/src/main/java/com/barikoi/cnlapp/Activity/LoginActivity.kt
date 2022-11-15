@@ -102,6 +102,7 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString(Api.USER_ID, userObj.getString("id"))
                         editor.putString(Api.PHONE, userObj.getString("phone"))
                         editor.putString(Api.SR_CODE, userObj.getString("sr_code"))
+                        editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
                         editor.putString(Api.TOKEN, token)
                         editor.commit()
 

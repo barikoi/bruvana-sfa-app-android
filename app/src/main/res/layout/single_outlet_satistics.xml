@@ -31,7 +31,7 @@
             android:layout_alignParentStart="true"
             android:translationZ="90dp"
             android:gravity="center"
-            android:text="A"
+            android:text=""
             android:textSize="9sp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Hasan General Store"
+                android:text=""
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="bold">
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:visibility="gone"
-            android:text="Hasan Miah"
+            android:text=""
             android:textColor="@color/text_title"
             android:textSize="9sp">
 
@@ -110,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Last Order Date: 20 Mar 2022"
+            android:text=""
             android:textColor="@color/text_title_2"
             android:textSize="9sp">
 

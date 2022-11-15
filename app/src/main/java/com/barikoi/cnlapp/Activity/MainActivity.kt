@@ -189,6 +189,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
                 TODO("Not yet implemented")
             }
@@ -276,7 +280,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.menu_order_summary) {
-            //startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+            startActivity(Intent(this@MainActivity, OrderSummaryActivity::class.java))
         } else if (id == R.id.menu_shop_route) {
             startActivity(Intent(this@MainActivity, RouteActivity::class.java))
         } else if (id == R.id.menu_notice){

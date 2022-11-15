@@ -98,6 +98,10 @@
     <string name="search_product">Search by product name</string>
     <string name="no_order">No Order</string>
     <string name="save_order">Save Order</string>
+    <string name="add_more_item">Add More Item</string>
+    <string name="download_chalan">Download Chalan</string>
+    <string name="confirm_order_dialog">Are you sure want to confirm todays order?</string>
+    <string name="order_summary">Order Summary</string>
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>

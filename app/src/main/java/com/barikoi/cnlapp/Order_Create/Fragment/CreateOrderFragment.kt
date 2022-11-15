@@ -67,7 +67,7 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
             }).attach()
         viewPager.setCurrentItem(0);
 
-        //viewPager.setUserInputEnabled(false)
+        viewPager.setUserInputEnabled(false)
         for (i in 0 until viewpagertab.getTabCount()) {
             val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams

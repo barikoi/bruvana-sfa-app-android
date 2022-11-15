@@ -26,18 +26,21 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.RouteActivity"
-            android:theme="@style/Theme.CNLApp.NoActionBar.Material"
+            android:name=".Activity.OrderSummaryActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
-
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material"/>
+        <activity
+            android:name=".Activity.RouteActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".Activity.LoginActivity"
             android:exported="true"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".Activity.SplashActivity"
             android:exported="true"
@@ -49,17 +52,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Activity.MainActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.CNLApp.NoActionBar.Material"
-            android:exported="true">
-            <!--<intent-filter>
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material">
+
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
         </activity>
 
         <provider
@@ -72,13 +77,19 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <meta-data android:name="io.sentry.dsn" android:value="https://851b695b52a740ce9649a4af9dbbd669@o437144.ingest.sentry.io/6750736" />
-        <!-- Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-           We recommend adjusting this value in production. -->
-        <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
-        <!-- Enable user interaction tracing to capture transactions for various UI events (such as clicks or scrolls). -->
-        <meta-data android:name="io.sentry.traces.user-interaction.enable" android:value="true" />
-
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="https://851b695b52a740ce9649a4af9dbbd669@o437144.ingest.sentry.io/6750736" />
+        <!--
+ Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+           We recommend adjusting this value in production.
+        -->
+        <meta-data
+            android:name="io.sentry.traces.sample-rate"
+            android:value="1.0" /> <!-- Enable user interaction tracing to capture transactions for various UI events (such as clicks or scrolls). -->
+        <meta-data
+            android:name="io.sentry.traces.user-interaction.enable"
+            android:value="true" />
     </application>
 
 </manifest>

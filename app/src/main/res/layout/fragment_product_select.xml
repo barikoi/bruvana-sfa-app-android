@@ -24,7 +24,7 @@
             android:layout_alignParentTop="true"
             android:text="Hasadasdasdasda"
             android:textSize="17sp"
-            android:textColor="@color/color_gray_medium"
+            android:textColor="@color/text_title"
             android:textStyle="bold">
 
         </TextView>

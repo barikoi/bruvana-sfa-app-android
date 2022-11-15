@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): RecyclerView.Adapter<ShopSelectAdapter.ViewHolder>(),
@@ -30,7 +31,12 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
         holder.shopName.text= shopList[position].shop_name
         holder.ownerName.text = shopList[position].shop_owner
-        holder.lastOrderDate.text = shopList[position].lastOrderDate
+        if (!shopList[position].lastOrderDate.equals("null")){
+            val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+            val orderDate = df.format(oldDate.parse(shopList[position].lastOrderDate))
+            holder.lastOrderDate.text = holder.itemView.context.resources.getString(com.barikoi.cnlapp.R.string.last_order_date)+orderDate
+        }
         holder.tvCategory.text = shopList[position].category
 
         if (shopList[position].isOrdered == 1){

@@ -44,7 +44,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(item.lastOrderDate))
-            holder.lastOrderDate.setText("Last Order Date: "+orderDate)
+            holder.lastOrderDate.setText(holder.itemView.context.resources.getString(R.string.last_order_date)+orderDate)
         }
         if (fromChoice.equals("bounce")){
             holder.btnDetails.setText("Bounce Item")
@@ -54,7 +54,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
 
         holder.btnDetails.setOnClickListener {
 
-            viewDialog(holder.itemView.context, item.shop_name, holder.lastOrderDate.text.toString(), item.products)
+            viewDialog(holder.itemView.context, item.shop_name, item.lastOrderDate, item.products)
         }
 
     }
@@ -73,7 +73,10 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
         var dformat = DecimalFormat("#.##")
         outletName.setText(outlet_name)
-        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ lastOrder)
+        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+        val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+        val orderDate = df.format(oldDate.parse(lastOrder))
+        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
         tvItemCount.setText(listItem.size.toString()+mContext.resources.getString(R.string.items))
 
         var grandTotal = 0.0

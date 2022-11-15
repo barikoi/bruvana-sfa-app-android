@@ -19,12 +19,10 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.NoConnectionError
-import com.android.volley.Request
-import com.android.volley.RequestQueue
+import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
@@ -35,12 +33,22 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.Utils.ViewUtils.showGPSDisabledAlertToUser
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
+import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.google.android.gms.location.*
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_confirm_order.*
+import kotlinx.android.synthetic.main.fragment_home.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
@@ -48,6 +56,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     var recylerView: RecyclerView? = null
     lateinit var ACTIVITY: MainActivity
     var user_id : String? = null
+    var sr_id : String? = null
+    var route_id: String? = null
     var confirmOrder: AppCompatButton? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -64,6 +74,10 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -75,10 +89,10 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         recylerView = view.findViewById(R.id.orderList)
 
         confirmOrder!!.setOnClickListener {
-            ViewUtils.viewDialog(mContext!!, "Are your sure want to confirm today's Order?", object :
+            ViewUtils.viewDialog(mContext!!, mContext!!.resources.getString(R.string.confirm_order_dialog), object :
                 DialogListener {
                 override fun onConfirmed() {
-                    createOrder()
+                    //createOrder()
                 }
                 override fun onCanceled() {
 
@@ -86,8 +100,9 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
             })
         }
-
-        getAllOrdersDB()
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val today = df.format(Calendar.getInstance().time)
+        getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date=2022-11-14"/*+today*/+"&end_date=2022-11-14"/*+today*/)
         return view
     }
 
@@ -100,7 +115,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                 val orderObj = JSONObject()
                 orderObj.put("outlet_id", orderList[i].outletId)
                 orderObj.put("sr_id", user_id)
-                //orderObj.put("ordered_at", "2022-10-25 09:22:00")
                 orderObj.put("distributor_office_code", orderList[i].distOfficeCode)
                 orderObj.put("grand_total", orderList[i].grandTotal)
                 orderObj.put("longitude", orderList[i].longitude)
@@ -174,58 +188,91 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         queue!!.add(jsonObjectRequest)
     }
 
-    private fun getAllOrdersDB() {
-        //allorderList = appDatabase!!.orderListDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
-        allorderList = appDatabase!!.orderListDao().getAllOrders()
-        if (allorderList!!.size > 0){
-            val adapter = ConfirmOrderListAdapter(allorderList!!, listener!!)
-            recylerView!!.adapter = adapter
-            adapter.notifyDataSetChanged()
-        }
-    }
+    private fun getAllOrders(url: String) {
 
-    fun getLocation(){
-        val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
-            val mLocationRequest = LocationRequest()
-            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            mLocationCallback = object : LocationCallback() {
-                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val location = locationResult.lastLocation
-                    if (location != null) {
-                        if (!location.isFromMockProvider) {
-                            //createOrder()
-                        } else {
-                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
-                                .show()
+        ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+                try {
+                    if (response != null){
+                        val itemList: ArrayList<OrderList> = ArrayList()
+                        var productItems: ArrayList<Products> = ArrayList()
+                        val obj = JSONObject(response)
+                        val orderArray = obj.getJSONArray("orders")
+                        if (orderArray.length() > 0){
+                            for (i in 0 until orderArray.length()){
+                                productItems.clear()
+                                val orderObj = orderArray.getJSONObject(i)
+                                val brandArray = orderObj.getJSONArray("brands")
+                                tvRouteName.setText(orderObj.getString("route_name"))
+                                if (brandArray.length() > 0){
+                                    for (j in 0 until brandArray.length()){
+                                        val brandObj = brandArray.getJSONObject(j)
+                                        productItems.add(
+                                            Products(
+                                                brandObj.getString("product_id"),
+                                                brandObj.getString("product"),
+                                                "",
+                                                brandObj.getString("brand_id"),
+                                                "",
+                                                brandObj.getDouble("unit_price"),
+                                                0.0,"",
+                                                brandObj.getString("unit_name"),
+                                                "",0,0,
+                                                brandObj.getInt("quantity"),
+                                                brandObj.getDouble("total_price")
+                                            )
+                                        )
+                                    }
+
+                                }
+                                itemList.add(
+                                    OrderList(
+                                        null,
+                                        orderObj.getString("order_no"),
+                                        orderObj.getString("orders_status"),
+                                        orderObj.getString("outlet_id"),
+                                        orderObj.getString("outlet_name"),
+                                        orderObj.getString("route_id"),
+                                        orderObj.getString("route_name"),
+                                        orderObj.getString("distributor_office_code"),
+                                        orderObj.getString("grand_total"),
+                                        orderObj.getString("latitude"),
+                                        orderObj.getString("longitude"),
+                                        productItems
+                                    )
+                                )
+                            }
                         }
-                    } else {
-                        Toast.makeText(
-                            mContext!!.applicationContext,
-                            "Location not available $location", Toast.LENGTH_SHORT
-                        ).show()
+
+
+                        val adapter = ConfirmOrderListAdapter(itemList, listener!!, "confirm")
+                        recylerView!!.adapter = adapter
+                        adapter.notifyDataSetChanged()
+
+
                     }
+                }catch (e: Exception){
+                    e.printStackTrace()
                 }
             }
 
-            if (ActivityCompat.checkSelfPermission(
-                    mContext!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    mContext!!, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
             }
-            mFusedLocationClient!!.requestLocationUpdates(
-                mLocationRequest, mLocationCallback!!,
-                Looper.myLooper()!!
-            )
-        } else {
-            showGPSDisabledAlertToUser(mContext!!)
-        }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, mContext!!)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 
     override fun onAttach(context: Context) {
@@ -234,6 +281,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
         user_id = prefs!!.getString(Api.USER_ID, "")
+        sr_id = prefs!!.getString(Api.SR_CODE, "")
+        route_id = prefs!!.getString(Api.ORDERED_ROUTE_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this

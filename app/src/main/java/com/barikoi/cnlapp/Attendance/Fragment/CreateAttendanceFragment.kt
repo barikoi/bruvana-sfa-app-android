@@ -185,6 +185,10 @@ class CreateAttendanceFragment : Fragment() {
 
             }
 
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
                 editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
                 editor!!.commit()

@@ -15,6 +15,7 @@ object Api {
     val SELECTED_SHOP = "selected_shop"
     val SELECTED_SHOP_ID = "selected_shop_id"
     val SELECTED_ROUTE_ID = "selected_route_id"
+    val ORDERED_ROUTE_ID = "ordered_route_id"
 
     val ROUTE_PAGE_SELECTED = "route_page_selected"
 
@@ -35,13 +36,22 @@ object Api {
     val route_outlet_list = base_url+"api/v1/route-list"
     val verified_shop_list = base_url+"api/v1/verified-outlets"
 
+    /*order create*/
     val routes_withfilter = base_url+"api/v1/routes"
+    val routes_bysr = base_url+"api/v1/routes"
+    val shops_byroutes = base_url+"api/v1/fetch-outlets"
     val all_product_list = base_url+"api/v1/products"
     val confirm_order = base_url+"api/v1/create-order"
+    val no_order = base_url+"api/v1/no-order"
+    val previous_order = base_url+"api/v1/previous-orders"
+    val get_saved_order = base_url+"api/v1/fetch-orders"
+    val update_saved_order = base_url+"api/v1/update-orders"
 
+    /*attendance*/
     val create_attendance = base_url+"api/v1/attendance"
     val get_attendance = base_url+"api/v1/get-attendance"
 
+    /*home view*/
     val get_summary = base_url+"api/v1/get-overview-stats"
     val get_last_week_products = base_url+"api/v1/products"
     val get_last_week_category = base_url+"api/v1/get-category-outlets"

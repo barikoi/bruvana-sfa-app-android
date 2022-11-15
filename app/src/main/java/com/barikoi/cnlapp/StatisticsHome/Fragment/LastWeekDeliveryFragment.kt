@@ -111,6 +111,10 @@ class LastWeekDeliveryFragment : Fragment() {
 
             }
 
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
                 TODO("Not yet implemented")
             }

@@ -4,8 +4,10 @@ import com.android.volley.AuthFailureError
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
+import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Utils.VolleyMultipartRequest
+import org.json.JSONObject
 import java.util.ArrayList
 
 object ApiServices {
@@ -35,6 +37,37 @@ object ApiServices {
             }
             @Throws(AuthFailureError::class)
             override fun getParams(): Map<String, String>? {
+                return parameters
+            }
+        }
+        request.retryPolicy = DefaultRetryPolicy(
+            40 * 1000, 0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        queue.add(request)
+    }
+
+    fun apiJSONObjectPOST(url: String, queue: RequestQueue, token: String, jsonObj: JSONObject , mListener: ApiServiceListener){
+        val request = object : JsonObjectRequest(Request.Method.POST, url,jsonObj,
+            {
+                    response ->
+                try{
+                    mListener.onJSONResponseSuccess(response)
+                }catch (e: Exception){
+                    mListener.onException(e)
+                }
+            },
+            {
+                    error ->
+                mListener.onResponseFailure(error)
+            }
+        ){
+            override fun getHeaders(): MutableMap<String, String> {
+                val parameters: MutableMap<String, String> = HashMap()
+                parameters["Accept"] = "application/json"
+                if (token != "") {
+                    parameters["Authorization"] = "bearer $token"
+                }
                 return parameters
             }
         }

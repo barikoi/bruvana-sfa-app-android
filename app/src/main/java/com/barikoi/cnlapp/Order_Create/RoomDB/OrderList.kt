@@ -10,9 +10,12 @@ import java.io.Serializable
 @Entity
 data class OrderList (
         @PrimaryKey(autoGenerate = true) var id: Int?,
-        @ColumnInfo(name = "OutletId") var outletId: Int,
+        @ColumnInfo(name = "OrderId") var orderId: String,
+        @ColumnInfo(name = "OrderStatus") var orderStatus: String,
+        @ColumnInfo(name = "OutletId") var outletId: String,
         @ColumnInfo(name = "OutletName") var outletName: String,
         @ColumnInfo(name = "RouteId") var routeId: String,
+        @ColumnInfo(name = "RouteName") var routeName: String,
         @ColumnInfo(name = "DistributorOfficeCode") var distOfficeCode: String,
         @ColumnInfo(name = "GrandTotal") var grandTotal: String,
         @ColumnInfo(name = "Latitude") var latitude: String,

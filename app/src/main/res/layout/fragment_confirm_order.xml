@@ -4,50 +4,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/background_app"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Order_Create.Fragment.ConfirmOrderFragment">
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/tvRouteName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
+        android:maxWidth="250dp"
+        android:layout_margin="8dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:shadowColor="@color/black"
-        android:background="@drawable/cardview_bg"
-        android:backgroundTint="@color/light_yellow"
+        android:layout_centerVertical="true"
+        android:drawableLeft="@drawable/ic_route"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
         android:textColor="@color/black"
-        android:text="Saved Order"
+        android:text=""
         android:textStyle="bold"
-        android:textSize="15sp" />
+        android:textSize="15sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_marginRight="4dp" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/orderList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:layout_below="@+id/title"
-        android:layout_above="@+id/btnConfirm"
+        android:layout_below="@+id/tvRouteName"
+        android:layout_above="@+id/buttonLayout"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/single_confirm_order_view">
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnConfirm"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:paddingRight="8dp"
-        android:paddingLeft="8dp"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="12sp"
-        android:background="@drawable/cardview_bg"
-        android:backgroundTint="@color/btn_color"
-        android:text="Confirm Order">
+        android:layout_marginBottom="40dp"
+        android:orientation="vertical">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:text="@string/confirm_order"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:background="@drawable/button_whitebg_stroke"
+            android:backgroundTint="@color/cnl_color_1">
 
-    </androidx.appcompat.widget.AppCompatButton>
+        </androidx.appcompat.widget.AppCompatButton>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btndownloadChalan"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:text="@string/download_chalan"
+            android:textSize="12sp"
+            android:textColor="@color/text_title"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:background="@drawable/button_whitebg_stroke"
+            android:backgroundTint="@color/background_card">
+
+        </androidx.appcompat.widget.AppCompatButton>
+    </LinearLayout>
 </RelativeLayout>
