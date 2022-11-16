@@ -393,6 +393,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("grand_total", tvgrandTotal!!.text.toString())
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
+            orderObj.put("orders_status", "SAVED")
             val brandsArray = JSONArray()
             //val brandList = orderList[i].brands_array
             for (j in 0 until addedProducts!!.size){

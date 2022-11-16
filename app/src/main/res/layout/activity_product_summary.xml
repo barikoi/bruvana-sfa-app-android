@@ -22,35 +22,6 @@
             app:contentInsetEnd="0dp"
             android:background="@color/background_app">
 
-            <!--<LinearLayout
-                android:id="@+id/filterLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_filter"
-                    android:layout_marginStart="@dimen/_4sdp"
-                    android:layout_marginEnd="@dimen/_4sdp">
-
-                </ImageView>
-
-                <TextView
-                    android:id="@+id/filterDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textStyle="italic"
-                    android:textSize="15sp"
-                    android:textColor="@color/white"
-                    android:text=""
-                    android:layout_marginEnd="@dimen/_8sdp">
-
-                </TextView>
-            </LinearLayout>-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,7 +44,7 @@
                     android:textSize="17sp"
                     android:visibility="visible"
                     android:textColor="@color/text_title"
-                    android:text="@string/order_summary">
+                    android:text="@string/title_product_summary">
 
                 </TextView>
 
@@ -83,24 +54,6 @@
 
 
     </com.google.android.material.appbar.AppBarLayout>
-    <AutoCompleteTextView
-        android:id="@+id/editTextSearchShop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="8dp"
-        android:background="@drawable/stroke_background"
-        android:backgroundTint="@color/white"
-        android:drawableRight="@drawable/ic_search"
-        android:drawablePadding="8dp"
-        android:drawableTint="@color/color_gray"
-        android:ems="10"
-        android:hint="@string/search_shop"
-        android:imeOptions="actionNext"
-        android:inputType="textCapWords"
-        android:padding="6dp"
-        android:textSize="12sp" />
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -142,33 +95,15 @@
 
         </TextView>
     </androidx.cardview.widget.CardView>
-    <TextView
-        android:id="@+id/tvRouteName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxWidth="250dp"
-        android:layout_margin="8dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerVertical="true"
-        android:drawableLeft="@drawable/ic_route"
-        android:drawablePadding="8dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/black"
-        android:text=""
-        android:textStyle="bold"
-        android:textSize="15sp"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:layout_marginRight="4dp" />
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/orderList"
+        android:id="@+id/productList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dp"
         android:layout_margin="8dp"
         android:layout_alignParentTop="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/single_confirm_order_view">
+        tools:listitem="@layout/product_view_stock">
 
     </androidx.recyclerview.widget.RecyclerView>
 

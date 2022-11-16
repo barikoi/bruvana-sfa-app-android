@@ -86,7 +86,7 @@
 
     <!--Create Order-->
     <string name="order_collection">Order Collection</string>
-    <string name="selec_dokan">Select Dokan</string>
+    <string name="select_dokan">Select Dokan</string>
     <string name="confirm_order">Confirm Order</string>
     <string name="select">Select</string>
     <string name="sort_by">Sort by</string>
@@ -102,6 +102,14 @@
     <string name="download_chalan">Download Chalan</string>
     <string name="confirm_order_dialog">Are you sure want to confirm todays order?</string>
     <string name="order_summary">Order Summary</string>
+
+    <string name="shops_ordered_this_month"> Shops ordered this month</string>
+    <string name="sold_in">Sold in </string>
+    <string name="route"> route</string>
+
+    <!--notice view-->
+    <string name="see_more">See More...</string>
+    <string name="see_less">See Less...</string>
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>

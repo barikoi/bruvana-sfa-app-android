@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.barikoi.cnlapp.Activity.MainActivity
@@ -21,6 +21,7 @@ import java.io.Serializable
 
 class CreateOrderFragment : Fragment(), OnBackPressedListener{
     lateinit var ACTIVITY: MainActivity
+    var viewpagertab: TabLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +40,7 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_create_order, container, false)
+        viewpagertab = view.findViewById(R.id.viewpagertab2)
         return view
     }
 
@@ -54,28 +56,28 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         //fragmentManager.executePendingTransactions()
     }*/
 
-    private fun setTabViewPager() {
-        val titles = arrayOf(resources.getString(R.string.selec_dokan), resources.getString(R.string.confirm_order))
+    fun setTabViewPager() {
+        val titles = arrayOf(resources.getString(R.string.select_dokan), resources.getString(R.string.confirm_order))
         val fragments = ArrayList<Fragment>()
         fragments.add(SelectDokanFragment())
         fragments.add(ConfirmOrderFragment())
-        viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        viewPager3.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator
-        TabLayoutMediator(viewpagertab, viewPager,
+        TabLayoutMediator(viewpagertab!!, viewPager3,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        viewPager.setCurrentItem(0);
+        viewPager3.setCurrentItem(0)
 
-        viewPager.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.getTabCount()) {
-            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+        viewPager3.setUserInputEnabled(false)
+        for (i in 0 until viewpagertab!!.getTabCount()) {
+            val tab = (viewpagertab!!.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(12, 12, 8, 12)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        Log.d("Fragment", "viewpager current Item: " + viewPager3.getCurrentItem())
+        viewPager3.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
@@ -83,10 +85,6 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()*/
                 } else if (position == 1) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
-                    editor!!.commit()*/
-                }
-                else if (position == 2) {
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
                     editor!!.commit()*/
                 }
@@ -105,7 +103,6 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
             val bundle = Bundle()
             bundle.putString("from", key)
             bundle.putSerializable(key, value) // Put anything what you want
-
             fragmentName.arguments = bundle
             val fragmentManager = (activity as FragmentActivity).supportFragmentManager
             fragmentManager.beginTransaction()
@@ -128,6 +125,7 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         (fragment as? IOnBackPressed)?.onBackPressed()?.not()?.let {
 
         }*/
+
     }
 
 

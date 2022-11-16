@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:background="@color/background_app">
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/viewpagertab"
+            android:id="@+id/viewpagertab2"
             style="@style/TabLayoutStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
             app:tabTextColor="@color/text_title" />
 
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
+            android:id="@+id/viewPager3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/viewpagertab"

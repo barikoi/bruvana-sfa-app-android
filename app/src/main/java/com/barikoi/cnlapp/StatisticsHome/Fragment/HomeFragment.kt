@@ -73,7 +73,7 @@ class HomeFragment : Fragment() {
     private fun init() {
         val c = Calendar.getInstance()
         //c.add(Calendar.DAY_OF_WEEK, -7)
-        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.DAY_OF_MONTH, 1)
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())

@@ -1,54 +1,42 @@
 package com.barikoi.cnlapp.Order_Create.Fragment
 
-import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
-import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
-import com.barikoi.cnlapp.Utils.ViewUtils.showGPSDisabledAlertToUser
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
-import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
-import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
-import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
+import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
+import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.RoomDb.AppDatabase
+import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_confirm_order.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
@@ -68,6 +56,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     private var mFusedLocationClient: FusedLocationProviderClient? = null
     private var mLocationCallback: LocationCallback? = null
     private var listener: OnEditOrderListener? = null
+    val orderList: ArrayList<OrderList> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +81,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
             ViewUtils.viewDialog(mContext!!, mContext!!.resources.getString(R.string.confirm_order_dialog), object :
                 DialogListener {
                 override fun onConfirmed() {
-                    //createOrder()
+                    createOrder()
                 }
                 override fun onCanceled() {
 
@@ -107,18 +96,19 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     }
 
     private fun createOrder(){
-        val orderList = appDatabase!!.orderListDao().getAllOrders()
-        if (orderList!!.size> 0){
+        if (orderList.size> 0){
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             for(i in 0 until orderList.size){
                 val orderObj = JSONObject()
                 orderObj.put("outlet_id", orderList[i].outletId)
+                orderObj.put("order_no", orderList[i].orderId)
                 orderObj.put("sr_id", user_id)
                 orderObj.put("distributor_office_code", orderList[i].distOfficeCode)
                 orderObj.put("grand_total", orderList[i].grandTotal)
-                orderObj.put("longitude", orderList[i].longitude)
-                orderObj.put("latitude", orderList[i].latitude)
+                orderObj.put("orders_status", "PENDING")
+                /*orderObj.put("longitude", orderList[i].longitude)
+                orderObj.put("latitude", orderList[i].latitude)*/
                 val brandsArray = JSONArray()
                 val brandList = orderList[i].brands_array
                 for (j in 0 until brandList.size){
@@ -129,7 +119,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                     brandObj.put("quantity", brandList[j].ordered_quantity)
                     brandObj.put("unit_price", brandList[j].unit_price)
                     brandObj.put("total_price", brandList[j].ordered_total_price)
-                    brandsArray!!.put(brandObj)
+                    brandObj.put("unit_name", brandList[j].unit_name)
+                    brandsArray.put(brandObj)
                 }
 
                 orderObj.put("brands", brandsArray)
@@ -146,13 +137,13 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
     private fun submitOrder(orderObj: JSONObject) {
         val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.POST, Api.confirm_order, orderObj,
+            Request.Method.POST, Api.update_saved_order, orderObj,
             { response ->
                 try {
                     Log.d("ConfirmOrder", "response api: "+response)
-                    appDatabase!!.orderListDao().deleteALL()
-                    appDatabase!!.saveOrderDao().deleteALL()
-                    CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                    /*appDatabase!!.orderListDao().deleteALL()
+                    appDatabase!!.saveOrderDao().deleteALL()*/
+                    CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -189,19 +180,19 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     }
 
     private fun getAllOrders(url: String) {
-
         ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
-                        val itemList: ArrayList<OrderList> = ArrayList()
-                        var productItems: ArrayList<Products> = ArrayList()
+                        orderList.clear()
+                        val productItems: ArrayList<Products> = ArrayList()
                         val obj = JSONObject(response)
                         val orderArray = obj.getJSONArray("orders")
                         if (orderArray.length() > 0){
                             for (i in 0 until orderArray.length()){
                                 productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
+                                if (orderObj.getString("orders_status").equals("SAVED", true)){
                                 val brandArray = orderObj.getJSONArray("brands")
                                 tvRouteName.setText(orderObj.getString("route_name"))
                                 if (brandArray.length() > 0){
@@ -225,7 +216,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                                     }
 
                                 }
-                                itemList.add(
+                                orderList.add(
                                     OrderList(
                                         null,
                                         orderObj.getString("order_no"),
@@ -242,10 +233,11 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                                     )
                                 )
                             }
+                            }
                         }
 
 
-                        val adapter = ConfirmOrderListAdapter(itemList, listener!!, "confirm")
+                        val adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
                         recylerView!!.adapter = adapter
                         adapter.notifyDataSetChanged()
 
@@ -291,6 +283,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     }
 
     override fun onEdit(order: OrderList) {
+        val pager: ViewPager2? =parentFragment?.requireParentFragment()?.view?.findViewById<ViewPager2>(R.id.viewPager3)
+        pager?.setCurrentItem(0)
         CreateOrderFragment.startFragmentWithValue(
             "Order",
             order,

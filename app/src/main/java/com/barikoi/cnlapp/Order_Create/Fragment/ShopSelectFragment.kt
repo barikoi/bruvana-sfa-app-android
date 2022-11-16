@@ -89,17 +89,26 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         adapter = ShopSelectAdapter( ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
+        var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         spinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                for (i in 0 until routeNameList!!.size) {
+                /*for (i in 0 until routeNameList!!.size) {
                     Log.d("RouteList", "all 2 "+ routeNameList!![i].second)
+                }*/
+                if(selectedRoute!!.length>0){
+                    val pos= (spinner!!.adapter as ArrayAdapter<String>).getPosition(selectedRoute)
+                    if(pos>-1) {
+                        selectedRoute = ""
+                        spinner!!.setSelection(pos)
+                        return
+                    }
                 }
                 Log.d("RouteList", "position: "+p2)
                 Log.d("RouteList", "size: "+routeNameList!!.size)
                 val route_id = routeNameList!![p2].first
-                editor!!.putString(Api.SELECTED_ROUTE_ID, route_id)
-                editor!!.commit()
+                /*editor!!.putString(Api.SELECTED_ROUTE_ID, route_id)
+                editor!!.commit()*/
                 getShopListbyRoute(Api.shops_byroutes+"?route_id="+route_id+"&sr_id="+sr_id)
             }
 

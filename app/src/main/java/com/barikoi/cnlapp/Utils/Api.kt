@@ -41,11 +41,14 @@ object Api {
     val routes_bysr = base_url+"api/v1/routes"
     val shops_byroutes = base_url+"api/v1/fetch-outlets"
     val all_product_list = base_url+"api/v1/products"
-    val confirm_order = base_url+"api/v1/create-order"
     val no_order = base_url+"api/v1/no-order"
     val previous_order = base_url+"api/v1/previous-orders"
     val get_saved_order = base_url+"api/v1/fetch-orders"
+    val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
+
+    val product_stock_summary = base_url+"api/v1/products"
+    val get_notice = base_url+"api/v1/notices?start_date=2022-11-14&end_date=2022-11-15"
 
     /*attendance*/
     val create_attendance = base_url+"api/v1/attendance"
