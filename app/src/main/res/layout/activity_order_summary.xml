@@ -21,49 +21,20 @@
             app:contentInsetRight="0dp"
             app:contentInsetEnd="0dp"
             android:background="@color/background_app">
-
-            <!--<LinearLayout
-                android:id="@+id/filterLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_filter"
-                    android:layout_marginStart="@dimen/_4sdp"
-                    android:layout_marginEnd="@dimen/_4sdp">
-
-                </ImageView>
-
-                <TextView
-                    android:id="@+id/filterDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textStyle="italic"
-                    android:textSize="15sp"
-                    android:textColor="@color/white"
-                    android:text=""
-                    android:layout_marginEnd="@dimen/_8sdp">
-
-                </TextView>
-            </LinearLayout>-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
-                <ImageView
+                <ImageButton
                     android:id="@+id/btnBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="8dp"
                     android:layout_centerVertical="true"
+                    android:background="@android:color/transparent"
                     android:src="@drawable/ic_back">
 
-                </ImageView>
+                </ImageButton>
                 <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="match_parent"
@@ -72,6 +43,7 @@
                     android:textStyle="bold"
                     android:textSize="17sp"
                     android:visibility="visible"
+                    android:layout_centerVertical="true"
                     android:textColor="@color/text_title"
                     android:text="@string/order_summary">
 

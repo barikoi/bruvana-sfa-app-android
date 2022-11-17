@@ -3,20 +3,16 @@
 
     <item
         android:id="@+id/menu_mostfrequent"
-        android:icon="@drawable/ic_home_cnl"
         android:title="@string/most_frequent" />
 
     <item
         android:id="@+id/menu_lowstock"
-        android:icon="@drawable/map"
         android:title="@string/low_stock" />
     <item
         android:id="@+id/menu_atoz"
-        android:icon="@drawable/map"
         android:title="@string/atoz" />
     <item
         android:id="@+id/menu_ztoa"
-        android:icon="@drawable/map"
         android:title="@string/ztoa" />
 
 </menu>

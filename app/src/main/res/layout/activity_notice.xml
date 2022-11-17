@@ -26,15 +26,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
-                <ImageView
+                <ImageButton
                     android:id="@+id/btnBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="8dp"
                     android:layout_centerVertical="true"
+                    android:background="@android:color/transparent"
                     android:src="@drawable/ic_back">
 
-                </ImageView>
+                </ImageButton>
                 <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="match_parent"
@@ -42,6 +43,7 @@
                     android:gravity="center"
                     android:textStyle="bold"
                     android:textSize="17sp"
+                    android:layout_centerVertical="true"
                     android:visibility="visible"
                     android:textColor="@color/text_title"
                     android:text="@string/title_notice">
@@ -99,7 +101,7 @@
         </TextView>
     </androidx.cardview.widget.CardView>
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/productList"
+        android:id="@+id/noticeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dp"

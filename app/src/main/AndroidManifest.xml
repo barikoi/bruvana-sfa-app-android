@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.barikoi.cnlapp" >
+    package="com.barikoi.cnlapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -24,19 +24,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CNLApp"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31" >
+        tools:targetApi="31">
         <activity
             android:name=".Notice.NoticeActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.CNLApp.NoActionBar.Material"/>
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
-            android:name=".Activity.ProductSummaryActivity"
+            android:name=".TradeOffers.TradeOffersActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
-            android:name=".Activity.ProductStockUpdateActivity"
+            android:name=".ProductStock.ProductSummaryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
+        <activity
+            android:name=".ProductStock.ProductStockUpdateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
@@ -60,7 +65,7 @@
             android:name=".Activity.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar" >
+            android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -71,7 +76,7 @@
             android:name=".Activity.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.CNLApp.NoActionBar.Material" >
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material">
 
             <!--
             <intent-filter>
@@ -86,7 +91,7 @@
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
-            android:grantUriPermissions="true" >
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />

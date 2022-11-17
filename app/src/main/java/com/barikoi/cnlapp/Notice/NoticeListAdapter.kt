@@ -1,19 +1,19 @@
 package com.barikoi.cnlapp.Notice
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
-import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class NoticeListAdapter (val notices: List<Notice>) : RecyclerView.Adapter<NoticeListAdapter.ViewHolder>(){
     override fun onCreateViewHolder(
@@ -29,9 +29,11 @@ class NoticeListAdapter (val notices: List<Notice>) : RecyclerView.Adapter<Notic
 
         holder.userName.text = mItem.senderName
         holder.tvDesignation.text = mItem.designation
+        holder.noticeMessage.text = mItem.message
+
         if (!mItem.updated_at.equals("null")){
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd MMMM yy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(mItem.updated_at))
             holder.noticeDate.setText(orderDate)
         }
@@ -44,8 +46,42 @@ class NoticeListAdapter (val notices: List<Notice>) : RecyclerView.Adapter<Notic
             holder.imageUser.visibility = View.GONE
         }
 
+
+
+        var expandable = false
+
+        holder.noticeMessage.getViewTreeObserver().addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                //Log.d("Notice", "Line Count: "+holder.noticeMessage.lineCount)
+                if (holder.noticeMessage.lineCount >2){
+                    /*Log.d("Notice", "Line Count: "+holder.noticeMessage.lineCount+" ellipse: "+holder.noticeMessage.layout.getEllipsisCount(holder.noticeMessage.lineCount))
+                    if (holder.noticeMessage.layout.getEllipsisCount(holder.noticeMessage.lineCount-1) > 3){
+                        holder.seeMore.visibility = View.VISIBLE
+                        holder.seeMore.text = holder.itemView.resources.getString(R.string.see_more)
+                    }
+                    else{
+                        holder.seeMore.visibility = View.GONE
+                    }*/
+                    holder.seeMore.visibility = View.VISIBLE
+                    holder.seeMore.text = holder.itemView.resources.getString(R.string.see_more)
+                    holder.noticeMessage.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                }
+            }
+        })
+
+
         holder.seeMore.setOnClickListener {
-            holder.seeMore.text = holder.itemView.resources.getString(R.string.see_less)
+            if (!expandable){
+                expandable = true
+                holder.noticeMessage.maxLines = Integer.MAX_VALUE
+                holder.seeMore.visibility = View.VISIBLE
+                holder.seeMore.text = holder.itemView.resources.getString(R.string.see_less)
+            }else{
+                expandable = false
+                holder.noticeMessage.maxLines = 3
+                holder.seeMore.text = holder.itemView.resources.getString(R.string.see_more)
+                holder.seeMore.visibility = View.VISIBLE
+            }
         }
     }
 

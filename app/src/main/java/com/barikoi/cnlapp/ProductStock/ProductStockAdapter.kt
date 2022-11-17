@@ -1,16 +1,12 @@
-package com.barikoi.cnlapp.Adapter
+package com.barikoi.cnlapp.ProductStock
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Model.ProductStock
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
-import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
 
@@ -18,12 +14,12 @@ class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adap
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ProductStockAdapter.ViewHolder {
+    ): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.product_view_stock, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ProductStockAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = products[position]
 
         holder.productName.text = mItem.product_name

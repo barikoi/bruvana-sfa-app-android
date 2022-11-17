@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Model
+package com.barikoi.cnlapp.ProductStock
 
 import java.io.Serializable
 

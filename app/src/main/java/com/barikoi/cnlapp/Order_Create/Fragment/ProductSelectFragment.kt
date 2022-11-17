@@ -40,7 +40,6 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
-import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
@@ -205,7 +204,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         sortTitle!!.setOnClickListener {
             val popup = PopupMenu(mContext, sortTitle)
-            popup.menuInflater.inflate(R.menu.sort_menu, popup.menu)
+            popup.menuInflater.inflate(R.menu.sort_menu_product, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem?): Boolean {

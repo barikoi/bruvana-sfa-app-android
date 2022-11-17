@@ -1,16 +1,13 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ProductStock
 
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.View
 import android.widget.Toast
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Adapter.ProductStockAdapter
-import com.barikoi.cnlapp.Model.ProductStock
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -18,6 +15,9 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import kotlinx.android.synthetic.main.activity_product_stock_update.*
+import kotlinx.android.synthetic.main.activity_product_stock_update.btnBack
+import kotlinx.android.synthetic.main.activity_product_stock_update.productList
+import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,6 +35,10 @@ class ProductStockUpdateActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
         setDateFilter()
+        btnBack.setOnClickListener {
+            onBackPressed()
+            finish()
+        }
     }
 
     private fun setDateFilter() {
@@ -48,7 +52,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        getProductStock(Api.product_stock_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&with_stock=1&with_order=1")
+        getProductStock(Api.all_product_list+"?start_date="+StartDate+"&end_date="+EndDate+"&with_stock=1&with_order=1")
     }
 
     private fun getProductStock(url: String) {

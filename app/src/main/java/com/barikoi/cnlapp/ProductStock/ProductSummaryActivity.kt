@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ProductStock
 
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
@@ -9,8 +9,6 @@ import android.widget.Toast
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Adapter.ProductStockAdapter
-import com.barikoi.cnlapp.Model.ProductStock
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -19,6 +17,9 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_product_summary.*
+import kotlinx.android.synthetic.main.activity_product_summary.btnBack
+import kotlinx.android.synthetic.main.activity_product_summary.productList
+import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,7 +36,10 @@ class ProductSummaryActivity : AppCompatActivity() {
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
-
+        btnBack.setOnClickListener {
+            onBackPressed()
+            finish()
+        }
         setDateFilter()
     }
 
@@ -79,13 +83,13 @@ class ProductSummaryActivity : AppCompatActivity() {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getProductStock(Api.product_stock_summary+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_stock=1&with_order=1")
+            getProductStock(Api.all_product_list+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_stock=1&with_order=1")
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getProductStock(Api.product_stock_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&with_stock=1&with_order=1")
+        getProductStock(Api.all_product_list+"?start_date="+StartDate+"&end_date="+EndDate+"&with_stock=1&with_order=1")
     }
 
     private fun getProductStock(url: String) {

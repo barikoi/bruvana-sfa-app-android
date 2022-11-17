@@ -14,6 +14,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -28,6 +29,7 @@ import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Shops
+import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
@@ -74,6 +76,45 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         gd.cornerRadius = 5f
         gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
         createShop.setBackgroundDrawable(gd)
+
+
+        sortTitle!!.setOnClickListener {
+            val popup = PopupMenu(mContext, sortTitle)
+            popup.menuInflater.inflate(R.menu.sort_menu_outlet, popup.menu)
+            popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
+                PopupMenu.OnMenuItemClickListener {
+                override fun onMenuItemClick(item: MenuItem?): Boolean {
+                    when(item!!.itemId){
+                        R.id.menu_ztoa->{
+                            shopList!!.sortByDescending {
+                                it.shop_name
+                            }
+                            if (shopList!!.size > 0){
+                                adapter = ShopSelectAdapter(shopList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+
+                            sortTitle!!.setText(resources.getString(R.string.ztoa))
+                        }
+                        R.id.menu_atoz->{
+                            shopList!!.sortBy {
+                                it.shop_name
+                            }
+                            if (shopList!!.size > 0){
+                                adapter = ShopSelectAdapter(shopList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+                            sortTitle!!.setText(resources.getString(R.string.atoz))
+                        }
+                    }
+                    return true
+                }
+
+            })
+            popup.show()
+        }
     }
 
     override fun onCreateView(
@@ -149,6 +190,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             }
 
         })
+
 
         //getLocation2()
 
@@ -269,9 +311,9 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 }
 
                                 if (shopList!!.size > 0){
-                                    val adapter = ShopSelectAdapter(shopList!!, listener!!)
+                                    adapter = ShopSelectAdapter(shopList!!, listener!!)
                                     recylerView!!.adapter = adapter
-                                    adapter.notifyDataSetChanged()
+                                    adapter!!.notifyDataSetChanged()
                                 }
                             }
                             if (spinner != null) {

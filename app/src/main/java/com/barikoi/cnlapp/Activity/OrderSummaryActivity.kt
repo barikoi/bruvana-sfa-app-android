@@ -24,7 +24,9 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_order_summary.*
+import kotlinx.android.synthetic.main.activity_order_summary.btnBack
 import kotlinx.android.synthetic.main.activity_order_summary.tvRouteName
+import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -55,6 +57,11 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 
         listener = this
         setDateFilter()
+
+        btnBack.setOnClickListener {
+            onBackPressed()
+            finish()
+        }
 
         editTextSearchShop.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {

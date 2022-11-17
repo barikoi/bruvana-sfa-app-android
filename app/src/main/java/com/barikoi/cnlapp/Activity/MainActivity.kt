@@ -27,7 +27,10 @@ import com.barikoi.cnlapp.StatisticsHome.Fragment.HomeFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
+import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
+import com.barikoi.cnlapp.ProductStock.ProductSummaryActivity
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
@@ -287,8 +290,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.menu_notice){
             startActivity(Intent(this@MainActivity, NoticeActivity::class.java))
         }else if (id == R.id.menu_trade_offers){
-           //startActivity(Intent(this@MainActivity, RouteActivity::class.java))
-
+           startActivity(Intent(this@MainActivity, TradeOffersActivity::class.java))
         }else if (id == R.id.menu_product_summary){
             startActivity(Intent(this@MainActivity, ProductSummaryActivity::class.java))
         } else if (id == R.id.menu_product_stock_update){

@@ -283,8 +283,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     }
 
     override fun onEdit(order: OrderList) {
-        val pager: ViewPager2? =parentFragment?.requireParentFragment()?.view?.findViewById<ViewPager2>(R.id.viewPager3)
-        pager?.setCurrentItem(0)
+        /*val pager: ViewPager2? =parentFragment?.requireParentFragment()?.view?.findViewById<ViewPager2>(R.id.viewPager3)
+        pager?.setCurrentItem(0)*/
         CreateOrderFragment.startFragmentWithValue(
             "Order",
             order,
