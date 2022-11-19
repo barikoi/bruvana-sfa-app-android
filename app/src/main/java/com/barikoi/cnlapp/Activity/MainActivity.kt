@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -109,7 +110,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val header = navigationDrawer!!.getHeaderView(0)
         tvHeaderUserName = header.findViewById<TextView>(R.id.textView_username)
+        val tvHeaderEmail = header.findViewById<TextView>(R.id.textView_useremail)
+        val btnLogout = findViewById<AppCompatButton>(R.id.btnLogout)
         tvHeaderUserName!!.text = userName
+        if (prefs!!.getString(Api.EMAIL, "")!!.length >0){
+            tvHeaderEmail.visibility = View.VISIBLE
+            tvHeaderEmail.text = prefs!!.getString(Api.EMAIL, "")
+        }
+
+        btnLogout.setOnClickListener {
+            AlertDialog.Builder(this@MainActivity, R.style.AlertDialog)
+                .setTitle(R.string.logout)
+                .setMessage(R.string.sure_log_out)
+                .setPositiveButton(android.R.string.yes,
+                    DialogInterface.OnClickListener { dialog, which ->
+                        logout(this@MainActivity)
+                    })
+                .setNegativeButton(android.R.string.cancel,
+                    DialogInterface.OnClickListener { dialog, which -> }) // do nothing
+                .setIcon(resources.getDrawable(R.drawable.warning))
+                .show()
+        }
 
         //setCurrentFragment(HomeFragment(), this@MainActivity)
         fab_order.setOnClickListener {
@@ -122,7 +143,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    //tvTitle!!.text = "Home"
                     tvTitle.text = ""
                     tvTitle.visibility = View.GONE
                     userLayout.visibility = View.VISIBLE
@@ -130,21 +150,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_route -> {
-                    //tvTitle!!.text = "Map"
+                    tvTitle!!.text = resources.getString(R.string.route_plan)
                     userLayout.visibility = View.GONE
-                    tvTitle.text = ""
                     tvTitle.visibility = View.VISIBLE
                     setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
-                R.id.navigation_order -> {
-                    //tvTitle!!.text = "Map"
-                    //setCurrentFragment(MapFragment(), this@MainActivity)
+                /*R.id.navigation_order -> {
                     userLayout.visibility = View.GONE
                     tvTitle.text = ""
                     tvTitle.visibility = View.VISIBLE
                     return@OnNavigationItemSelectedListener true
-                }
+                }*/
                 R.id.navigation_chat -> {
                     //tvTitle!!.text = "Map"
                     setCurrentFragment(ChatFragment(), this@MainActivity)
@@ -237,39 +254,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
     }
-
-    /*fun toOrdinal(day: Int): String {
-        *//*val formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            MessageFormat("{0,ordinal}", Locale.getDefault())
-        } else {
-            TODO("VERSION.SDK_INT < N")
-        }
-        return formatter.format(arrayOf(day))*//*
-
-        var ordinal=""
-        when(day % 20){
-            1 -> ordinal = "st"
-            2 -> ordinal = "nd"
-            3 -> ordinal = "rd"
-            else -> ordinal = day > 30 > "st":"th"
-        }
-
-        switch (day % 20) {
-            case 1:
-            ordinal = "st";
-            break;
-            case 2:
-            ordinal = "nd";
-            break;
-            case 3:
-            ordinal = "rd";
-            break;
-            default:
-            ordinal = day > 30 > "st" : "th";
-        }
-        return ordinal;
-    }*/
-        fun toOrdinal(day: Int) =
+    fun toOrdinal(day: Int) =
             if (day % 100 / 10 == 1) "th"
             else when (day % 10) { 1 -> "st" 2 -> "nd" 3 -> "rd" else -> "th" }
 
@@ -295,21 +280,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(Intent(this@MainActivity, ProductSummaryActivity::class.java))
         } else if (id == R.id.menu_product_stock_update){
             startActivity(Intent(this@MainActivity, ProductStockUpdateActivity::class.java))
-        }else if (id == R.id.menu_incentive){
+        }/*else if (id == R.id.menu_incentive){
 
-        }else if (id == R.id.menu_logout) {
-            AlertDialog.Builder(this@MainActivity, R.style.AlertDialog)
-                .setTitle(R.string.logout)
-                .setMessage(R.string.sure_log_out)
-                .setPositiveButton(android.R.string.yes,
-                    DialogInterface.OnClickListener { dialog, which ->
-                        logout(this@MainActivity)
-                    })
-                .setNegativeButton(android.R.string.cancel,
-                    DialogInterface.OnClickListener { dialog, which -> }) // do nothing
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show()
-        }
+        }*/
         drawer!!.closeDrawer(GravityCompat.START)
         return true
     }

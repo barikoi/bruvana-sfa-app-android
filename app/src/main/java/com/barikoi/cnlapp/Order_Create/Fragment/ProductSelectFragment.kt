@@ -570,16 +570,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                     price = 0.0
                                 }
                                 if (selectedOrder != null){
-                                    var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
-                                    if (orderlistDB!!.size > 0){
-                                        val exist = orderlistDB[0].brands_array.find {
-                                            it.product_id == productId
-                                        }
+                                    //var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
+                                    val exist = selectedOrder!!.brands_array.find {
+                                        it.product_id == productId
+                                    }
 
-                                        if (exist != null){
-                                            orderedQty = exist.ordered_quantity
-                                            orderedTotalPrice = exist.ordered_total_price
-                                        }
+                                    if (exist != null){
+                                        orderedQty = exist.ordered_quantity
+                                        orderedTotalPrice = exist.ordered_total_price
                                     }
                                 }
                                 val products = Products(

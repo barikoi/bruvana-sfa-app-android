@@ -3,53 +3,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_app"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:layout_gravity="center_vertical"
+        android:orientation="vertical"
         android:visibility="visible">
         <RelativeLayout
             android:id="@+id/spinnerLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/isVerified"
-            android:layout_alignParentLeft="true"
-            android:padding="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_gravity="center_vertical"
-            android:visibility="visible"
-            android:background="@drawable/rounded_stroke_bg">
-        <com.barikoi.cnlapp.Utils.MoreSpinner
-            android:id="@+id/spinnerRoutes"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:theme="@style/spinnerItemStyle"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:padding="4dp"
+            android:visibility="visible">
 
-        </com.barikoi.cnlapp.Utils.MoreSpinner>
+            <com.barikoi.cnlapp.Utils.MoreSpinner
+                android:id="@+id/spinnerRoutes"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:theme="@style/spinnerItemStyle"
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+            </com.barikoi.cnlapp.Utils.MoreSpinner>
         </RelativeLayout>
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/isVerified"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
             android:button="@null"
             android:visibility="visible"
             android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
-            android:text="Verified"
+            android:drawableTint="@color/cnl_color_1"
+            android:text="@string/verified"
             android:textStyle="bold"
-            android:layout_alignParentRight="true" />
-    </RelativeLayout>
+            android:textSize="12sp" />
+    </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -71,10 +70,13 @@
         app:layout_dodgeInsetEdges="bottom"
         app:pressedTranslationZ="12dp" />
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/topLayout"
+        android:layout_margin="8dp"
+        mapbox:cardCornerRadius="10dp"
+        android:background="@drawable/stroke_background"
         app:layout_behavior=".Utils.CollapseBehavior">
 
         <com.mapbox.mapboxsdk.maps.MapView
@@ -86,7 +88,7 @@
             app:mapbox_uiAttributionMarginLeft="5dp"
             app:mapbox_uiLogo="false">
         </com.mapbox.mapboxsdk.maps.MapView>
-    </RelativeLayout>
+    </androidx.cardview.widget.CardView>
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar1"
         style="@style/SpinKitView.Large.ThreeBounce"

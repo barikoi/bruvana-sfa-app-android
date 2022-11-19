@@ -5,12 +5,7 @@
     android:layout_height="wrap_content"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:background="@color/color_gray_light"
-    android:paddingBottom="16dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-
-    android:paddingTop="32dp">
+    android:background="@color/cnl_color_1">
 
 
     <RelativeLayout
@@ -18,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -25,11 +21,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginLeft="16dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:layout_alignParentTop="true">
             <!--<ImageView
                 android:id="@+id/imagePerson"
                 android:layout_width="60dp"
@@ -40,51 +35,68 @@
                 android:background="@drawable/circle_border"
                 android:src="@drawable/ic_female_avatar" />-->
 
-            <ImageView
-                android:id="@+id/imagePerson"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:padding="8dp"
-                android:src="@drawable/profile" />
-
-            <TextView
-                android:id="@+id/textView_username"
-                android:layout_width="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:cardCornerRadius="50dp"
+                android:padding="5dp"
+                android:background="@drawable/circle_bg"
+                android:backgroundTint="@color/white">
+                <ImageView
+                    android:id="@+id/imagePerson"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/profile" />
+            </androidx.cardview.widget.CardView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:padding="4dp"
-                android:text="Name"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textAllCaps="false"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textSize="20sp"
-                />
-            <TextView
-                android:id="@+id/textView_useremail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:padding="4dp"
-                android:visibility="gone"
-                android:text=""
-                android:textAllCaps="false"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="15sp"
-                />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@color/black">
+                android:layout_weight="3"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/textView_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="4dp"
+                    android:text="Name"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="18sp"
+                    />
+                <TextView
+                    android:id="@+id/textView_useremail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:padding="4dp"
+                    android:visibility="gone"
+                    android:text=""
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textSize="12sp"
+                    />
+            </LinearLayout>
+            <ImageButton
+                android:id="@+id/btnEdit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_gravity="bottom"
+                android:background="@android:color/transparent"
+                android:tint="@color/white"
+                android:src="@drawable/ic_edit">
 
-            </View>
+            </ImageButton>
+        </LinearLayout>
         </LinearLayout>
 
 

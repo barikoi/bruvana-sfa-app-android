@@ -83,6 +83,7 @@ class HomeFragment : Fragment() {
         val EndDate = df.format(end)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
+        materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
         materialDateBuilder.setTitleText("SELECT A DATE")
 
         val materialDatePicker = materialDateBuilder.build()

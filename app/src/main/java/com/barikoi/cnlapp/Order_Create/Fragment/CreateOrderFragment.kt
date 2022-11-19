@@ -41,6 +41,7 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_create_order, container, false)
         viewpagertab = view.findViewById(R.id.viewpagertab2)
+        viewPager = view.findViewById(R.id.viewPager3)
         return view
     }
 
@@ -61,23 +62,23 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         val fragments = ArrayList<Fragment>()
         fragments.add(SelectDokanFragment())
         fragments.add(ConfirmOrderFragment())
-        viewPager3.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        viewPager!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator
-        TabLayoutMediator(viewpagertab!!, viewPager3,
+        TabLayoutMediator(viewpagertab!!, viewPager!!,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        viewPager3.setCurrentItem(0)
+        viewPager!!.setCurrentItem(0)
 
-        viewPager3.setUserInputEnabled(false)
+        viewPager!!.setUserInputEnabled(false)
         for (i in 0 until viewpagertab!!.getTabCount()) {
             val tab = (viewpagertab!!.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(12, 12, 8, 12)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPager3.getCurrentItem())
-        viewPager3.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        Log.d("Fragment", "viewpager current Item: " + viewPager!!.getCurrentItem())
+        viewPager!!.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
@@ -94,12 +95,14 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
 
 
     companion object{
+        var viewPager: ViewPager2? = null
         fun startFragmentWithValue(
             key: String,
             value: Serializable,
             fragmentName: Fragment,
             activity: Activity
         ) {
+            viewPager!!.setCurrentItem(0)
             val bundle = Bundle()
             bundle.putString("from", key)
             bundle.putSerializable(key, value) // Put anything what you want

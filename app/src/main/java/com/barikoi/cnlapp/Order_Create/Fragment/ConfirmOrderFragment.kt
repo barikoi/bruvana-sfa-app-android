@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.barikoi.cnlapp.Activity.MainActivity
@@ -285,12 +284,15 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     override fun onEdit(order: OrderList) {
         /*val pager: ViewPager2? =parentFragment?.requireParentFragment()?.view?.findViewById<ViewPager2>(R.id.viewPager3)
         pager?.setCurrentItem(0)*/
+        val frag: CreateOrderFragment? = this.parentFragment as CreateOrderFragment?
         CreateOrderFragment.startFragmentWithValue(
             "Order",
             order,
-            ProductSelectFragment(),
+            /*ProductSelectFragment(),*/
+            SelectDokanFragment(),
             ACTIVITY
         )
+
     }
 
 }
