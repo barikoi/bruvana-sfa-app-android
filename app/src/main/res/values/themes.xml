@@ -28,6 +28,7 @@
         <item name="colorSurface">@color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
         <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
+        <item name="fontFamily">@font/ceraprofontfamily</item>
     </style>
     <style name="spinnerItemStyle">
         <item name="android:textSize">20sp</item>
@@ -37,7 +38,8 @@
     <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">12sp</item>
         <item name="textAllCaps">false</item>
-        <item name="tabIndicatorHeight">2dp</item>
+        <item name="android:textStyle">bold</item>
+        <!--<item name="tabIndicatorHeight">2dp</item>-->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
     <style name="TabLayoutStyle" parent="Widget.Design.TabLayout">
@@ -55,6 +57,10 @@
     </style>
     <style name="TextInputLayout">
         <item name="android:textColor">#000000</item>
+        <!--<item name="colorOnPrimary">@color/cnl_color_1</item>-->
+        <item name="android:textColorHint">@color/text_title</item>
+        <item name="hintTextColor">@color/text_title</item>
+        <item name="colorPrimary">@color/text_title</item>
     </style>
 
     <style name="AlertDialog" parent="Base.Theme.AppCompat.Light.Dialog">
@@ -64,6 +70,7 @@
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="fontFamily">@font/ceraprofontfamily</item>
     </style>
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/black</item>
@@ -77,6 +84,7 @@
         <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+        <item name="fontFamily">@font/ceraprofontfamily</item>
     </style>
 
     <style name="buttonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">

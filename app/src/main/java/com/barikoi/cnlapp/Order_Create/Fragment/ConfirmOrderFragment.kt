@@ -13,7 +13,6 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
-import com.android.volley.toolbox.JsonObjectRequest
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
@@ -30,6 +29,8 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_confirm_order.*
+import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
+import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -42,6 +43,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
     var recylerView: RecyclerView? = null
     lateinit var ACTIVITY: MainActivity
+    var token : String? = null
     var user_id : String? = null
     var sr_id : String? = null
     var route_id: String? = null
@@ -64,6 +66,13 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        checkforOrders()
+    }
+
+    private fun checkforOrders() {
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val today = df.format(Calendar.getInstance().time)
+        getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+today+"&end_date="+today)
     }
 
     override fun onCreateView(
@@ -88,9 +97,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
 
             })
         }
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = df.format(Calendar.getInstance().time)
-        getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date=2022-11-14"/*+today*/+"&end_date=2022-11-14"/*+today*/)
+
         return view
     }
 
@@ -115,9 +122,9 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                     brandObj.put("product_id", brandList[j].product_id)
                     brandObj.put("product", brandList[j].product_name)
                     brandObj.put("brand_id", brandList[j].brand_id)
-                    brandObj.put("quantity", brandList[j].ordered_quantity)
-                    brandObj.put("unit_price", brandList[j].unit_price)
-                    brandObj.put("total_price", brandList[j].ordered_total_price)
+                    brandObj.put("quantity", brandList[j].ordered_quantity.toString())
+                    brandObj.put("unit_price", brandList[j].unit_price.toString())
+                    brandObj.put("total_price", brandList[j].ordered_total_price.toString())
                     brandObj.put("unit_name", brandList[j].unit_name)
                     brandsArray.put(brandObj)
                 }
@@ -135,51 +142,50 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     }
 
     private fun submitOrder(orderObj: JSONObject) {
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.POST, Api.update_saved_order, orderObj,
-            { response ->
+        ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, orderObj, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
                 try {
                     Log.d("ConfirmOrder", "response api: "+response)
                     /*appDatabase!!.orderListDao().deleteALL()
                     appDatabase!!.saveOrderDao().deleteALL()*/
-                    CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
+                    val message = response.getString("message")
+                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                        override fun onConfirmed() {
+                            //CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
+                            CreateOrderFragment.viewPager!!.setCurrentItem(1)
+                        }
+
+                        override fun onCanceled() {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }) { error ->
-            if (error is NoConnectionError) {
-                Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
             }
-            if (error != null && error.networkResponse != null) {
-                try {
-                    //NetworkResponse response = error.networkResponse;
-                    val s = String(error.networkResponse.data)
-                    Log.d("Verify", "message: $s")
-                    val data = JSONObject(s)
-                    Log.d("Verify", "message: " + data.getString("message"))
-                    Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
-                    throw Exception(data.getString("message"))
-                } catch (e: UnsupportedEncodingException) {
-                    e.printStackTrace()
-                    Sentry.captureException(e)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    Sentry.captureException(e)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Sentry.captureException(e)
-                }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
             }
-        }
-        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
-            40 * 1000, 0,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-        queue!!.add(jsonObjectRequest)
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, mContext!!)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 
     private fun getAllOrders(url: String) {
-        ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener{
+        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
@@ -188,6 +194,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                         val obj = JSONObject(response)
                         val orderArray = obj.getJSONArray("orders")
                         if (orderArray.length() > 0){
+                            no_route_check.visibility = View.GONE
+                            bodyLayout.visibility = View.VISIBLE
                             for (i in 0 until orderArray.length()){
                                 productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
@@ -233,6 +241,14 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                                 )
                             }
                             }
+                        }else{
+                            no_route_check.visibility = View.VISIBLE
+                            bodyLayout.visibility = View.GONE
+
+                            btn_tryAgain.setOnClickListener {
+                                checkforOrders()
+                            }
+
                         }
 
 
@@ -271,9 +287,10 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
+        token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         sr_id = prefs!!.getString(Api.SR_CODE, "")
-        route_id = prefs!!.getString(Api.ORDERED_ROUTE_ID, "")
+        route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this
@@ -284,6 +301,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     override fun onEdit(order: OrderList) {
         /*val pager: ViewPager2? =parentFragment?.requireParentFragment()?.view?.findViewById<ViewPager2>(R.id.viewPager3)
         pager?.setCurrentItem(0)*/
+        editor!!.putString(Api.SELECTED_SHOP_ID, order.outletId)
+        editor!!.commit()
         val frag: CreateOrderFragment? = this.parentFragment as CreateOrderFragment?
         CreateOrderFragment.startFragmentWithValue(
             "Order",

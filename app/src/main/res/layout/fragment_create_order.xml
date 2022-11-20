@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,20 +8,23 @@
     android:id="@+id/createOrder"
     tools:context=".Order_Create.Fragment.CreateOrderFragment">
     <RelativeLayout
+        android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="8dp"
+        android:layout_margin="16dp"
         android:orientation="vertical"
+        android:visibility="visible"
         android:background="@color/background_app">
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/viewpagertab2"
             style="@style/TabLayoutStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/stroke_background"
-            app:tabIndicatorHeight="0dp"
-            app:tabIndicatorGravity="stretch"
+            android:layout_height="40dp"
+            android:background="@drawable/cardview_bg"
+            app:tabIndicatorHeight="30dp"
+            app:tabIndicatorGravity="center"
             app:tabIndicator="@drawable/tab_selected"
+            app:tabIndicatorColor="@color/cnl_color_1"
             android:layout_alignParentTop="true"
             app:tabMinWidth="120dp"
             app:tabMode="fixed"
@@ -36,4 +39,38 @@
             />
 
     </RelativeLayout>
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/no_route_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/no_route_selected_today"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:textSize="17sp"
+            android:textColor="@color/text_title">
+
+        </TextView>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_tryAgain"
+            android:layout_width="100dp"
+            android:layout_height="36dp"
+            android:layout_margin="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/cardview_bg"
+            android:backgroundTint="@color/color_gray"
+            android:padding="2dp"
+            android:textAllCaps="false"
+            android:textColor="@color/text_title"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:text="@string/try_again" />
+    </LinearLayout>
+</RelativeLayout>

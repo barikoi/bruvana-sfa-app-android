@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.TradeOffers
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +9,6 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.ProductStock.ProductStock
-import com.barikoi.cnlapp.ProductStock.ProductStockAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
@@ -61,7 +60,8 @@ class TradeOfferListAdapter (val products: List<ProductAll>) : RecyclerView.Adap
             holder.previousPrice.getViewTreeObserver().addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    holder.tradeDivider.layoutParams.width = holder.previousPrice.layoutParams.width+holder.logoTaka.layoutParams.width
+                    holder.previousPrice.setPaintFlags(holder.previousPrice.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG)
+                    //holder.tradeDivider.layoutParams.width = holder.previousPrice.layoutParams.width+holder.logoTaka.layoutParams.width
                     holder.previousPrice.getViewTreeObserver().removeOnGlobalLayoutListener(this)
                 }
             })

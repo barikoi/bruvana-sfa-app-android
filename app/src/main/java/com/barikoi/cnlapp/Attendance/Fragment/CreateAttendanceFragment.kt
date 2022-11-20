@@ -27,6 +27,10 @@ import androidx.fragment.app.Fragment
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewPager2
+import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewpagertab2
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -35,7 +39,10 @@ import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.google.android.gms.location.*
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_attendance.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -121,6 +128,7 @@ class CreateAttendanceFragment : Fragment() {
         }
         btnSubmit.setOnClickListener {
             if (selectedRoute.length > 0 && isImageAdded){
+                progressBar.visibility = View.VISIBLE
                 getLocation("submit")
             }else{
                 if (!isImageAdded){
@@ -152,17 +160,6 @@ class CreateAttendanceFragment : Fragment() {
         var imagesList = ArrayList<Images>()
         imagesList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images>
         if (imagesList.size > 0) {
-            /*for (i in imagesList.indices) {
-                val fileExist = File(imagesList[i].filePath).canRead()
-                if (fileExist) {
-                    val imagename = imagesList[i].filePath.substring(
-                        imagesList[i].filePath.lastIndexOf("/")
-                    )
-                    byteparams["image"] = VolleyMultipartRequest.DataPart(
-                        imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
-                    )
-                }
-            }*/
             val fileExist = File(imagesList[0].filePath).canRead()
             if (fileExist) {
                 val imagename = imagesList[0].filePath.substring(
@@ -190,16 +187,43 @@ class CreateAttendanceFragment : Fragment() {
             }
 
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
-                editor!!.commit()
-                appDatabase!!.imagesDao()!!.deleteAllImages()
+                progressBar.visibility = View.GONE
                 val data = JSONObject(String(response.data))
                 val message = data.getString("message")
-                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+                ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                    override fun onConfirmed() {
+                        editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                        editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
+                        editor!!.commit()
+                        appDatabase!!.imagesDao()!!.deleteAllImages()
+
+                        val titles = arrayOf(resources.getString(R.string.attendance), resources.getString(R.string.history), resources.getString(R.string.summary))
+                        val fragments = ArrayList<Fragment>()
+                        fragments.add(CreateAttendanceFragment())
+                        fragments.add(HistoryFragment())
+                        fragments.add(SummaryFragment())
+                        viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+                        TabLayoutMediator(viewpagertab2!!, viewPager2!!,
+                            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
+                                tab.text = titles[position]
+                                tab.parent
+                            }).attach()
+                        viewPager2!!.setCurrentItem(0);
+                        viewPager2!!.setUserInputEnabled(false)
+                        //CreateOrderFragment.setCurrentFragment(CreateAttendanceFragment(), ACTIVITY)
+                    }
+
+                    override fun onCanceled() {
+                        TODO("Not yet implemented")
+                    }
+
+                })
             }
 
             @RequiresApi(Build.VERSION_CODES.KITKAT)
             override fun onResponseFailure(error: VolleyError) {
+                progressBar.visibility = View.GONE
                 val s = String(
                     error.networkResponse.data,
                     StandardCharsets.UTF_8
@@ -210,6 +234,7 @@ class CreateAttendanceFragment : Fragment() {
             }
 
             override fun onException(e: Exception) {
+                progressBar.visibility = View.GONE
                 Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
             }
 
@@ -376,49 +401,55 @@ class CreateAttendanceFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+        try{
+            val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
 
-        if (resultCode == Activity.RESULT_CANCELED) {
-            if (filePath != null) {
-                //bottomSheetBehaviorinput.setState(BottomSheetBehavior.STATE_EXPANDED)
-                Log.d("Image", "Canceled: $filePath")
-                imagepicker.deleteFileLocal(filePath)
-                editor!!.putString(ApiCall.IMAGE_PATH, "")
-                editor!!.apply()
-            }
-            return
-        }
-        if (requestCode == CAMERA) {
-            Log.e("imageUtils", "OnActivity result code 1: " + Activity.RESULT_OK)
-            var imagePosition = 0
-            var imageList: ArrayList<Images?>? = ArrayList()
-            imageList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images?>?
-            Log.d("Imagepos", "List: $imageList")
-            imagePosition = if (imageList!!.size > 0) {
-                imageList[imageList.size - 1]!!.position + 1
-            } else {
-                imagePosition + 1
-            }
-            imagepicker.AddNewImage(data, CAMERA, imagePosition)
-            try {
-                val placeImage = Images(
-                    null, imagePosition,
-                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
-                )
-                isImageAdded = true
-                if (imagePosition > 0) {
-                    Log.d("Imagepos", "insert")
-                    Executors.newSingleThreadExecutor().execute {
-                        appDatabase!!.imagesDao()!!.insertAll(placeImage)
-                    }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                if (filePath != null) {
+                    //bottomSheetBehaviorinput.setState(BottomSheetBehavior.STATE_EXPANDED)
+                    Log.d("Image", "Canceled: $filePath")
+                    imagepicker.deleteFileLocal(filePath)
                     editor!!.putString(ApiCall.IMAGE_PATH, "")
                     editor!!.apply()
                 }
-            } catch (e: java.lang.Exception) {
-                Log.e("imageUtils", "OnActivity result 2: $e")
-                Sentry.captureException(e)
+                return
             }
+            if (requestCode == CAMERA) {
+                Log.e("imageUtils", "OnActivity result code 1: " + Activity.RESULT_OK)
+                var imagePosition = 0
+                var imageList: ArrayList<Images?>? = ArrayList()
+                imageList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images?>?
+                Log.d("Imagepos", "List: $imageList")
+                imagePosition = if (imageList!!.size > 0) {
+                    imageList[imageList.size - 1]!!.position + 1
+                } else {
+                    imagePosition + 1
+                }
+                imagepicker.AddNewImage(data, CAMERA, imagePosition)
+                try {
+                    val placeImage = Images(
+                        null, imagePosition,
+                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                    )
+                    isImageAdded = true
+                    if (imagePosition > 0) {
+                        Log.d("Imagepos", "insert")
+                        Executors.newSingleThreadExecutor().execute {
+                            appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                        }
+                        editor!!.putString(ApiCall.IMAGE_PATH, "")
+                        editor!!.apply()
+                    }
+                } catch (e: java.lang.Exception) {
+                    Log.e("imageUtils", "OnActivity result 2: $e")
+                    Sentry.captureException(e)
+                }
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+            Sentry.captureException(e)
         }
+
     }
 
     override fun onAttach(context: Context) {

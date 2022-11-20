@@ -2,15 +2,19 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -31,6 +35,7 @@ class LastWeekCategoryFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
+    var token : String? = null
     var srId: String ? = ""
     var routeId: String ? = ""
 
@@ -66,7 +71,8 @@ class LastWeekCategoryFragment : Fragment() {
 
     private fun getSummaryCategory(url: String) {
 
-        ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener {
+        ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
@@ -111,11 +117,16 @@ class LastWeekCategoryFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun createTable(data: ArrayList<Pair<String, String>>) {
         tabLayout.isStretchAllColumns = true
         tabLayout.bringToFront()
+        val colorsTxt: Array<String> = mContext!!.getResources().getStringArray(R.array.colors)
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
+            val image = ImageView(mContext)
+            image.setImageDrawable(resources.getDrawable(R.drawable.ic_dot))
+            image.drawable.setTint(Color.parseColor(colorsTxt[i]))
             val c1 = TextView(mContext)
             c1.gravity = Gravity.START
             c1.setTextColor(resources.getColor(R.color.text_title))
@@ -124,6 +135,7 @@ class LastWeekCategoryFragment : Fragment() {
             c2.gravity = Gravity.END
             c2.setTextColor(resources.getColor(R.color.text_title))
             c2.setText(data.get(i).second)
+            tr.addView(image)
             tr.addView(c1)
             tr.addView(c2)
             tabLayout.addView(tr)
@@ -136,6 +148,7 @@ class LastWeekCategoryFragment : Fragment() {
         editor = prefs!!.edit()
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        token = prefs!!.getString(Api.TOKEN, "")
         srId = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }

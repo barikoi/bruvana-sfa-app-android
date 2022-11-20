@@ -71,7 +71,7 @@ class HistoryFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_history, container, false)
     }
 
-    private fun setDateFilter() {
+    fun setDateFilter() {
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time

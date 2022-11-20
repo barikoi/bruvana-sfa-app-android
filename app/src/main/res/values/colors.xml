@@ -34,6 +34,7 @@
     <color name="btn_color_dark">#F57921</color>
     <color name="btn_gray_light">#DADADA</color>
     <color name="btn_no_order">#FFB7A7</color>
+    <color name="btn_gray_stroke">#ACACAC</color>
 
     <color name="color_gray_depp">#6D8890</color>
     <color name="color_gray_medium">#4F7270</color>
@@ -46,5 +47,18 @@
     <color name="active_green">#50FD95</color>
     <color name="color_brown">#D4B782</color>
     <color name="color_light_brown">#F0DBB1</color>
+
+    <string-array name="colors">
+        <item>#7ECF71</item>
+        <item>#CE6200</item>
+        <item>#79C3A8</item>
+        <item>#AD59AE</item>
+        <item>#6876A9</item>
+        <item>#84C82E</item>
+        <item>#AE9B75</item>
+        <item>#C88585</item>
+        <item>#0000ff</item>
+        <item>#4C6D8B</item>
+    </string-array>
 
 </resources>

@@ -79,7 +79,7 @@
         android:drawablePadding="4dp"
         android:text=""
         android:textColor="@color/text_title"
-        android:textSize="12sp">
+        android:textSize="14sp">
 
     </TextView>
     <TextView
@@ -95,7 +95,7 @@
         android:ellipsize="end"
         android:text=""
         android:textColor="@color/text_title"
-        android:textSize="10sp">
+        android:textSize="12sp">
     </TextView>
 
     <TextView

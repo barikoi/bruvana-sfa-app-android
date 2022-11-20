@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -13,6 +14,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -24,13 +26,13 @@ import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
-import com.barikoi.cnlapp.StatisticsHome.Fragment.HomeFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductSummaryActivity
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Fragment.HomeFragment
 import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -45,7 +47,6 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     var drawer: DrawerLayout? = null
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var nav_view: BottomNavigationView? = null
     var queue : RequestQueue? = null
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -134,6 +136,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //setCurrentFragment(HomeFragment(), this@MainActivity)
         fab_order.setOnClickListener {
+            fab_order.background.setTint(resources.getColor(R.color.cnl_color_2))
+            fab_order.drawable.setTint(resources.getColor(R.color.white))
+            nav_view!!.selectedItemId = R.id.navigation_order
             userLayout.visibility = View.GONE
             tvTitle.text = resources.getString(R.string.order_collection)
             tvTitle.visibility = View.VISIBLE
@@ -141,6 +146,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         nav_view!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            fab_order.background.setTint(resources.getColor(R.color.white))
+            fab_order.drawable.setTint(resources.getColor(R.color.fab_icon))
             when (item.itemId) {
                 R.id.navigation_home -> {
                     tvTitle.text = ""
@@ -163,10 +170,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     return@OnNavigationItemSelectedListener true
                 }*/
                 R.id.navigation_chat -> {
-                    //tvTitle!!.text = "Map"
+                    tvTitle!!.text = resources.getString(R.string.title_chat)
                     setCurrentFragment(ChatFragment(), this@MainActivity)
                     userLayout.visibility = View.GONE
-                    tvTitle.text = ""
                     tvTitle.visibility = View.VISIBLE
                     return@OnNavigationItemSelectedListener true
                 }
@@ -353,10 +359,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        /*val fragment = this.supportFragmentManager.findFragmentById(R.id.createOrder)
-        (fragment as? OnBackPressedListener)?.onBackPressed()?.not()?.let {
+        val count = supportFragmentManager.backStackEntryCount
+
+        if (count == 0) {
             super.onBackPressed()
-        }*/
+            //additional code
+        } else {
+            supportFragmentManager.popBackStack()
+        }
     }
 
 }

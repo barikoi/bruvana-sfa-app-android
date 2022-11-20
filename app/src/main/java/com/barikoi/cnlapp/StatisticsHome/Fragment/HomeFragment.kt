@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.*
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
@@ -46,6 +47,7 @@ class HomeFragment : Fragment() {
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     val dots: ArrayList<ImageView> = ArrayList()
+    var token: String ? = ""
     var srId: String ? = ""
     var routeId: String ? = ""
 
@@ -67,7 +69,63 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        checkforAttendanceToday()
         init()
+    }
+
+    private fun checkforAttendanceToday() {
+        val today = Calendar.getInstance().time
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        ApiServices.apiGET(Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
+            mQueue!!, token!!, object : ApiServiceListener{
+                override fun onResponseSuccess(response: String) {
+                    try {
+                        if (response != null) {
+                            val obj = JSONObject(response)
+                            val attedanceArray = obj.getJSONArray("attendances")
+                            if (attedanceArray.length() >0){
+                                no_route_check.visibility = View.GONE
+                                bodyLayout.visibility = View.VISIBLE
+                                for (i in 0 until attedanceArray.length()) {
+                                    val attendanceObj = attedanceArray.getJSONObject(i)
+                                    attendanceObj.getInt("route_id")
+                                    attendanceObj.getString("route_name")
+
+                                    editor!!.putString(Api.SELECTED_ROUTE_ID, attendanceObj.getInt("route_id").toString())
+                                        .putString(Api.SELECTED_ROUTE_NAME, attendanceObj.getString("route_name")).commit()
+                                }
+
+                            }else{
+                                no_route_check.visibility = View.VISIBLE
+                                bodyLayout.visibility = View.GONE
+
+                                btn_tryAgain.setOnClickListener {
+                                    checkforAttendanceToday()
+                                }
+                            }
+                        }
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, mContext!!)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
     }
 
     private fun init() {
@@ -131,7 +189,7 @@ class HomeFragment : Fragment() {
         var aiv = ""
         var aiv_completed = ""
 
-        ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener{
+        ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
@@ -141,7 +199,7 @@ class HomeFragment : Fragment() {
                         if (targetsArray.length() > 0){
                             for (i in 0 until targetsArray.length()){
                                 val targetObj =targetsArray.getJSONObject(i)
-                                total_target = targetObj.getString("target_amount")
+                                total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
                                 bpc = targetObj.getString("target_sku_per_memo")
                                 lpc = targetObj.getString("target_number_of_memo")
                                 aiv = targetObj.getString("target_aiv")
@@ -150,7 +208,7 @@ class HomeFragment : Fragment() {
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
-                                total_target_completed = targetObj.getString("revenue")
+                                total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
                                 bpc_completed = targetObj.getString("bpc")
                                 lpc_completed = targetObj.getString("lpc")
                                 aiv_completed = targetObj.getString("aiv")
@@ -196,7 +254,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setSecondPartSummary() {
-        val titles = arrayOf(resources.getString(R.string.summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category))
+        val titles = arrayOf(resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category))
         val fragments = ArrayList<Fragment>()
         fragments.add(LastWeekSummaryFragment())
         fragments.add(LastWeekProductFragment())
@@ -311,6 +369,7 @@ class HomeFragment : Fragment() {
         editor = prefs!!.edit()
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        token = prefs!!.getString(Api.TOKEN, "")
         srId = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }

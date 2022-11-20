@@ -79,21 +79,6 @@ class RouteFragment : Fragment() {
                             val territory_name = route.getString("territory_name")
                             val outlet_count = route.getString("outlet_count")
 
-
-                            /*val route_outlet_list = route.getJSONArray("route_outlet_list")
-                            for (j in 0 until route_outlet_list.length()) {
-                                val outlet = route_outlet_list.getJSONObject(j)
-                                val outlet_id = outlet.getString("outlet_id")
-                                val outlet_name = outlet.getString("outlet_name")
-                                val outlet_code = outlet.getString("outlet_code")
-                                val outlet_type = outlet.getString("outlet_type")
-                                val outlet_status = outlet.getString("outlet_status")
-                                val outlet_created_by = outlet.getString("outlet_created_by")
-                                val outlet_created_date = outlet.getString("outlet_created_date")
-                                val outlet_updated_by = outlet.getString("outlet_updated_by")
-                                val outlet_updated_date = outlet.getString("outlet_updated_date")
-                            }*/
-
                             arrayList!!.add(Routes(route_id, route_code, route_name, territory_name, area_name, outlet_count, ArrayList()))
 
                         }

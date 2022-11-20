@@ -130,7 +130,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         adapter = ShopSelectAdapter( ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
-        var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
 
         spinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -301,7 +301,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         "",
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
-                                        outletObj.getString("route_code"),
+                                        outletObj.getString("route_id"),
                                         outletObj.getString("route_name"),
                                         outletObj.getString("last_delivered_at"),
                                         outletObj.getInt("ordered_today")

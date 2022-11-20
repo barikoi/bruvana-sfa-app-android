@@ -2,26 +2,49 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment.Companion.viewPager
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.callback.OnBackPressedListener
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_create_order.*
+import org.json.JSONObject
 import java.io.Serializable
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
-class CreateOrderFragment : Fragment(), OnBackPressedListener{
+class CreateOrderFragment : Fragment(){
     lateinit var ACTIVITY: MainActivity
     var viewpagertab: TabLayout? = null
+    private var prefs: SharedPreferences? = null
+    private var editor: SharedPreferences.Editor? = null
+    var mContext: Context? = null
+    var mQueue: RequestQueue? = null
+    var token: String ? = ""
+    var srId: String ? = ""
+    var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +54,7 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        checkforAttendanceToday()
         setTabViewPager()
     }
 
@@ -47,6 +71,13 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        editor = prefs!!.edit()
+        mContext = context
+        mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        token = prefs!!.getString(Api.TOKEN, "")
+        srId = prefs!!.getString(Api.SR_CODE, "")
+        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }
 
     /*fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
@@ -114,6 +145,7 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         }
 
         fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
+            //viewPager!!.setCurrentItem(0)
             val fragmentManager = (activity as FragmentActivity).supportFragmentManager
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentLayout2, fragment!!)
@@ -122,13 +154,60 @@ class CreateOrderFragment : Fragment(), OnBackPressedListener{
         }
     }
 
-    override fun onBackPressed() {
-        /*val fragment =
-            this.supportFragmentManager.findFragmentById(R.id.main_container)
-        (fragment as? IOnBackPressed)?.onBackPressed()?.not()?.let {
+    private fun checkforAttendanceToday() {
+        val today = Calendar.getInstance().time
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        ApiServices.apiGET(
+            Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
+            mQueue!!, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    try {
+                        if (response != null) {
+                            val obj = JSONObject(response)
+                            val attedanceArray = obj.getJSONArray("attendances")
+                            if (attedanceArray.length() >0){
+                                no_route_check.visibility = View.GONE
+                                bodyLayout.visibility = View.VISIBLE
+                                for (i in 0 until attedanceArray.length()) {
+                                    val attendanceObj = attedanceArray.getJSONObject(i)
+                                    attendanceObj.getInt("route_id")
+                                    attendanceObj.getString("route_name")
 
-        }*/
+                                    editor!!.putString(Api.SELECTED_ROUTE_ID, attendanceObj.getInt("route_id").toString())
+                                        .putString(Api.SELECTED_ROUTE_NAME, attendanceObj.getString("route_name")).commit()
+                                }
 
+                            }else{
+                                no_route_check.visibility = View.VISIBLE
+                                bodyLayout.visibility = View.GONE
+
+                                btn_tryAgain.setOnClickListener {
+                                    checkforAttendanceToday()
+                                }
+                            }
+                        }
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, mContext!!)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
     }
 
 

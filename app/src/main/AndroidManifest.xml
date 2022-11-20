@@ -58,7 +58,7 @@
         <activity
             android:name=".Activity.LoginActivity"
             android:exported="true"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar"
             android:windowSoftInputMode="stateHidden" />
         <activity

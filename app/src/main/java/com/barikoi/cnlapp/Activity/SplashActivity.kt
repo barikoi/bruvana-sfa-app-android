@@ -52,7 +52,10 @@ class SplashActivity : AppCompatActivity() {
         showProgress()
 
         checkPermissions()
-        //Handler().postDelayed(Runnable { init() }, 2000)
+        /*val handler: Handler = Handler()
+        handler.postDelayed(Runnable {
+            init()
+            handler.removeCallbacksAndMessages(null) }, 2000)*/
     }
 
     private fun checkPermissions(): Boolean {
@@ -112,9 +115,11 @@ class SplashActivity : AppCompatActivity() {
         } */
         else {
             Log.d("Splash", "request permission if list not empty")
-            /*Handler().postDelayed(Runnable {
-                init() }, 1000)*/
-            init()
+            val handler: Handler = Handler()
+            handler.postDelayed(Runnable {
+                init()
+                handler.removeCallbacksAndMessages(null) }, 2000)
+            //init()
 
         }
         return true

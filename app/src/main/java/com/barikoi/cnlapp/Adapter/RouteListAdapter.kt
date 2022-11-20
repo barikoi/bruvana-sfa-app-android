@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.Adapter
 
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
+import kotlinx.android.synthetic.main.fragment_product_select.*
 import org.w3c.dom.Text
 
 class RouteListAdapter(val routes: List<Routes>) : RecyclerView.Adapter<RouteListAdapter.ViewHolder>() {
@@ -24,6 +26,12 @@ class RouteListAdapter(val routes: List<Routes>) : RecyclerView.Adapter<RouteLis
         holder.areaName.text = routes[position].area_name
         holder.routeCode.text = routes[position].route_code
         holder.shopCount.text = routes[position].outlet_count
+
+        val gd = GradientDrawable()
+        gd.setColor(holder.itemView.resources.getColor(R.color.white))
+        gd.cornerRadius = 5f
+        gd.setStroke(2, holder.itemView.resources.getColor(R.color.cnl_color_1))
+        holder.itemCount.setBackgroundDrawable(gd)
     }
 
     override fun getItemCount(): Int {

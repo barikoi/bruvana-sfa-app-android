@@ -13,7 +13,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
-import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
@@ -26,13 +25,13 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_order_summary.*
 import kotlinx.android.synthetic.main.activity_order_summary.btnBack
 import kotlinx.android.synthetic.main.activity_order_summary.tvRouteName
-import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 
+    var token : String? = null
     var user_id : String? = null
     var sr_id : String? = null
     var route_id: String? = null
@@ -51,6 +50,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
+        token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         sr_id = prefs!!.getString(Api.SR_CODE, "")
         route_id = prefs!!.getString(Api.ORDERED_ROUTE_ID, "")
@@ -70,7 +70,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0){
-                    getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date="+StartDate+"&end_date="+EndDate)
+                    getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate)
                 }
             }
             override fun afterTextChanged(p0: Editable?) {
@@ -119,18 +119,18 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
+            getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getAllOrders(Api.get_saved_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+route_id*/+"&start_date="+StartDate+"&end_date="+EndDate)
+        getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate)
     }
 
     private fun getAllOrders(url: String) {
 
-        ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener{
+        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){

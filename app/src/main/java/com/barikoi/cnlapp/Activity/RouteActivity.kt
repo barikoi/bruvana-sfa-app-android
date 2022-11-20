@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -32,7 +33,7 @@ class RouteActivity : AppCompatActivity() {
     var mQueue: RequestQueueSingleton? = null
     private var userId: String? = ""
     private var tvTitle: TextView? = null
-    private var back_img: ImageView? = null
+    private var back_img: ImageButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,17 +46,18 @@ class RouteActivity : AppCompatActivity() {
 
         mQueue = RequestQueueSingleton.getInstance(applicationContext)
 
-        back_img = findViewById(R.id.back_button)
+        back_img = findViewById(R.id.btnBack)
 
         back_img!!.setOnClickListener {
             onBackPressed()
+            finish()
         }
 
         tvTitle = findViewById(R.id.tvTitle)
         viewPager2 = findViewById<ViewPager2>(R.id.viewPager)
         tabLayout2 = findViewById<TabLayout>(R.id.viewpagertab)
 
-        val titles = arrayOf("Route List", "Shop List")
+        val titles = arrayOf(resources.getString(R.string.route_list), resources.getString(R.string.shop_list))
         val fragments = ArrayList<Fragment>()
         fragments.add(RouteFragment())
         fragments.add(ShopListFragment())
@@ -79,24 +81,16 @@ class RouteActivity : AppCompatActivity() {
                 if (position == 0) {
                     editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()
-                    tvTitle!!.text = "Route List"
+                    tvTitle!!.text = resources.getString(R.string.route_list)
                     RouteFragment.getAllRouteList(userId!!)
                 } else if (position == 1) {
                     editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
                     editor!!.commit()
-                    tvTitle!!.text = "Shop List"
+                    tvTitle!!.text = resources.getString(R.string.shop_list)
                     ShopListFragment.getShopList(userId!!)
                 }
             }
         })
 
-    }
-
-    fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
-        val fragmentManager = (activity as FragmentActivity).supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragmentLayout, fragment!!)
-        fragmentTransaction.commit()
-        fragmentManager.executePendingTransactions()
     }
 }

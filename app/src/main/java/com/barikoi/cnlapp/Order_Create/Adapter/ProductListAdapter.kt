@@ -2,6 +2,7 @@ package com.barikoi.cnlapp.Order_Create.Adapter
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.os.Build
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.R
@@ -35,6 +37,7 @@ Filterable{
         return ViewHolder(v)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         holder.setIsRecyclable(false)
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
@@ -49,6 +52,9 @@ Filterable{
             /*holder.layoutQty.visibility = View.VISIBLE
             holder.layoutAdd.visibility = View.GONE*/
             holder.productCount.setText(productObj.ordered_quantity.toString())
+            holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
+        }else{
+            holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
         }
 
         if (productObj.ordered_total_price > 0.0) {
@@ -64,20 +70,16 @@ Filterable{
         if (productList[position].stock_available > 0){
             holder.stockAvailable.text = productList[position].stock_available.toString()+ " in stock"
         }else{
-            holder.stockAvailable.text = "Stock out"
+            holder.stockAvailable.text = holder.itemView.resources.getString(R.string.stock_out)
         }
 
         holder.perUnitPrice.text = productList[position].unit_price.toString()
 
         holder.productUnit.text = productList[position].unit_name
 
-        /*try {
-            val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
-            holder.tvSubtoal.text = subtotal.toString()
-        }catch (e:Exception){
-            e.printStackTrace()
-        }*/
-        holder.tvAdd.setOnClickListener {
+        holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
+
+        holder.btnAdd.setOnClickListener {
             val qtyValue = holder.productCount.text.toString().toInt() + 1
             holder.productCount.setText(qtyValue.toString())
             /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
@@ -109,7 +111,7 @@ Filterable{
             mListener.onValueChanged(productList[position], position)
         }
 
-        holder.tvMinus.setOnClickListener {
+        holder.btnMinus.setOnClickListener {
             val qtyValue = holder.productCount.text.toString().toInt() - 1
             holder.productCount.setText(qtyValue.toString())
             /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
@@ -149,12 +151,14 @@ Filterable{
                 productObj.ordered_quantity=  holder.productCount.text.toString().toInt()
 
                 if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
-                    holder.tvMinus.isEnabled = false
+                    holder.btnMinus.isEnabled = false
                     /*holder.layoutQty.visibility = View.GONE
                     holder.layoutAdd.visibility = View.VISIBLE*/
                     holder.tvSubtoal.text = "0"
+                    holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
                 }else{
-                    holder.tvMinus.isEnabled = true
+                    holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
+                    holder.btnMinus.isEnabled = true
                 }
             }
 
@@ -218,8 +222,8 @@ Filterable{
         internal val productUnit : TextView
         internal val perUnitPrice : TextView
         internal val tvSubtoal : TextView
-        internal val tvMinus : LinearLayout
-        internal val tvAdd : LinearLayout
+        internal val btnMinus : ImageButton
+        internal val btnAdd : ImageButton
         internal val productCount: EditText
         /*internal val layoutQty : LinearLayout
         internal val layoutAdd : LinearLayout*/
@@ -230,8 +234,8 @@ Filterable{
             productUnit = itemView.findViewById(R.id.tvProductVariation)
             perUnitPrice = itemView.findViewById(R.id.tvPerUnit)
             tvSubtoal = itemView.findViewById(R.id.tvSubTotal)
-            tvMinus = itemView.findViewById(R.id.layoutMinus)
-            tvAdd = itemView.findViewById(R.id.layoutPlus)
+            btnMinus = itemView.findViewById(R.id.btnminus)
+            btnAdd = itemView.findViewById(R.id.btnPlus)
             productCount = itemView.findViewById(R.id.tvCount)
             /*layoutQty = itemView.findViewById(R.id.layoutQty)
             layoutAdd = itemView.findViewById(R.id.layoutAdd)*/

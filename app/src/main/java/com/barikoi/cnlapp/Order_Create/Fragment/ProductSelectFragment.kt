@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
 import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
@@ -39,6 +40,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
+import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -65,15 +67,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var tvgrandTotal: TextView? = null
     var saveOrder: AppCompatButton? = null
     var noOrder: AppCompatButton? = null
-    var totalAmount : String? =  null
     var latitude: Double? = 0.0
     var longitude: Double? = 0.0
     var mContext: Context? = null
     var queue: RequestQueue? = null
+    var token : String? = null
     var user_id : String? = null
     var sr_id : String? = null
     var selectedShop : Shops? =  null
     var selectedOrder : OrderList? =  null
+    var totalAmount : String? =  null
+    var grandTotalPrice : Double? = 0.0
     var shopName : String? =  null
     var shopId : String? =  null
     var listener: OnValueChangeListener? = null
@@ -94,6 +98,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val bundle = this.arguments
 
         if (bundle != null) {
@@ -107,15 +116,32 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     selectedOrder = bundle.getSerializable("Order") as OrderList?
                     shopName = selectedOrder!!.outletName
                     addedProducts!!.clear()
+                    appDatabase!!.saveOrderDao().deleteALL()
+                    var itemCountt = 0
+                    for (i in 0 until selectedOrder!!.brands_array.size){
+                        itemCountt = itemCountt+selectedOrder!!.brands_array[i].ordered_quantity
+                    }
+
+                    if (itemCountt == 1 || itemCountt == 0){
+                        totalItemCount!!.setText(itemCountt.toString()+"Item")
+                    }else{
+                        totalItemCount!!.setText(itemCountt.toString()+"Items")
+                    }
+                    tvgrandTotal!!.setText("Total "+selectedOrder!!.grandTotal)
+                    appDatabase!!.saveOrderDao().insertAll(
+                        SaveOrder(
+                            null,
+                            selectedOrder!!.outletId,
+                            itemCountt,
+                            selectedOrder!!.grandTotal.toDouble()
+                        )
+                    )
                 }
             }
 
         }
 
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        shopTitle!!.text = shopName
         val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 5f
@@ -123,7 +149,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         previous_order.setBackgroundDrawable(gd)
 
         previous_order.setOnClickListener {
-            ApiServices.apiGET(Api.previous_order+"?sr_id=T0102"/*+sr_id*/+"&route_id=152"/*+selectedShop!!.route_code*/+"&outlet_id=1234"/*+shopId*/, queue!!, "", object : ApiServiceListener{
+            ApiServices.apiGET(Api.previous_order+"?sr_id="+sr_id+"&route_id="+selectedShop!!.route_code+"&outlet_id="+shopId, queue!!, token!!, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {
                     getPreviousOrders(response)
                 }
@@ -137,14 +163,32 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    TODO("Not yet implemented")
+                    ViewUtils.getErrorResponse(error, mContext!!)
                 }
 
                 override fun onException(e: Exception) {
-                    TODO("Not yet implemented")
+                    Toast.makeText(
+                        mContext!!.applicationContext,
+                        e.message, Toast.LENGTH_SHORT
+                    ).show()
                 }
 
             })
+        }
+
+        if (selectedOrder != null){
+            no_order.visibility = View.GONE
+            save_order.visibility = View.GONE
+            update_order.visibility = View.VISIBLE
+        }else{
+            no_order.visibility = View.VISIBLE
+            save_order.visibility = View.VISIBLE
+            update_order.visibility = View.GONE
+        }
+
+        update_order.setOnClickListener {
+            appDatabase!!.saveOrderDao().deleteALL()
+            getLocation("update_order")
         }
     }
 
@@ -179,8 +223,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             }
 
-            viewDialog(mContext!!, shopName!!, lastDeliveryDate, productItems)
         }
+        viewDialog(mContext!!, shopName!!, lastDeliveryDate, productItems)
 
 
     }
@@ -265,8 +309,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         //adapter = ProductListAdapter(ArrayList(), listener!!)
 
-        shopTitle!!.text = shopName
-
         getAllProducts()
 
         et_search!!.addTextChangedListener(object : TextWatcher{
@@ -286,6 +328,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
+            appDatabase!!.saveOrderDao().deleteALL()
             ViewUtils.viewDialog(mContext!!, "Are you sure want to save "+shopName+"'s order?", object :
                 DialogListener {
                 override fun onConfirmed() {
@@ -299,37 +342,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         noOrder!!.setOnClickListener {
+            appDatabase!!.saveOrderDao().deleteALL()
             getLocation("no_order")
         }
 
         return view
     }
-
-    /*fun saveOrderDB(location: Location){
-        val orderListDB = appDatabase!!.orderListDao().getOrdersDB(selectedShop!!.shop_id)
-        if (orderListDB!!.size > 0){
-            appDatabase!!.orderListDao().deleteByShop(selectedShop!!.shop_id)
-            appDatabase!!.orderListDao().insertAll(
-                OrderList(null,
-                selectedShop!!.shop_id.toInt(),
-                selectedShop!!.shop_name,
-                selectedShop!!.route_code,
-                selectedShop!!.distributor_office_code, totalAmount!!,
-                location.latitude.toString(), location.longitude.toString(), addedProducts!!)
-            )
-        }else{
-            appDatabase!!.orderListDao().insertAll(
-                OrderList(null,
-                selectedShop!!.shop_id.toInt(),
-                selectedShop!!.shop_name,
-                selectedShop!!.route_code,
-                selectedShop!!.distributor_office_code, totalAmount!!,
-                location.latitude.toString(), location.longitude.toString(), addedProducts!!)
-            )
-        }
-
-        CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
-    }*/
 
     fun getLocation(choice: String){
         val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -345,6 +363,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         if (!location.isFromMockProvider) {
                             if (choice.equals("no_order")){
                                 submitNoOrder(location)
+                            }else if(choice.equals("update_order")){
+                                updateOrder(location)
                             }else{
                                 submitOrder(location)
                             }
@@ -380,16 +400,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
     }
 
-    private fun submitOrder(location: Location) {
+    private fun updateOrder(location: Location) {
         if (addedProducts!!.size >0){
-        val obj1 = JSONObject()
-        val ordersArray = JSONArray()
+            val obj1 = JSONObject()
+            val ordersArray = JSONArray()
             val orderObj = JSONObject()
             orderObj.put("outlet_id", shopId)
             orderObj.put("sr_id", sr_id)
             //orderObj.put("ordered_at", "2022-10-25 09:22:00")
-            orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)
-            orderObj.put("grand_total", tvgrandTotal!!.text.toString())
+            orderObj.put("order_no", selectedOrder!!.orderId)
+            orderObj.put("distributor_office_code", selectedOrder!!.distOfficeCode)
+            orderObj.put("grand_total", grandTotalPrice.toString())
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
             orderObj.put("orders_status", "SAVED")
@@ -400,10 +421,81 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 brandObj.put("product_id", addedProducts!![j].product_id)
                 brandObj.put("product", addedProducts!![j].product_name)
                 brandObj.put("brand_id", addedProducts!![j].brand_id)
-                brandObj.put("quantity", addedProducts!![j].ordered_quantity)
+                brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
                 brandObj.put("unit_name", addedProducts!![j].unit_name)
-                brandObj.put("unit_price", addedProducts!![j].unit_price)
-                brandObj.put("total_price", addedProducts!![j].ordered_total_price)
+                brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                brandsArray.put(brandObj)
+            }
+
+            orderObj.put("brands", brandsArray)
+            ordersArray.put(orderObj)
+            obj1.put("orders", ordersArray)
+
+            if (obj1.length() >0){
+                Log.d("ConfirmOrder", "response: "+obj1)
+                ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, obj1, object : ApiServiceListener{
+                    override fun onResponseSuccess(response: String) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onJSONResponseSuccess(response: JSONObject) {
+                        val message = response.getString("message")
+                        //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+                        ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                            override fun onConfirmed() {
+                                CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                            }
+
+                            override fun onCanceled() {
+                                TODO("Not yet implemented")
+                            }
+
+                        })
+                    }
+
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                    }
+
+                    override fun onResponseFailure(error: VolleyError) {
+                        ViewUtils.getErrorResponse(error, mContext!!)
+                    }
+
+                    override fun onException(e: Exception) {
+
+                    }
+
+                })
+            }
+        }
+    }
+
+    private fun submitOrder(location: Location) {
+        if (addedProducts!!.size >0){
+        val obj1 = JSONObject()
+        val ordersArray = JSONArray()
+            val orderObj = JSONObject()
+            orderObj.put("outlet_id", shopId)
+            orderObj.put("sr_id", sr_id)
+            //orderObj.put("ordered_at", "2022-10-25 09:22:00")
+            orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)
+            orderObj.put("grand_total", grandTotalPrice.toString())
+            orderObj.put("longitude", location.longitude.toString())
+            orderObj.put("latitude", location.latitude.toString())
+            //orderObj.put("orders_status", "SAVED")
+            val brandsArray = JSONArray()
+            //val brandList = orderList[i].brands_array
+            for (j in 0 until addedProducts!!.size){
+                val brandObj = JSONObject()
+                brandObj.put("product_id", addedProducts!![j].product_id)
+                brandObj.put("product", addedProducts!![j].product_name)
+                brandObj.put("brand_id", addedProducts!![j].brand_id)
+                brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
+                brandObj.put("unit_name", addedProducts!![j].unit_name)
+                brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
                 brandsArray.put(brandObj)
             }
 
@@ -413,15 +505,25 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         if (obj1.length() >0){
             Log.d("ConfirmOrder", "response: "+obj1)
-            ApiServices.apiJSONObjectPOST(Api.confirm_order, queue!!, "", obj1, object : ApiServiceListener{
+            ApiServices.apiJSONObjectPOST(Api.confirm_order, queue!!, token!!, obj1, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {
                     TODO("Not yet implemented")
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {
                     val message = response.getString("message")
-                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                    CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                    //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                        override fun onConfirmed() {
+                            CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                        }
+
+                        override fun onCanceled() {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
                 }
 
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
@@ -429,32 +531,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    if (error is TimeoutError) {
-                        //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                        Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
-                    }
-                    if (error is NoConnectionError) {
-                        //mListerner.onFailure("Turn on your internet connection and Try again")
-                        Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
-                    }
-                    if (error != null && error.networkResponse != null) {
-                        try {
-                            val s = String(error.networkResponse.data)
-                            Log.d("MainActivity", "message: $s")
-                            val data = JSONObject(s)
-                            //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                            //mListerner.onFailure(data.getString("message"))
-                            Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
-                        } catch (e: UnsupportedEncodingException) {
-                            Sentry.captureException(e)
-                            e.printStackTrace()
-                        } catch (e: JSONException) {
-                            //mListerner.onFailure(e.message)
-                            Sentry.captureException(e)
-                            Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                            e.printStackTrace()
-                        }
-                    }
+                    ViewUtils.getErrorResponse(error, mContext!!)
                 }
 
                 override fun onException(e: Exception) {
@@ -479,17 +556,27 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         if (obj1.length() >0){
             Log.d("ConfirmOrder", "response: "+obj1)
-            ApiServices.apiJSONObjectPOST(Api.no_order, queue!!, "", obj1, object : ApiServiceListener{
+            ApiServices.apiJSONObjectPOST(Api.no_order, queue!!, token!!, obj1, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {
                     TODO("Not yet implemented")
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {
                     val message = response.getString("message")
-                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                    editor!!.putString(Api.ORDERED_ROUTE_ID, selectedShop!!.route_code)
-                    editor!!.commit()
-                    CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                    //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener{
+                        override fun onConfirmed() {
+                            editor!!.putString(Api.ORDERED_ROUTE_ID, selectedShop!!.route_code)
+                            editor!!.commit()
+                            CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                        }
+
+                        override fun onCanceled() {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
                 }
 
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
@@ -586,6 +673,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                     qtyLastMonth, availableStock, orderedQty, orderedTotalPrice)
 
                                 productsList!!.add(products)
+                                if (orderedQty > 0){
+                                    addedProducts!!.add(products)
+                                }
                             }
 
                             if (productsList!!.size > 0){
@@ -650,8 +740,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         outletName.setText(outlet_name)
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
-        val orderDate = df.format(oldDate.parse(lastOrder))
-        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
+        if (lastOrder.length > 0) {
+            val orderDate = df.format(oldDate.parse(lastOrder))
+            tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
+        }
         tvItemCount.setText(listItem.size.toString()+mContext.resources.getString(R.string.items))
 
         var grandTotal = 0.0
@@ -684,7 +776,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
-        //token = prefs.getString("token", "")
+        token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         sr_id = prefs!!.getString(Api.SR_CODE, "")
         appDatabase = AppDatabase.getInstance(context)
@@ -746,9 +838,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
         tvgrandTotal!!.setText("Total "+dformat.format(grandTotal).toString())
         totalAmount = dformat.format(grandTotal).toString()
+        grandTotalPrice = dformat.format(grandTotal).toDouble()
 
     }
-
-
 
 }

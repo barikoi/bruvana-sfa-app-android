@@ -39,6 +39,7 @@ class LastWeekSummaryFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
+    var token : String? = null
     var srId: String ? = ""
     var routeId: String ? = ""
 
@@ -79,7 +80,7 @@ class LastWeekSummaryFragment : Fragment() {
         var bpc_completed = ""
         var aiv_completed = ""
 
-        ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener {
+        ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
@@ -98,7 +99,7 @@ class LastWeekSummaryFragment : Fragment() {
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
-                                total_target_completed = targetObj.getString("revenue")
+                                total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
                                 bpc_completed = targetObj.getString("bpc")
                                 lpc_completed = targetObj.getString("lpc")
                                 aiv_completed = targetObj.getString("aiv")
@@ -169,6 +170,7 @@ class LastWeekSummaryFragment : Fragment() {
         editor = prefs!!.edit()
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        token = prefs!!.getString(Api.TOKEN, "")
         srId = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }

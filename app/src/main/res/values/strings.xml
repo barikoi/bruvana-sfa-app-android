@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CNL App</string>
+    <string name="splash_title">Care Nutrition Limited</string>
 
     <!--bottom_nav-->
     <string name="title_home">Home</string>
@@ -39,7 +40,10 @@
     <string name="atoz">A to Z</string>
     <string name="ztoa">Z to A</string>
 
+    <string name="stock_out">Stock out</string>
+
     <string name="sr_code">SR Code</string>
+    <string name="ss_id">SS Id</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="logout">Log Out</string>
@@ -50,9 +54,14 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
+    <string name="check">Check</string>
+    <string name="try_again">Try Again</string>
 
     <string name="route_plan">Route Plan</string>
     <string name="verified">Verified</string>
+
+    <string name="route_code">Route Code</string>
+    <string name="shop_count">Shop Count</string>
 
     <!--attendance history-->
     <string name="market">Market: </string>
@@ -72,7 +81,7 @@
     <string name="last_week_product">Last Week Product</string>
     <string name="last_week_category">Last Week Category</string>
     <string name="last_week_delivery">Last Week Delivery</string>
-    <string name="bounce_list">Bounce List</string>
+    <string name="bounce_list">Last Week Bounce</string>
 
     <string name="summary">Summary</string>
     <string name="total_order_value">Total Order Value</string>
@@ -87,6 +96,9 @@
     <string name="last_order_date">Last order date- </string>
     <string name="items">Items</string>
 
+    <string name="no_route_selected_today">Today\'s route not selected yet. \nSubmit your attendance for route selection.</string>
+    <string name="no_order_found">No order found today</string>
+    <string name="coming_soon">Coming Soon!!!</string>
     <!--Create Order-->
     <string name="order_collection">Order Collection</string>
     <string name="select_dokan">Select Dokan</string>
@@ -101,6 +113,7 @@
     <string name="search_product">Search by product name</string>
     <string name="no_order">No Order</string>
     <string name="save_order">Save Order</string>
+    <string name="update_order">Update Order</string>
     <string name="add_more_item">Add More Item</string>
     <string name="download_chalan">Download Chalan</string>
     <string name="confirm_order_dialog">Are you sure want to confirm todays order?</string>
@@ -110,6 +123,9 @@
     <string name="sold_in">Sold in </string>
     <string name="route"> route</string>
     <string name="product_list">Product List</string>
+
+    <string name="route_list">Route List</string>
+    <string name="shop_list">Shop List</string>
 
     <!--notice view-->
     <string name="see_more">See More...</string>

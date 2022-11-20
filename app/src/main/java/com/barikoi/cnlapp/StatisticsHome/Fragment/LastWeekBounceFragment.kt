@@ -28,6 +28,7 @@ class LastWeekBounceFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
+    var token : String? = null
     var srId: String ? = ""
     var routeId: String ? = ""
 
@@ -45,13 +46,13 @@ class LastWeekBounceFragment : Fragment() {
     }
 
     private fun init() {
-        //getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
-        getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_bounce=1&with_last_week_order=1")
+        getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
+        //getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_bounce=1&with_last_week_order=1")
     }
 
     private fun getLastBounceItems(url: String) {
 
-        ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener {
+        ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
@@ -139,6 +140,7 @@ class LastWeekBounceFragment : Fragment() {
         editor = prefs!!.edit()
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        token = prefs!!.getString(Api.TOKEN, "")
         srId = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }

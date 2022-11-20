@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Dec"
+            android:text=""
             android:textStyle="bold"
             android:textColor="@color/cnl_color_1"
             android:textSize="17sp">
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="12"
+            android:text=""
             android:textStyle="bold"
             android:textColor="@color/text_title"
             android:textSize="18sp">
@@ -53,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/marketTitle"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vulputate cursus cursus amet ultrices habitasse pulvinar aenean. "
+            android:text=""
             android:textColor="@color/text_title"
             android:textSize="15sp">
 

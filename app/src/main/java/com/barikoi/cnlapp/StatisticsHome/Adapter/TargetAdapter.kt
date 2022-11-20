@@ -29,8 +29,8 @@ class TargetAdapter (val targets: List<TargetValue>) : RecyclerView.Adapter<Targ
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.progressView.setProgress(Math.round(targets[position].completed.toDouble()).toInt(), true)
                 holder.progressView.max = Math.round(targets[position].target.toDouble()).toInt()
+                holder.progressView.setProgress(Math.round(targets[position].completed.toDouble()).toInt(), true)
 
                 Log.d("Target", "target: " + Math.round(targets[position].target.toDouble()).toInt())
                 Log.d("Target", "completed: " + Math.round(targets[position].completed.toDouble()).toInt())

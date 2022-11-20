@@ -15,6 +15,7 @@ object Api {
     val SELECTED_SHOP = "selected_shop"
     val SELECTED_SHOP_ID = "selected_shop_id"
     val SELECTED_ROUTE_ID = "selected_route_id"
+    val SELECTED_ROUTE_NAME = "selected_route_name"
     val ORDERED_ROUTE_ID = "ordered_route_id"
 
     val ROUTE_PAGE_SELECTED = "route_page_selected"
@@ -40,7 +41,7 @@ object Api {
     val routes_withfilter = base_url+"api/v1/routes"
     val shops_byroutes = base_url+"api/v1/fetch-outlets"
     val all_product_list = base_url+"api/v1/products"
-    val no_order = base_url+"api/v1/no-order"
+    val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"
     val get_saved_order = base_url+"api/v1/fetch-orders"
     val confirm_order = base_url+"api/v1/create-order"

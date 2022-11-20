@@ -115,6 +115,7 @@
                     android:id="@+id/tradeDivider"
                     android:layout_width="30dp"
                     android:layout_height="2dp"
+                    android:visibility="gone"
                     android:layout_centerVertical="true"
                     android:background="@color/text_title_2">
 

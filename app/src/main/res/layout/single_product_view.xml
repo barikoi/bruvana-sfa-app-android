@@ -93,25 +93,17 @@
                 android:padding="1dp"
                 android:orientation="horizontal"
                 android:background="@drawable/cardview_bg_stroke_2dp">
-                <LinearLayout
-                    android:id="@+id/layoutMinus"
+                <ImageButton
+                    android:id="@+id/btnminus"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp"
+                    android:padding="8dp"
                     android:gravity="center_vertical"
                     android:background="@drawable/cardview_bg_stroke_2dp"
-                    android:backgroundTint="@color/btn_gray_light">
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnminus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/ic_minus">
+                    android:backgroundTint="@color/btn_gray_light"
+                    android:src="@drawable/ic_minus">
 
-                    </androidx.appcompat.widget.AppCompatButton>
-                </LinearLayout>
+                </ImageButton>
 
                 <EditText
                     android:id="@+id/tvCount"
@@ -125,23 +117,17 @@
                     android:textSize="12sp">
 
                 </EditText>
-                <LinearLayout
-                    android:id="@+id/layoutPlus"
+                <ImageButton
+                    android:id="@+id/btnPlus"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:padding="4dp"
+                    android:padding="8dp"
+                    android:gravity="center_vertical"
                     android:background="@drawable/cardview_bg_stroke_2dp"
-                    android:backgroundTint="@color/btn_gray_light">
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnPlus"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="2dp"
-                        android:padding="4dp"
-                        android:background="@drawable/ic_plus">
+                    android:backgroundTint="@color/btn_gray_light"
+                    android:src="@drawable/ic_plus">
 
-                    </androidx.appcompat.widget.AppCompatButton>
-                </LinearLayout>
+                </ImageButton>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="80dp"

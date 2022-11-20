@@ -37,7 +37,7 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
             val orderDate = df.format(oldDate.parse(shopList[position].lastOrderDate))
             holder.lastOrderDate.text = holder.itemView.context.resources.getString(com.barikoi.cnlapp.R.string.last_order_date)+orderDate
         }
-        holder.tvCategory.text = shopList[position].category
+        holder.tvCategory.text = shopList[position].category.get(0).toString().uppercase(Locale.getDefault())
 
         if (shopList[position].isOrdered == 1){
             holder.isOrdered.visibility = View.VISIBLE

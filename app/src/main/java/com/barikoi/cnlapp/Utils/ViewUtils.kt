@@ -72,6 +72,29 @@ object ViewUtils {
         )
 
     }
+    fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener){
+        val dialog = Dialog(mContext)
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_response_popup)
+        val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
+        val btnOk = dialog.findViewById<AppCompatButton>(R.id.btn_ok)
+        tvMessage.setText(message)
+
+        btnOk.setOnClickListener {
+            listener.onConfirmed()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        val window = dialog.window
+        window!!.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+    }
 
     fun getErrorResponse(error: VolleyError, mContext: Context){
         if (error is TimeoutError) {

@@ -5,9 +5,7 @@
     android:id="@+id/swipeRefresh"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:background="@color/background_app"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
     <RelativeLayout
@@ -23,7 +21,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:scrollbarThumbVertical="@color/black"
-            android:background="@color/white"
+            android:background="@color/background_app"
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/single_route_list" />
         <com.github.ybq.android.spinkit.SpinKitView
@@ -34,7 +32,7 @@
             android:padding="8dp"
             android:visibility="gone"
             android:layout_centerInParent="true"
-            app:SpinKit_Color="@color/color_gray_medium" />
+            app:SpinKit_Color="@color/cnl_color_1" />
         <TextView
             android:id="@+id/tvNoContent"
             android:layout_width="wrap_content"
@@ -42,7 +40,7 @@
             android:layout_margin="8dp"
             android:layout_centerInParent="true"
             android:textSize="20sp"
-            android:textColor="@color/color_gray_medium"
+            android:textColor="@color/cnl_color_1"
             android:textAlignment="center"
             android:visibility="gone"
             android:gravity="center_horizontal">

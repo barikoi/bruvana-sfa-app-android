@@ -179,13 +179,13 @@ class ShopListFragment : Fragment() {
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
                                 val outlet_type = outlet.getString("store_type")
-                                val outlet_category = outlet.getString("outlet_category")
+                                /*val outlet_category = outlet.getString("outlet_category")*/
                                 val owner_name = outlet.getString("owner_name")
                                 val distributor_office = outlet.getString("distributor_office")
                                 val distributor_office_code = outlet.getString("distributor_office_code")
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
-                                val last_order_date = outlet.getString("order_delivery_date")
+                                /*val last_order_date = outlet.getString("order_delivery_date")*/
 
                                 shopList!!.add(
                                     Shops(
@@ -195,7 +195,7 @@ class ShopListFragment : Fragment() {
                                         outlet_address,
                                         outlet_code,
                                         outlet_type,
-                                        outlet_category,
+                                        "",
                                         owner_name,
                                         distributor_office,
                                         distributor_office_code,
@@ -204,7 +204,7 @@ class ShopListFragment : Fragment() {
                                         longitude,
                                         route_id,
                                         route_name,
-                                        last_order_date,
+                                        "",
                                         0
                                     )
                                 )

@@ -70,7 +70,7 @@
         android:hint="@string/search_shop"
         android:imeOptions="actionNext"
         android:inputType="textCapWords"
-        android:padding="6dp"
+        android:padding="10dp"
         android:textSize="12sp" />
 
     <TextView

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
@@ -24,7 +25,12 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
     override fun onBindViewHolder(holder: ShopListAdapter.ViewHolder, position: Int) {
         holder.shopName.text = shopList[position].shop_name
         holder.address.text = shopList[position].address
-        holder.shopState.text = shopList[position].state
+        /*holder.shopState.text = shopList[position].state*/
+        if (shopList[position].state.equals("active", true)){
+            holder.shopState.visibility = View.VISIBLE
+        }else{
+            holder.shopState.visibility = View.GONE
+        }
         holder.shopCode.text = shopList[position].shop_code
         holder.shopType.text = shopList[position].shop_type
         holder.distributorName.text = shopList[position].distributor_office
@@ -38,7 +44,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val shopName: TextView
-        internal val shopState: TextView
+        internal val shopState: ImageView
         internal val address: TextView
         internal val shopCode: TextView
         internal val distributorName: TextView
