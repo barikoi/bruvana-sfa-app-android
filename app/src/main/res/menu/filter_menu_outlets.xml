@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_A"
+        android:title="A" />
+
+    <item
+        android:id="@+id/menu_B"
+        android:title="B" />
+    <item
+        android:id="@+id/menu_C"
+        android:title="C" />
+
+    <item
+        android:id="@+id/menu_D"
+        android:title="D" />
+    <item
+        android:id="@+id/menu_E"
+        android:title="E" />
+    <item
+        android:id="@+id/menu_F"
+        android:title="F" />
+    <item
+        android:id="@+id/menu_pharmacy"
+        android:title="Pharmacy" />
+
+    <item
+        android:id="@+id/menu_mpharma"
+        android:title="M. Pharma" />
+    <item
+        android:id="@+id/menu_warehouse"
+        android:title="Warehouse" />
+
+    <item
+        android:id="@+id/menu_ordered"
+        android:title="Ordered" />
+    <item
+        android:id="@+id/menu_no_order"
+        android:title="No Order" />
+
+</menu>

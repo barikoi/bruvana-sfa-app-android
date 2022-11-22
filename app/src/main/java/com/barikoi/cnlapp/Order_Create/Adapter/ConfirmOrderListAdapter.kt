@@ -12,6 +12,7 @@ import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEditOrderListener, var from: String): RecyclerView.Adapter<ConfirmOrderListAdapter.ViewHolder>(), Filterable {
@@ -30,6 +31,16 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
             val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
+        }
+
+        if (!orderList[position].orderedAt.equals("null")){
+            holder.orderAt.visibility = View.VISIBLE
+            val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+            val orderDate = df.format(oldDate.parse(orderList[position].orderedAt))
+            holder.orderAt.setText(holder.itemView.context.resources.getString(R.string.ordered_at)+orderDate)
+        }else{
+            holder.orderAt.visibility = View.GONE
         }
 
         holder.addMore.setOnClickListener {
@@ -88,6 +99,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val shopName: TextView
+        internal val orderAt: TextView
         internal val subTotal: TextView
         internal val addMore: TextView
         internal val editItem: ImageView
@@ -96,6 +108,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
 
         init {
             shopName = itemView.findViewById(R.id.tvShopName)
+            orderAt = itemView.findViewById(R.id.tvOrderDate)
             subTotal = itemView.findViewById(R.id.tvSubTotal)
             productList = itemView.findViewById(R.id.productlist)
             addMore = itemView.findViewById(R.id.tvAddMore)

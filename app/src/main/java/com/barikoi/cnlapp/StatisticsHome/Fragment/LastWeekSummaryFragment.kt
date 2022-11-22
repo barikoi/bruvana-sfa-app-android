@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_last_week_summary.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -81,6 +82,8 @@ class LastWeekSummaryFragment : Fragment() {
         var aiv_completed = ""
         var visit_ratio = ""
 
+        var dformat = DecimalFormat("#.##")
+
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
@@ -91,10 +94,10 @@ class LastWeekSummaryFragment : Fragment() {
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
                                 total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                bpc_completed = targetObj.getString("bpc")
-                                lpc_completed = targetObj.getString("lpc")
-                                aiv_completed = targetObj.getString("aiv")
-                                visit_ratio = targetObj.getString("visit_ratio")
+                                bpc_completed = dformat.format(targetObj.getString("bpc").toDouble())
+                                lpc_completed = dformat.format(targetObj.getString("lpc").toDouble())
+                                aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                visit_ratio = dformat.format(targetObj.getString("visit_ratio").toDouble())
                             }
                         }
 

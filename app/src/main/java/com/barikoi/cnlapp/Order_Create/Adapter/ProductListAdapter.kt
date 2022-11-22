@@ -80,6 +80,11 @@ Filterable{
         holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
 
         holder.btnAdd.setOnClickListener {
+            /*if (productList[position].stock_available > 0){
+
+            }else{
+                Toast.makeText(holder.itemView.context, holder.itemView.resources.getString(R.string.stock_out), Toast.LENGTH_SHORT).show()
+            }*/
             val qtyValue = holder.productCount.text.toString().toInt() + 1
             holder.productCount.setText(qtyValue.toString())
             /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()

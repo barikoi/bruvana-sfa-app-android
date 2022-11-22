@@ -34,12 +34,15 @@ import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
+import com.barikoi.cnlapp.TradeOffers.TradeOfferListAdapter
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.gms.location.*
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.activity_trade_offers.*
 import kotlinx.android.synthetic.main.fragment_shop_select.*
+import kotlinx.android.synthetic.main.fragment_shop_select.filterTitle
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -55,8 +58,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     var listener: OnSelectListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ShopSelectAdapter? = null
-    //var routeList: ArrayList<Routes>? = ArrayList()
     var shopList: ArrayList<Shops>? = ArrayList()
+    var filterList: ArrayList<Shops>? = ArrayList()
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -109,6 +112,134 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 adapter!!.notifyDataSetChanged()
                             }
                             sortTitle!!.setText(resources.getString(R.string.atoz))
+                        }
+                    }
+                    return true
+                }
+
+            })
+            popup.show()
+        }
+
+        filterTitle.setOnClickListener {
+            val popup = PopupMenu(mContext, filterTitle)
+            popup.menuInflater.inflate(R.menu.filter_menu_outlets, popup.menu)
+            popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
+                PopupMenu.OnMenuItemClickListener {
+                @RequiresApi(Build.VERSION_CODES.N)
+                override fun onMenuItemClick(item: MenuItem?): Boolean {
+                    when(item!!.itemId){
+                        R.id.menu_A->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("A", true)
+                            }
+                            if (filterList!!.size > 0){
+                                adapter = ShopSelectAdapter(filterList!!, listener!!)
+                                shoplist.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+                        }
+                        R.id.menu_B->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("B", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_C->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("C", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_D->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("D", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_E->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("E", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_F->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("F", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_pharmacy->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("P", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_mpharma->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("M", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_warehouse->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                !it.category.get(0).toString().equals("W", true)
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_no_order->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                it.isOrdered != 0
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        R.id.menu_ordered->{
+                            filterList!!.clear()
+                            filterList!!.addAll(shopList!!)
+                            filterList!!.removeIf {
+                                it.isOrdered != 1
+                            }
+                            adapter = ShopSelectAdapter(filterList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
                         }
                     }
                     return true

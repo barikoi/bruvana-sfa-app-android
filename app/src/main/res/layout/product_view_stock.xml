@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:maxWidth="200dp"
-                android:text="Product Name"
+                android:text=""
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="bold">
@@ -59,7 +59,7 @@
                 android:layout_marginBottom="4dp"
                 android:gravity="center_vertical"
                 android:visibility="visible"
-                android:text="18 ins"
+                android:text=""
                 android:textColor="@color/cnl_color_2"
                 android:textSize="10sp">
 

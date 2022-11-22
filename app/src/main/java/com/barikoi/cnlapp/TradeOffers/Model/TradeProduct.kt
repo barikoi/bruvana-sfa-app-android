@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.TradeOffers
+package com.barikoi.cnlapp.TradeOffers.Model
 
 import java.io.Serializable
 

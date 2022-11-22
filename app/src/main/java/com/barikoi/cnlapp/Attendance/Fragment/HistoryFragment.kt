@@ -170,9 +170,6 @@ class HistoryFragment : Fragment() {
             if (response != null){
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
-                var absent = 0
-                var present = 0
-                var late= 0
                 var latitude = 0.0
                 var longitude = 0.0
                 historyList.clear()
@@ -204,8 +201,6 @@ class HistoryFragment : Fragment() {
                             if (attendanceObj.getInt("is_absent") == 1) absent += 1*/
                         }
                     }
-
-                    present = attedanceArray.length() - absent
                 }
 
                 adapter = HistoryListAdapter(historyList)

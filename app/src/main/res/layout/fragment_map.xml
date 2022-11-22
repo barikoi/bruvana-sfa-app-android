@@ -121,5 +121,5 @@
         android:layout_marginTop="8dp"
         android:layout_centerInParent="true"
         android:visibility="gone"
-        app:SpinKit_Color="@color/colorPrimary" />
+        app:SpinKit_Color="@color/cnl_color_1" />
 </RelativeLayout>

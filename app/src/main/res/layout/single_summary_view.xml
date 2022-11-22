@@ -18,7 +18,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="Total Target"
+            android:text=""
             android:textStyle="bold"
             android:textColor="@color/text_title"
             android:textSize="14sp">
@@ -31,7 +31,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:gravity="center"
-            android:text="10000"
+            android:text=""
             android:textStyle="bold"
             android:textColor="@color/white"
             android:textSize="30sp">
@@ -60,7 +60,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="73000"
+        android:text=""
         android:textStyle="bold"
         android:textColor="@color/progress_track"
         android:textSize="14sp">

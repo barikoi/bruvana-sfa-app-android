@@ -29,31 +29,37 @@
             android:name=".Notice.NoticeActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".TradeOffers.TradeOffersActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".ProductStock.ProductSummaryActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".ProductStock.ProductStockUpdateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".Activity.OrderSummaryActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".Activity.RouteActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".Activity.LoginActivity"

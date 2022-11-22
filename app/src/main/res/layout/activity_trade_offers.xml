@@ -101,7 +101,7 @@
         android:layout_margin="8dp"
         android:layout_alignParentTop="true"
         app:spanCount="2"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         tools:listitem="@layout/single_trade_offers_view">
 
     </androidx.recyclerview.widget.RecyclerView>

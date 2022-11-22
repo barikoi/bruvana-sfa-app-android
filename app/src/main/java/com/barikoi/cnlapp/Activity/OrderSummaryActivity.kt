@@ -169,6 +169,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                     OrderList(
                                         null,
                                         orderObj.getString("order_no"),
+                                        orderObj.getString("ordered_at"),
                                         orderObj.getString("orders_status"),
                                         orderObj.getString("outlet_id"),
                                         orderObj.getString("outlet_name"),

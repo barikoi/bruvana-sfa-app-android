@@ -22,35 +22,6 @@
             app:contentInsetEnd="0dp"
             android:background="@color/background_app">
 
-            <!--<LinearLayout
-                android:id="@+id/filterLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_filter"
-                    android:layout_marginStart="@dimen/_4sdp"
-                    android:layout_marginEnd="@dimen/_4sdp">
-
-                </ImageView>
-
-                <TextView
-                    android:id="@+id/filterDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textStyle="italic"
-                    android:textSize="15sp"
-                    android:textColor="@color/white"
-                    android:text=""
-                    android:layout_marginEnd="@dimen/_8sdp">
-
-                </TextView>
-            </LinearLayout>-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -179,11 +150,13 @@
                         android:id="@+id/routeNameSelected"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_route"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="@color/text_title"
                         android:gravity="center"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:text="">
+                        android:text="asdasdasd">
                     </TextView>
                 </LinearLayout>
 
@@ -197,7 +170,7 @@
         android:id="@+id/fragmentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="80dp"
         android:layout_marginBottom="50dp"
         android:layout_below="@+id/appbar"
         android:layout_above="@+id/bottom_nav_view"/>

@@ -114,6 +114,7 @@
                     android:gravity="center"
                     android:textColor="@color/black"
                     android:text="0"
+                    android:textStyle="bold"
                     android:textSize="12sp">
 
                 </EditText>

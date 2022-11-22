@@ -104,9 +104,9 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.taskId = "taskId"
         imagepicker.CAMERA = 4
         imagepicker.setMainactivity(ACTIVITY)
-        imagepicker.setFragmetnt(this)
+        imagepicker.setFragmetnt(CreateAttendanceFragment())
 
-        getAllRoutes(com.barikoi.cnlapp.Utils.Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
+        getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
 
         spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -190,13 +190,12 @@ class CreateAttendanceFragment : Fragment() {
                 progressBar.visibility = View.GONE
                 val data = JSONObject(String(response.data))
                 val message = data.getString("message")
-
+                appDatabase!!.imagesDao()!!.deleteAllImages()
                 ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                     override fun onConfirmed() {
                         editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
                         editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
                         editor!!.commit()
-                        appDatabase!!.imagesDao()!!.deleteAllImages()
 
                         val titles = arrayOf(resources.getString(R.string.attendance), resources.getString(R.string.history), resources.getString(R.string.summary))
                         val fragments = ArrayList<Fragment>()

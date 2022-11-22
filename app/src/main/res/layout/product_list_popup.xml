@@ -29,7 +29,7 @@
             android:drawableLeft="@drawable/ic_shop_small"
             android:drawablePadding="8dp"
             android:layout_gravity="center_horizontal"
-            android:text="General Store"
+            android:text=""
             android:textColor="@color/text_title"
             android:textSize="12sp">
 
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Last order date- 31 March 2022"
+            android:text=""
             android:textColor="@color/text_title_2"
             android:textSize="9sp">
 

@@ -13,6 +13,8 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.TradeOffers.Model.ProductAll
+import com.barikoi.cnlapp.TradeOffers.Model.TradeProduct
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
@@ -66,11 +68,9 @@ class TradeOffersActivity : AppCompatActivity() {
                             filterList.removeIf {
                                 it.tradeList.size == 0
                             }
-                            if (filterList.size > 0){
-                                adapter = TradeOfferListAdapter(filterList)
-                                productList.adapter = adapter
-                                adapter!!.notifyDataSetChanged()
-                            }
+                            adapter = TradeOfferListAdapter(filterList)
+                            productList.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
                             tvTitle.setText(resources.getString(R.string.title_trade_offers))
                         }
                     }

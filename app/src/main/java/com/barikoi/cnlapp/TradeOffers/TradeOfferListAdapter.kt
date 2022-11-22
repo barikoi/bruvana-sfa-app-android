@@ -10,6 +10,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.TradeOffers.Model.ProductAll
 import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat

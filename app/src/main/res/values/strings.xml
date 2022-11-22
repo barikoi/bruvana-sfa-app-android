@@ -41,6 +41,7 @@
     <string name="ztoa">Z to A</string>
 
     <string name="stock_out">Stock out</string>
+    <string name="product_stock_out">Product is stock out</string>
 
     <string name="sr_code">SR Code</string>
     <string name="ss_id">SS Id</string>
@@ -95,6 +96,7 @@
     <string name="total">Total-</string>
     <string name="last_order_date">Last order date- </string>
     <string name="items">Items</string>
+    <string name="ordered_at">Ordered at- </string>
 
     <string name="no_route_selected_today">Today\'s route not selected yet. \nSubmit your attendance for route selection.</string>
     <string name="no_order_found">No order found today</string>
