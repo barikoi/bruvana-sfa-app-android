@@ -38,10 +38,13 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.activity_order_summary.*
 import kotlinx.android.synthetic.main.appcontent_main.*
+import kotlinx.android.synthetic.main.appcontent_main.tvTitle
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -73,8 +76,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")
         userName = prefs!!.getString(Api.NAME, "")
+        //val route = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
         nav_view = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
-        //nav_view!!.setSelectedItemId(R.id.navigation_map)
 
         nav_view!!.background = null
         nav_view!!.menu.getItem(2).isEnabled = false
@@ -83,11 +86,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationDrawer = findViewById(R.id.nav_view)
         navigationDrawer!!.setNavigationItemSelectedListener(this)
         drawer = findViewById(R.id.drawer_layout)
-        /*drawer.useCustomBehavior(Gravity.START)
-        drawer.setViewScale(Gravity.START, 0.9f)
-        drawer.setViewElevation(Gravity.START, 20f)
-        drawer.setRadius(Gravity.START, 25f)*/
-        //drawer!!.openDrawer(GravityCompat.START, true)
+
         menu_drawer = findViewById<ImageView>(R.id.drawer)
         menu_drawer!!.setOnClickListener(View.OnClickListener {
             drawer!!.openDrawer(
@@ -108,6 +107,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userLayout.visibility = View.VISIBLE
         tvUserName.setText(userName)
         getAuthUser(token, Api.authUserCheck+"?start_date=2022-04-30 00:00:00"/*+StartDate*/+"&end_date="+EndDate)
+
         setCurrentFragment(HomeFragment(), this@MainActivity)
 
         val header = navigationDrawer!!.getHeaderView(0)
@@ -183,10 +183,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     setCurrentFragment(AttendanceFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
-                /*R.id.navigation_announcement -> {
-                    MainActivity.setCurrentFragment(FragmentAnnouncement(), this@MainActivity)
-                    return@OnNavigationItemSelectedListener true
-                }*/
             }
             false
         })
@@ -206,8 +202,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 tvRank.setText(userObj.getInt("so_ranking").toString())
                                 rank_suffix.setText(toOrdinal(userObj.getInt("so_ranking")))
                             }else{
-                                tvRank.setText("0")
+                                //rankLayout.visibility = View.VISIBLE
+                                //tvRank.setText("0")
                             }
+                            routeNameSelected.setText(prefs!!.getString(Api.SELECTED_ROUTE_NAME, ""))
                         }
                     }catch (e: Exception){
                         e.printStackTrace()
@@ -225,32 +223,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             override fun onResponseFailure(error: VolleyError) {
-                if (error is TimeoutError) {
-                    //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                    Toast.makeText(applicationContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
-                }
-                if (error is NoConnectionError) {
-                    //mListerner.onFailure("Turn on your internet connection and Try again")
-                    Toast.makeText(applicationContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
-                }
-                if (error != null && error.networkResponse != null) {
-                    try {
-                        val s = String(error.networkResponse.data)
-                        Log.d("MainActivity", "message: $s")
-                        val data = JSONObject(s)
-                        //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                        //mListerner.onFailure(data.getString("message"))
-                        Toast.makeText(applicationContext, data.getString("message"), Toast.LENGTH_LONG).show()
-                    } catch (e: UnsupportedEncodingException) {
-                        Sentry.captureException(e)
-                        e.printStackTrace()
-                    } catch (e: JSONException) {
-                        //mListerner.onFailure(e.message)
-                        Sentry.captureException(e)
-                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
-                        e.printStackTrace()
-                    }
-                }
+                ViewUtils.getErrorResponse(error, applicationContext)
             }
 
             override fun onException(e: Exception) {

@@ -7,8 +7,10 @@ import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
+import com.barikoi.cnlapp.Utils.ViewUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -47,7 +49,21 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
 
         holder.btnDetails.setOnClickListener {
-            mListener.onShopSelected(shopList[position])
+            if (shopList[position].isOrdered == 1){
+                ViewUtils.viewDialog(holder.itemView.context, "Already order saved for this outlet", object : DialogListener{
+                    override fun onConfirmed() {
+
+                    }
+
+                    override fun onCanceled() {
+
+                    }
+
+                })
+            }else{
+                mListener.onShopSelected(shopList[position])
+            }
+
         }
     }
 

@@ -79,23 +79,14 @@ class LastWeekSummaryFragment : Fragment() {
         var lpc_completed = ""
         var bpc_completed = ""
         var aiv_completed = ""
+        var visit_ratio = ""
 
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
-                        /*if (targetsArray.length() > 0){
-                            for (i in 0 until targetsArray.length()){
-                                val targetObj =targetsArray.getJSONObject(i)
-                                if (targetObj.equals("target_amount")) total_target = targetObj.getString("target_amount")
-                                if (targetObj.equals("target_sku_per_memo")) bpc = targetObj.getString("target_sku_per_memo")
-                                if (targetObj.equals("target_number_of_memo")) lpc = targetObj.getString("target_number_of_memo")
-                                if (targetObj.equals("target_aiv")) aiv = targetObj.getString("target_aiv")
-                            }
-                        }*/
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
@@ -103,12 +94,14 @@ class LastWeekSummaryFragment : Fragment() {
                                 bpc_completed = targetObj.getString("bpc")
                                 lpc_completed = targetObj.getString("lpc")
                                 aiv_completed = targetObj.getString("aiv")
+                                visit_ratio = targetObj.getString("visit_ratio")
                             }
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        itemList.add(Pair(resources.getString(R.string.total_target), total_target_completed))
+                        itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
                         itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
+                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio+"%"))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
 

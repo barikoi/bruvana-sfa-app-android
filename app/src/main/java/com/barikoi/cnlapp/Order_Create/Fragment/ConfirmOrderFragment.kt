@@ -109,7 +109,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                 val orderObj = JSONObject()
                 orderObj.put("outlet_id", orderList[i].outletId)
                 orderObj.put("order_no", orderList[i].orderId)
-                orderObj.put("sr_id", user_id)
+                orderObj.put("sr_id", sr_id)
                 orderObj.put("distributor_office_code", orderList[i].distOfficeCode)
                 orderObj.put("grand_total", orderList[i].grandTotal)
                 orderObj.put("orders_status", "PENDING")
@@ -119,13 +119,15 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                 val brandList = orderList[i].brands_array
                 for (j in 0 until brandList.size){
                     val brandObj = JSONObject()
-                    brandObj.put("product_id", brandList[j].product_id)
-                    brandObj.put("product", brandList[j].product_name)
-                    brandObj.put("brand_id", brandList[j].brand_id)
-                    brandObj.put("quantity", brandList[j].ordered_quantity.toString())
-                    brandObj.put("unit_price", brandList[j].unit_price.toString())
-                    brandObj.put("total_price", brandList[j].ordered_total_price.toString())
-                    brandObj.put("unit_name", brandList[j].unit_name)
+                    if (brandList[j].ordered_quantity > 0) {
+                        brandObj.put("product_id", brandList[j].product_id)
+                        brandObj.put("product", brandList[j].product_name)
+                        brandObj.put("brand_id", brandList[j].brand_id)
+                        brandObj.put("quantity", brandList[j].ordered_quantity.toString())
+                        brandObj.put("unit_price", brandList[j].unit_price.toString())
+                        brandObj.put("total_price", brandList[j].ordered_total_price.toString())
+                        brandObj.put("unit_name", brandList[j].unit_name)
+                    }
                     brandsArray.put(brandObj)
                 }
 
@@ -150,8 +152,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
             override fun onJSONResponseSuccess(response: JSONObject) {
                 try {
                     Log.d("ConfirmOrder", "response api: "+response)
-                    /*appDatabase!!.orderListDao().deleteALL()
-                    appDatabase!!.saveOrderDao().deleteALL()*/
+                    appDatabase!!.orderListDao().deleteALL()
+                    appDatabase!!.saveOrderDao().deleteALL()
                     val message = response.getString("message")
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
@@ -221,7 +223,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                                             )
                                         )
                                     }
-
                                 }
                                 orderList.add(
                                     OrderList(
@@ -289,7 +290,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
-        sr_id = prefs!!.getString(Api.SR_CODE, "")
+        sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
         route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context

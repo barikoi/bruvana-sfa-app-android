@@ -173,42 +173,39 @@ class HistoryFragment : Fragment() {
                 var absent = 0
                 var present = 0
                 var late= 0
+                var latitude = 0.0
+                var longitude = 0.0
                 historyList.clear()
                 if (attedanceArray.length() >0){
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
-                        historyList.add(
-                            HistoryList(
-                                attendanceObj.getString("id"),
-                                attendanceObj.getString("enter_time"),
-                                attendanceObj.getString("exit_time"),
-                                attendanceObj.getInt("is_late"),
-                                attendanceObj.getInt("is_absent"),
-                                attendanceObj.getString("checkin_address"),
-                                attendanceObj.getDouble("latitude"),
-                                attendanceObj.getDouble("longitude"),
-                                attendanceObj.getString("image"),
-                                attendanceObj.getString("late_reason"),
-                                attendanceObj.getInt("route_id"),
-                                attendanceObj.getString("route_name")
-                        )
-                        )
-                        if (attendanceObj.getInt("is_late") == 1) late += 1
-                        if (attendanceObj.getInt("is_absent") == 1) absent +=1
+                        if (!attendanceObj.getString("enter_time").equals("null")) {
+                            if (!attendanceObj.getString("latitude").equals("null")) latitude =
+                                attendanceObj.getDouble("latitude")
+                            if (!attendanceObj.getString("longitude").equals("null")) longitude =
+                                attendanceObj.getDouble("longitude")
+                            historyList.add(
+                                HistoryList(
+                                    attendanceObj.getString("id"),
+                                    attendanceObj.getString("enter_time"),
+                                    attendanceObj.getString("exit_time"),
+                                    attendanceObj.getInt("is_late"),
+                                    attendanceObj.getInt("is_absent"),
+                                    attendanceObj.getString("checkin_address"),
+                                    latitude,
+                                    longitude,
+                                    attendanceObj.getString("image"),
+                                    attendanceObj.getString("late_reason"),
+                                    attendanceObj.getString("route_id"),
+                                    attendanceObj.getString("route_name")
+                                )
+                            )
+                            /*if (attendanceObj.getInt("is_late") == 1) late += 1
+                            if (attendanceObj.getInt("is_absent") == 1) absent += 1*/
+                        }
                     }
 
                     present = attedanceArray.length() - absent
-
-                    /*editor!!.putInt(Api.TOTAL_PRESENT, present)
-                    editor!!.putInt(Api.TOTAL_LATE, late)
-                    editor!!.putInt(Api.TOTAL_ABSENT, absent)
-                    editor!!.commit()*/
-
-                    /*if (historyList.size > 0){
-                        adapter = HistoryListAdapter(historyList)
-                        historyListView.adapter = adapter
-                        adapter!!.notifyDataSetChanged()
-                    }*/
                 }
 
                 adapter = HistoryListAdapter(historyList)

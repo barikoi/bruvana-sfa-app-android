@@ -7,7 +7,7 @@
     android:background="@color/background_app"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Order_Create.Fragment.ConfirmOrderFragment">
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,6 @@
             android:maxWidth="250dp"
             android:layout_margin="8dp"
             android:layout_alignParentTop="true"
-            android:layout_centerVertical="true"
             android:drawableLeft="@drawable/ic_route"
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
@@ -34,7 +33,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/orderList"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:layout_below="@+id/tvRouteName"
             android:layout_above="@+id/buttonLayout"
@@ -79,7 +78,7 @@
 
             </androidx.appcompat.widget.AppCompatButton>
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 
     <LinearLayout

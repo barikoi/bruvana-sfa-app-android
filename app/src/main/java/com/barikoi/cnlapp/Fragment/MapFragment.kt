@@ -62,6 +62,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var mMap: MapboxMap? = null
     private var mapView: MapView? = null
     lateinit var fab: FloatingActionButton
+    lateinit var shopCount: TextView
     private var locationEngine: LocationEngine? = null
     //private var locationPlugin: LocationLayerPlugin? = null
     private var permissionsManager: PermissionsManager? = null
@@ -90,12 +91,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapView!!.onCreate(savedInstanceState)
         mapView!!.getMapAsync(this)
         fab = view.findViewById(R.id.fab)
+        shopCount = view.findViewById(R.id.shopCount)
         cbVerified = view.findViewById(R.id.isVerified)
         loading = view.findViewById(R.id.progressBar1)
-        //Telemetry.disableOnUserRequest();
-
-        //mapView!!.setStyleUrl(getString(R.string.map_view_styleUrl))
-
 
         spinner = view.findViewById(R.id.spinnerRoutes)
 
@@ -175,6 +173,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 Log.d("RouteList", "all 2 "+ allRouteList!![k].route_name+" "+ allRouteList!![k].shopList.size.toString())
                             }*/
                         }
+
+                        shopCount.setText("${shopList!!.size} outlet(s)")
                     }else if (data.has("verified_outlet")){
                         val routesOutletArray = data.getJSONArray("verified_outlet")
                         for (i in 0 until routesOutletArray.length()){
@@ -217,6 +217,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             verifiedShopList!!.add(shops)
                             icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
                             plotMarker(shops, icon)
+
                             /*if (allRouteList!!.size >0){
                                 for (i in 0 until allRouteList!!.size){
                                     if (!route_id.equals(allRouteList!![i].route_code)){
@@ -227,6 +228,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 allRouteList!!.add(Routes(route_id, route_id, route_name, "", "", "", verifiedShopList!!))
                             }*/
                             }
+                        shopCount.setText("${verifiedShopList!!.size} outlet(s)")
                         Log.d("RouteList", "all verified 1 "+ verifiedShopList!!.size.toString())
                         Log.d("RouteList", "all verified 1 "+ allRouteList!!.size.toString())
                         /*for (k in 0 until allRouteList!!.size) {
@@ -303,8 +305,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         mContext = context
         userId = prefs!!.getString(Api.USER_ID, "")
         srCode = prefs!!.getString(Api.SR_CODE, "")
-        //mMap!!.clear()
-        //getShopList(Api.route_outlet_list+"?sr_id="+userId)
     }
     fun setTaskDetails(){
         icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker)
@@ -324,106 +324,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         placemarkermap!![p.shop_code] = m
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 15.0))
     }
-    /*@SuppressLint("MissingPermission")
-    override fun onMapReady(mapboxMap: MapboxMap?) {
-        mMap = mapboxMap
-        //mMap!!.setStyle(Style.MAPBOX_STREETS)
-        enableLocation()
-
-        val uiSettings: UiSettings = mapboxMap!!.uiSettings
-        uiSettings.setCompassEnabled(false)
-
-        //setTaskDetails()
-        //getShopList(userId!!)
-        getShopList(Api.route_outlet_list+"?sr_id="+userId)
-
-        fab.setOnClickListener(View.OnClickListener {
-            if (locationEngine != null) {
-                val lastLocation = locationEngine!!.lastLocation
-                if (lastLocation != null) {
-                    setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
-                } else {
-                    locationEngine!!.requestLocationUpdates()
-                }
-            } else {
-                enableLocation()
-            }
-        })
-
-        spinner!!.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>,
-                                        view: View, position: Int, id: Long) {
-                placemarkermap!!.clear()
-                //loading!!.visibility = View.VISIBLE
-                routeId = routesList!!.get(position).first
-                //val shops: ArrayList<Shops> = ArrayList()
-                if (cbVerified!!.isChecked){
-                    mMap!!.clear()
-                    getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
-                }else{
-                    if (shopList!!.size > 0){
-                        mMap!!.clear()
-                        Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
-                        Log.d("RouteList", "all shops "+ shopList!!.size.toString())
-                        for (j in 0 until shopList!!.size) {
-                            Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
-                            if (shopList!![j].route_name.equals(routesList!![position].second)) {
-                                //shops.add(shopList!![i])
-                                icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
-                                plotMarker(shopList!![j], icon)
-                            }
-
-                        }
-                    }
-                }
-                *//*else if(verifiedShopList!!.size > 0){
-                    mMap!!.clear()
-                    Log.d("RouteList", "all verified routelist "+ routesList!!.size.toString()+" position"+position)
-                    Log.d("RouteList", "all verified shops "+ verifiedShopList!!.size.toString())
-                    for (j in 0 until verifiedShopList!!.size) {
-                        Log.d("RouteList", "all verified shops for "+ verifiedShopList!![j].route_code)
-                        if (verifiedShopList!![j].route_name.equals(routesList!![position])) {
-                            //shops.add(shopList!![i])
-                            routeId = verifiedShopList!![j].route_code
-                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
-                            plotMarker(verifiedShopList!![j], icon)
-                        }
-
-                    }
-                }*//*
-
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // write code to perform some action
-            }
-        }
-
-        cbVerified!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            if (isChecked) {
-                mMap!!.clear()
-                getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
-            } else {
-                mMap!!.clear()
-                //getShopList(Api.route_outlet_list+"?sr_id="+userId)
-                if (shopList!!.size > 0){
-                    mMap!!.clear()
-                    Log.d("RouteList", "spinner selected "+ spinner!!.selectedItem)
-                    Log.d("RouteList", "all shops "+ shopList!!.size.toString())
-                    for (j in 0 until shopList!!.size) {
-                        Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
-                        if (shopList!![j].route_name.equals(spinner!!.selectedItem)) {
-                            //shops.add(shopList!![i])
-                            icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
-                            plotMarker(shopList!![j], icon)
-                        }
-
-                    }
-                }
-            }
-        })
-    }*/
 
     private fun enableLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
@@ -434,34 +334,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             permissionsManager!!.requestLocationPermissions(Activity())
         }
     }
-   /* @SuppressLint("MissingPermission")
-    private fun initializeLocationEngine() {
-        val locationEngineProvider = LocationEngineProvider(mContext!!.applicationContext)
-        locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable()
-        locationEngine!!.priority = LocationEnginePriority.HIGH_ACCURACY
-        locationEngine!!.activate()
-        if (locationPlugin == null) {
-            locationPlugin = LocationLayerPlugin(mapView!!, mMap!!, locationEngine, LocationLayerOptions.builder(mContext!!).maxZoom(25.0).build())
-            locationPlugin!!.setLocationLayerEnabled(true)
-            locationPlugin!!.renderMode = RenderMode.COMPASS
-            locationPlugin!!.setCameraMode(CameraMode.TRACKING)
-            Log.d("Search", "getLastLatLon 2: " + locationPlugin!!.lastKnownLocation)
-            //mMap!!.animateCamera(CameraUpdateFactory.zoomTo(15.0))
-        }
-        locationEngine!!.addLocationEngineListener(this)
-        //locationEngine!!.requestLocationUpdates()
-        Log.d("Search", "getLastLatLon 2: " + locationEngine!!.lastLocation)
-
-        val lastLocation = locationEngine!!.lastLocation
-        if (lastLocation != null) {
-            //setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
-            locationEngine!!.removeLocationUpdates()
-        } else {
-            //Log.d("Search", "getLastLatLon: " +lastLocation.toString())
-            locationEngine!!.addLocationEngineListener(this)
-        }
-
-    }*/
 
     private fun setCameraPosition(location: LatLng, zoom: Double?) {
         mMap?.moveCamera(
@@ -474,27 +346,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         )
     }
 
-
-    /*@SuppressLint("MissingPermission")
-    override fun onConnected() {
-        //locationEngine!!.requestLocationUpdates()
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun onLocationChanged(location: Location?) {
-        if (location != null) {
-            *//*taskerLat = location.latitude
-            taskerLon = location.longitude*//*
-            if (mMap != null)
-            *//*IntentDataCheck()*//*
-                locationEngine!!.removeLocationEngineListener(this)
-        } else {
-            //locationEngine!!.requestLocationUpdates()
-        }
-    }*/
-
-
-
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
 
     }
@@ -505,33 +356,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     @SuppressLint("MissingPermission")
     override fun onStart() {
         super.onStart()
-        /*if (locationEngine != null) {
-            //locationEngine!!.requestLocationUpdates()
-        }
-        if (locationPlugin != null) {
-            locationPlugin!!.onStart()
-        }*/
 
         mapView!!.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        /*if (locationEngine != null) {
-            locationEngine!!.removeLocationUpdates()
-        }
-        if (locationPlugin != null) {
-            locationPlugin!!.onStop()
-        }*/
         mapView!!.onStop()
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        /*if (locationEngine != null) {
-            locationEngine!!.deactivate()
-        }*/
         mapView!!.onDestroy()
     }
 
@@ -567,8 +403,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val uiSettings: UiSettings = mapboxMap!!.uiSettings
         uiSettings.setCompassEnabled(false)
 
-        //setTaskDetails()
-        //getShopList(userId!!)
         getShopList(Api.route_outlet_list+"?sr_id="+userId)
 
         fab.setOnClickListener(View.OnClickListener {

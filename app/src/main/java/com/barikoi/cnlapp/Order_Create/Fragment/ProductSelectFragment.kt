@@ -149,31 +149,40 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         previous_order.setBackgroundDrawable(gd)
 
         previous_order.setOnClickListener {
-            ApiServices.apiGET(Api.previous_order+"?sr_id="+sr_id+"&route_id="+selectedShop!!.route_code+"&outlet_id="+shopId, queue!!, token!!, object : ApiServiceListener{
-                override fun onResponseSuccess(response: String) {
-                    getPreviousOrders(response)
-                }
+            try {
+                ApiServices.apiGET(
+                    Api.previous_order + "?sr_id=" + sr_id + "&route_id=" + selectedShop!!.route_code + "&outlet_id=" + shopId,
+                    queue!!,
+                    token!!,
+                    object : ApiServiceListener {
+                        override fun onResponseSuccess(response: String) {
+                            getPreviousOrders(response)
+                        }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                        override fun onJSONResponseSuccess(response: JSONObject) {
+                            TODO("Not yet implemented")
+                        }
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                            TODO("Not yet implemented")
+                        }
 
-                override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
-                }
+                        override fun onResponseFailure(error: VolleyError) {
+                            ViewUtils.getErrorResponse(error, mContext!!)
+                        }
 
-                override fun onException(e: Exception) {
-                    Toast.makeText(
-                        mContext!!.applicationContext,
-                        e.message, Toast.LENGTH_SHORT
-                    ).show()
-                }
+                        override fun onException(e: Exception) {
+                            Toast.makeText(
+                                mContext!!.applicationContext,
+                                e.message, Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
-            })
+                    })
+            }catch (e: Exception){
+                e.printStackTrace()
+                Sentry.captureException(e)
+            }
         }
 
         if (selectedOrder != null){
@@ -188,7 +197,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         update_order.setOnClickListener {
             appDatabase!!.saveOrderDao().deleteALL()
-            getLocation("update_order")
+            ViewUtils.viewDialog(mContext!!, "Are you sure want to update"+shopName+"'s order?", object :
+                DialogListener {
+                override fun onConfirmed() {
+                    progressBar.visibility = View.VISIBLE
+                    getLocation("update_order")
+                }
+                override fun onCanceled() {
+
+                }
+            })
+
         }
     }
 
@@ -332,6 +351,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             ViewUtils.viewDialog(mContext!!, "Are you sure want to save "+shopName+"'s order?", object :
                 DialogListener {
                 override fun onConfirmed() {
+                    progressBar.visibility = View.VISIBLE
                     getLocation("save_order")
                 }
                 override fun onCanceled() {
@@ -343,7 +363,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         noOrder!!.setOnClickListener {
             appDatabase!!.saveOrderDao().deleteALL()
-            getLocation("no_order")
+            ViewUtils.viewDialog(mContext!!, "Are you sure want to select no order?", object :
+                DialogListener {
+                override fun onConfirmed() {
+                    progressBar.visibility = View.VISIBLE
+                    getLocation("no_order")
+                }
+                override fun onCanceled() {
+
+                }
+            })
+
         }
 
         return view
@@ -418,13 +448,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             //val brandList = orderList[i].brands_array
             for (j in 0 until addedProducts!!.size){
                 val brandObj = JSONObject()
-                brandObj.put("product_id", addedProducts!![j].product_id)
-                brandObj.put("product", addedProducts!![j].product_name)
-                brandObj.put("brand_id", addedProducts!![j].brand_id)
-                brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
-                brandObj.put("unit_name", addedProducts!![j].unit_name)
-                brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                if (addedProducts!![j].ordered_quantity > 0) {
+                    brandObj.put("product_id", addedProducts!![j].product_id)
+                    brandObj.put("product", addedProducts!![j].product_name)
+                    brandObj.put("brand_id", addedProducts!![j].brand_id)
+                    brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                    brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                }
                 brandsArray.put(brandObj)
             }
 
@@ -440,6 +472,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
 
                     override fun onJSONResponseSuccess(response: JSONObject) {
+                        progressBar.visibility = View.GONE
                         val message = response.getString("message")
                         //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
 
@@ -460,11 +493,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
 
                     override fun onResponseFailure(error: VolleyError) {
+                        progressBar.visibility = View.GONE
                         ViewUtils.getErrorResponse(error, mContext!!)
                     }
-
                     override fun onException(e: Exception) {
-
+                        progressBar.visibility = View.GONE
                     }
 
                 })
@@ -489,13 +522,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             //val brandList = orderList[i].brands_array
             for (j in 0 until addedProducts!!.size){
                 val brandObj = JSONObject()
-                brandObj.put("product_id", addedProducts!![j].product_id)
-                brandObj.put("product", addedProducts!![j].product_name)
-                brandObj.put("brand_id", addedProducts!![j].brand_id)
-                brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
-                brandObj.put("unit_name", addedProducts!![j].unit_name)
-                brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                if (addedProducts!![j].ordered_quantity >0) {
+                    brandObj.put("product_id", addedProducts!![j].product_id)
+                    brandObj.put("product", addedProducts!![j].product_name)
+                    brandObj.put("brand_id", addedProducts!![j].brand_id)
+                    brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                    brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                }
                 brandsArray.put(brandObj)
             }
 
@@ -512,7 +547,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                 override fun onJSONResponseSuccess(response: JSONObject) {
                     val message = response.getString("message")
+                    progressBar.visibility = View.GONE
                     //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                    appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
+                    appDatabase!!.orderListDao().deleteByShop(shopId!!)
 
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
@@ -532,10 +570,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, mContext!!)
+                    progressBar.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
-
+                    progressBar.visibility = View.GONE
                 }
 
             })
@@ -564,6 +603,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 override fun onJSONResponseSuccess(response: JSONObject) {
                     val message = response.getString("message")
                     //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
 
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener{
                         override fun onConfirmed() {
@@ -584,36 +624,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    if (error is TimeoutError) {
-                        //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                        Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
-                    }
-                    if (error is NoConnectionError) {
-                        //mListerner.onFailure("Turn on your internet connection and Try again")
-                        Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
-                    }
-                    if (error != null && error.networkResponse != null) {
-                        try {
-                            val s = String(error.networkResponse.data)
-                            Log.d("MainActivity", "message: $s")
-                            val data = JSONObject(s)
-                            //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                            //mListerner.onFailure(data.getString("message"))
-                            Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
-                        } catch (e: UnsupportedEncodingException) {
-                            Sentry.captureException(e)
-                            e.printStackTrace()
-                        } catch (e: JSONException) {
-                            //mListerner.onFailure(e.message)
-                            Sentry.captureException(e)
-                            Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                            e.printStackTrace()
-                        }
-                    }
+                    progressBar.visibility = View.GONE
+                    ViewUtils.getErrorResponse(error, mContext!!)
                 }
 
                 override fun onException(e: Exception) {
-
+                    progressBar.visibility = View.GONE
                 }
 
             })
@@ -778,7 +794,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
-        sr_id = prefs!!.getString(Api.SR_CODE, "")
+        sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this

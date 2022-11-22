@@ -13,6 +13,6 @@ class HistoryList (
         val longitude: Double,
         val imageLink: String,
         val lateReason: String,
-        val routeId: Int,
+        val routeId: String,
         val routeName: String
         ):Serializable

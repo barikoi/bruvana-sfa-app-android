@@ -78,6 +78,8 @@ class CreateOrderFragment : Fragment(){
         token = prefs!!.getString(Api.TOKEN, "")
         srId = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+
+        ACTIVITY = context as MainActivity
     }
 
     /*fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
@@ -114,9 +116,13 @@ class CreateOrderFragment : Fragment(){
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
+                    viewPager!!.setCurrentItem(0)
+                    setCurrentFragment(SelectDokanFragment(), ACTIVITY)
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()*/
                 } else if (position == 1) {
+                    viewPager!!.setCurrentItem(1)
+                    setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
                     editor!!.commit()*/
                 }
@@ -168,13 +174,26 @@ class CreateOrderFragment : Fragment(){
                             if (attedanceArray.length() >0){
                                 no_route_check.visibility = View.GONE
                                 bodyLayout.visibility = View.VISIBLE
-                                for (i in 0 until attedanceArray.length()) {
-                                    val attendanceObj = attedanceArray.getJSONObject(i)
+                                val attendanceObj = attedanceArray.getJSONObject(0)
+                                if (!attendanceObj.getString("route_id").equals("null")) {
                                     attendanceObj.getInt("route_id")
                                     attendanceObj.getString("route_name")
 
-                                    editor!!.putString(Api.SELECTED_ROUTE_ID, attendanceObj.getInt("route_id").toString())
-                                        .putString(Api.SELECTED_ROUTE_NAME, attendanceObj.getString("route_name")).commit()
+                                    editor!!.putString(
+                                        Api.SELECTED_ROUTE_ID,
+                                        attendanceObj.getInt("route_id").toString()
+                                    )
+                                        .putString(
+                                            Api.SELECTED_ROUTE_NAME,
+                                            attendanceObj.getString("route_name")
+                                        ).commit()
+                                }else{
+                                    no_route_check.visibility = View.VISIBLE
+                                    bodyLayout.visibility = View.GONE
+
+                                    btn_tryAgain.setOnClickListener {
+                                        checkforAttendanceToday()
+                                    }
                                 }
 
                             }else{

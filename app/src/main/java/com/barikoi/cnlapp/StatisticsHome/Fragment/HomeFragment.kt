@@ -86,13 +86,26 @@ class HomeFragment : Fragment() {
                             if (attedanceArray.length() >0){
                                 no_route_check.visibility = View.GONE
                                 bodyLayout.visibility = View.VISIBLE
-                                for (i in 0 until attedanceArray.length()) {
-                                    val attendanceObj = attedanceArray.getJSONObject(i)
+                                val attendanceObj = attedanceArray.getJSONObject(0)
+                                if (!attendanceObj.getString("route_id").equals("null")) {
                                     attendanceObj.getInt("route_id")
                                     attendanceObj.getString("route_name")
 
-                                    editor!!.putString(Api.SELECTED_ROUTE_ID, attendanceObj.getInt("route_id").toString())
-                                        .putString(Api.SELECTED_ROUTE_NAME, attendanceObj.getString("route_name")).commit()
+                                    editor!!.putString(
+                                        Api.SELECTED_ROUTE_ID,
+                                        attendanceObj.getInt("route_id").toString()
+                                    )
+                                        .putString(
+                                            Api.SELECTED_ROUTE_NAME,
+                                            attendanceObj.getString("route_name")
+                                        ).commit()
+                                }else{
+                                    no_route_check.visibility = View.VISIBLE
+                                    bodyLayout.visibility = View.GONE
+
+                                    btn_tryAgain.setOnClickListener {
+                                        checkforAttendanceToday()
+                                    }
                                 }
 
                             }else{

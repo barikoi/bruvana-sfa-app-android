@@ -33,6 +33,7 @@ import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
@@ -60,6 +61,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var loading: ProgressBar? = null
+    private var appDatabase: AppDatabase? = null
     lateinit var ACTIVITY: MainActivity
     private var mFusedLocationClient: FusedLocationProviderClient? = null
     private var mLocationCallback: LocationCallback? = null
@@ -377,7 +379,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         sr_id = prefs!!.getString(Api.SR_CODE, "")
         mContext = context
         listener = this
-
+        appDatabase = AppDatabase.getInstance(context)
         ACTIVITY = context as MainActivity
 
         getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
@@ -386,6 +388,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     override fun onShopSelected(shop: Shops) {
         editor!!.putString(Api.SELECTED_SHOP_ID, shop.shop_id)
         editor!!.commit()
+        appDatabase!!.saveOrderDao().deleteByShop(shop.shop_id)
         CreateOrderFragment.startFragmentWithValue("Shop", shop, ProductSelectFragment(), ACTIVITY)
     }
 }
