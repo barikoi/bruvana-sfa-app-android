@@ -677,7 +677,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
         val request = StringRequest(
-            Request.Method.GET, Api.all_product_list+"?with_quantity_last_month=1&with_available_stock=1",
+            Request.Method.GET, Api.all_product_list+"?with_stock=1",
             {
                     response ->
                 try {
