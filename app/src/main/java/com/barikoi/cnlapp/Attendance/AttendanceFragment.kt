@@ -11,15 +11,18 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
 import com.barikoi.cnlapp.Attendance.Fragment.HistoryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SummaryFragment
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_attendance.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AttendanceFragment : Fragment() {
@@ -27,7 +30,9 @@ class AttendanceFragment : Fragment() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
-    var mQueue: RequestQueueSingleton? = null
+    var mQueue: RequestQueue? = null
+    var token : String? = null
+
     companion object{
         var viewPager2: ViewPager2? = null
         var viewpagertab2: TabLayout? = null
@@ -86,8 +91,8 @@ class AttendanceFragment : Fragment() {
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()*/
                 } else if (position == 1) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
-                    editor!!.commit()*/
+
+                    //HistoryFragment.setDateFilter(mQueue!!, token!!, start, end)
                 }
             }
         })
@@ -100,7 +105,8 @@ class AttendanceFragment : Fragment() {
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
         mContext = context
-        mQueue = RequestQueueSingleton.getInstance(context)
+        mQueue = RequestQueueSingleton.getInstance(context).requestQueue
+        token = prefs!!.getString(Api.TOKEN, "")
     }
 
 

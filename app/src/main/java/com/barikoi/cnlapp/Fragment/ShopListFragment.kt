@@ -205,7 +205,7 @@ class ShopListFragment : Fragment() {
                                         route_id,
                                         route_name,
                                         "",
-                                        0
+                                        0, 0
                                     )
                                 )
                             }

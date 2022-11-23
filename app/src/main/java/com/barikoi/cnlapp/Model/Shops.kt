@@ -19,5 +19,6 @@ class Shops(
     val route_code: String,
     val route_name: String,
     val lastOrderDate: String,
-    val isOrdered: Int
+    val isOrdered: Int,
+    val isNoOrdered: Int
 ): Serializable

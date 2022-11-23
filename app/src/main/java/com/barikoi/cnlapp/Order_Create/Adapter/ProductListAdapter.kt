@@ -80,40 +80,40 @@ Filterable{
         holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
 
         holder.btnAdd.setOnClickListener {
-            /*if (productList[position].stock_available > 0){
+            if (productList[position].stock_available > 0){
+                val qtyValue = holder.productCount.text.toString().toInt() + 1
+                holder.productCount.setText(qtyValue.toString())
+                /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                holder.tvSubtoal.text = subtotal.toString()*/
+                val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+                try {
+                    if (prodList!!.size > 0){
+                        Log.d("Product", "item count add: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
+                        appDatabase.saveOrderDao().update(
+                            prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
+                            prodList[0].itemsCount + 1,
+                            prodList[0].totalPrice+productObj.unit_price
+                        )
+                    }else{
+                        appDatabase.saveOrderDao().insertAll(
+                            SaveOrder(
+                                null,
+                                prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
+                                holder.productCount.text.toString().toInt(),
+                                holder.tvSubtoal.text.toString().toDouble()
+                            )
+                        )
+                    }
+                }catch (e:Exception){
+                    Log.d("Product", "exception: "+e.message)
+                }
 
+
+                mListener.onValueChanged(productList[position], position)
             }else{
                 Toast.makeText(holder.itemView.context, holder.itemView.resources.getString(R.string.stock_out), Toast.LENGTH_SHORT).show()
-            }*/
-            val qtyValue = holder.productCount.text.toString().toInt() + 1
-            holder.productCount.setText(qtyValue.toString())
-            /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
-            holder.tvSubtoal.text = subtotal.toString()*/
-            val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
-            try {
-                if (prodList!!.size > 0){
-                    Log.d("Product", "item count add: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
-                    appDatabase.saveOrderDao().update(
-                        prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                        prodList[0].itemsCount + 1,
-                        prodList[0].totalPrice+productObj.unit_price
-                    )
-                }else{
-                    appDatabase.saveOrderDao().insertAll(
-                        SaveOrder(
-                            null,
-                            prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                            holder.productCount.text.toString().toInt(),
-                            holder.tvSubtoal.text.toString().toDouble()
-                        )
-                    )
-                }
-            }catch (e:Exception){
-                Log.d("Product", "exception: "+e.message)
             }
 
-
-            mListener.onValueChanged(productList[position], position)
         }
 
         holder.btnMinus.setOnClickListener {
@@ -143,12 +143,14 @@ Filterable{
             mListener.onValueChanged(productList[position], position)
         }
 
+        holder.productCount.isEnabled = false
         holder.productCount.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                if (holder.productCount.text.toString().trim().length>0){
                 val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = dformat.format(subtotal).toString()
 
@@ -165,6 +167,7 @@ Filterable{
                     holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
                     holder.btnMinus.isEnabled = true
                 }
+            }
             }
 
             override fun afterTextChanged(p0: Editable?) {

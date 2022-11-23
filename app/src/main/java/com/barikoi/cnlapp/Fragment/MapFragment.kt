@@ -50,6 +50,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var routeNameList: ArrayList<String>? = ArrayList()
     var allRouteList: ArrayList<Routes>? = ArrayList()
     var shopList: ArrayList<Shops>? = ArrayList()
+    var nonVerifiedShopList: ArrayList<Shops>? = ArrayList()
     var verifiedShopList: ArrayList<Shops>? = ArrayList()
     var recylerView: RecyclerView? = null
     var mContext: Context? = null
@@ -163,7 +164,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         route_id,
                                         route_name,
                                         "",
-                                        0
+                                        0,0
                                     )
                                 )
                             }
@@ -174,7 +175,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             }*/
                         }
 
-                        shopCount.setText("${shopList!!.size} outlet(s)")
+                        //shopCount.setText("${shopList!!.size} outlet(s)")
                     }else if (data.has("verified_outlet")){
                         val routesOutletArray = data.getJSONArray("verified_outlet")
                         for (i in 0 until routesOutletArray.length()){
@@ -212,7 +213,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 route_id,
                                 route_name,
                                 "",
-                                0
+                                0, 0
                             )
                             verifiedShopList!!.add(shops)
                             icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
@@ -430,6 +431,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     mMap!!.clear()
                     getShopList(Api.verified_shop_list+"?route_id="+routeId+"&sr_code="+srCode)
                 }else{
+                    nonVerifiedShopList!!.clear()
                     if (shopList!!.size > 0){
                         mMap!!.clear()
                         Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
@@ -438,11 +440,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
                             if (shopList!![j].route_name.equals(routesList!![position].second)) {
                                 //shops.add(shopList!![i])
+                                nonVerifiedShopList!!.add(shopList!![j])
                                 icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
                                 plotMarker(shopList!![j], icon)
                             }
 
                         }
+                        shopCount.setText("${nonVerifiedShopList!!.size} outlet(s)")
                     }
                 }
                 /*else if(verifiedShopList!!.size > 0){
@@ -476,18 +480,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 mMap!!.clear()
                 //getShopList(Api.route_outlet_list+"?sr_id="+userId)
                 if (shopList!!.size > 0){
+                    nonVerifiedShopList!!.clear()
                     mMap!!.clear()
                     Log.d("RouteList", "spinner selected "+ spinner!!.selectedItem)
                     Log.d("RouteList", "all shops "+ shopList!!.size.toString())
                     for (j in 0 until shopList!!.size) {
                         Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
                         if (shopList!![j].route_name.equals(spinner!!.selectedItem)) {
-                            //shops.add(shopList!![i])
+                            nonVerifiedShopList!!.add(shopList!![j])
                             icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
                             plotMarker(shopList!![j], icon)
                         }
 
                     }
+                    shopCount.setText("${nonVerifiedShopList!!.size} outlet(s)")
                 }
             }
         })

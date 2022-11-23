@@ -18,6 +18,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.Order_Create.Fragment.ConfirmOrderFragment.Companion.mCallback
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment.Companion.viewPager
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
@@ -104,6 +105,7 @@ class CreateOrderFragment : Fragment(){
         viewPager!!.setCurrentItem(0)
 
         viewPager!!.setUserInputEnabled(false)
+
         for (i in 0 until viewpagertab!!.getTabCount()) {
             val tab = (viewpagertab!!.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
@@ -121,10 +123,9 @@ class CreateOrderFragment : Fragment(){
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()*/
                 } else if (position == 1) {
-                    viewPager!!.setCurrentItem(1)
-                    setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
-                    editor!!.commit()*/
+                    //viewPager!!.setCurrentItem(1)
+                    //setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
+                    ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, srId!!, routeId!!)
                 }
             }
         })
@@ -146,7 +147,8 @@ class CreateOrderFragment : Fragment(){
             fragmentName.arguments = bundle
             val fragmentManager = (activity as FragmentActivity).supportFragmentManager
             fragmentManager.beginTransaction()
-                .replace(R.id.fragmentLayout2, fragmentName)
+                .add(R.id.fragmentLayout2, fragmentName)
+                .addToBackStack(fragmentName.toString())
                 .commit()
         }
 

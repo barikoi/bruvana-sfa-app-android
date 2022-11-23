@@ -13,7 +13,10 @@ import android.os.Bundle
 import android.os.Looper
 import android.preference.PreferenceManager
 import android.text.Editable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -197,7 +200,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         update_order.setOnClickListener {
             appDatabase!!.saveOrderDao().deleteALL()
-            ViewUtils.viewDialog(mContext!!, "Are you sure want to update"+shopName+"'s order?", object :
+            val builder = SpannableStringBuilder()
+            val str1= SpannableString(shopName)
+            str1.setSpan(ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)), 0, str1.length, 0)
+            builder.append(str1)
+            ViewUtils.viewDialog(mContext!!, "Are you sure want to update"+str1+"'s order?", object :
                 DialogListener {
                 override fun onConfirmed() {
                     progressBar.visibility = View.VISIBLE
@@ -347,18 +354,48 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
-            appDatabase!!.saveOrderDao().deleteALL()
-            ViewUtils.viewDialog(mContext!!, "Are you sure want to save "+shopName+"'s order?", object :
-                DialogListener {
-                override fun onConfirmed() {
-                    progressBar.visibility = View.VISIBLE
-                    getLocation("save_order")
-                }
-                override fun onCanceled() {
+            if (addedProducts!!.size >0) {
+                appDatabase!!.saveOrderDao().deleteALL()
+                val builder = SpannableStringBuilder()
+                val str1 = SpannableString(shopName)
+                str1.setSpan(
+                    ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
+                    0,
+                    str1.length,
+                    0
+                )
+                builder.append(str1)
+                ViewUtils.viewDialog(
+                    mContext!!,
+                    "Are you sure want to save " + str1 + "'s order?",
+                    object :
+                        DialogListener {
+                        override fun onConfirmed() {
+                            progressBar.visibility = View.VISIBLE
+                            getLocation("save_order")
+                        }
 
-                }
+                        override fun onCanceled() {
 
-            })
+                        }
+
+                    })
+            }else{
+                ViewUtils.viewDialogResponse(
+                    mContext!!,
+                    "No products selected to order",
+                    object :
+                        DialogListener {
+                        override fun onConfirmed() {
+
+                        }
+
+                        override fun onCanceled() {
+
+                        }
+
+                    })
+            }
         }
 
         noOrder!!.setOnClickListener {
@@ -456,8 +493,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                    brandsArray.put(brandObj)
                 }
-                brandsArray.put(brandObj)
+
             }
 
             orderObj.put("brands", brandsArray)
@@ -738,6 +776,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
                 }
             })
+        request.retryPolicy = DefaultRetryPolicy(
+            60 * 1000, 0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
         queue!!.add(request)
     }
     fun viewDialog(mContext: Context, outlet_name: String, lastOrder: String, listItem: ArrayList<ProductStatistics>){

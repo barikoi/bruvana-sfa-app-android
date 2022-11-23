@@ -29,6 +29,15 @@
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
         <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
         <item name="fontFamily">@font/ceraprofontfamily</item>
+        <!--<item name="android:listPreferredItemHeightSmall">20dp</item>-->
+        <!--<item name="popupMenuBackground">@drawable/rounded_corner_lightgray</item>-->
+        <item name="popupMenuStyle">@style/Popup</item>
+    </style>
+
+    <style name="Popup" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:listPreferredItemHeightSmall">20dp</item>
+        <item name="background">@drawable/rounded_corner_lightgray</item>
+        <item name="backgroundTint">@color/white</item>
     </style>
     <style name="spinnerItemStyle">
         <item name="android:textSize">20sp</item>

@@ -22,10 +22,6 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_history.*
-import kotlinx.android.synthetic.main.fragment_history.dateRangeLayout
-import kotlinx.android.synthetic.main.fragment_history.tvDateRange
 import kotlinx.android.synthetic.main.fragment_summary.*
 import org.json.JSONException
 import org.json.JSONObject

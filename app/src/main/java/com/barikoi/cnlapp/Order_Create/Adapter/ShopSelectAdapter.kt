@@ -42,15 +42,20 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         holder.tvCategory.text = shopList[position].category.get(0).toString().uppercase(Locale.getDefault())
 
         if (shopList[position].isOrdered == 1){
+            holder.isOrdered.setImageResource(R.drawable.ic_ordered)
             holder.isOrdered.visibility = View.VISIBLE
-        }else{
+        }else if (shopList[position].isNoOrdered == 1){
+            holder.isOrdered.setImageResource(R.drawable.ic_no_ordered)
+            holder.isOrdered.visibility = View.VISIBLE
+        } else{
             holder.isOrdered.visibility = View.GONE
         }
 
 
+
         holder.btnDetails.setOnClickListener {
-            if (shopList[position].isOrdered == 1){
-                ViewUtils.viewDialog(holder.itemView.context, "Already order saved for this outlet", object : DialogListener{
+            if (shopList[position].isOrdered == 1 || shopList[position].isNoOrdered == 1){
+                ViewUtils.viewDialogResponse(holder.itemView.context, "Already visited this outlet for today", object : DialogListener{
                     override fun onConfirmed() {
 
                     }

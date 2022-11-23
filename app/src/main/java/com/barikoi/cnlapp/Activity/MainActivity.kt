@@ -22,6 +22,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
@@ -47,7 +48,6 @@ import kotlinx.android.synthetic.main.appcontent_main.*
 import kotlinx.android.synthetic.main.appcontent_main.tvTitle
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -64,6 +64,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var nav_view: BottomNavigationView? = null
     var queue : RequestQueue? = null
 
+    companion object {
+        var routeName_selected: TextView? = null
+    }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +80,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")
         userName = prefs!!.getString(Api.NAME, "")
-        //val route = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
         nav_view = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
 
         nav_view!!.background = null
@@ -87,6 +90,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationDrawer!!.setNavigationItemSelectedListener(this)
         drawer = findViewById(R.id.drawer_layout)
 
+        routeName_selected = findViewById(R.id.routeNameSelected)
+
         menu_drawer = findViewById<ImageView>(R.id.drawer)
         menu_drawer!!.setOnClickListener(View.OnClickListener {
             drawer!!.openDrawer(
@@ -96,7 +101,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
         val c = Calendar.getInstance()
-        //c.add(Calendar.DAY_OF_WEEK, -7)
         c.set(Calendar.DAY_OF_MONTH, 1);
         val end = Calendar.getInstance().time
         val start = c.time
@@ -133,8 +137,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .setIcon(resources.getDrawable(R.drawable.warning))
                 .show()
         }
-
-        //setCurrentFragment(HomeFragment(), this@MainActivity)
         fab_order.setOnClickListener {
             fab_order.background.setTint(resources.getColor(R.color.cnl_color_2))
             fab_order.drawable.setTint(resources.getColor(R.color.white))
@@ -205,7 +207,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 //rankLayout.visibility = View.VISIBLE
                                 //tvRank.setText("0")
                             }
-                            routeNameSelected.setText(prefs!!.getString(Api.SELECTED_ROUTE_NAME, ""))
+                            //routeName_selected!!.setText(prefs!!.getString(Api.SELECTED_ROUTE_NAME, ""))
                         }
                     }catch (e: Exception){
                         e.printStackTrace()
@@ -332,13 +334,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        val count = supportFragmentManager.backStackEntryCount
-
-        if (count == 0) {
-            super.onBackPressed()
-            //additional code
+        val fm = supportFragmentManager
+        if (fm.getBackStackEntryCount() > 0) {
+            Log.i("MainActivity", "popping backstack")
+            fm.popBackStack()
         } else {
-            supportFragmentManager.popBackStack()
+            Log.i("MainActivity", "nothing on backstack, calling super")
+            super.onBackPressed()
         }
     }
 

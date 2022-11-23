@@ -15,6 +15,7 @@ import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.*
+import com.barikoi.cnlapp.Activity.MainActivity.Companion.routeName_selected
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
@@ -91,7 +92,6 @@ class HomeFragment : Fragment() {
                                 if (!attendanceObj.getString("route_id").equals("null")) {
                                     attendanceObj.getInt("route_id")
                                     attendanceObj.getString("route_name")
-
                                     editor!!.putString(
                                         Api.SELECTED_ROUTE_ID,
                                         attendanceObj.getInt("route_id").toString()
@@ -100,6 +100,7 @@ class HomeFragment : Fragment() {
                                             Api.SELECTED_ROUTE_NAME,
                                             attendanceObj.getString("route_name")
                                         ).commit()
+                                    routeName_selected!!.setText(attendanceObj.getString("route_name"))
                                 }else{
                                     no_route_check.visibility = View.VISIBLE
                                     bodyLayout.visibility = View.GONE

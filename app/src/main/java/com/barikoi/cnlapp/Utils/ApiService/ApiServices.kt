@@ -41,7 +41,7 @@ object ApiServices {
             }
         }
         request.retryPolicy = DefaultRetryPolicy(
-            40 * 1000, 0,
+            60 * 1000, 0,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         queue.add(request)
@@ -72,7 +72,7 @@ object ApiServices {
             }
         }
         request.retryPolicy = DefaultRetryPolicy(
-            40 * 1000, 0,
+            60 * 1000, 0,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         queue.add(request)

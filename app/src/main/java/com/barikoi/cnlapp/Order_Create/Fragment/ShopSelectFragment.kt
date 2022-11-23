@@ -1,14 +1,12 @@
 package com.barikoi.cnlapp.Order_Create.Fragment
 
-import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,22 +17,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.NoConnectionError
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.TimeoutError
+import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.TradeOffers.TradeOfferListAdapter
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
@@ -324,9 +316,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
         })
 
-
-        //getLocation2()
-
         return view
     }
 
@@ -437,7 +426,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("route_id"),
                                         outletObj.getString("route_name"),
                                         outletObj.getString("last_delivered_at"),
-                                        outletObj.getInt("ordered_today")
+                                        outletObj.getInt("ordered_today"),
+                                        outletObj.getInt("is_no_order")
                                     )
 
                                     shopList!!.add(shops)
@@ -496,6 +486,10 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     }
                 }
             })
+        request.retryPolicy = DefaultRetryPolicy(
+            60 * 1000, 0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
         queue!!.add(request)
     }
 
@@ -513,7 +507,9 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         appDatabase = AppDatabase.getInstance(context)
         ACTIVITY = context as MainActivity
 
-        getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
+        if (routeNameList!!.size == 0) {
+            getAllRoutes(Api.routes_withfilter + "?with_geometry=0&sr_id=" + user_id)
+        }
     }
 
     override fun onShopSelected(shop: Shops) {

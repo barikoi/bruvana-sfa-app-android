@@ -356,6 +356,10 @@ class CreateAttendanceFragment : Fragment() {
                     }
                 }
             })
+        request.retryPolicy = DefaultRetryPolicy(
+            60 * 1000, 0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
         mQueue!!.add(request)
 
     }

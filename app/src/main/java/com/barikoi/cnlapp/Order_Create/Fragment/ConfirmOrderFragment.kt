@@ -8,9 +8,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity
@@ -18,6 +20,7 @@ import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
@@ -34,14 +37,14 @@ import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
+class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessListener {
 
     var recylerView: RecyclerView? = null
+    var progressBar: ProgressBar? = null
     lateinit var ACTIVITY: MainActivity
     var token : String? = null
     var user_id : String? = null
@@ -58,22 +61,67 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
     private var mLocationCallback: LocationCallback? = null
     private var listener: OnEditOrderListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
+    lateinit var adapter: ConfirmOrderListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkforOrders()
+        //checkforOrders()
+        adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
+        recylerView!!.adapter = adapter
+        adapter.notifyDataSetChanged()
+    }
+    companion object{
+        var mCallback: OrderListSuccessListener? = ConfirmOrderFragment()
+        fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String/*, listener: OrderListSuccessListener*/) {
+            val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val today = df.format(Calendar.getInstance().time)
+            if (mCallback!= null) {
+                getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+today+"&end_date="+today, queue, token, mCallback!!)
+            }
+
+        }
+
+        fun getAllOrders(url: String, queue: RequestQueue, token: String, callback: OrderListSuccessListener) {
+            ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
+                override fun onResponseSuccess(response: String) {
+                    try {
+                        if (response != null){
+                            val obj = JSONObject(response)
+                            val orderArray = obj.getJSONArray("orders")
+                            callback.onSuccess(orderArray)
+
+                        }
+                    }catch (e: Exception){
+                        //progressBar.visibility = View.GONE
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    callback.onFailure(error)
+                }
+
+                override fun onException(e: Exception) {
+                }
+
+            })
+        }
     }
 
-    private fun checkforOrders() {
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = df.format(Calendar.getInstance().time)
-        getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+today+"&end_date="+today)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,8 +131,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         val view = inflater.inflate(R.layout.fragment_confirm_order, container, false)
 
         confirmOrder = view.findViewById(R.id.btnConfirm)
-        recylerView = view.findViewById(R.id.orderList)
-
+        recylerView = view.findViewById(R.id.orderListView)
+        progressBar = view.findViewById(R.id.progressBar2)
         confirmOrder!!.setOnClickListener {
             ViewUtils.viewDialog(mContext!!, mContext!!.resources.getString(R.string.confirm_order_dialog), object :
                 DialogListener {
@@ -158,7 +206,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
                             //CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
-                            CreateOrderFragment.viewPager!!.setCurrentItem(1)
+                            //CreateOrderFragment.viewPager!!.setCurrentItem(1)
+                            checkforOrders(queue!!, token!!, sr_id!!, route_id!!/*, mCallback!!*/)
                         }
 
                         override fun onCanceled() {
@@ -169,104 +218,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }
-
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, mContext!!)
-            }
-
-            override fun onException(e: Exception) {
-                TODO("Not yet implemented")
-            }
-
-        })
-    }
-
-    private fun getAllOrders(url: String) {
-        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
-            override fun onResponseSuccess(response: String) {
-                try {
-                    if (response != null){
-                        orderList.clear()
-                        val productItems: ArrayList<Products> = ArrayList()
-                        val obj = JSONObject(response)
-                        val orderArray = obj.getJSONArray("orders")
-                        if (orderArray.length() > 0){
-                            no_route_check.visibility = View.GONE
-                            bodyLayout.visibility = View.VISIBLE
-                            for (i in 0 until orderArray.length()){
-                                productItems.clear()
-                                val orderObj = orderArray.getJSONObject(i)
-                                if (orderObj.getString("orders_status").equals("SAVED", true)){
-                                val brandArray = orderObj.getJSONArray("brands")
-                                tvRouteName.setText(orderObj.getString("route_name"))
-                                if (brandArray.length() > 0){
-                                    for (j in 0 until brandArray.length()){
-                                        val brandObj = brandArray.getJSONObject(j)
-                                        productItems.add(
-                                            Products(
-                                                brandObj.getString("product_id"),
-                                                brandObj.getString("product"),
-                                                "",
-                                                brandObj.getString("brand_id"),
-                                                "",
-                                                brandObj.getDouble("unit_price"),
-                                                0.0,"",
-                                                brandObj.getString("unit_name"),
-                                                "",0,0,
-                                                brandObj.getInt("quantity"),
-                                                brandObj.getDouble("total_price")
-                                            )
-                                        )
-                                    }
-                                }
-                                orderList.add(
-                                    OrderList(
-                                        null,
-                                        orderObj.getString("order_no"),
-                                        orderObj.getString("ordered_at"),
-                                        orderObj.getString("orders_status"),
-                                        orderObj.getString("outlet_id"),
-                                        orderObj.getString("outlet_name"),
-                                        orderObj.getString("route_id"),
-                                        orderObj.getString("route_name"),
-                                        orderObj.getString("distributor_office_code"),
-                                        orderObj.getString("grand_total"),
-                                        orderObj.getString("latitude"),
-                                        orderObj.getString("longitude"),
-                                        productItems
-                                    )
-                                )
-                            }
-                            }
-                        }else{
-                            no_route_check.visibility = View.VISIBLE
-                            bodyLayout.visibility = View.GONE
-
-                            btn_tryAgain.setOnClickListener {
-                                checkforOrders()
-                            }
-
-                        }
-
-
-                        val adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
-                        recylerView!!.adapter = adapter
-                        adapter.notifyDataSetChanged()
-
-
-                    }
-                }catch (e: Exception){
-                    e.printStackTrace()
-                }
-            }
-
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
             }
 
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
@@ -297,12 +248,11 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
         mContext = context
         listener = this
         ACTIVITY = context as MainActivity
+        mCallback = this
 
     }
 
     override fun onEdit(order: OrderList) {
-        /*val pager: ViewPager2? =parentFragment?.requireParentFragment()?.view?.findViewById<ViewPager2>(R.id.viewPager3)
-        pager?.setCurrentItem(0)*/
         editor!!.putString(Api.SELECTED_SHOP_ID, order.outletId)
         editor!!.commit()
         val frag: CreateOrderFragment? = this.parentFragment as CreateOrderFragment?
@@ -314,6 +264,85 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener {
             ACTIVITY
         )
 
+    }
+
+    override fun onSuccess(orderArray: JSONArray) {
+        progressBar!!.visibility = View.GONE
+        orderList.clear()
+        val productItems: ArrayList<Products> = ArrayList()
+        if (orderArray.length() > 0){
+            no_route_check.visibility = View.GONE
+            bodyLayout.visibility = View.VISIBLE
+            for (i in 0 until orderArray.length()){
+                productItems.clear()
+                val orderObj = orderArray.getJSONObject(i)
+                if (orderObj.getString("orders_status").equals("SAVED", true)){
+                    val brandArray = orderObj.getJSONArray("brands")
+                    tvRouteName.setText(orderObj.getString("route_name"))
+                    if (brandArray.length() > 0){
+                        for (j in 0 until brandArray.length()){
+                            val brandObj = brandArray.getJSONObject(j)
+                            productItems.add(
+                                Products(
+                                    brandObj.getString("product_id"),
+                                    brandObj.getString("product"),
+                                    "",
+                                    brandObj.getString("brand_id"),
+                                    "",
+                                    brandObj.getDouble("unit_price"),
+                                    0.0,"",
+                                    brandObj.getString("unit_name"),
+                                    "",0,0,
+                                    brandObj.getInt("quantity"),
+                                    brandObj.getDouble("total_price")
+                                )
+                            )
+                        }
+                    }
+                    orderList.add(
+                        OrderList(
+                            null,
+                            orderObj.getString("order_no"),
+                            orderObj.getString("ordered_at"),
+                            orderObj.getString("orders_status"),
+                            orderObj.getString("outlet_id"),
+                            orderObj.getString("outlet_name"),
+                            orderObj.getString("route_id"),
+                            orderObj.getString("route_name"),
+                            orderObj.getString("distributor_office_code"),
+                            orderObj.getString("grand_total"),
+                            orderObj.getString("latitude"),
+                            orderObj.getString("longitude"),
+                            productItems
+                        )
+                    )
+                }
+            }
+        }else{
+            no_route_check.visibility = View.VISIBLE
+            bodyLayout.visibility = View.GONE
+
+            btn_tryAgain.setOnClickListener {
+                checkforOrders(queue!!, token!!, sr_id!!, route_id!!/*, mCallback!!*/)
+            }
+
+        }
+
+
+        recylerView.apply {
+            adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
+            recylerView!!.adapter = adapter
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    override fun onFailure(error: VolleyError) {
+        progressBar!!.visibility = View.GONE
+        ViewUtils.getErrorResponse(error, mContext!!)
+    }
+
+    override fun onDataSet(StartDate: Date, EndDate: Date) {
+        TODO("Not yet implemented")
     }
 
 }
