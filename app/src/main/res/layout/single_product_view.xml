@@ -42,7 +42,7 @@
                 android:drawableLeft="@drawable/warning"
                 android:drawablePadding="4dp"
                 android:visibility="gone"
-                android:text="18 ins"
+                android:text=""
                 android:textColor="@color/red"
                 android:textStyle="bold"
                 android:textSize="9sp">

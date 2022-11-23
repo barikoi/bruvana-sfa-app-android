@@ -1,10 +1,9 @@
-package com.barikoi.cnlapp.Attendance.Fragment
+package com.barikoi.cnlapp.Attendance.Fragment.SO
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,9 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Attendance.Adapter.HistoryListAdapter
 import com.barikoi.cnlapp.Attendance.Adapter.ReasonListAdapter
-import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -23,9 +20,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.fragment_summary.*
-import org.json.JSONException
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 

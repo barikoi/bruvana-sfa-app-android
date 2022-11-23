@@ -14,15 +14,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
-import com.barikoi.cnlapp.Attendance.Fragment.HistoryFragment
-import com.barikoi.cnlapp.Attendance.Fragment.SummaryFragment
+import com.barikoi.cnlapp.Attendance.Fragment.SO.HistoryFragment
+import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_attendance.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class AttendanceFragment : Fragment() {

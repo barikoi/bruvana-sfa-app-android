@@ -30,6 +30,8 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewPager2
 import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewpagertab2
+import com.barikoi.cnlapp.Attendance.Fragment.SO.HistoryFragment
+import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
@@ -42,7 +44,6 @@ import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_attendance.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import org.json.JSONException
 import org.json.JSONObject
