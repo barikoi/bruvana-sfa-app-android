@@ -103,42 +103,49 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
      * Opens the camera to take a picture
      */
     fun takePicture() {
-        layoutImagePick.visibility = GONE
-        layoutImageAdd.visibility = VISIBLE
-        layoutImageScroller.visibility = VISIBLE
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(activity!!.packageManager) != null) {
-            var photoFile: File? = null
-            try {
-                taskId = taskId
-                Log.d("ImagePicker", "TaskId 2: $taskId")
-                photoFile = createImageFile(taskId)
-            } catch (ex: IOException) {
-                // Error occurred while creating the File
-                Log.e("fileException", ex.message!!)
-            } catch (ex: Exception) {
-                Sentry.captureException(ex)
+        try {
+            layoutImagePick.visibility = GONE
+            layoutImageAdd.visibility = VISIBLE
+            layoutImageScroller.visibility = VISIBLE
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(activity!!.packageManager) != null) {
+                var photoFile: File? = null
+                try {
+                    taskId = taskId
+                    Log.d("ImagePicker", "TaskId 2: $taskId")
+                    photoFile = createImageFile(taskId)
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    Log.e("fileException", ex.message!!)
+                } catch (ex: Exception) {
+                    Sentry.captureException(ex)
+                }
+                // Continue only if the File was successfully created
+                if (photoFile != null) {
+                    photoURI = FileProvider.getUriForFile(
+                        activity!!,
+                        context.packageName + ".fileprovider",
+                        photoFile
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    activity!!.startActivityForResult(takePictureIntent, CAMERA)
+                }
+                //activity.startActivityForResult(takePictureIntent, CAMERA);
             }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(
-                    activity!!,
-                    context.packageName + ".fileprovider",
-                    photoFile
-                )
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                activity!!.startActivityForResult(takePictureIntent, CAMERA)
-            }
-            //activity.startActivityForResult(takePictureIntent, CAMERA);
+        }catch (e: Exception){
+            e.printStackTrace()
+            Sentry.captureException(e)
         }
+
     }
 
     fun takePictureFragment() {
+        try {
         layoutImagePick.visibility = GONE
         layoutImageAdd.visibility = VISIBLE
         layoutImageScroller.visibility = VISIBLE
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(fragment!!.requireContext().packageManager) != null) {
+        if (takePictureIntent.resolveActivity(fragment!!.requireActivity().packageManager) != null) {
             var photoFile: File? = null
             try {
                 taskId = taskId
@@ -160,6 +167,10 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                 fragment!!.startActivityForResult(takePictureIntent, CAMERA)
             }
+        }
+        }catch (e: Exception){
+            e.printStackTrace()
+            Sentry.captureException(e)
         }
     }
 

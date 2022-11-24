@@ -105,7 +105,7 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.taskId = "taskId"
         imagepicker.CAMERA = 4
         imagepicker.setMainactivity(ACTIVITY)
-        imagepicker.setFragmetnt(CreateAttendanceFragment())
+        imagepicker.setFragmetnt(this)
 
         getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
 

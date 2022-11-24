@@ -53,7 +53,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         sr_id = prefs!!.getString(Api.SR_CODE, "")
-        route_id = prefs!!.getString(Api.ORDERED_ROUTE_ID, "")
+        route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         listener = this
         setDateFilter()
