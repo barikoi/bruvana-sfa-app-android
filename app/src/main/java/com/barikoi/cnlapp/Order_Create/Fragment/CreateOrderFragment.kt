@@ -29,6 +29,7 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.callback.OnBackPressedListener
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import org.json.JSONObject
 import java.io.Serializable
@@ -140,25 +141,37 @@ class CreateOrderFragment : Fragment(){
             fragmentName: Fragment,
             activity: Activity
         ) {
-            viewPager!!.setCurrentItem(0)
-            val bundle = Bundle()
-            bundle.putString("from", key)
-            bundle.putSerializable(key, value) // Put anything what you want
-            fragmentName.arguments = bundle
-            val fragmentManager = (activity as FragmentActivity).supportFragmentManager
-            fragmentManager.beginTransaction()
-                .add(R.id.fragmentLayout2, fragmentName)
-                .addToBackStack(fragmentName.toString())
-                .commit()
+            try{
+                viewPager!!.setCurrentItem(0)
+                val bundle = Bundle()
+                bundle.putString("from", key)
+                bundle.putSerializable(key, value) // Put anything what you want
+                fragmentName.arguments = bundle
+                val fragmentManager = (activity as FragmentActivity).supportFragmentManager
+                fragmentManager.beginTransaction()
+                    .add(R.id.fragmentLayout2, fragmentName)
+                    .addToBackStack(fragmentName.toString())
+                    .commit()
+            }catch (e:Exception){
+                e.printStackTrace()
+                Sentry.captureException(e)
+            }
+
         }
 
         fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
-            //viewPager!!.setCurrentItem(0)
-            val fragmentManager = (activity as FragmentActivity).supportFragmentManager
-            val fragmentTransaction = fragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentLayout2, fragment!!)
-            fragmentTransaction.commit()
-            //fragmentManager.executePendingTransactions()
+            try{
+                //viewPager!!.setCurrentItem(0)
+                val fragmentManager = (activity as FragmentActivity).supportFragmentManager
+                val fragmentTransaction = fragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentLayout2, fragment!!)
+                fragmentTransaction.commit()
+                //fragmentManager.executePendingTransactions()
+            }catch (e:Exception){
+                e.printStackTrace()
+                Sentry.captureException(e)
+            }
+
         }
     }
 

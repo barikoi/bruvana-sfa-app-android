@@ -32,6 +32,7 @@ import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
@@ -418,6 +419,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 enableLocation()
             }*/
         })
+
+        /*val destination = Point.fromLngLat(taskLon!!, taskLat!!)
+        val origin = Point.fromLngLat(location.longitude, location.latitude)
+        val navroute = NavigationRoute.builder(mContext)
+            .accessToken(getString(R.string.mapbox_access_token))
+            .baseUrl(getString(R.string.base_url))
+            .user("gh")
+            .origin(origin!!)
+            .destination(destination!!)
+            .alternatives(true)*/
 
         spinner!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {

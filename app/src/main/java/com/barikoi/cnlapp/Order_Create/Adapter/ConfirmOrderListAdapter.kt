@@ -12,6 +12,7 @@ import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,8 +25,9 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        var dformat = DecimalFormat("#.##")
         holder.shopName.text = orderList[position].outletName
-        holder.subTotal.text = orderList[position].grandTotal
+        holder.subTotal.text = dformat.format(orderList[position].grandTotal.toDouble()).toString()
 
         if (orderList[position].brands_array.size > 0){
             val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)

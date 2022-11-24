@@ -204,7 +204,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val str1= SpannableString(shopName)
             str1.setSpan(ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)), 0, str1.length, 0)
             builder.append(str1)
-            ViewUtils.viewDialog(mContext!!, "Are you sure want to update"+str1+"'s order?", object :
+            ViewUtils.viewDialog(mContext!!, "Are you sure want to update "+str1+"'s order?", object :
                 DialogListener {
                 override fun onConfirmed() {
                     progressBar.visibility = View.VISIBLE

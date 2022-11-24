@@ -121,6 +121,11 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 @RequiresApi(Build.VERSION_CODES.N)
                 override fun onMenuItemClick(item: MenuItem?): Boolean {
                     when(item!!.itemId){
+                        R.id.menu_All->{
+                            adapter = ShopSelectAdapter(shopList!!, listener!!)
+                            shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
                         R.id.menu_A->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
@@ -217,7 +222,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
                             filterList!!.removeIf {
-                                it.isOrdered != 0
+                                it.isNoOrdered != 1
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter

@@ -72,6 +72,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //checkforOrders()
+        //progressBar!!.visibility =View.VISIBLE
         adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
         recylerView!!.adapter = adapter
         adapter.notifyDataSetChanged()
@@ -269,16 +270,15 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     override fun onSuccess(orderArray: JSONArray) {
         progressBar!!.visibility = View.GONE
         orderList.clear()
-        val productItems: ArrayList<Products> = ArrayList()
         if (orderArray.length() > 0){
             no_route_check.visibility = View.GONE
             bodyLayout.visibility = View.VISIBLE
             for (i in 0 until orderArray.length()){
-                productItems.clear()
                 val orderObj = orderArray.getJSONObject(i)
                 if (orderObj.getString("orders_status").equals("SAVED", true)){
                     val brandArray = orderObj.getJSONArray("brands")
                     tvRouteName.setText(orderObj.getString("route_name"))
+                    val productItems: ArrayList<Products> = ArrayList()
                     if (brandArray.length() > 0){
                         for (j in 0 until brandArray.length()){
                             val brandObj = brandArray.getJSONObject(j)

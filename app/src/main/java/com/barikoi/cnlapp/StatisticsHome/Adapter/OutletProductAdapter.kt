@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import java.text.DecimalFormat
 
 class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView.Adapter<OutletProductAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
@@ -28,6 +29,7 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         holder.perUnitPrice.setText(item.unit_price.toString())
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false
+        var dformat = DecimalFormat("#.##")
         holder.subTotal.setText(item.total_price.toString())
     }
 

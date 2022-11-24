@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.R
+import java.text.DecimalFormat
 
 class ConfirmOrderProductListAdapter(var mValues: List<Products>):RecyclerView.Adapter<ConfirmOrderProductListAdapter.ViewHolder>() {
 
@@ -22,10 +23,10 @@ class ConfirmOrderProductListAdapter(var mValues: List<Products>):RecyclerView.A
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
+        var dformat = DecimalFormat("#.##")
         holder.productName.text = productList[position].product_name
         holder.addedProduct.text = productList[position].ordered_quantity.toString()
-        holder.tvSubtoal.text = productList[position].ordered_total_price.toString()
+        holder.tvSubtoal.text = dformat.format(productList[position].ordered_total_price).toString()
         holder.tvUnitName.text = productList[position].unit_name
     }
 

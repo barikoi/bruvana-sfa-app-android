@@ -61,5 +61,5 @@ object Api {
     val get_last_week_delivery_bounce = base_url+"api/v1/get-delivered-bounce-outlets"
 
     /*TO Part*/
-    val get_all_so_list = base_url+"api/"
+    val get_all_so_list = base_url+"api/v1/get-so"
 }
