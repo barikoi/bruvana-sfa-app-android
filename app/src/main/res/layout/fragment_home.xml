@@ -11,7 +11,7 @@
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,10 +80,12 @@
     </androidx.recyclerview.widget.RecyclerView>
             <!--summary, product, category-->
     <RelativeLayout
+        android:id="@+id/layoutSecond"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_margin="8dp"
         android:orientation="vertical"
+        android:visibility="gone"
         android:background="@drawable/rounded_corner_lightgray"
         android:backgroundTint="@color/white">
         <com.google.android.material.tabs.TabLayout
@@ -123,10 +125,12 @@
     </RelativeLayout>
             <!--delivery and bounce-->
     <RelativeLayout
+        android:id="@+id/layoutThird"
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_margin="8dp"
         android:orientation="vertical"
+        android:visibility="gone"
         android:background="@drawable/rounded_corner_lightgray"
         android:backgroundTint="@color/white">
         <com.google.android.material.tabs.TabLayout

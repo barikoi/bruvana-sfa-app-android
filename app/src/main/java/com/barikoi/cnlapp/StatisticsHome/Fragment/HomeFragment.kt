@@ -72,7 +72,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkforAttendanceToday()
-        init()
+
     }
 
     private fun checkforAttendanceToday() {
@@ -101,6 +101,8 @@ class HomeFragment : Fragment() {
                                             attendanceObj.getString("route_name")
                                         ).commit()
                                     routeName_selected!!.setText(attendanceObj.getString("route_name"))
+                                    routeId =  attendanceObj.getInt("route_id").toString()
+                                    init()
                                 }else{
                                     no_route_check.visibility = View.VISIBLE
                                     bodyLayout.visibility = View.GONE
@@ -188,9 +190,9 @@ class HomeFragment : Fragment() {
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
 
         getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&sr_id="+srId+"&route_id="+routeId)
-        setSecondPartSummary()
-        setThirdPartSummary()
 
+        /*setSecondPartSummary()
+        setThirdPartSummary()*/
 
     }
 
@@ -239,7 +241,8 @@ class HomeFragment : Fragment() {
                         val adapter = TargetAdapter(itemList)
                         targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
-
+                        setSecondPartSummary()
+                        setThirdPartSummary()
 
                     }
                 }catch (e: Exception){
@@ -269,6 +272,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setSecondPartSummary() {
+        layoutSecond.visibility = View.VISIBLE
         val titles = arrayOf(resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category))
         val fragments = ArrayList<Fragment>()
         fragments.add(LastWeekSummaryFragment())
@@ -312,6 +316,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setThirdPartSummary() {
+        layoutThird.visibility = View.VISIBLE
         val titles = arrayOf(resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
         val fragments = ArrayList<Fragment>()
         fragments.add(LastWeekDeliveryFragment())
