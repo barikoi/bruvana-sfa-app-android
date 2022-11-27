@@ -100,6 +100,7 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString(Api.EMAIL, userObj.getString("email"))
                         editor.putString(Api.NAME, userObj.getString("name"))
                         editor.putString(Api.USER_ID, userObj.getString("id"))
+                        editor.putString(Api.USER_TYPE, userObj.getString("designation"))
                         editor.putString(Api.PHONE, userObj.getString("phone"))
                         editor.putString(Api.SR_CODE, userObj.getString("sr_code"))
                         editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))

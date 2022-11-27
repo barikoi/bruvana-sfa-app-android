@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Attendance.Adapter.HistoryListAdapter
+import com.barikoi.cnlapp.Attendance.Adapter.SO.HistoryListAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
@@ -41,9 +41,6 @@ class HistoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,29 +79,7 @@ class HistoryFragment : Fragment() {
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
 
-        ApiServices.apiGET(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate,
-            mQueue!!, token!!, object : ApiServiceListener{
-                override fun onResponseSuccess(response: String) {
-                    getHistoryList(response)
-                }
-
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
-                }
-
-                override fun onException(e: Exception) {
-                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
-                }
-
-            })
+        getAttendance(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -133,34 +108,37 @@ class HistoryFragment : Fragment() {
                 editor!!.commit()
             }
 
-            ApiServices.apiGET(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date),
-                mQueue!!, token!!, object : ApiServiceListener{
-                    override fun onResponseSuccess(response: String) {
-                        getHistoryList(response)
-                    }
-
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onResponseFailure(error: VolleyError) {
-                        ViewUtils.getErrorResponse(error, mContext!!)
-                    }
-
-                    override fun onException(e: Exception) {
-                        Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
-                    }
-
-                })
+            getAttendance(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
     }
+    fun getAttendance(url: String){
+        ApiServices.apiGET(
+            url,
+            mQueue!!, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    getHistoryList(response)
+                }
 
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, mContext!!)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
+    }
     fun getHistoryList(response: String){
         try {
             if (response != null){
@@ -179,6 +157,7 @@ class HistoryFragment : Fragment() {
                                 attendanceObj.getDouble("longitude")
                             historyList.add(
                                 HistoryList(
+                                    attendanceObj.getString("name"),
                                     attendanceObj.getString("id"),
                                     attendanceObj.getString("enter_time"),
                                     attendanceObj.getString("exit_time"),

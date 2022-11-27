@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Attendance.Adapter.ReasonListAdapter
+import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener

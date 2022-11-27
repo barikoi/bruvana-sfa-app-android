@@ -275,6 +275,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         editor.remove(Api.TOKEN)
         editor.remove(Api.NAME)
         editor.remove(Api.USER_ID)
+        editor.remove(Api.USER_TYPE)
         editor.remove(Api.PHONE)
         editor.commit()
 

@@ -86,7 +86,7 @@
                         android:textStyle="bold"
                         android:textSize="15sp"
                         android:textColor="@color/text_title"
-                        android:text="Hasan Khan Chowdhuri">
+                        android:text="">
                     </TextView>
                     <TextView
                         android:id="@+id/userDesignation"
@@ -99,7 +99,7 @@
                         android:gravity="start"
                         android:textSize="12sp"
                         android:textColor="@color/text_title"
-                        android:text="Executive Sales Officer">
+                        android:text="">
                     </TextView>
                 </LinearLayout>
             </LinearLayout>

@@ -16,6 +16,8 @@ import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SO.HistoryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
+import com.barikoi.cnlapp.Attendance.Fragment.TO.HistoryTOFragment
+import com.barikoi.cnlapp.Attendance.Fragment.TO.SummaryTOFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
@@ -31,6 +33,7 @@ class AttendanceFragment : Fragment() {
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var token : String? = null
+    var user_type : String? = null
 
     companion object{
         var viewPager2: ViewPager2? = null
@@ -64,8 +67,13 @@ class AttendanceFragment : Fragment() {
         val titles = arrayOf(resources.getString(R.string.attendance), resources.getString(R.string.history), resources.getString(R.string.summary))
         val fragments = ArrayList<Fragment>()
         fragments.add(CreateAttendanceFragment())
-        fragments.add(HistoryFragment())
-        fragments.add(SummaryFragment())
+        if (user_type.equals("TO", true)) {
+            fragments.add(HistoryTOFragment())
+            fragments.add(SummaryTOFragment())
+        }else{
+            fragments.add(HistoryFragment())
+            fragments.add(SummaryFragment())
+        }
         viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator
         TabLayoutMediator(viewpagertab2!!, viewPager2!!,
@@ -106,6 +114,7 @@ class AttendanceFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
+        user_type = prefs!!.getString(Api.USER_TYPE, "")
     }
 
 

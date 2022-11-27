@@ -135,15 +135,16 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                 try {
                     if (response != null){
                         val itemList: ArrayList<OrderList> = ArrayList()
-                        var productItems: ArrayList<Products> = ArrayList()
+
                         val obj = JSONObject(response)
                         val orderArray = obj.getJSONArray("orders")
                         if (orderArray.length() > 0){
                             for (i in 0 until orderArray.length()){
-                                productItems.clear()
+                                //productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
                                 val brandArray = orderObj.getJSONArray("brands")
                                 tvRouteName.setText(orderObj.getString("route_name"))
+                                val productItems: ArrayList<Products> = ArrayList()
                                 if (brandArray.length() > 0){
                                     for (j in 0 until brandArray.length()){
                                         val brandObj = brandArray.getJSONObject(j)

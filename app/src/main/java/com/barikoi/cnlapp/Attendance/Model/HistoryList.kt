@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.Attendance.Model
 import java.io.Serializable
 
 class HistoryList (
+        val userName: String,
         val attendanceId: String,
         val enterTime: String,
         val exitTime: String,

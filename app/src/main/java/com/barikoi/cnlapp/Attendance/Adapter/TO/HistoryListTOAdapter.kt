@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Attendance.Adapter
+package com.barikoi.cnlapp.Attendance.Adapter.TO
 
 import android.view.LayoutInflater
 import android.view.View
@@ -14,10 +14,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
+class HistoryListTOAdapter (val histories: List<HistoryList>) : RecyclerView.Adapter<HistoryListTOAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_attendance_history, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_attendance_history_to, parent, false)
         return ViewHolder(v)
     }
 
@@ -28,6 +28,12 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
         val _sdfWatchtime = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
 
         val mItem = histories[position]
+
+        if (!mItem.userName.equals("null")){
+            holder.userName.setText(mItem.userName)
+        }else{
+            holder.userName.visibility = View.GONE
+        }
         if (!mItem.enterTime.isNullOrEmpty() && !mItem.enterTime.equals("null")){
             holder.textViewMonth.setText(_sdfWatchMonth.format(oldDate.parse(mItem.enterTime)))
             holder.textViewDate.setText(_sdfWatchDate.format(oldDate.parse(mItem.enterTime)))
@@ -47,22 +53,6 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
         }else{
             holder.marketName.setText("")
         }
-        /*Thread {
-            try {
-                if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
-                    *//*val newurl = URL(Api.base_url+java.net.URLEncoder.encode(mItem.imageLink, "UTF-8"))
-                    val bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream())
-                    holder.imageUser.setImageBitmap(bitmap)*//*
-                    Glide.with(holder.itemView.context)
-                        .load(Api.base_url+mItem.imageLink)
-                        .into(holder.imageUser)
-                }else{
-                    holder.imageUser.visibility = View.GONE
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }.start()*/
 
         if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
             /*val newurl = URL(Api.base_url+java.net.URLEncoder.encode(mItem.imageLink, "UTF-8"))
@@ -91,6 +81,7 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
         internal val textViewMonth: TextView
         internal val textViewDate: TextView
         internal val marketName: TextView
+        internal val userName: TextView
         internal val inTime: TextView
         internal val outTime: TextView
         internal val inAddress: TextView
@@ -100,6 +91,7 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
             textViewMonth = itemView.findViewById(R.id.tvMonth)
             textViewDate = itemView.findViewById(R.id.tvDate)
             marketName = itemView.findViewById(R.id.marketName)
+            userName = itemView.findViewById(R.id.soName)
             inTime = itemView.findViewById(R.id.inTime)
             outTime = itemView.findViewById(R.id.outTime)
             inAddress = itemView.findViewById(R.id.inAddress)

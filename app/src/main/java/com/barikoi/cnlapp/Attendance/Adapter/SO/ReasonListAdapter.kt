@@ -1,12 +1,10 @@
-package com.barikoi.cnlapp.Attendance.Adapter
+package com.barikoi.cnlapp.Attendance.Adapter.SO
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import java.text.SimpleDateFormat
 import java.util.*
@@ -15,12 +13,12 @@ class ReasonListAdapter(val reasons: List<Pair<String, String>>) : RecyclerView.
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ReasonListAdapter.ViewHolder {
+    ): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_attendance_reason_view, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ReasonListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.ENGLISH)
         val _sdfWatchDate = SimpleDateFormat("dd", Locale.ENGLISH)

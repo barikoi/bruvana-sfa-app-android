@@ -68,6 +68,7 @@ class CreateAttendanceFragment : Fragment() {
     var mQueue: RequestQueue? = null
     var user_id : String? = null
     var token : String? = null
+    var user_type : String? = null
     var appDatabase: ImageDatabase? = null
     private var isImageAdded = false
     private val CAMERA = 4
@@ -80,9 +81,6 @@ class CreateAttendanceFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,19 +105,26 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.setMainactivity(ACTIVITY)
         imagepicker.setFragmetnt(this)
 
-        getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
+        if (user_type.equals("TO", true)){
+            spinnerLayout.visibility = View.GONE
+            titleRoute.visibility = View.GONE
+        }else{
+            spinnerLayout.visibility = View.VISIBLE
+            titleRoute.visibility = View.VISIBLE
+            getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
 
-        spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                route_id = routeNameList!![p2].first.toInt()
-                selectedRoute = routeNameList!![p2].second
+            spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    route_id = routeNameList!![p2].first.toInt()
+                    selectedRoute = routeNameList!![p2].second
+
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
 
             }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
-
         }
 
         getLocation("reversegeo")
@@ -128,17 +133,29 @@ class CreateAttendanceFragment : Fragment() {
             getLocation("reversegeo")
         }
         btnSubmit.setOnClickListener {
-            if (selectedRoute.length > 0 && isImageAdded){
-                progressBar.visibility = View.VISIBLE
-                getLocation("submit")
-            }else{
-                if (!isImageAdded){
-                    Toast.makeText(mContext, "Upload image for attendance", Toast.LENGTH_SHORT).show()
+            if (user_type.equals("TO", true)){
+                if (isImageAdded){
+                    progressBar.visibility = View.VISIBLE
+                    getLocation("submit")
+                }else{
+                    if (!isImageAdded){
+                        Toast.makeText(mContext, "Upload image for attendance", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                if (selectedRoute.length == 0){
-                    Toast.makeText(mContext, "Select route for attendance", Toast.LENGTH_SHORT).show()
+            }else{
+                if (selectedRoute.length > 0 && isImageAdded){
+                    progressBar.visibility = View.VISIBLE
+                    getLocation("submit")
+                }else{
+                    if (!isImageAdded){
+                        Toast.makeText(mContext, "Upload image for attendance", Toast.LENGTH_SHORT).show()
+                    }
+                    if (selectedRoute.length == 0){
+                        Toast.makeText(mContext, "Select route for attendance", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
+
 
         }
     }
@@ -465,6 +482,7 @@ class CreateAttendanceFragment : Fragment() {
         mQueue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         user_id = prefs!!.getString(com.barikoi.cnlapp.Utils.Api.USER_ID, "")
         token = prefs!!.getString(Api.TOKEN, "")
+        user_type = prefs!!.getString(Api.USER_TYPE, "")
         ACTIVITY = context as MainActivity
         appDatabase = ImageDatabase.getInstance(mContext!!)
     }
