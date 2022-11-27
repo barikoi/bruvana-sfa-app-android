@@ -58,7 +58,7 @@ Filterable{
         }
 
         if (productObj.ordered_total_price > 0.0) {
-            holder.tvSubtoal.setText(productObj.ordered_total_price.toString())
+            holder.tvSubtoal.setText(dformat.format(productObj.ordered_total_price).toString())
         }
 
 

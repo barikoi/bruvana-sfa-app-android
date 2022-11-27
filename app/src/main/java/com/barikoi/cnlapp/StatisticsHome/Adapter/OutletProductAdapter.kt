@@ -30,7 +30,7 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false
         var dformat = DecimalFormat("#.##")
-        holder.subTotal.setText(item.total_price.toString())
+        holder.subTotal.setText(dformat.format(item.total_price).toString())
     }
 
     override fun getItemCount(): Int {
