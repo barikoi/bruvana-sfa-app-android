@@ -101,6 +101,7 @@
     <string name="no_route_selected_today">Today\'s route not selected yet. \nSubmit your attendance for route selection.</string>
     <string name="no_order_found">No order found today</string>
     <string name="coming_soon">Coming Soon!!!</string>
+    <string name="no_so_found">No SO found</string>
     <!--Create Order-->
     <string name="order_collection">Order Collection</string>
     <string name="select_dokan">Select Dokan</string>

@@ -55,9 +55,6 @@ class HistoryListTOAdapter (val histories: List<HistoryList>) : RecyclerView.Ada
         }
 
         if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
-            /*val newurl = URL(Api.base_url+java.net.URLEncoder.encode(mItem.imageLink, "UTF-8"))
-            val bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream())
-            holder.imageUser.setImageBitmap(bitmap)*/
             Glide.with(holder.itemView.context)
                 .load(Api.base_url+mItem.imageLink)
                 .into(holder.imageUser)

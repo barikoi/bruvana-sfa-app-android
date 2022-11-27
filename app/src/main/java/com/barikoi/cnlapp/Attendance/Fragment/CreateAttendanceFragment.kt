@@ -192,7 +192,7 @@ class CreateAttendanceFragment : Fragment() {
         params["type"] = "checkin"
         params["latitude"] = location.latitude.toString()
         params["longitude"] = location.longitude.toString()
-        params["route_id"] = route_id.toString()
+        if(route_id != null) params["route_id"] = route_id.toString()
         if(editTextReason.text.toString().length > 0) params["late_reason"] = editTextReason.text.toString()
 
         ApiServices.apiPOSTMultipart(Api.create_attendance, mQueue!!, token!!, params, byteparams, object : ApiServiceListener{

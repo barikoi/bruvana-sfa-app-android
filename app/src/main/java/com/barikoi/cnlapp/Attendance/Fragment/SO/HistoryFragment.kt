@@ -158,6 +158,7 @@ class HistoryFragment : Fragment() {
                             historyList.add(
                                 HistoryList(
                                     attendanceObj.getString("name"),
+                                    attendanceObj.getString("user_id"),
                                     attendanceObj.getString("id"),
                                     attendanceObj.getString("enter_time"),
                                     attendanceObj.getString("exit_time"),

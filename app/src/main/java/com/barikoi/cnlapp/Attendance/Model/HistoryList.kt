@@ -4,6 +4,7 @@ import java.io.Serializable
 
 class HistoryList (
         val userName: String,
+        val userId: String,
         val attendanceId: String,
         val enterTime: String,
         val exitTime: String,

@@ -2,13 +2,17 @@ package com.barikoi.cnlapp.Attendance.Fragment.TO
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -16,6 +20,7 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.TO.HistoryListTOAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.Attendance.Model.SOList
+import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -23,7 +28,9 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
+import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import kotlinx.android.synthetic.main.fragment_history_t_o.*
+import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,6 +47,10 @@ class HistoryTOFragment : Fragment() {
     var token : String? = null
     var historyList : ArrayList<HistoryList> = ArrayList()
     var adapter: HistoryListTOAdapter? = null
+    var selected_so : Int? = null
+    var selected_so_id : String? = null
+    val soList: ArrayList<SOList> = ArrayList()
+    val filteredsoList: ArrayList<HistoryList> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +59,29 @@ class HistoryTOFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getSOList()
         init()
+
+        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (spinnerSO.adapter.count >0) {
+                    selected_so = p2
+                    if (p2>0) {
+                        selected_so_id = soList[p2 - 1].id
+                    }
+                    if (p2 == 0) {
+                        setDateFilter("&with_to=1")
+                    } else {
+                        setDateFilter("")
+                    }
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
     }
 
     private fun getSOList() {
@@ -57,7 +89,8 @@ class HistoryTOFragment : Fragment() {
             Api.get_all_so_list,
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
-                    getHistoryList(response)
+                    viewSOList(response)
+                    //setDateFilter()
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {
@@ -80,10 +113,7 @@ class HistoryTOFragment : Fragment() {
     }
 
     private fun init() {
-        setDateFilter()
-
-        adapter = HistoryListTOAdapter(historyList)
-        historyListView.adapter = adapter
+        getSOList()
     }
 
     override fun onCreateView(
@@ -94,7 +124,7 @@ class HistoryTOFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_history_t_o, container, false)
     }
 
-    fun setDateFilter() {
+    fun setDateFilter(urlSuffix: String) {
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
@@ -109,7 +139,7 @@ class HistoryTOFragment : Fragment() {
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
 
-        getAttendance(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate)
+        getAttendance(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate+urlSuffix)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -138,7 +168,7 @@ class HistoryTOFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getAttendance(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
+            getAttendance(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+urlSuffix)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
@@ -148,8 +178,9 @@ class HistoryTOFragment : Fragment() {
         ApiServices.apiGET(
             url,
             mQueue!!, token!!, object : ApiServiceListener {
+                @RequiresApi(Build.VERSION_CODES.N)
                 override fun onResponseSuccess(response: String) {
-                    viewSOList(response)
+                    getHistoryList(response)
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {
@@ -174,12 +205,12 @@ class HistoryTOFragment : Fragment() {
     private fun viewSOList(response: String) {
         try {
             if (response != null){
+                soList.clear()
                 val obj = JSONObject(response)
                 val soArray = obj.getJSONArray("so")
+                val soNameList: ArrayList<String> = ArrayList()
+                soNameList.add(prefs!!.getString(Api.NAME, "")+" (You)")
                 if (soArray.length() >0){
-                    val soList: ArrayList<SOList> = ArrayList()
-                    val soNameList: ArrayList<String> = ArrayList()
-                    soNameList.add(prefs!!.getString(Api.NAME, "")+" (You)")
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
                         soList.add(
@@ -196,16 +227,18 @@ class HistoryTOFragment : Fragment() {
 
                     }
                 }
-
-                adapter = HistoryListTOAdapter(historyList)
-                historyListView.adapter = adapter
-                adapter!!.notifyDataSetChanged()
+                val adapter = ArrayAdapter(
+                    mContext!!,
+                    android.R.layout.simple_spinner_item, soNameList
+                )
+                spinnerSO.adapter = adapter
             }
         }catch (e:Exception){
             e.printStackTrace()
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun getHistoryList(response: String){
         try {
             if (response != null){
@@ -225,6 +258,7 @@ class HistoryTOFragment : Fragment() {
                             historyList.add(
                                 HistoryList(
                                     attendanceObj.getString("name"),
+                                    attendanceObj.getString("user_id"),
                                     attendanceObj.getString("id"),
                                     attendanceObj.getString("enter_time"),
                                     attendanceObj.getString("exit_time"),
@@ -245,9 +279,26 @@ class HistoryTOFragment : Fragment() {
                     }
                 }
 
-                adapter = HistoryListTOAdapter(historyList)
+                if (selected_so == 0){
+                    adapter = HistoryListTOAdapter(historyList)
+                    historyTOListView.adapter = adapter
+                    adapter!!.notifyDataSetChanged()
+                }else{
+                    filteredsoList.clear()
+                    filteredsoList.addAll(historyList)
+                    filteredsoList.removeIf {
+                        !it.userId.equals(selected_so_id, true)
+                    }
+                    if (filteredsoList.size > 0){
+                        adapter = HistoryListTOAdapter(filteredsoList)
+                        historyTOListView.adapter = adapter
+                        adapter!!.notifyDataSetChanged()
+                    }
+                }
+
+                /*adapter = HistoryListTOAdapter(historyList)
                 historyListView.adapter = adapter
-                adapter!!.notifyDataSetChanged()
+                adapter!!.notifyDataSetChanged()*/
             }
         }catch (e:Exception){
             e.printStackTrace()
