@@ -9,6 +9,12 @@
         android:iconTint="@color/black"
         android:title="@string/title_shop_route" />
   </group>
+  <group android:id="@+id/nav_order_delivery_update">
+    <item
+        android:id="@+id/menu_order_delivery_update"
+        android:iconTint="@color/black"
+        android:title="@string/order_delivery_update" />
+  </group>
   <group android:id="@+id/nav_order_summary">
     <item
         android:id="@+id/menu_order_summary"

@@ -121,6 +121,7 @@
     <string name="download_chalan">Download Chalan</string>
     <string name="confirm_order_dialog">Are you sure want to confirm todays order?</string>
     <string name="order_summary">Order Summary</string>
+    <string name="order_delivery_update">Order Delivery Update</string>
 
     <string name="shops_ordered_this_month"> Shops ordered this month</string>
     <string name="sold_in">Sold in </string>
@@ -129,6 +130,10 @@
 
     <string name="route_list">Route List</string>
     <string name="shop_list">Shop List</string>
+
+    <string name="pending">Pending</string>
+    <string name="delivered">Delivered</string>
+    <string name="bounced">Bounced</string>
 
     <!--notice view-->
     <string name="see_more">See More...</string>

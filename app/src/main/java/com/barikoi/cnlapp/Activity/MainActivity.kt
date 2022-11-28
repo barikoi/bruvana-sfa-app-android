@@ -19,6 +19,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -30,6 +31,7 @@ import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductSummaryActivity
 import com.barikoi.cnlapp.R
@@ -137,6 +139,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .setIcon(resources.getDrawable(R.drawable.warning))
                 .show()
         }
+
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)){
+            fab_order.visibility = View.GONE
+        }else{
+            fab_order.visibility = View.VISIBLE
+        }
+
         fab_order.setOnClickListener {
             fab_order.background.setTint(resources.getColor(R.color.cnl_color_2))
             fab_order.drawable.setTint(resources.getColor(R.color.white))
@@ -148,8 +157,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         nav_view!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            fab_order.background.setTint(resources.getColor(R.color.white))
-            fab_order.drawable.setTint(resources.getColor(R.color.fab_icon))
+            if (fab_order.isVisible){
+                fab_order.background.setTint(resources.getColor(R.color.white))
+                fab_order.drawable.setTint(resources.getColor(R.color.fab_icon))
+            }
             when (item.itemId) {
                 R.id.navigation_home -> {
                     tvTitle.text = ""
@@ -253,7 +264,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(Intent(this@MainActivity, OrderSummaryActivity::class.java))
         } else if (id == R.id.menu_shop_route) {
             startActivity(Intent(this@MainActivity, RouteActivity::class.java))
-        } else if (id == R.id.menu_notice){
+        } else if (id == R.id.menu_order_delivery_update) {
+            startActivity(Intent(this@MainActivity, OrderDeliveryUpdateActivity::class.java))
+        }else if (id == R.id.menu_notice){
             startActivity(Intent(this@MainActivity, NoticeActivity::class.java))
         }else if (id == R.id.menu_trade_offers){
            startActivity(Intent(this@MainActivity, TradeOffersActivity::class.java))

@@ -26,6 +26,9 @@ object Api {
     val TOTAL_ABSENT = "total_absent"
     val TOTAL_LATE = "total_late"
 
+    val START_DATE_ORDER = "start_date_order"
+    val END_DATE_ORDER = "end_date_order"
+
     val base_url = "http://cnl.bkoih3.ml:7000/"
 
     val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
@@ -44,6 +47,7 @@ object Api {
     val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"
     val get_saved_order = base_url+"api/v1/fetch-orders"
+    val get_orders_to = base_url+"api/v1/get-order-list"
     val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
 

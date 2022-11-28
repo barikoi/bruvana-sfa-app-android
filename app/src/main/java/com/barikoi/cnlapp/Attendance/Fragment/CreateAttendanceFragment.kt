@@ -44,6 +44,7 @@ import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_attendance.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -228,6 +229,12 @@ class CreateAttendanceFragment : Fragment() {
                             }).attach()
                         viewPager2!!.setCurrentItem(0);
                         viewPager2!!.setUserInputEnabled(false)
+                        for (i in 0 until viewpagertab2!!.getTabCount()) {
+                            val tab = (viewpagertab2!!.getChildAt(0) as ViewGroup).getChildAt(i)
+                            val p = tab.layoutParams as ViewGroup.MarginLayoutParams
+                            p.setMargins(15, 15, 10, 15)
+                            tab.requestLayout()
+                        }
                         //CreateOrderFragment.setCurrentFragment(CreateAttendanceFragment(), ACTIVITY)
                     }
 
