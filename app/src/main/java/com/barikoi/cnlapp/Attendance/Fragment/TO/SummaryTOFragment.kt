@@ -25,6 +25,7 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
+import com.bumptech.glide.Glide
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.fragment_summary_t_o.*
 import org.json.JSONObject
@@ -40,30 +41,43 @@ class SummaryTOFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var user_id : String? = null
-    var token : String? = null
+    var user_id: String? = null
+    var token: String? = null
     var adapter: ReasonListAdapter? = null
-    var selected_so : Int? = null
-    var selected_so_id : String? = null
+    var selected_so: Int? = null
+    var selected_so_id: String? = null
     val soList: ArrayList<SOList> = ArrayList()
     val filteredsoList: ArrayList<Pair<String, String>> = ArrayList()
-    var reasonList : ArrayList<Pair<String, String>> = ArrayList()
+    var reasonList: ArrayList<Pair<String, String>> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
 
-        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO.adapter.count >0) {
+                if (spinnerSO.adapter.count > 0) {
                     selected_so = p2
-                    if (p2>0) {
+                    if (p2 > 0) {
+                        userLayout.visibility = View.VISIBLE
                         selected_so_id = soList[p2 - 1].id
+                        if (!soList[p2 - 1].imageUrl.equals("null")) {
+                            Glide.with(mContext!!)
+                                .load(Api.base_url + soList[p2 - 1].imageUrl)
+                                .into(imageUser)
+                        } else {
+                            imageUser.visibility = View.GONE
+                        }
+                        userName.setText(soList[p2 - 1].name)
+                        userDesignation.setText(soList[p2 - 1].designation)
+                    } else {
+                        userLayout.visibility = View.GONE
                     }
                     if (p2 == 0) {
                         setDateFilter("&with_to=1")
@@ -91,6 +105,7 @@ class SummaryTOFragment : Fragment() {
     private fun init() {
         getSOList()
     }
+
     private fun getSOList() {
         ApiServices.apiGET(
             Api.get_all_so_list,
@@ -118,15 +133,16 @@ class SummaryTOFragment : Fragment() {
 
             })
     }
+
     private fun viewSOList(response: String) {
         try {
-            if (response != null){
+            if (response != null) {
                 soList.clear()
                 val obj = JSONObject(response)
                 val soArray = obj.getJSONArray("so")
                 val soNameList: ArrayList<String> = ArrayList()
-                soNameList.add(prefs!!.getString(Api.NAME, "")+" (You)")
-                if (soArray.length() >0){
+                soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
+                if (soArray.length() > 0) {
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
                         soList.add(
@@ -149,7 +165,7 @@ class SummaryTOFragment : Fragment() {
                 )
                 spinnerSO.adapter = adapter
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -169,7 +185,7 @@ class SummaryTOFragment : Fragment() {
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
 
-        getAttendance(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate+urlSuffix)
+        getAttendance(Api.get_attendance + "?start_date=" + StartDate + "&end_date=" + EndDate + urlSuffix)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -198,13 +214,17 @@ class SummaryTOFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getAttendance(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+urlSuffix)
+            getAttendance(
+                Api.get_attendance + "?start_date=" + df.format(s_date) + "&end_date=" + df.format(
+                    e_date
+                ) + urlSuffix
+            )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
     }
 
-    fun getAttendance(url: String){
+    fun getAttendance(url: String) {
         ApiServices.apiGET(
             url,
             mQueue!!, token!!, object : ApiServiceListener {
@@ -232,39 +252,64 @@ class SummaryTOFragment : Fragment() {
             })
     }
 
-    fun getHistoryList(response: String){
+    fun getHistoryList(response: String) {
         try {
-            if (response != null){
+            if (response != null) {
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
                 var absent = 0
                 var present = 0
-                var late= 0
+                var late = 0
+                var total = 0
                 reasonList.clear()
-                if (attedanceArray.length() >0){
+                if (attedanceArray.length() > 0) {
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
-                        if (!attendanceObj.getString("late_reason").equals("null") && attendanceObj.getString("late_reason").length > 0){
-                            reasonList.add(Pair(attendanceObj.getString("enter_time"),
-                                attendanceObj.getString("late_reason")))
+                        if (attendanceObj.getString("user_id").equals(selected_so_id)) {
+                            total +=1
+                            if (!attendanceObj.getString("late_reason")
+                                    .equals("null") && attendanceObj.getString("late_reason").length > 0
+                            ) {
+                                reasonList.add(
+                                    Pair(
+                                        attendanceObj.getString("enter_time"),
+                                        attendanceObj.getString("late_reason")
+                                    )
+                                )
+                            }
+                            if (attendanceObj.getString("enter_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
+                                total -= 1
+                            }
+                            if (attendanceObj.getInt("is_late") == 1) late += 1
+                            if (attendanceObj.getInt("is_absent") == 1) absent += 1
+                        }else{
+                            if (selected_so == 0){
+                                total +=1
+                                if (!attendanceObj.getString("late_reason")
+                                        .equals("null") && attendanceObj.getString("late_reason").length > 0
+                                ) {
+                                    reasonList.add(
+                                        Pair(
+                                            attendanceObj.getString("enter_time"),
+                                            attendanceObj.getString("late_reason")
+                                        )
+                                    )
+                                }
+                                if (attendanceObj.getString("enter_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
+                                    total -= 1
+                                }
+                                if (attendanceObj.getInt("is_late") == 1) late += 1
+                                if (attendanceObj.getInt("is_absent") == 1) absent += 1
+                            }
                         }
-
-                        if (attendanceObj.getInt("is_late") == 1) late += 1
-                        if (attendanceObj.getInt("is_absent") == 1) absent +=1
                     }
 
-                    present = attedanceArray.length() - absent
+                    present = total - absent
 
                     editor!!.putInt(Api.TOTAL_PRESENT, present)
                     editor!!.putInt(Api.TOTAL_LATE, late)
                     editor!!.putInt(Api.TOTAL_ABSENT, absent)
                     editor!!.commit()
-
-                    /*if (reasonList.size > 0){
-                        val adapter = ReasonListAdapter(reasonList)
-                        summaryListView.adapter = adapter
-                        adapter.notifyDataSetChanged()
-                    }*/
                 }
 
                 val adapter = ReasonListAdapter(reasonList)
@@ -275,10 +320,11 @@ class SummaryTOFragment : Fragment() {
                 lateCount.setText(late.toString())
                 absentCount.setText(absent.toString())
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         prefs = PreferenceManager.getDefaultSharedPreferences(context)

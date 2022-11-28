@@ -170,13 +170,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 )
                             }
                             Log.d("RouteList", "all 1 "+ shopList!!.size.toString())
-                            //allRouteList!!.add(Routes(route_id, route_code, route_name, "", "", "", shopList!!))
-                            /*for (k in 0 until allRouteList!!.size) {
-                                Log.d("RouteList", "all 2 "+ allRouteList!![k].route_name+" "+ allRouteList!![k].shopList.size.toString())
-                            }*/
                         }
-
-                        //shopCount.setText("${shopList!!.size} outlet(s)")
                     }else if (data.has("verified_outlet")){
                         val routesOutletArray = data.getJSONArray("verified_outlet")
                         for (i in 0 until routesOutletArray.length()){
@@ -219,30 +213,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             verifiedShopList!!.add(shops)
                             icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)
                             plotMarker(shops, icon)
-
-                            /*if (allRouteList!!.size >0){
-                                for (i in 0 until allRouteList!!.size){
-                                    if (!route_id.equals(allRouteList!![i].route_code)){
-                                        allRouteList!!.add(Routes(route_id, route_id, route_name, "", "", "", verifiedShopList!!))
-                                    }
-                                }
-                            }else{
-                                allRouteList!!.add(Routes(route_id, route_id, route_name, "", "", "", verifiedShopList!!))
-                            }*/
                             }
                         shopCount.setText("${verifiedShopList!!.size} outlet(s)")
                         Log.d("RouteList", "all verified 1 "+ verifiedShopList!!.size.toString())
                         Log.d("RouteList", "all verified 1 "+ allRouteList!!.size.toString())
-                        /*for (k in 0 until allRouteList!!.size) {
-                            Log.d("RouteList", "all verified 2 "+ allRouteList!![k].route_name+" "+ allRouteList!![k].shopList.size.toString())
-                        }*/
 
                     }
 
                     if (spinner != null) {
-                        /*for (l in 0 until allRouteList!!.size) {
-                            Log.d("RouteList", "all 3 "+ allRouteList!![l].route_name+" "+ allRouteList!![l].shopList.size.toString())
-                        }*/
                         if (spinner!!.adapter == null){
                             val adapter = ArrayAdapter(
                                 mContext!!,
@@ -250,9 +228,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             )
                             spinner!!.adapter = adapter
                         }
-                        /*if (spinner!!.adapter.count == 0) {
-
-                        }*/
 
                     }
 
@@ -267,11 +242,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 Log.d("error", error.toString())
                 loading!!.visibility = View.GONE
                 if (error is TimeoutError) {
-                    //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
                     Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
                 }
                 if (error is NoConnectionError) {
-                    //mListerner.onFailure("Turn on your internet connection and Try again")
                     Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
                 }
                 if (error != null && error.networkResponse != null) {
@@ -279,14 +252,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         val s = String(error.networkResponse.data)
                         Log.d("Map", "message: $s")
                         val data = JSONObject(s)
-                        //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                        //mListerner.onFailure(data.getString("message"))
                         Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
                     } catch (e: UnsupportedEncodingException) {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     } catch (e: JSONException) {
-                        //mListerner.onFailure(e.message)
                         Sentry.captureException(e)
                         Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
                         e.printStackTrace()

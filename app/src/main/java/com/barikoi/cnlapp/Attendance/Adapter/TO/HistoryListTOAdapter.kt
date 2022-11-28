@@ -49,9 +49,9 @@ class HistoryListTOAdapter (val histories: List<HistoryList>) : RecyclerView.Ada
         }
 
         if (!mItem.routeName.isNullOrEmpty() && !mItem.routeName.equals("null")){
-            holder.marketName.setText(mItem.routeName)
+            holder.marketName.setText(holder.itemView.resources.getString(R.string.market)+" "+mItem.routeName)
         }else{
-            holder.marketName.setText("")
+            holder.marketName.visibility = View.GONE
         }
 
         if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
