@@ -10,18 +10,20 @@
     android:orientation="vertical"
     android:padding="4dp">
     <LinearLayout
-        android:id="@+id/layoutStatus"
+        android:id="@+id/layoutStatus2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:layout_centerVertical="true"
         android:background="@drawable/button_bg_stroke"
-        android:backgroundTint="@color/status_pending_stroke">
+        android:backgroundTint="@color/cnl_color_1">
         <TextView
             android:id="@+id/tvOrderStatus"
             android:layout_width="match_parent"
             android:layout_height="24dp"
             android:layout_margin="2dp"
+            android:paddingRight="16dp"
+            android:paddingLeft="16dp"
             android:gravity="center"
             android:background="@drawable/button_bg_stroke"
             android:text=""
@@ -76,6 +78,7 @@
             android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
+            android:visibility="gone"
             android:background="@drawable/cardview_bg_stroke_2dp"
             android:backgroundTint="@color/white"
             android:padding="2dp"

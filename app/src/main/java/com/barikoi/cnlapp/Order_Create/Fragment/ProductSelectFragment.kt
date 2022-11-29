@@ -241,6 +241,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 brandObj.getString("brand_id"),
                                 brandObj.getDouble("unit_price"),
                                 brandObj.getInt("quantity"),
+                                brandObj.getInt("bounce"),
                                 brandObj.getDouble("total_price")
                             )
                         )
@@ -490,6 +491,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("product", addedProducts!![j].product_name)
                     brandObj.put("brand_id", addedProducts!![j].brand_id)
                     brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("bounce", "0")
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
@@ -565,6 +567,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("product", addedProducts!![j].product_name)
                     brandObj.put("brand_id", addedProducts!![j].brand_id)
                     brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("bounce", "0")
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
@@ -724,7 +727,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val products = Products(
                                     productId,
                                     productName, productCode, brandId, brandName, price, discount, image, unitName, categoryName,
-                                    qtyLastMonth, availableStock, orderedQty, orderedTotalPrice)
+                                    qtyLastMonth, availableStock, 0, orderedQty, orderedTotalPrice)
 
                                 productsList!!.add(products)
                                 if (orderedQty > 0){
@@ -873,7 +876,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     products.discount, products.imageUrl,
                     products.unit_name, products.category_name,
                     products.quantity_last_month,
-                    products.stock_available, products.ordered_quantity, products.ordered_total_price
+                    products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
                 )
                 )
 
@@ -886,7 +889,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     products.discount, products.imageUrl,
                     products.unit_name, products.category_name,
                     products.quantity_last_month,
-                    products.stock_available, products.ordered_quantity, products.ordered_total_price
+                    products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
                 )
                 )
             }

@@ -41,6 +41,7 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
     var token : String? = null
     var user_id : String? = null
     var sr_id : String? = null
+    var territory_id : String? = null
     var user_type : String? = null
     var route_id: String? = null
     private var prefs: SharedPreferences? = null
@@ -48,8 +49,11 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
     var queue: RequestQueue? = null
     var listener : OnEditOrderListener? =null
     private var adapter: ConfirmOrderListAdapter? = null
-    var StartDate: String? = null
-    var EndDate: String? = null
+    companion object{
+        var StartDate: String? = null
+        var EndDate: String? = null
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,8 +64,9 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         user_type = prefs!!.getString(Api.USER_TYPE, "")
-        sr_id = prefs!!.getString(Api.SR_CODE, "")
-        route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        //sr_id = prefs!!.getString(Api.SR_CODE, "")
+        //route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
 
         if (user_type.equals("TO", true)){
             sr_id = ""
@@ -104,11 +109,14 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
-                    PendingOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, StartDate!!, EndDate!!)
+                    viewPager.setCurrentItem(0)
+                    PendingOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 } else if (position == 1) {
-
+                    viewPager.setCurrentItem(1)
+                    //DeliveredOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }else if (position == 2) {
-
+                    viewPager.setCurrentItem(2)
+                    //BouncedOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }
             }
         })
@@ -121,10 +129,10 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-        StartDate = df.format(start)
+        StartDate = df.format(end)
         EndDate = df.format(end)
 
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        tvDateRange.setText(/*simpleFormat.format(end) + " - " + */simpleFormat.format(end))
 
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
@@ -145,14 +153,16 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
             if (s_date.compareTo(e_date) == 0) {
                 tvDateRange.setText(simpleFormat.format(s_date))
                 editor!!.putString(Api.START_DATE_ORDER, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ORDER, df.format(s_date))
+                editor!!.putString(Api.END_DATE_ORDER, df.format(e_date))
                 editor!!.commit()
             } else {
                 tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
                 editor!!.putString(Api.START_DATE_ORDER, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ORDER, df.format(s_date))
+                editor!!.putString(Api.END_DATE_ORDER, df.format(e_date))
                 editor!!.commit()
             }
+            StartDate = df.format(s_date)
+            EndDate = df.format(e_date)
             setTabLayoutView()
             //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_summary=1")
 

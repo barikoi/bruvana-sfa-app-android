@@ -1,10 +1,12 @@
 package com.barikoi.cnlapp.Order_Delivery.Adapter
 
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
@@ -23,6 +25,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
         return ViewHolder(v)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = orderList[position]
         var dformat = DecimalFormat("#.##")
@@ -38,7 +41,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
         if (!mItem.orderStatus.equals("null")) {
             if (mItem.orderStatus.equals("PENDING")) {
                 holder.orderStatus.text = holder.itemView.resources.getString(R.string.pending)
-                holder.layoutStatus.setBackgroundColor(holder.itemView.resources.getColor(R.color.status_pending_stroke))
+                holder.layoutStatus.background.setTint(holder.itemView.resources.getColor(R.color.status_pending_stroke))
                 val gd = GradientDrawable()
                 gd.setColor(holder.itemView.resources.getColor(R.color.status_pending))
                 gd.cornerRadius = 5f
@@ -46,7 +49,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
                 holder.orderStatus.setBackgroundDrawable(gd)
             } else if (mItem.orderStatus.equals("DELIVERED")) {
                 holder.orderStatus.text = holder.itemView.resources.getString(R.string.delivered)
-                holder.layoutStatus.setBackgroundColor(holder.itemView.resources.getColor(R.color.status_delivered_stroke))
+                holder.layoutStatus.background.setTint(holder.itemView.resources.getColor(R.color.status_delivered_stroke))
                 val gd = GradientDrawable()
                 gd.setColor(holder.itemView.resources.getColor(R.color.status_delivered))
                 gd.cornerRadius = 5f
@@ -54,7 +57,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
                 holder.orderStatus.setBackgroundDrawable(gd)
             } else {
                 holder.orderStatus.text = holder.itemView.resources.getString(R.string.bounced)
-                holder.layoutStatus.setBackgroundColor(holder.itemView.resources.getColor(R.color.status_bounced_stroke))
+                holder.layoutStatus.background.setTint(holder.itemView.resources.getColor(R.color.status_bounced_stroke))
                 val gd = GradientDrawable()
                 gd.setColor(holder.itemView.resources.getColor(R.color.status_bounced))
                 gd.cornerRadius = 5f
@@ -73,7 +76,9 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
             holder.orderAt.visibility = View.GONE
         }
 
-        if (from.equals("TO", true)){
+        if (from.equals("SO", true)){
+            holder.editItem.visibility = View.VISIBLE
+        }else{
             holder.editItem.visibility = View.GONE
         }
 
@@ -133,7 +138,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
             subTotal = itemView.findViewById(R.id.tvSubTotal)
             productList = itemView.findViewById(R.id.productlist)
             editItem = itemView.findViewById(R.id.btn_edit)
-            layoutStatus = itemView.findViewById(R.id.layoutStatus)
+            layoutStatus = itemView.findViewById(R.id.layoutStatus2)
             orderStatus = itemView.findViewById(R.id.tvOrderStatus)
 
         }

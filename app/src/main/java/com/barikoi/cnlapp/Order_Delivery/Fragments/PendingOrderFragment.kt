@@ -7,6 +7,7 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,11 +20,15 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
+import com.barikoi.cnlapp.Order_Create.Fragment.ConfirmOrderFragment
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Delivery.Adapter.OrderDeliveryListAdapter
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.EndDate
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.StartDate
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
@@ -33,8 +38,6 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
 import kotlinx.android.synthetic.main.fragment_pending_order.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -50,24 +53,27 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     lateinit var ACTIVITY: OrderDeliveryUpdateActivity
     var token : String? = null
     var user_id : String? = null
+    var user_type : String? = null
     var sr_id : String? = null
     var route_id: String? = null
-    var confirmOrder: AppCompatButton? = null
+    var territory_id : String? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var appDatabase: AppDatabase? = null
-    var allorderList: List<OrderList> ? = null
-    private var mFusedLocationClient: FusedLocationProviderClient? = null
-    private var mLocationCallback: LocationCallback? = null
     private var listener: OnEditOrderListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
     lateinit var adapter: OrderDeliveryListAdapter
+    private var updatedProducts: ArrayList<ProductStatistics>? = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
     }
 
     override fun onCreateView(
@@ -77,19 +83,19 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_pending_order, container, false)
         recylerView = view.findViewById(R.id.orderListView)
-        progressBar = view.findViewById(R.id.progressBar2)
+        progressBar = view.findViewById(R.id.progressBar1)
         return view
     }
 
 
     companion object{
         var mCallback: OrderListSuccessListener? = PendingOrderFragment()
-        fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String, start: String, end: String) {
+        fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
             if (mCallback!= null) {
                 if (sr_id.length == 0){
-                    getAllOrders(Api.get_orders_to+"?start_date="+start+"&end_date="+end, queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?start_date="+start+"&end_date="+end+"&territory_id="+territory_id+"&order_status=PENDING", queue, token, mCallback!!)
                 }else{
-                    getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+"&end_date="+end, queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+"&end_date="+end+"&order_status=PENDING", queue, token, mCallback!!)
                 }
 
             }
@@ -134,75 +140,86 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     override fun onSuccess(array: JSONArray) {
         progressBar!!.visibility = View.GONE
         orderList.clear()
-        if (array.length() > 0){
-            no_route_check.visibility = View.GONE
-            bodyLayout.visibility = View.VISIBLE
-            for (i in 0 until array.length()){
-                val orderObj = array.getJSONObject(i)
-                if (orderObj.getString("orders_status").equals("PENDING", true)){
-                    val brandArray = orderObj.getJSONArray("brands")
-                    tvRouteName.setText(orderObj.getString("route_name"))
-                    val productItems: ArrayList<Products> = ArrayList()
-                    if (brandArray.length() > 0){
-                        for (j in 0 until brandArray.length()){
-                            val brandObj = brandArray.getJSONObject(j)
-                            productItems.add(
-                                Products(
-                                    brandObj.getString("product_id"),
-                                    brandObj.getString("product"),
-                                    "",
-                                    brandObj.getString("brand_id"),
-                                    "",
-                                    brandObj.getDouble("unit_price"),
-                                    0.0,"",
-                                    brandObj.getString("unit_name"),
-                                    "",0,0,
-                                    brandObj.getInt("quantity"),
-                                    brandObj.getDouble("total_price")
+        try {
+            if (array.length() > 0){
+                no_route_check.visibility = View.GONE
+                bodyLayout.visibility = View.VISIBLE
+                for (i in 0 until array.length()){
+                    val orderObj = array.getJSONObject(i)
+                    if (orderObj.getString("orders_status").equals("PENDING", true)){
+                        val brandArray = orderObj.getJSONArray("brands")
+                        tvRouteName.setText(orderObj.getString("route_name"))
+                        val productItems: ArrayList<Products> = ArrayList()
+                        if (brandArray.length() > 0){
+                            for (j in 0 until brandArray.length()){
+                                val brandObj = brandArray.getJSONObject(j)
+                                productItems.add(
+                                    Products(
+                                        brandObj.getString("product_id"),
+                                        brandObj.getString("product"),
+                                        "",
+                                        brandObj.getString("brand_id"),
+                                        "",
+                                        brandObj.getDouble("unit_price"),
+                                        0.0,"",
+                                        brandObj.getString("unit_name"),
+                                        "",0,0,
+                                        brandObj.getInt("bounce"),
+                                        brandObj.getInt("quantity"),
+                                        brandObj.getDouble("total_price")
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
-                    orderList.add(
-                        OrderList(
-                            null,
-                            orderObj.getString("order_no"),
-                            orderObj.getString("ordered_at"),
-                            orderObj.getString("orders_status"),
-                            orderObj.getString("outlet_id"),
-                            orderObj.getString("outlet_name"),
-                            orderObj.getString("route_id"),
-                            orderObj.getString("route_name"),
-                            orderObj.getString("distributor_office_code"),
-                            orderObj.getString("grand_total"),
-                            orderObj.getString("latitude"),
-                            orderObj.getString("longitude"),
-                            productItems
+                        orderList.add(
+                            OrderList(
+                                null,
+                                orderObj.getString("order_no"),
+                                orderObj.getString("ordered_at"),
+                                orderObj.getString("orders_status"),
+                                orderObj.getString("outlet_id"),
+                                orderObj.getString("outlet_name"),
+                                orderObj.getString("route_id"),
+                                orderObj.getString("route_name"),
+                                orderObj.getString("distributor_office_code"),
+                                orderObj.getString("grand_total"),
+                                orderObj.getString("latitude"),
+                                orderObj.getString("longitude"),
+                                productItems
+                            )
                         )
-                    )
+                    }
                 }
-            }
-        }else{
-            no_route_check.visibility = View.VISIBLE
-            bodyLayout.visibility = View.GONE
+            }else{
+                no_route_check.visibility = View.VISIBLE
+                bodyLayout.visibility = View.GONE
 
-            btn_tryAgain.setOnClickListener {
-                /*checkforOrders(
-                    queue!!,
-                    token!!,
-                    sr_id!!,
-                    route_id!!
-                )*/
+                btn_tryAgain.setOnClickListener {
+                    /*checkforOrders(
+                        queue!!,
+                        token!!,
+                        sr_id!!,
+                        route_id!!
+                    )*/
+                }
+
             }
 
+
+            recylerView.apply {
+                if (user_type.equals("TO", true)) {
+                    adapter = OrderDeliveryListAdapter(orderList, listener!!, "TO")
+                }else{
+                    adapter = OrderDeliveryListAdapter(orderList, listener!!, "SO")
+                }
+                recylerView!!.adapter = adapter
+                adapter.notifyDataSetChanged()
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+            Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
         }
 
-
-        recylerView.apply {
-            adapter = OrderDeliveryListAdapter(orderList, listener!!, "confirm")
-            recylerView!!.adapter = adapter
-            adapter.notifyDataSetChanged()
-        }
     }
 
     override fun onFailure(error: VolleyError) {
@@ -221,8 +238,15 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
-        sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
-        route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        user_type = prefs!!.getString(Api.USER_TYPE, "")
+        if (user_type.equals("TO", true)){
+            sr_id = ""
+            route_id = ""
+        }else{
+            sr_id = prefs!!.getString(Api.SR_CODE, "")
+            route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        }
+        territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this
@@ -241,31 +265,33 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     fun viewDialog(mContext: Context, order: OrderList){
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.single_order_status_update)
+        dialog.setContentView(R.layout.order_status_update_popup)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
+        val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
         var statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
-        val radio_group : RadioGroup? = null
+        var radio_group : RadioGroup? = RadioGroup(mContext)
         val itemValue : ArrayList<String> = ArrayList()
         itemValue.add(mContext.resources.getString(R.string.pending))
         itemValue.add(mContext.resources.getString(R.string.delivered))
         itemValue.add(mContext.resources.getString(R.string.bounced))
-        statusGroup = RadioGroup(mContext)
-        statusGroup.setOrientation(RadioGroup.HORIZONTAL)
+        radio_group!!.setOrientation(RadioGroup.HORIZONTAL)
         for (i in itemValue.indices) {
             val rbn = RadioButton(mContext)
             rbn.setText(itemValue.get(i))
             rbn.id = i
-            rbn.setTextColor(resources.getColor(R.color.white))
-            rbn.buttonTintList = ColorStateList.valueOf(resources.getColor(R.color.white))
-            statusGroup.addView(rbn)
+            rbn.setTextColor(resources.getColor(R.color.text_title))
+            rbn.buttonTintList = ColorStateList.valueOf(resources.getColor(R.color.cnl_color_1))
+            radio_group.addView(rbn)
         }
-        radio_group!!.addView(statusGroup)
-        statusGroup.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
+        val checkedid = 0
+        statusGroup.addView(radio_group)
+        radio_group.check(checkedid)
+        radio_group.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
             /*if (checkedId == 0) {
                 isChecked = 1
                 announcementType = "LATE"
@@ -294,10 +320,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     ProductStatistics(
                         order.brands_array[i].product_id,
                         order.brands_array[i].product_name,
-                        order.brands_array[i].category_name,
+                        order.brands_array[i].unit_name,
                         order.brands_array[i].brand_id,
                         order.brands_array[i].unit_price,
                         order.brands_array[i].ordered_quantity,
+                        order.brands_array[i].bounced_quantity,
                         order.brands_array[i].ordered_total_price
                 ))
             }
@@ -306,10 +333,23 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             adapter.notifyDataSetChanged()
         }
 
-        tvGrandTotal.setText(dformat.format(order.grandTotal).toString())
+        tvGrandTotal.setText(dformat.format(order.grandTotal.toDouble()).toString())
 
         btnClose.setOnClickListener {
             dialog.dismiss()
+        }
+
+        btnSubmit.setOnClickListener {
+            ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), object :
+                DialogListener {
+                override fun onConfirmed() {
+                    //createOrder()
+                }
+                override fun onCanceled() {
+
+                }
+
+            })
         }
         dialog.show()
         val window = dialog.window
@@ -318,5 +358,85 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
+    }
+
+    private fun createOrder(order: OrderList, status: String, grandTotal: String){
+        if (updatedProducts!!.size> 0){
+            val obj1 = JSONObject()
+            val ordersArray = JSONArray()
+            val orderObj = JSONObject()
+            orderObj.put("outlet_id", order.outletId)
+            orderObj.put("order_no", order.orderId)
+            orderObj.put("sr_id", sr_id)
+            orderObj.put("distributor_office_code", order.distOfficeCode)
+            orderObj.put("grand_total", grandTotal)
+            orderObj.put("orders_status", status)
+            val brandsArray = JSONArray()
+            for(i in 0 until updatedProducts!!.size){
+                val brandObj = JSONObject()
+                if (updatedProducts!![i].quantity > 0) {
+                    brandObj.put("product_id", updatedProducts!![i].product_id)
+                    brandObj.put("product", updatedProducts!![i].product_name)
+                    brandObj.put("brand_id", updatedProducts!![i].brand_id)
+                    brandObj.put("quantity", updatedProducts!![i].quantity.toString())
+                    brandObj.put("bounce", updatedProducts!![i].bounced_quantity.toString())
+                    brandObj.put("unit_price", updatedProducts!![i].unit_price.toString())
+                    brandObj.put("total_price", updatedProducts!![i].total_price.toString())
+                    brandObj.put("unit_name", updatedProducts!![i].product_type)
+                }
+                brandsArray.put(brandObj)
+
+
+            }
+            orderObj.put("brands", brandsArray)
+            ordersArray.put(orderObj)
+            obj1.put("orders", ordersArray)
+
+            if (obj1.length() >0){
+                Log.d("ConfirmOrder", "response: "+obj1)
+                submitOrder(obj1)
+            }
+        }
+    }
+    private fun submitOrder(orderObj: JSONObject) {
+        ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, orderObj, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                try {
+                    Log.d("ConfirmOrder", "response api: "+response)
+                    appDatabase!!.orderListDao().deleteALL()
+                    appDatabase!!.saveOrderDao().deleteALL()
+                    val message = response.getString("message")
+                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                        override fun onConfirmed() {
+                            checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                        }
+
+                        override fun onCanceled() {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, mContext!!)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 }

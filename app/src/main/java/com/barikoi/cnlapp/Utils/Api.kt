@@ -7,6 +7,7 @@ object Api {
     val NAME = "name"
     val SR_CODE = "sr_code"
     val EMPLOYEE_ID = "employee_id"
+    val TERRITORY_ID = "territory_id"
     val PHONE = "phone"
     val EMAIL = "email"
     val TOKEN = "token"
@@ -47,7 +48,7 @@ object Api {
     val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"
     val get_saved_order = base_url+"api/v1/fetch-orders"
-    val get_orders_to = base_url+"api/v1/get-order-list"
+    val get_orders_to = base_url+"api/v1/get-orders"
     val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
 

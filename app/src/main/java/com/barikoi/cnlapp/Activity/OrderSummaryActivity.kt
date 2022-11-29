@@ -159,6 +159,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                                 0.0,"",
                                                 brandObj.getString("unit_name"),
                                                 "",0,0,
+                                                brandObj.getInt("bounce"),
                                                 brandObj.getInt("quantity"),
                                                 brandObj.getDouble("total_price")
                                             )

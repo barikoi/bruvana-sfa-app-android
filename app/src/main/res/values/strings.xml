@@ -120,6 +120,7 @@
     <string name="add_more_item">Add More Item</string>
     <string name="download_chalan">Download Chalan</string>
     <string name="confirm_order_dialog">Are you sure want to confirm todays order?</string>
+    <string name="update_order_dialog">Are you sure want to update this order?</string>
     <string name="order_summary">Order Summary</string>
     <string name="order_delivery_update">Order Delivery Update</string>
 

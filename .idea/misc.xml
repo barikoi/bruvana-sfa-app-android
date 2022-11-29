@@ -115,6 +115,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_summary_t_o.xml" value="0.2484076433121019" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/imagecapture.xml" value="0.75" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/nav_header_main.xml" value="0.15625" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/order_status_update_popup.xml" value="0.25" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/preview_image_withdelete.xml" value="0.6215277777777778" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/product_list_popup.xml" value="0.18" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/product_view_stock.xml" value="0.1" />
@@ -125,7 +126,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_confirm_order_view.xml" value="0.22" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_image_view.xml" value="0.41569767441860467" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_notice_view.xml" value="0.1" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_order_delivery_status_view.xml" value="0.25" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_order_delivery_status_view.xml" value="0.75" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_order_status_update.xml" value="0.6701388888888888" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_outlet_product.xml" value="1.25" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_outlet_satistics.xml" value="1.1" />

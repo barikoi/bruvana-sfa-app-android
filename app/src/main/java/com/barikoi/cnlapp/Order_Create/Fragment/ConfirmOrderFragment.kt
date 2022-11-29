@@ -56,9 +56,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var appDatabase: AppDatabase? = null
-    var allorderList: List<OrderList> ? = null
-    private var mFusedLocationClient: FusedLocationProviderClient? = null
-    private var mLocationCallback: LocationCallback? = null
     private var listener: OnEditOrderListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
     lateinit var adapter: ConfirmOrderListAdapter
@@ -173,6 +170,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                         brandObj.put("product", brandList[j].product_name)
                         brandObj.put("brand_id", brandList[j].brand_id)
                         brandObj.put("quantity", brandList[j].ordered_quantity.toString())
+                        brandObj.put("bounce", "0")
                         brandObj.put("unit_price", brandList[j].unit_price.toString())
                         brandObj.put("total_price", brandList[j].ordered_total_price.toString())
                         brandObj.put("unit_name", brandList[j].unit_name)
@@ -293,6 +291,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                                     0.0,"",
                                     brandObj.getString("unit_name"),
                                     "",0,0,
+                                    brandObj.getInt("bounce"),
                                     brandObj.getInt("quantity"),
                                     brandObj.getDouble("total_price")
                                 )
