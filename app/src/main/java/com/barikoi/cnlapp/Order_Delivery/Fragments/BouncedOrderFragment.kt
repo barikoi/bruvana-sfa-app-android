@@ -7,6 +7,7 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
@@ -299,7 +301,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     fun viewDialog(mContext: Context, order: OrderList){
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.order_status_update_popup)
+        dialog.setContentView(R.layout.popup_order_status_update)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
@@ -307,6 +309,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
+        val reasonLayout = dialog.findViewById<LinearLayout>(R.id.reasonLayout)
+        val etReason = dialog.findViewById<EditText>(R.id.editTextReason)
         var statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
         var radio_group : RadioGroup? = RadioGroup(mContext)
         val itemValue : ArrayList<String> = ArrayList()
@@ -323,19 +327,16 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             radio_group.addView(rbn)
         }
         val checkedid = 2
+        var isChecked = 0
         statusGroup.addView(radio_group)
         radio_group.check(checkedid)
         radio_group.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
-            /*if (checkedId == 0) {
-                isChecked = 1
-                announcementType = "LATE"
-            } else if (checkedId == 1) {
-                isChecked = 1
-                announcementType = "LEAVE"
-            } else {
-                isChecked = 1
-                announcementType = "GENERAL"
-            }*/
+            isChecked = checkedId
+            if (checkedId == 2){
+                reasonLayout.visibility = View.VISIBLE
+            }else{
+                reasonLayout.visibility = View.GONE
+            }
         })
 
         var dformat = DecimalFormat("#.##")
@@ -344,11 +345,10 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(order.orderedAt))
         tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
-        tvItemCount.setText(order.brands_array.size.toString()+mContext.resources.getString(R.string.items))
-
         var grandTotal = 0.0
+        var itemCount = 0
+        var brandsStatistics : ArrayList<ProductStatistics> = ArrayList()
         if (order.brands_array.size> 0){
-            val brandsStatistics : ArrayList<ProductStatistics> = ArrayList()
             for (i in 0 until order.brands_array.size){
                 brandsStatistics.add(
                     ProductStatistics(
@@ -360,18 +360,38 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         order.brands_array[i].ordered_quantity,
                         order.brands_array[i].bounced_quantity,
                         order.brands_array[i].ordered_total_price
-                    )
-                )
+                    ))
+                grandTotal = grandTotal+order.brands_array[i].ordered_total_price
+                itemCount = itemCount+order.brands_array[i].ordered_quantity
             }
             val adapter = OutletProductAdapter(brandsStatistics)
             listView.adapter = adapter
             adapter.notifyDataSetChanged()
         }
 
-        tvGrandTotal.setText(dformat.format(order.grandTotal.toDouble()).toString())
+        tvGrandTotal!!.setText(dformat.format(grandTotal).toString())
+        tvItemCount!!.setText(itemCount.toString()+mContext.resources.getString(R.string.items))
 
         btnClose.setOnClickListener {
             dialog.dismiss()
+        }
+        btnSubmit.setOnClickListener {
+            ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), object :
+                DialogListener {
+                override fun onConfirmed() {
+                    val status = itemValue.get(isChecked).uppercase(Locale.getDefault())
+                    if (order.orderStatus.equals(status, true)){
+                        Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT).show()
+                    }else{
+                        createOrder(order, status, tvGrandTotal!!.text.toString(), brandsStatistics,  etReason.text.toString(), dialog)
+                    }
+
+                }
+                override fun onCanceled() {
+
+                }
+
+            })
         }
         dialog.show()
         val window = dialog.window
@@ -380,6 +400,96 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
+    }
+
+    private fun createOrder(order: OrderList, status: String, grandTotal: String,updatedProducts: ArrayList<ProductStatistics>, reason: String, dialog: Dialog){
+        if (updatedProducts.size> 0){
+            val obj1 = JSONObject()
+            val ordersArray = JSONArray()
+            val orderObj = JSONObject()
+            orderObj.put("outlet_id", order.outletId)
+            orderObj.put("order_no", order.orderId)
+            orderObj.put("sr_id", sr_id)
+            orderObj.put("distributor_office_code", order.distOfficeCode)
+            orderObj.put("grand_total", grandTotal)
+            if (reason.trim().length >0){
+                orderObj.put("orders_reason", reason)
+            }
+            orderObj.put("orders_status", status)
+            val brandsArray = JSONArray()
+            for(i in 0 until updatedProducts!!.size){
+                val brandObj = JSONObject()
+                if (updatedProducts!![i].quantity > 0) {
+                    brandObj.put("product_id", updatedProducts[i].product_id)
+                    brandObj.put("product", updatedProducts[i].product_name)
+                    brandObj.put("brand_id", updatedProducts[i].brand_id)
+                    brandObj.put("quantity", updatedProducts[i].quantity.toString())
+                    brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
+                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
+                    brandObj.put("total_price", updatedProducts[i].total_price.toString())
+                    brandObj.put("unit_name", updatedProducts[i].product_type)
+                }
+                brandsArray.put(brandObj)
+            }
+            orderObj.put("brands", brandsArray)
+            ordersArray.put(orderObj)
+            obj1.put("orders", ordersArray)
+
+            if (obj1.length() >0){
+                Log.d("ConfirmOrder", "response: "+obj1)
+                submitOrder(obj1, dialog)
+            }
+        }
+    }
+    private fun submitOrder(orderObj: JSONObject, dialog: Dialog) {
+        ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, orderObj, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                try {
+                    Log.d("ConfirmOrder", "response api: "+response)
+                    dialog.dismiss()
+                    appDatabase!!.orderListDao().deleteALL()
+                    appDatabase!!.saveOrderDao().deleteALL()
+                    val message = response.getString("message")
+                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                        override fun onConfirmed() {
+                            PendingOrderFragment.checkforOrders(
+                                queue!!,
+                                token!!,
+                                sr_id!!,
+                                route_id!!,
+                                territory_id!!,
+                                StartDate!!,
+                                EndDate!!
+                            )
+                        }
+
+                        override fun onCanceled() {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, mContext!!)
+            }
+
+            override fun onException(e: Exception) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 
 }

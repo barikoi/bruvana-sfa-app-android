@@ -4,5 +4,5 @@ import com.barikoi.cnlapp.Model.Products
 
 interface OnValueChangeListener {
 
-    fun onValueChanged(products: Products, position: Int)
+    fun onValueChanged(products: Any, position: Int)
 }

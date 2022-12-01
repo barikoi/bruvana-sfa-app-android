@@ -64,7 +64,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.product_list_popup)
+        dialog.setContentView(R.layout.popup_product_list)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
@@ -77,12 +77,13 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(lastOrder))
         tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
-        tvItemCount.setText(listItem.size.toString()+mContext.resources.getString(R.string.items))
 
+        var itemCount = 0
         var grandTotal = 0.0
         if (listItem.size> 0){
             for (i in 0 until listItem.size){
                 grandTotal = grandTotal+listItem[i].total_price
+                itemCount = itemCount+listItem[i].quantity
             }
 
             val adapter = OutletProductAdapter(listItem)
@@ -91,6 +92,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         }
 
         tvGrandTotal.setText(dformat.format(grandTotal).toString())
+        tvItemCount.setText(itemCount.toString()+mContext.resources.getString(R.string.items))
 
         btnClose.setOnClickListener {
             dialog.dismiss()

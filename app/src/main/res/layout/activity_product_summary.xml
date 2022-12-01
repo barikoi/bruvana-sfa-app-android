@@ -56,6 +56,37 @@
 
 
     </com.google.android.material.appbar.AppBarLayout>
+    <!--<TextView
+        android:id="@+id/titleRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="start"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:textColor="@color/text_title"
+        android:text="@string/todays_route">
+    </TextView>-->
+    <RelativeLayout
+        android:id="@+id/spinnerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_margin="8dp"
+        android:layout_gravity="center_vertical"
+        android:visibility="gone"
+        android:background="@drawable/cardview_bg">
+        <com.barikoi.cnlapp.Utils.MoreSpinner
+            android:id="@+id/spinnerDistributorHouse"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:theme="@style/spinnerItemStyle"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+        </com.barikoi.cnlapp.Utils.MoreSpinner>
+    </RelativeLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

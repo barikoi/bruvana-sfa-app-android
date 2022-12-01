@@ -48,7 +48,7 @@ object ViewUtils {
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.dialog_popup)
+        dialog.setContentView(R.layout.popup_dialog)
         val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
         val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
         val btnNo = dialog.findViewById<AppCompatButton>(R.id.btn_no)
@@ -77,7 +77,7 @@ object ViewUtils {
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.dialog_response_popup)
+        dialog.setContentView(R.layout.popup_dialog_response)
         val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
         val btnOk = dialog.findViewById<AppCompatButton>(R.id.btn_ok)
         tvMessage.setText(message)

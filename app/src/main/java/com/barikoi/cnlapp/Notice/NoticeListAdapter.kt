@@ -33,7 +33,7 @@ class NoticeListAdapter (val notices: List<Notice>) : RecyclerView.Adapter<Notic
 
         if (!mItem.updated_at.equals("null")){
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val df = SimpleDateFormat("dd MMMM yy", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(mItem.updated_at))
             holder.noticeDate.setText(orderDate)
         }

@@ -1,6 +1,5 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.OrderSummary.SO
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

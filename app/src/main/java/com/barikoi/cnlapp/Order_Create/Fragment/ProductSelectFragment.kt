@@ -66,7 +66,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var recylerView: RecyclerView? = null
     var shopTitle: TextView? = null
     var sortTitle: TextView? = null
-    var totalItemCount: TextView? = null
+    private var totalItemCount: TextView? = null
     var tvgrandTotal: TextView? = null
     var saveOrder: AppCompatButton? = null
     var noOrder: AppCompatButton? = null
@@ -790,7 +790,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.product_list_popup)
+        dialog.setContentView(R.layout.popup_product_list)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
@@ -847,8 +847,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         ACTIVITY = context as MainActivity
     }
 
-    override fun onValueChanged(products: Products, position: Int) {
+    override fun onValueChanged(products: Any, position: Int) {
         var dformat = DecimalFormat("#.##")
+        products as Products
         var itemCount = 0
         var grandTotal = 0.0
         val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)

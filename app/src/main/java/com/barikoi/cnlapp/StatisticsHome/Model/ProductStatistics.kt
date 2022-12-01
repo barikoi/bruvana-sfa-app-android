@@ -8,7 +8,7 @@ class ProductStatistics (
     val product_type: String,
     val brand_id: String,
     val unit_price: Double,
-    val quantity: Int,
-    val bounced_quantity: Int,
+    var quantity: Int,
+    var bounced_quantity: Int,
     var total_price: Double
 ): Serializable

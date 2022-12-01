@@ -23,19 +23,21 @@ import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
+import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
+import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductSummaryActivity
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.StatisticsHome.Fragment.HomeFragment
+import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
+import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment
 import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -45,7 +47,6 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.activity_order_summary.*
 import kotlinx.android.synthetic.main.appcontent_main.*
 import kotlinx.android.synthetic.main.appcontent_main.tvTitle
 import org.json.JSONException
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var tvHeaderUserName: TextView? = null
     private var token : String?= ""
     private var userId: String? = ""
+    private var userType: String? = ""
     private var userName: String? = ""
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -81,6 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")
+        userType = prefs!!.getString(Api.USER_TYPE, "")
         userName = prefs!!.getString(Api.NAME, "")
         nav_view = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
 
@@ -113,8 +116,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userLayout.visibility = View.VISIBLE
         tvUserName.setText(userName)
         getAuthUser(token, Api.authUserCheck+"?start_date=2022-04-30 00:00:00"/*+StartDate*/+"&end_date="+EndDate)
+        if (userType.equals("TO", true)){
+            setCurrentFragment(HomeTOFragment(), this@MainActivity)
+        }else{
+            setCurrentFragment(HomeFragment(), this@MainActivity)
+        }
 
-        setCurrentFragment(HomeFragment(), this@MainActivity)
 
         val header = navigationDrawer!!.getHeaderView(0)
         tvHeaderUserName = header.findViewById<TextView>(R.id.textView_username)
@@ -166,7 +173,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     tvTitle.text = ""
                     tvTitle.visibility = View.GONE
                     userLayout.visibility = View.VISIBLE
-                    setCurrentFragment(HomeFragment(), this@MainActivity)
+                    if (userType.equals("TO", true)){
+                        setCurrentFragment(HomeTOFragment(), this@MainActivity)
+                    }else{
+                        setCurrentFragment(HomeFragment(), this@MainActivity)
+                    }
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_route -> {
@@ -261,7 +272,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.menu_order_summary) {
-            startActivity(Intent(this@MainActivity, OrderSummaryActivity::class.java))
+            if (userType.equals("TO", true)){
+                startActivity(Intent(this@MainActivity, OrderSummaryTOActivity::class.java))
+            }else{
+                startActivity(Intent(this@MainActivity, OrderSummaryActivity::class.java))
+            }
         } else if (id == R.id.menu_shop_route) {
             startActivity(Intent(this@MainActivity, RouteActivity::class.java))
         } else if (id == R.id.menu_order_delivery_update) {
@@ -290,6 +305,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         editor.remove(Api.USER_ID)
         editor.remove(Api.USER_TYPE)
         editor.remove(Api.PHONE)
+        editor.remove(Api.SELECTED_ROUTE_NAME)
+        editor.remove(Api.SELECTED_ROUTE_ID)
+        editor.remove(Api.SELECTED_SHOP)
+        editor.remove(Api.SELECTED_SHOP_ID)
         editor.commit()
 
         /*val home = Intent(context, SplashActivity::class.java)

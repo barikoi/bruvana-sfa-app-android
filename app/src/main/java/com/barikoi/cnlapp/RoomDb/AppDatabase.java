@@ -12,14 +12,17 @@ import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList;
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderListDao;
 import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder;
 import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrderDao;
+import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder;
+import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrderDao;
 
 
-@Database(entities = {OrderList.class, SaveOrder.class}, version = 4, exportSchema = false)
+@Database(entities = {OrderList.class, SaveOrder.class, UpdateOrder.class}, version = 5, exportSchema = false)
 @TypeConverters(DataConvertor.class)
 public abstract class AppDatabase extends RoomDatabase {
 
 	public abstract OrderListDao orderListDao();
 	public abstract SaveOrderDao saveOrderDao();
+	public abstract UpdateOrderDao updateOrderDao();
 
 	public static AppDatabase INSTANCE;
 	private static final Object sLock = new Object();

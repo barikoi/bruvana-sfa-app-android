@@ -11,7 +11,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.google.android.material.progressindicator.LinearProgressIndicator
 
-class TargetAdapter (val targets: List<TargetValue>) : RecyclerView.Adapter<TargetAdapter.ViewHolder>(){
+class TargetAdapter (val targets: List<TargetValue>, val from: String) : RecyclerView.Adapter<TargetAdapter.ViewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -24,6 +24,12 @@ class TargetAdapter (val targets: List<TargetValue>) : RecyclerView.Adapter<Targ
         holder.tvTitle.setText(targets[position].title)
         holder.targetedAmount.setText(targets[position].target)
         holder.completedAmount.setText(targets[position].completed)
+
+        if (from.equals("TO", true)){
+            holder.itemView.setBackgroundColor(holder.itemView.resources.getColor(R.color.cnl_color_1))
+        }else if (from.equals("SO", true)){
+            holder.itemView.setBackgroundColor(holder.itemView.resources.getColor(R.color.card_blue))
+        }
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

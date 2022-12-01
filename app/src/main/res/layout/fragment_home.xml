@@ -6,7 +6,7 @@
     android:background="@color/background_app"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".StatisticsHome.Fragment.HomeFragment">
+    tools:context=".StatisticsHome.Fragment.SO.HomeFragment">
     <androidx.core.widget.NestedScrollView
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"

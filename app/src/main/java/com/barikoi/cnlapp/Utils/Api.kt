@@ -53,7 +53,10 @@ object Api {
     val update_saved_order = base_url+"api/v1/update-orders"
 
     val product_stock_summary = base_url+"api/v1/products"
+
+    /*notice*/
     val get_notice = base_url+"api/v1/notices"
+    val submit_notice = base_url+"api/v1/notices"
 
     /*attendance*/
     val create_attendance = base_url+"api/v1/attendance"
@@ -67,4 +70,5 @@ object Api {
 
     /*TO Part*/
     val get_all_so_list = base_url+"api/v1/get-so"
+    val get_dh_list = base_url+"api/v1/dh"
 }

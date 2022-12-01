@@ -1,14 +1,19 @@
 package com.barikoi.cnlapp.ProductStock
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -18,8 +23,10 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_product_summary.*
 import kotlinx.android.synthetic.main.activity_product_summary.btnBack
+import kotlinx.android.synthetic.main.activity_product_summary.dateRangeLayout
 import kotlinx.android.synthetic.main.activity_product_summary.productList
-import kotlinx.android.synthetic.main.activity_trade_offers.*
+import kotlinx.android.synthetic.main.activity_product_summary.spinnerLayout
+import kotlinx.android.synthetic.main.activity_product_summary.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,6 +35,8 @@ class ProductSummaryActivity : AppCompatActivity() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
+    var token : String? = null
+    val dhList: ArrayList<Pair<String, String>> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +45,40 @@ class ProductSummaryActivity : AppCompatActivity() {
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
+        token = prefs!!.getString(Api.TOKEN, "")
+
         btnBack.setOnClickListener {
             onBackPressed()
             finish()
         }
-        setDateFilter()
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)){
+            spinnerLayout.visibility = View.VISIBLE
+            getDHList()
+            spinnerDistributorHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+                @RequiresApi(Build.VERSION_CODES.N)
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    if (spinnerDistributorHouse.adapter.count >0) {
+                        /*selected_so = p2
+                        if (p2>0) {
+                            selected_so_id = soList[p2 - 1].id
+                        }
+                        if (p2 == 0) {
+                            setDateFilter("&with_to=1")
+                        } else {
+                            setDateFilter("")
+                        }*/
+                    }
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
+
+            }
+        }else{
+            spinnerLayout.visibility = View.GONE
+            setDateFilter()
+        }
     }
 
 
@@ -147,5 +185,60 @@ class ProductSummaryActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun getDHList() {
+        ApiServices.apiGET(
+            Api.get_dh_list,
+            queue!!, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    viewDHList(response)
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
+    }
+
+    private fun viewDHList(response: String) {
+        try {
+            if (response != null){
+                dhList.clear()
+                val obj = JSONObject(response)
+                val dhArray = obj.getJSONArray("distributor_houses")
+                val dhNameList: ArrayList<String> = ArrayList()
+                if (dhArray.length() >0){
+                    for (i in 0 until dhArray.length()) {
+                        val dhObj = dhArray.getJSONObject(i)
+                        dhList.add(
+                            Pair(dhObj.getString("dh_name"), dhObj.getString("dh_code"))
+                        )
+                        dhNameList.add(dhObj.getString("dh_name"))
+
+                    }
+                }
+                val adapter = ArrayAdapter(
+                    applicationContext,
+                    android.R.layout.simple_spinner_item, dhList
+                )
+                spinnerDistributorHouse.adapter = adapter
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 }

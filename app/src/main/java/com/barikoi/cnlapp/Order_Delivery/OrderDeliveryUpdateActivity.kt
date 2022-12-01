@@ -4,6 +4,8 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +15,7 @@ import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Fragment.RouteFragment
 import com.barikoi.cnlapp.Fragment.ShopListFragment
+import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Delivery.Fragments.BouncedOrderFragment
@@ -30,8 +33,6 @@ import kotlinx.android.synthetic.main.activity_order_delivery_update.dateRangeLa
 import kotlinx.android.synthetic.main.activity_order_delivery_update.tvDateRange
 import kotlinx.android.synthetic.main.activity_order_delivery_update.viewPager
 import kotlinx.android.synthetic.main.activity_order_delivery_update.viewpagertab
-import kotlinx.android.synthetic.main.activity_order_summary.*
-import kotlinx.android.synthetic.main.fragment_attendance.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -47,8 +48,6 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
-    var listener : OnEditOrderListener? =null
-    private var adapter: ConfirmOrderListAdapter? = null
     companion object{
         var StartDate: String? = null
         var EndDate: String? = null
@@ -79,6 +78,32 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
             onBackPressed()
             finish()
         }
+        editTextSearchShop.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                /*adapter!!.filter.filter(s)
+                if (s!!.length == 0) {
+                    val shops: ArrayList<Shops> = ArrayList()
+                    for (i in 0 until shopList!!.size) {
+                        if (shopList!![i].route_name == routeNameList!![spinner!!.selectedItemPosition].second) {
+                            shops.add(shopList!![i])
+                        }
+
+                    }
+                    adapter!!.shopList=shops
+                    adapter!!.notifyDataSetChanged()
+                }*/
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
         setDateFilter()
 
     }
@@ -113,10 +138,8 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
                     PendingOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 } else if (position == 1) {
                     viewPager.setCurrentItem(1)
-                    //DeliveredOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }else if (position == 2) {
                     viewPager.setCurrentItem(2)
-                    //BouncedOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }
             }
         })
@@ -164,12 +187,10 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
             StartDate = df.format(s_date)
             EndDate = df.format(e_date)
             setTabLayoutView()
-            //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_summary=1")
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
         setTabLayoutView()
-        //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate+"&with_summary=1")
     }
 }

@@ -102,6 +102,15 @@
     <string name="no_order_found">No order found today</string>
     <string name="coming_soon">Coming Soon!!!</string>
     <string name="no_so_found">No SO found</string>
+
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
+    <string name="live_stock_update"><a href="http://www.bla.com">Live Stock Update</a></string>
+    <string name="last_week_summary_link"><a href="http://www.bla.com">Last Week Summary</a></string>
+    <string name="ov">OV:</string>
+    <string name="bpc">BPC:</string>
+    <string name="lpc">LPC:</string>
+
     <!--Create Order-->
     <string name="order_collection">Order Collection</string>
     <string name="select_dokan">Select Dokan</string>
@@ -136,9 +145,15 @@
     <string name="delivered">Delivered</string>
     <string name="bounced">Bounced</string>
 
+    <string name="total_bounce">Total Bounce</string>
+    <string name="bounce_reason">Reason of Bounce</string>
+    <string name="product_return_reason">Product return reason...</string>
+
     <!--notice view-->
     <string name="see_more">See More...</string>
     <string name="see_less">See Less...</string>
+    <string name="add_notice">Add Notice</string>
+    <string name="type_notice_here">Type notice here...</string>
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>

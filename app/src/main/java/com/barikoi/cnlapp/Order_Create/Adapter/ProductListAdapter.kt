@@ -22,11 +22,10 @@ import com.barikoi.cnlapp.RoomDb.AppDatabase
 import java.text.DecimalFormat
 import java.util.*
 
-class ProductListAdapter(var mValues: List<Products>, mListener: OnValueChangeListener): RecyclerView.Adapter<ProductListAdapter.ViewHolder>(),
+class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChangeListener): RecyclerView.Adapter<ProductListAdapter.ViewHolder>(),
 Filterable{
 
     var productList: List<Products> = mValues
-    var mListener: OnValueChangeListener = mListener
     var dformat = DecimalFormat("#.##")
     lateinit var mRecyclerView: RecyclerView
     private var prefs: SharedPreferences? = null

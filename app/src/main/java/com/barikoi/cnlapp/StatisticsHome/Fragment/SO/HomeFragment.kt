@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.StatisticsHome.Fragment
+package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -17,7 +17,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity.Companion.routeName_selected
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
-import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
@@ -29,13 +28,9 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_history.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.tvDateRange
-import org.json.JSONException
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -55,9 +50,6 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
 
     }
 
@@ -100,7 +92,12 @@ class HomeFragment : Fragment() {
                                             Api.SELECTED_ROUTE_NAME,
                                             attendanceObj.getString("route_name")
                                         ).commit()
-                                    routeName_selected!!.setText(attendanceObj.getString("route_name"))
+                                    if (attendanceObj.getString("route_name").length > 0) {
+                                        routeName_selected!!.visibility = View.VISIBLE
+                                        routeName_selected!!.setText(attendanceObj.getString("route_name"))
+                                    }else{
+                                        routeName_selected!!.visibility = View.GONE
+                                    }
                                     routeId =  attendanceObj.getInt("route_id").toString()
                                     init()
                                 }else{
@@ -238,7 +235,7 @@ class HomeFragment : Fragment() {
                         itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
                         itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
 
-                        val adapter = TargetAdapter(itemList)
+                        val adapter = TargetAdapter(itemList, "SO")
                         targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setSecondPartSummary()

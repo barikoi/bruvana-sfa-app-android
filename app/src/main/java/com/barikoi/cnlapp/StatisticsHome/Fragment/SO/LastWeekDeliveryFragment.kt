@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.StatisticsHome.Fragment
+package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -22,8 +22,11 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_last_week_delivery.*
 import org.json.JSONObject
+import kotlin.collections.ArrayList
 
-class LastWeekBounceFragment : Fragment() {
+
+class LastWeekDeliveryFragment : Fragment() {
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -40,17 +43,18 @@ class LastWeekBounceFragment : Fragment() {
 
         }
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
     }
 
     private fun init() {
-        getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
-        //getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_bounce=1&with_last_week_order=1")
+        getLastDeliveryItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_delivered=1&with_last_week_order=1")
+        //getLastDeliveryItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_delivered=1&with_last_week_order=1")
     }
 
-    private fun getLastBounceItems(url: String) {
+    private fun getLastDeliveryItems(url: String) {
 
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
@@ -93,7 +97,7 @@ class LastWeekBounceFragment : Fragment() {
                             }
                         }
 
-                        val adapter = OutletAdapter(itemList, "bounce")
+                        val adapter = OutletAdapter(itemList, "delivery")
                         listView.adapter = adapter
                         adapter.notifyDataSetChanged()
 
@@ -125,13 +129,12 @@ class LastWeekBounceFragment : Fragment() {
 
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_last_week_bounce, container, false)
+        return inflater.inflate(R.layout.fragment_last_week_delivery, container, false)
     }
 
     override fun onAttach(context: Context) {
