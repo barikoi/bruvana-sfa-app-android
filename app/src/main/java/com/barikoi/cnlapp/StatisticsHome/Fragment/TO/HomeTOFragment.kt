@@ -3,18 +3,18 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.TO
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.R
@@ -26,23 +26,22 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_home_t_o.*
+import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class HomeTOFragment : Fragment() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    val dots: ArrayList<ImageView> = ArrayList()
     var token: String ? = ""
-    var srId: String ? = ""
-    var routeId: String ? = ""
+    var territoryId: String ? = ""
+    var employeeId: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +57,9 @@ class HomeTOFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkforAttendanceToday()
+        //checkforAttendanceToday()
+
+        init()
 
         liveStockUpdate.setOnClickListener {
             startActivity(Intent(requireActivity(), ProductStockUpdateActivity::class.java))
@@ -84,7 +85,7 @@ class HomeTOFragment : Fragment() {
                                 no_route_check.visibility = View.GONE
                                 bodyLayout.visibility = View.VISIBLE
                                 val attendanceObj = attedanceArray.getJSONObject(0)
-                                if (!attendanceObj.getString("route_id").equals("null")) {
+                                /*if (!attendanceObj.getString("route_id").equals("null")) {
                                     attendanceObj.getInt("route_id")
                                     attendanceObj.getString("route_name")
                                     editor!!.putString(
@@ -95,8 +96,8 @@ class HomeTOFragment : Fragment() {
                                             Api.SELECTED_ROUTE_NAME,
                                             attendanceObj.getString("route_name")
                                         ).commit()
-                                    MainActivity.routeName_selected!!.setText(attendanceObj.getString("route_name"))
-                                    routeId =  attendanceObj.getInt("route_id").toString()
+                                    //MainActivity.routeName_selected!!.setText(attendanceObj.getString("route_name"))
+                                    //routeId =  attendanceObj.getInt("route_id").toString()
                                     init()
                                 }else{
                                     no_route_check.visibility = View.VISIBLE
@@ -105,8 +106,8 @@ class HomeTOFragment : Fragment() {
                                     btn_tryAgain.setOnClickListener {
                                         checkforAttendanceToday()
                                     }
-                                }
-
+                                }*/
+                                init()
                             }else{
                                 no_route_check.visibility = View.VISIBLE
                                 bodyLayout.visibility = View.GONE
@@ -179,24 +180,24 @@ class HomeTOFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&sr_id="+srId+"&route_id="+routeId)
+            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_to_stats=1&territory_id="+territoryId)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
 
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&sr_id="+srId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&with_to_stats=1&territory_id="+territoryId)
 
     }
 
     private fun getSummaryTargets(url: String) {
-        var total_target = ""
-        var total_target_completed = ""
-        var lpc = ""
-        var lpc_completed = ""
-        var bpc = ""
-        var bpc_completed = ""
-        var aiv = ""
-        var aiv_completed = ""
+        var total_target = "--:--"
+        var total_target_completed = "--:--"
+        var target_ads = "--:--"
+        var ads_completed = "--:--"
+        var target_rds = "--:--"
+        var rds_completed = "--:--"
+        var number_of_memo = "--:--"
+        var number_of_memo_completed = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
@@ -205,32 +206,34 @@ class HomeTOFragment : Fragment() {
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
+                        no_route_check.visibility = View.GONE
+                        bodyLayout.visibility = View.VISIBLE
                         if (targetsArray.length() > 0){
                             for (i in 0 until targetsArray.length()){
                                 val targetObj =targetsArray.getJSONObject(i)
-                                total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
-                                bpc = dformat.format(targetObj.getString("target_sku_per_memo").toDouble())
-                                lpc = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
-                                aiv = dformat.format(targetObj.getString("target_aiv").toDouble())
+                                if(!targetObj.isNull("target_amount"))total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
+                                if(!targetObj.isNull("target_ads"))target_ads = dformat.format(targetObj.getString("target_ads").toDouble())
+                                if(!targetObj.isNull("target_rds"))target_rds = dformat.format(targetObj.getString("target_rds").toDouble())
+                                if(!targetObj.isNull("target_number_of_memo"))number_of_memo = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
                             }
                         }
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
-                                total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                bpc_completed = dformat.format(targetObj.getString("bpc").toDouble())
-                                lpc_completed = dformat.format(targetObj.getString("lpc").toDouble())
-                                aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                if(!targetObj.isNull("ads"))ads_completed = dformat.format(targetObj.getString("ads").toDouble())
+                                if(!targetObj.isNull("rds"))rds_completed = dformat.format(targetObj.getString("rds").toDouble())
+                                if(!targetObj.isNull("number_of_memo"))number_of_memo_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                             }
                         }
 
                         val itemList: ArrayList<TargetValue> = ArrayList()
                         itemList.add(TargetValue(resources.getString(R.string.total_target), total_target, total_target_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.ads), target_ads, ads_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.rds), target_rds, rds_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.number_of_memo), number_of_memo, number_of_memo_completed))
 
-                        val adapter = TargetAdapter(itemList, "SO")
+                        val adapter = TargetAdapter(itemList, "TO")
                         targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setActiveInactiveView()
@@ -264,6 +267,17 @@ class HomeTOFragment : Fragment() {
 
     }
     private fun setActiveInactiveView() {
+        val gd = GradientDrawable()
+        gd.setColor(mContext!!.resources.getColor(R.color.white))
+        gd.cornerRadius = 16f
+        gd.setStroke(3, mContext!!.resources.getColor(R.color.cnl_color_2))
+        activeLayout.setBackgroundDrawable(gd)
+        val gd2 = GradientDrawable()
+        gd2.setColor(mContext!!.resources.getColor(R.color.white))
+        gd2.cornerRadius = 16f
+        gd2.setStroke(3, mContext!!.resources.getColor(R.color.cnl_color_1))
+        inactiveLayout.setBackgroundDrawable(gd2)
+
         val today = Calendar.getInstance().time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         ApiServices.apiGET(
@@ -309,19 +323,32 @@ class HomeTOFragment : Fragment() {
         })
     }
     private fun setLiveStockView() {
-        ApiServices.apiGET(Api.get_all_so_list, mQueue!!, token!!, object : ApiServiceListener{
+        val itemList: ArrayList<Pair<String, String>> = ArrayList()
+        val today = Calendar.getInstance().time
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        ApiServices.apiGET(Api.all_product_list+"?start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&with_stock=1&territory_id="+territoryId, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val targetsArray = obj.getJSONArray("targets")
-                        val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        /*itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
-                        itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio+"%"))
-                        itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))*/
-                        createTable(itemList, tabLayout)
+                        val productsArray = obj.getJSONArray("products")
+                        itemList.clear()
+                        if (productsArray.length() > 0) {
+                            for (i in 0 until productsArray.length()) {
+                                val productObj = productsArray.getJSONObject(i)
+                                itemList.add(
+                                    Pair(
+                                        productObj.getString("product_name"),
+                                        productObj.getString("current_available_stock")
+                                    )
+                                )
+                            }
+
+                            itemList.sortBy {
+                                it.second
+                            }
+                            createTable(itemList, tabLayout)
+                        }
 
                     }
                 }catch (e: Exception){
@@ -349,18 +376,28 @@ class HomeTOFragment : Fragment() {
         })
     }
     private fun setLastWeekSummary() {
-        ApiServices.apiGET(Api.get_all_so_list, mQueue!!, token!!, object : ApiServiceListener{
+        val c = Calendar.getInstance()
+        c.add(Calendar.DAY_OF_WEEK, -7)
+        val end = Calendar.getInstance().time
+        val start = c.time
+        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
+        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        val StartDate = df.format(start)
+        val EndDate = df.format(end)
+        ApiServices.apiGET(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+"&end_date="+EndDate+"&to="+employeeId, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val targetsArray = obj.getJSONArray("targets")
+                        val ordersArray = obj.getJSONArray("orders")
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        /*itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
-                        itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio+"%"))
-                        itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))*/
+                        if (ordersArray.length() >0){
+                            for(i in 0 until ordersArray.length()){
+                                val orderObj = ordersArray.getJSONObject(i)
+                                itemList.add(Pair(orderObj.getString("sr_name"), orderObj.getString("order_collected")))
+                            }
+                        }
                         createTable(itemList, tabLayout2)
 
                     }
@@ -389,11 +426,21 @@ class HomeTOFragment : Fragment() {
         })
     }
 
-    private fun createTable(data: ArrayList<Pair<String, String>>, tabLayout2: TableLayout) {
-        tabLayout2.isStretchAllColumns = true
-        tabLayout2.bringToFront()
-        for (i in 0 until data.size) {
+    private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {
+        tab_Layout.isStretchAllColumns = true
+        tab_Layout.bringToFront()
+        tab_Layout.removeAllViews()
+        for (i in 0 until /*data.size*/5) {
             val tr = TableRow(mContext)
+            val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+            val leftMargin = 0
+            val topMargin = 0
+            val rightMargin = 0
+            val bottomMargin = 8
+
+            tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
+            tr.setLayoutParams(tableRowParams)
+            tr.gravity = Gravity.CENTER_VERTICAL
             val c1 = TextView(mContext)
             c1.gravity = Gravity.START
             c1.setTextColor(resources.getColor(R.color.text_title))
@@ -402,10 +449,11 @@ class HomeTOFragment : Fragment() {
             c2.gravity = Gravity.END
             c2.setTextColor(resources.getColor(R.color.text_title))
             c2.setText(data.get(i).second)
+            c2.gravity = Gravity.CENTER
             c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
             tr.addView(c1)
             tr.addView(c2)
-            tabLayout.addView(tr)
+            tab_Layout.addView(tr)
         }
     }
 
@@ -417,8 +465,8 @@ class HomeTOFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.SR_CODE, "")
-        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
     }
 
 

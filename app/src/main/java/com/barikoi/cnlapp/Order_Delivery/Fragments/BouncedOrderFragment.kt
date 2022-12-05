@@ -7,6 +7,8 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +30,7 @@ import com.barikoi.cnlapp.Order_Delivery.Adapter.OrderDeliveryListAdapter
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.EndDate
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.StartDate
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.etSearchShop
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
@@ -45,21 +48,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
-   /* var recylerView: RecyclerView? = null
-    lateinit var progressBar: ProgressBar
-    lateinit var ACTIVITY: OrderDeliveryUpdateActivity
-    var token : String? = null
-    var user_id : String? = null
-    var sr_id : String? = null
-    var route_id: String? = null
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    var mContext: Context? = null
-    var queue: RequestQueue? = null
-    var appDatabase: AppDatabase? = null
-    private var listener: OnEditOrderListener? = null
-    val orderList: ArrayList<OrderList> = ArrayList()
-    lateinit var adapter: OrderDeliveryListAdapter*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +56,25 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+
+        etSearchShop!!.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                adapter.filter.filter(s)
+                if (s!!.length == 0) {
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+ StartDate+"&end_date="+ EndDate+"&order_status=DELIVERED", queue!!, token!!, mCallback!!)
+                }
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -58,7 +58,7 @@ class LastWeekProductFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryProducts(Api.get_last_week_products+"?sr_id="+srId+"&route_id="+routeId+"&with_last_week_order=1")
+        getSummaryProducts(Api.all_product_list+"?sr_id="+srId+"&route_id="+routeId+"&with_last_week_order=1")
     }
 
 

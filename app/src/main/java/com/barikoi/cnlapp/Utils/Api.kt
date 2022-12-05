@@ -52,8 +52,6 @@ object Api {
     val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
 
-    val product_stock_summary = base_url+"api/v1/products"
-
     /*notice*/
     val get_notice = base_url+"api/v1/notices"
     val submit_notice = base_url+"api/v1/notices"
@@ -64,7 +62,7 @@ object Api {
 
     /*home view*/
     val get_summary = base_url+"api/v1/get-overview-stats"
-    val get_last_week_products = base_url+"api/v1/products"
+    //val get_last_week_products = base_url+"api/v1/products"
     val get_last_week_category = base_url+"api/v1/get-category-outlets"
     val get_last_week_delivery_bounce = base_url+"api/v1/get-delivered-bounce-outlets"
 

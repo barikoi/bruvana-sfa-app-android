@@ -45,8 +45,6 @@ object ViewUtils {
 
     fun viewDialog(mContext: Context, message: String, listener: DialogListener){
         val dialog = Dialog(mContext)
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.popup_dialog)
         val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView

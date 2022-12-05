@@ -9,6 +9,8 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AutoCompleteTextView
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.RequestQueue
@@ -51,6 +53,7 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
     companion object{
         var StartDate: String? = null
         var EndDate: String? = null
+        var etSearchShop: AutoCompleteTextView? = null
     }
 
 
@@ -67,6 +70,8 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
         //route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
 
+        etSearchShop = findViewById(R.id.editTextSearchShop)
+
         if (user_type.equals("TO", true)){
             sr_id = ""
             route_id = ""
@@ -78,32 +83,6 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
             onBackPressed()
             finish()
         }
-        editTextSearchShop.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                /*adapter!!.filter.filter(s)
-                if (s!!.length == 0) {
-                    val shops: ArrayList<Shops> = ArrayList()
-                    for (i in 0 until shopList!!.size) {
-                        if (shopList!![i].route_name == routeNameList!![spinner!!.selectedItemPosition].second) {
-                            shops.add(shopList!![i])
-                        }
-
-                    }
-                    adapter!!.shopList=shops
-                    adapter!!.notifyDataSetChanged()
-                }*/
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-        })
         setDateFilter()
 
     }

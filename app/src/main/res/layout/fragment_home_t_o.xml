@@ -11,7 +11,7 @@
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,6 +93,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
                         <LinearLayout
+                            android:id="@+id/activeLayout"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:gravity="start"
@@ -135,6 +136,7 @@
                             </TextView>
                         </LinearLayout>
                         <LinearLayout
+                            android:id="@+id/inactiveLayout"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:gravity="start"
@@ -200,6 +202,7 @@
                     android:textAllCaps="true"
                     android:textColor="@color/text_title_blue"
                     android:textSize="20sp"
+                    android:textColorLink="@color/text_title_blue"
                     android:layout_alignParentLeft="true">
                 </TextView>
                 <LinearLayout
@@ -242,6 +245,7 @@
                     android:textAllCaps="true"
                     android:textColor="@color/text_title_blue"
                     android:textSize="20sp"
+                    android:textColorLink="@color/text_title_blue"
                     android:layout_alignParentLeft="true">
                 </TextView>
                 <LinearLayout

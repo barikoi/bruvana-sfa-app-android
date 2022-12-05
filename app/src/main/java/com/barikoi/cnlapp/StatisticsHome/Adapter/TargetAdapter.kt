@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
@@ -19,6 +20,7 @@ class TargetAdapter (val targets: List<TargetValue>, val from: String) : Recycle
         return ViewHolder(v)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.tvTitle.setText(targets[position].title)
@@ -26,13 +28,19 @@ class TargetAdapter (val targets: List<TargetValue>, val from: String) : Recycle
         holder.completedAmount.setText(targets[position].completed)
 
         if (from.equals("TO", true)){
-            holder.itemView.setBackgroundColor(holder.itemView.resources.getColor(R.color.cnl_color_1))
+            holder.itemView.background.setTint(holder.itemView.resources.getColor(R.color.cnl_color_1))
         }else if (from.equals("SO", true)){
-            holder.itemView.setBackgroundColor(holder.itemView.resources.getColor(R.color.card_blue))
+            holder.itemView.background.setTint(holder.itemView.resources.getColor(R.color.card_blue))
         }
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (targets[position].target.equals("--:--")){
+                    targets[position].target = "0"
+                }
+                if (targets[position].completed.equals("--:--")){
+                    targets[position].completed = "0"
+                }
                 holder.progressView.max = Math.round(targets[position].target.toDouble()).toInt()
                 holder.progressView.setProgress(Math.round(targets[position].completed.toDouble()).toInt(), true)
 

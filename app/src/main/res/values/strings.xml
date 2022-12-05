@@ -90,7 +90,8 @@
     <string name="visit_ratio">Visit Ratio</string>
     <string name="number_of_memo">Number of Memo</string>
     <string name="aiv">AIV</string>
-
+    <string name="ads">ADS</string>
+    <string name="rds">RDS</string>
     <string name="total_target">Total Target</string>
     <string name="details">Details</string>
     <string name="total">Total-</string>

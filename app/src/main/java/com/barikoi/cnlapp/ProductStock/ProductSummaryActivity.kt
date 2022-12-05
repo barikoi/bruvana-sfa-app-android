@@ -36,6 +36,9 @@ class ProductSummaryActivity : AppCompatActivity() {
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
     var token : String? = null
+    var territoryId : String? = null
+    var territorySuffix : String? = ""
+    var selectedTerritoryId : String? = null
     val dhList: ArrayList<Pair<String, String>> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +49,7 @@ class ProductSummaryActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
+        territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
 
         btnBack.setOnClickListener {
             onBackPressed()
@@ -67,6 +71,9 @@ class ProductSummaryActivity : AppCompatActivity() {
                         } else {
                             setDateFilter("")
                         }*/
+                        selectedTerritoryId = dhList.get(p2).second
+                        territorySuffix = "&territory_id="+selectedTerritoryId
+                        setDateFilter()
                     }
                 }
 
@@ -75,6 +82,7 @@ class ProductSummaryActivity : AppCompatActivity() {
                 }
 
             }
+
         }else{
             spinnerLayout.visibility = View.GONE
             setDateFilter()
@@ -122,13 +130,13 @@ class ProductSummaryActivity : AppCompatActivity() {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getProductStock(Api.all_product_list+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_stock=1&with_order=1")
+            getProductStock(Api.all_product_list+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_order=1"+territorySuffix)
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getProductStock(Api.all_product_list+"?start_date="+StartDate+"&end_date="+EndDate+"&with_stock=1&with_order=1")
+        getProductStock(Api.all_product_list+"?start_date="+StartDate+"&end_date="+EndDate+"&with_order=1"+territorySuffix)
     }
 
     private fun getProductStock(url: String) {
@@ -189,7 +197,7 @@ class ProductSummaryActivity : AppCompatActivity() {
 
     private fun getDHList() {
         ApiServices.apiGET(
-            Api.get_dh_list,
+            Api.get_dh_list+"?territory_id="+territoryId,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewDHList(response)
@@ -225,7 +233,7 @@ class ProductSummaryActivity : AppCompatActivity() {
                     for (i in 0 until dhArray.length()) {
                         val dhObj = dhArray.getJSONObject(i)
                         dhList.add(
-                            Pair(dhObj.getString("dh_name"), dhObj.getString("dh_code"))
+                            Pair(dhObj.getString("dh_name"), dhObj.getString("territory_id"))
                         )
                         dhNameList.add(dhObj.getString("dh_name"))
 
@@ -233,7 +241,7 @@ class ProductSummaryActivity : AppCompatActivity() {
                 }
                 val adapter = ArrayAdapter(
                     applicationContext,
-                    android.R.layout.simple_spinner_item, dhList
+                    android.R.layout.simple_spinner_item, dhNameList
                 )
                 spinnerDistributorHouse.adapter = adapter
             }
