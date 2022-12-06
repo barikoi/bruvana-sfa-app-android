@@ -52,10 +52,10 @@ class LastWeekSummaryFragment : Fragment() {
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&sr_id="+srId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&sr_id="+srId+"&route_id="+routeId)
     }
 
     override fun onCreateView(
@@ -72,6 +72,8 @@ class LastWeekSummaryFragment : Fragment() {
         var bpc_completed = ""
         var aiv_completed = ""
         var visit_ratio = ""
+        var bounce = ""
+        var delivery_value = ""
 
         var dformat = DecimalFormat("#.##")
 
@@ -85,10 +87,12 @@ class LastWeekSummaryFragment : Fragment() {
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
                                 total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                bpc_completed = dformat.format(targetObj.getString("bpc").toDouble())
-                                lpc_completed = dformat.format(targetObj.getString("lpc").toDouble())
+                                bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                                 aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
-                                visit_ratio = dformat.format(targetObj.getString("visit_ratio").toDouble())
+                                visit_ratio = dformat.format(targetObj.getString("number_of_visits").toDouble())
+                                bounce = dformat.format(targetObj.getString("bounce_amount").toDouble())
+                                delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
                             }
                         }
 
@@ -98,6 +102,8 @@ class LastWeekSummaryFragment : Fragment() {
                         itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio+"%"))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
+                        itemList.add(Pair(resources.getString(R.string.bounce), aiv_completed))
+                        itemList.add(Pair(resources.getString(R.string.delivery_value), aiv_completed))
 
                         createTable(itemList)
 

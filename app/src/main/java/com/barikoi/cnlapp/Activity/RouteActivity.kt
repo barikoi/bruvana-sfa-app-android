@@ -32,6 +32,7 @@ class RouteActivity : AppCompatActivity() {
     var mContext: Context? = null
     var mQueue: RequestQueueSingleton? = null
     private var userId: String? = ""
+    private var srCode: String? = ""
     private var tvTitle: TextView? = null
     private var back_img: ImageButton? = null
 
@@ -43,6 +44,7 @@ class RouteActivity : AppCompatActivity() {
         editor = prefs!!.edit()
 
         userId = prefs!!.getString(Api.USER_ID, "")
+        srCode = prefs!!.getString(Api.SR_CODE, "")
 
         mQueue = RequestQueueSingleton.getInstance(applicationContext)
 

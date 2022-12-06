@@ -18,6 +18,7 @@ import com.android.volley.VolleyError
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.barikoi.cnlapp.Utils.Api
@@ -26,7 +27,12 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
+import kotlinx.android.synthetic.main.activity_order_summary_to.*
 import kotlinx.android.synthetic.main.fragment_home_t_o.*
+import kotlinx.android.synthetic.main.fragment_home_t_o.bpcCount
+import kotlinx.android.synthetic.main.fragment_home_t_o.lpcCount
+import kotlinx.android.synthetic.main.fragment_home_t_o.ovCount
+import kotlinx.android.synthetic.main.fragment_home_t_o.tvDateRange
 import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -286,17 +292,21 @@ class HomeTOFragment : Fragment() {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val attendanceArray = obj.getJSONArray("attendances")
-                        if (attendanceArray.length() > 0){
-                            val obj = attendanceArray.getJSONObject(0)
-                            val activeSO = obj.getString("active_so")
-                            val inactiveSO = obj.getString("inactive_so")
-
-                            if (!activeSO.equals("null")) activeCount.setText(activeSO)
-                            if (!inactiveSO.equals("null")) inactiveCount.setText(inactiveSO)
+                        //val attendanceArray = obj.getJSONArray("active")
+                        val activeSO = obj.getJSONArray("active").length()
+                        val inactiveSO = obj.getJSONArray("inactive").length()
+                        activeCount.setText(activeSO.toString())
+                        inactiveCount.setText(inactiveSO.toString())
+                        if (obj.getJSONArray("active").length() > 0){
+                            activeLayout.setOnClickListener {
+                                startActivity(Intent(requireActivity(), ActiveInactiveActivity::class.java).putExtra("so_status", "active"))
+                            }
                         }
-
-
+                        if (obj.getJSONArray("inactive").length() > 0){
+                            inactiveLayout.setOnClickListener {
+                                startActivity(Intent(requireActivity(), ActiveInactiveActivity::class.java).putExtra("so_status", "inactive"))
+                            }
+                        }
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
@@ -376,6 +386,7 @@ class HomeTOFragment : Fragment() {
         })
     }
     private fun setLastWeekSummary() {
+        val dformat = DecimalFormat("#.##")
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
@@ -390,14 +401,17 @@ class HomeTOFragment : Fragment() {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val ordersArray = obj.getJSONArray("orders")
+                        val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         if (ordersArray.length() >0){
                             for(i in 0 until ordersArray.length()){
                                 val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(orderObj.getString("sr_name"), orderObj.getString("order_collected")))
+                                itemList.add(Pair(orderObj.getString("sr_name"), orderObj.getString("productive_outlets")))
                             }
                         }
+                        if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
+                        if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(obj.getString("sku_per_memo").toDouble()))
+                        if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(obj.getString("number_of_memo").toDouble()))
                         createTable(itemList, tabLayout2)
 
                     }
@@ -430,7 +444,13 @@ class HomeTOFragment : Fragment() {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
-        for (i in 0 until /*data.size*/5) {
+        var size : Int = 0
+        if (data.size<5){
+            size = data.size
+        }else{
+            size = 5
+        }
+        for (i in 0 until size) {
             val tr = TableRow(mContext)
             val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
             val leftMargin = 0

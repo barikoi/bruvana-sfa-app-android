@@ -64,6 +64,9 @@
     <string name="route_code">Route Code</string>
     <string name="shop_count">Shop Count</string>
 
+    <string name="active_so_list">Active SO List</string>
+    <string name="inactive_so_list">Inactive SO List</string>
+
     <!--attendance history-->
     <string name="market">Market: </string>
     <string name="in">In</string>
@@ -71,6 +74,8 @@
     <string name="date_range">Date Range</string>
     <string name="attendance">Attendance</string>
     <string name="history">History</string>
+    <string name="last_updated_time">Last updated time:</string>
+    <string name="last_location">Last location</string>
 
     <!--attendance summary-->
     <string name="present">Present</string>
@@ -87,11 +92,13 @@
     <string name="summary">Summary</string>
     <string name="total_order_value">Total Order Value</string>
     <string name="sku_per_memo">SKU Per Memo</string>
-    <string name="visit_ratio">Visit Ratio</string>
+    <string name="visit_ratio">Number of Visits</string>
     <string name="number_of_memo">Number of Memo</string>
     <string name="aiv">AIV</string>
     <string name="ads">ADS</string>
     <string name="rds">RDS</string>
+    <string name="bounce">Bounce</string>
+    <string name="delivery_value">Delivery Value</string>
     <string name="total_target">Total Target</string>
     <string name="details">Details</string>
     <string name="total">Total-</string>

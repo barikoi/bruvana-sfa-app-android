@@ -148,7 +148,8 @@ class HomeFragment : Fragment() {
         c.set(Calendar.DAY_OF_MONTH, 1)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        //val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
         tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         val StartDate = df.format(start)
@@ -181,12 +182,12 @@ class HomeFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&sr_id="+srId+"&route_id="+routeId)
+            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&sr_id="+srId+"&route_id="+routeId)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
 
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&sr_id="+srId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&sr_id="+srId+"&route_id="+routeId)
 
         /*setSecondPartSummary()
         setThirdPartSummary()*/
@@ -194,14 +195,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun getSummaryTargets(url: String) {
-        var total_target = ""
-        var total_target_completed = ""
-        var lpc = ""
-        var lpc_completed = ""
-        var bpc = ""
-        var bpc_completed = ""
-        var aiv = ""
-        var aiv_completed = ""
+        var total_target = "--:--"
+        var total_target_completed = "--:--"
+        var lpc = "--:--"
+        var lpc_completed = "--:--"
+        var bpc = "--:--"
+        var bpc_completed = "--:--"
+        var aiv = "--:--"
+        var aiv_completed = "--:--"
+        var ads = "--:--"
+        var ads_completed = "--:--"
+        var rds = "--:--"
+        var rds_completed = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
@@ -213,24 +218,30 @@ class HomeFragment : Fragment() {
                         if (targetsArray.length() > 0){
                             for (i in 0 until targetsArray.length()){
                                 val targetObj =targetsArray.getJSONObject(i)
-                                total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
-                                bpc = dformat.format(targetObj.getString("target_sku_per_memo").toDouble())
-                                lpc = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
-                                aiv = dformat.format(targetObj.getString("target_aiv").toDouble())
+                                if(!targetObj.isNull("target_amount")) total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
+                                if(!targetObj.isNull("target_ads")) ads = dformat.format(targetObj.getString("target_ads").toDouble())
+                                if(!targetObj.isNull("target_rds")) rds = dformat.format(targetObj.getString("target_rds").toDouble())
+                                if(!targetObj.isNull("target_sku_per_memo")) bpc = dformat.format(targetObj.getString("target_sku_per_memo").toDouble())
+                                if(!targetObj.isNull("target_number_of_memo")) lpc = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
+                                if(!targetObj.isNull("target_aiv")) aiv = dformat.format(targetObj.getString("target_aiv").toDouble())
                             }
                         }
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
-                                total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                bpc_completed = dformat.format(targetObj.getString("bpc").toDouble())
-                                lpc_completed = dformat.format(targetObj.getString("lpc").toDouble())
-                                aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                if(!targetObj.isNull("ads")) ads_completed = dformat.format(targetObj.getString("ads").toDouble())
+                                if(!targetObj.isNull("rds")) rds_completed = dformat.format(targetObj.getString("rds").toDouble())
+                                if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
                             }
                         }
 
                         val itemList: ArrayList<TargetValue> = ArrayList()
                         itemList.add(TargetValue(resources.getString(R.string.total_target), total_target, total_target_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.ads), ads, ads_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.rds), rds, rds_completed))
                         itemList.add(TargetValue(resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
                         itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
                         itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))

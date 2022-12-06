@@ -27,15 +27,7 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_order_summary.*
-import kotlinx.android.synthetic.main.activity_order_summary.btnBack
-import kotlinx.android.synthetic.main.activity_order_summary.dateRangeLayout
-import kotlinx.android.synthetic.main.activity_order_summary.editTextSearchShop
-import kotlinx.android.synthetic.main.activity_order_summary.orderList
-import kotlinx.android.synthetic.main.activity_order_summary.tvDateRange
-import kotlinx.android.synthetic.main.activity_order_summary.tvRouteName
 import kotlinx.android.synthetic.main.activity_order_summary_to.*
-import kotlinx.android.synthetic.main.fragment_home_t_o.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -146,31 +138,34 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     }
 
     fun getOrderSummary(url: String){
-        var dformat = DecimalFormat("#.##")
+        val dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, queue!!, token!!, object :
             ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val ordersArray = obj.getJSONArray("orders")
+                        val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
                         sowithOrderList!!.clear()
                         if (ordersArray.length() >0){
                             for(i in 0 until ordersArray.length()){
                                 val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("sr_id")), orderObj.getString("order_collected")))
+                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("sr_id")), orderObj.getString("productive_outlets")))
                                 sowithOrderList!!.add(
                                     OrdersSO(
                                         orderObj.getString("sr_id"),
                                         orderObj.getString("sr_name"),
-                                        orderObj.getString("order_collected"),
-                                        orderObj.getString("total_count"),
-                                        dformat.format(orderObj.getDouble("bounce")).toDouble(),
+                                        orderObj.getString("productive_outlets"),
+                                        orderObj.getString("total_outlets"),
+                                        dformat.format(orderObj.getDouble("bounce_amount")).toDouble(),
                                         orderObj.getJSONArray("orders")
                                     )
                                 )
                             }
+                            if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
+                            if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(obj.getString("sku_per_memo").toDouble()))
+                            if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(obj.getString("number_of_memo").toDouble()))
                             createTable(itemList, tabLayoutOrder)
                         }
 
@@ -230,7 +225,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             tr.setOnClickListener {
                 //Log.d("OrderSummary", "clicked: "+i)
                 collectionLayout.visibility = View.VISIBLE
-                order_collection_count.setText(sowithOrderList!!.get(i).order_collected+"/"+sowithOrderList!!.get(i).total_count)
+                order_collection_count.setText(sowithOrderList!!.get(i).order_collected+"/"+sowithOrderList!!.get(i).total_outlets)
                 total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
                 getAllOrders(sowithOrderList!!.get(i).ordersArray)
             }
@@ -277,8 +272,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                 orderObj.getString("orders_status"),
                                 orderObj.getString("outlet_id"),
                                 orderObj.getString("outlet_name"),
-                                orderObj.getString("route_id"),
-                                orderObj.getString("route_name"),
+                                "",
+                                "",
                                 orderObj.getString("distributor_office_code"),
                                 orderObj.getString("grand_total"),
                                 orderObj.getString("latitude"),

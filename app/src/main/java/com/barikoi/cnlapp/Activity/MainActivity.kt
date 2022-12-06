@@ -117,6 +117,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         tvUserName.setText(userName)
         getAuthUser(token, Api.authUserCheck+"?start_date=2022-04-30 00:00:00"/*+StartDate*/+"&end_date="+EndDate)
         if (userType.equals("TO", true)){
+            routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)
         }else{
             setCurrentFragment(HomeFragment(), this@MainActivity)

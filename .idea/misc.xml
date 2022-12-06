@@ -44,6 +44,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/cardview_bg_stroke_2dp.xml" value="0.1235" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/dialog_popup.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_absent.xml" value="0.1135" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_active.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_add_shop.xml" value="0.134" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_attendance.xml" value="0.1135" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_button_background.xml" value="0.113" />
@@ -53,6 +54,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_edit_button.xml" value="0.191" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_gps.xml" value="0.149" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_home.xml" value="0.1135" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_inactive.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_location.xml" value="0.1125" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_menu.xml" value="0.149" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/ic_message.xml" value="0.1135" />
@@ -78,6 +80,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_unselected.xml" value="0.1375" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_unselected_gray.xml" value="0.1245" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/font/ceraprofontfamily.xml" value="0.778125" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_active_inactive.xml" value="0.17" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_login.xml" value="0.7041666666666667" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_main.xml" value="0.15625" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_notice.xml" value="0.8175182481751825" />
@@ -108,7 +111,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_last_week_delivery.xml" value="0.9" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_last_week_product.xml" value="0.6119186046511628" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_last_week_summary.xml" value="0.23081463990554899" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_map.xml" value="0.2264041690793283" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_map.xml" value="0.23892100192678228" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_pending_order.xml" value="0.22" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_product_select.xml" value="0.33" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/fragment_route.xml" value="0.15625" />
@@ -125,6 +128,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/preview_image_withdelete.xml" value="0.6215277777777778" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/product_list_popup.xml" value="0.18" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/product_view_stock.xml" value="0.1" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_active_inactive_view.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_attendance_history.xml" value="0.75" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_attendance_history_to.xml" value="0.33" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/single_attendance_reason_view.xml" value="0.75" />
