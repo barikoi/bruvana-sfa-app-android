@@ -396,13 +396,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     }
 
                     if (spinner != null) {
-                        if (spinner!!.adapter == null){
-                            val adapter = ArrayAdapter(
-                                mContext!!,
-                                android.R.layout.simple_spinner_item, routeNameList!!
-                            )
-                            spinner!!.adapter = adapter
-                        }
+                        val adapter = ArrayAdapter(
+                            mContext!!,
+                            android.R.layout.simple_spinner_item, routeNameList!!
+                        )
+                        spinner!!.adapter = adapter
 
                     }
 

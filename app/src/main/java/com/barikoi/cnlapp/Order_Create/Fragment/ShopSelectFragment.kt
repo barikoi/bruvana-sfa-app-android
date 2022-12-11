@@ -2,8 +2,6 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
@@ -32,7 +30,6 @@ import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.gms.location.*
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.activity_trade_offers.*
 import kotlinx.android.synthetic.main.fragment_shop_select.*
 import kotlinx.android.synthetic.main.fragment_shop_select.filterTitle
 import org.json.JSONException

@@ -390,7 +390,8 @@ class HomeTOFragment : Fragment() {
         })
     }
     private fun setLastWeekSummary() {
-        progressBar3.visibility = View.VISIBLE
+        try{
+        progressBarHome.visibility = View.VISIBLE
         val dformat = DecimalFormat("#.##")
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
@@ -405,7 +406,7 @@ class HomeTOFragment : Fragment() {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
-                        progressBar3.visibility = View.GONE
+                        progressBarHome.visibility = View.GONE
                         summaryLayout.visibility = View.VISIBLE
                         val obj = JSONObject(response)
                         val ordersArray = obj.getJSONArray("so_list")
@@ -424,7 +425,7 @@ class HomeTOFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
-                    progressBar3.visibility = View.GONE
+                    progressBarHome.visibility = View.GONE
                     tryAgain.visibility = View.VISIBLE
                 }
 
@@ -439,17 +440,28 @@ class HomeTOFragment : Fragment() {
             }
 
             override fun onResponseFailure(error: VolleyError) {
+                try{
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar3.visibility = View.GONE
+                progressBarHome.visibility = View.GONE
                 tryAgain.visibility = View.VISIBLE
+                }catch (e:Exception){
+                    e.printStackTrace()
+                }
             }
 
             override fun onException(e: Exception) {
-                progressBar3.visibility = View.GONE
+                try{
+                progressBarHome.visibility = View.GONE
                 tryAgain.visibility = View.VISIBLE
+                }catch (e:Exception){
+                    e.printStackTrace()
+                }
             }
 
         })
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 
     private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {

@@ -383,7 +383,7 @@
 
                     </LinearLayout>
                     <com.github.ybq.android.spinkit.SpinKitView
-                        android:id="@+id/progressBar3"
+                        android:id="@+id/progressBarHome"
                         style="@style/SpinKitView.Small.Circle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

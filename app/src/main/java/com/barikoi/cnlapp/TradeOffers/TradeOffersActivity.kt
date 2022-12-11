@@ -13,6 +13,7 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.TradeOffers.Adapter.TradeOfferListAdapter
 import com.barikoi.cnlapp.TradeOffers.Model.ProductAll
 import com.barikoi.cnlapp.TradeOffers.Model.TradeProduct
 import com.barikoi.cnlapp.Utils.Api
@@ -20,6 +21,7 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
+
 import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 import kotlin.collections.ArrayList
@@ -66,9 +68,12 @@ class TradeOffersActivity : AppCompatActivity() {
                     when(item!!.itemId){
                         R.id.menu_all_product->{
                             if (itemList.size > 0){
-                                val adapter = TradeOfferListAdapter(itemList)
-                                productList2.adapter = adapter
-                                adapter!!.notifyDataSetChanged()
+                                if (adapter != null) {
+                                    adapter = TradeOfferListAdapter(itemList)
+                                    productList2.adapter = adapter
+                                    adapter!!.notifyDataSetChanged()
+                                }
+
                             }
 
                             tvTitle.setText(resources.getString(R.string.product_list))
@@ -79,7 +84,7 @@ class TradeOffersActivity : AppCompatActivity() {
                             filterList.removeIf {
                                 it.tradeList.size == 0
                             }
-                            val adapter = TradeOfferListAdapter(filterList)
+                            adapter = TradeOfferListAdapter(filterList)
                             productList2.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                             tvTitle.setText(resources.getString(R.string.title_trade_offers))

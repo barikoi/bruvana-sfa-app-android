@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.TradeOffers
+package com.barikoi.cnlapp.TradeOffers.Adapter
 
 import android.graphics.Paint
 import android.view.LayoutInflater
@@ -16,16 +16,17 @@ import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.*
 
-class TradeOfferListAdapter (val products: List<ProductAll>) : RecyclerView.Adapter<TradeOfferListAdapter.ViewHolder>(){
+class TradeOfferListAdapter (var mValues: List<ProductAll>) : RecyclerView.Adapter<TradeOfferListAdapter.ViewHolder>(){
+    var products: List<ProductAll> = mValues
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): TradeOfferListAdapter.ViewHolder {
+    ): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_trade_offers_view, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: TradeOfferListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = products[position]
 
         holder.productName.text = mItem.product_name

@@ -55,34 +55,12 @@ class ShopListFragment : Fragment() {
         et_search = view.findViewById(R.id.etSearch)
         adapter = ShopListAdapter( ArrayList<Shops>())
         recylerView!!.adapter = adapter
-        /*swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
-
-        swipeRefreshLayout.setOnRefreshListener(OnRefreshListener {
-            swipeRefreshLayout.setRefreshing(false)
-            editor!!.putInt(Api.ANNOUNCEMENT_PAGE_SELECTED, 0)
-            editor!!.commit()
-        })*/
-
 
         spinner!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>,
                                         view: View, position: Int, id: Long) {
 
-                /*Toast.makeText(mContext,
-                    getString(R.string.selected_item) + " " +
-                            "" + languages[position], Toast.LENGTH_SHORT).show()*/
-                /*for (i in 0 until allRouteList!!.size) {
-                    Log.d("RouteList", allRouteList!![i].route_name +" "+routesList!![position])
-                    Log.d("RouteList", allRouteList!![i].shopList.size.toString())
-                    if (allRouteList!![i].route_name == routesList!![position]) {
-                        Log.d("Route", "match: "+allRouteList!![i].route_name +" "+routesList!![position])
-                        val adapter = ShopListAdapter(allRouteList!![i].shopList)
-                        recylerView!!.setAdapter(adapter)
-                        adapter.notifyDataSetChanged()
-                        //break
-                    }
-                }*/
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
                     if (shopList!![i].route_name == routesList!![position]) {
