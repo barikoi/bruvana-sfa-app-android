@@ -67,13 +67,13 @@ class LastWeekSummaryFragment : Fragment() {
     }
 
     private fun getSummaryTargets(url: String) {
-        var total_target_completed = ""
-        var lpc_completed = ""
-        var bpc_completed = ""
-        var aiv_completed = ""
-        var visit_ratio = ""
-        var bounce = ""
-        var delivery_value = ""
+        var total_target_completed = "--:--"
+        var lpc_completed = "--:--"
+        var bpc_completed = "--:--"
+        var aiv_completed = "--:--"
+        var visit_ratio = "--:--"
+        var bounce = "--:--"
+        var delivery_value = "--:--"
 
         var dformat = DecimalFormat("#.##")
 
@@ -86,13 +86,13 @@ class LastWeekSummaryFragment : Fragment() {
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
-                                total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
-                                lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
-                                visit_ratio = dformat.format(targetObj.getString("number_of_visits").toDouble())
-                                bounce = dformat.format(targetObj.getString("bounce_amount").toDouble())
-                                delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
+                                if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                if(!targetObj.isNull("number_of_visits")) visit_ratio = dformat.format(targetObj.getString("number_of_visits").toDouble())
+                                if(!targetObj.isNull("bounce_amount")) bounce = dformat.format(targetObj.getString("bounce_amount").toDouble())
+                                if(!targetObj.isNull("delivered_value")) delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
                             }
                         }
 

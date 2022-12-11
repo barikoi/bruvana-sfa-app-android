@@ -47,8 +47,8 @@ object Api {
     val all_product_list = base_url+"api/v1/products"
     val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"
-    val get_saved_order = base_url+"api/v1/fetch-orders"
-    val get_orders_to = base_url+"api/v1/get-orders"
+    val get_saved_order = base_url+"api/v1/orders"
+    val get_orders_to = base_url+"api/v1/orders"
     val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
 

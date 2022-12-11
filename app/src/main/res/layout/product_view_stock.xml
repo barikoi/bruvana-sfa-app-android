@@ -60,6 +60,7 @@
                 android:gravity="center_vertical"
                 android:visibility="visible"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/cnl_color_2"
                 android:textSize="10sp">
 

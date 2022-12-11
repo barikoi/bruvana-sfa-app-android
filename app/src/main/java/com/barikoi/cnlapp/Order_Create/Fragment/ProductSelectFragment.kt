@@ -216,6 +216,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             })
 
         }
+        getAllProducts()
     }
 
     private fun getPreviousOrders(response: String) {
@@ -336,7 +337,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         //adapter = ProductListAdapter(ArrayList(), listener!!)
 
-        getAllProducts()
+
 
         et_search!!.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -680,7 +681,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
         val request = StringRequest(
-            Request.Method.GET, Api.all_product_list+"?with_stock=1",
+            Request.Method.GET, Api.all_product_list+"?with_stock=1&sr_id=" + sr_id + "&route_id=" + selectedShop!!.route_code,
             {
                     response ->
                 try {

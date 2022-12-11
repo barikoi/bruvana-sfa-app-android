@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.TableLayout
@@ -86,6 +85,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             }
 
         })
+        tryAgain2.setOnClickListener {
+            setDateFilter()
+        }
     }
 
     private fun setDateFilter() {
@@ -138,12 +140,16 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     }
 
     fun getOrderSummary(url: String){
+        progressBar4.visibility = View.VISIBLE
         val dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, queue!!, token!!, object :
             ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
+                        progressBar4.visibility = View.GONE
+                        summaryLayout2.visibility = View.VISIBLE
+                        tryAgain2.visibility = View.GONE
                         val obj = JSONObject(response)
                         val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
@@ -172,6 +178,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar4.visibility = View.GONE
+                    tryAgain2.visibility = View.VISIBLE
                 }
 
             }
@@ -186,10 +194,13 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
+                progressBar4.visibility = View.GONE
+                tryAgain2.visibility = View.VISIBLE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar4.visibility = View.GONE
+                tryAgain2.visibility = View.VISIBLE
             }
 
         })

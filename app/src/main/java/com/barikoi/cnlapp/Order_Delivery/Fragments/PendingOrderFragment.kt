@@ -180,7 +180,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     val orderObj = array.getJSONObject(i)
                     if (orderObj.getString("orders_status").equals("PENDING", true)){
                         val brandArray = orderObj.getJSONArray("brands")
-                        tvRouteName.setText(orderObj.getString("route_name"))
+                        //tvRouteName.setText(orderObj.getString("route_name"))
                         val productItems: ArrayList<Products> = ArrayList()
                         if (brandArray.length() > 0){
                             for (j in 0 until brandArray.length()){

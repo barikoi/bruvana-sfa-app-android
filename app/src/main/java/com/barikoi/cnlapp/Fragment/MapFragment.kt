@@ -453,12 +453,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         userId = prefs!!.getString(Api.USER_ID, "")
         if (prefs!!.getString(Api.USER_TYPE,"").equals("TO")){
             userId = ""
-        }else{
-            userId = prefs!!.getString(Api.USER_ID, "")
-        }
-        if (prefs!!.getString(Api.USER_TYPE,"").equals("TO")){
             srCode = ""
         }else{
+            userId = prefs!!.getString(Api.USER_ID, "")
             srCode = prefs!!.getString(Api.SR_CODE, "")
         }
 

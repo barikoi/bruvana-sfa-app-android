@@ -75,6 +75,10 @@ class HomeTOFragment : Fragment() {
             startActivity(Intent(requireActivity(), OrderSummaryTOActivity::class.java))
         }
 
+        tryAgain.setOnClickListener {
+            setLastWeekSummary()
+        }
+
     }
     private fun checkforAttendanceToday() {
         val today = Calendar.getInstance().time
@@ -386,6 +390,7 @@ class HomeTOFragment : Fragment() {
         })
     }
     private fun setLastWeekSummary() {
+        progressBar3.visibility = View.VISIBLE
         val dformat = DecimalFormat("#.##")
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
@@ -400,6 +405,8 @@ class HomeTOFragment : Fragment() {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
+                        progressBar3.visibility = View.GONE
+                        summaryLayout.visibility = View.VISIBLE
                         val obj = JSONObject(response)
                         val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
@@ -417,6 +424,8 @@ class HomeTOFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar3.visibility = View.GONE
+                    tryAgain.visibility = View.VISIBLE
                 }
 
             }
@@ -431,10 +440,13 @@ class HomeTOFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar3.visibility = View.GONE
+                tryAgain.visibility = View.VISIBLE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar3.visibility = View.GONE
+                tryAgain.visibility = View.VISIBLE
             }
 
         })

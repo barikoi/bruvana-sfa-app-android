@@ -73,7 +73,7 @@
                         android:textStyle="bold"
                         android:textSize="17sp"
                         android:textColor="@color/black"
-                        android:text="Shohel Rana">
+                        android:text="">
 
                     </TextView>
                     <RelativeLayout

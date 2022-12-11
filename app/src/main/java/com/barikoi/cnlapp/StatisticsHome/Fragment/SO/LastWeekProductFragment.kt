@@ -74,10 +74,12 @@ class LastWeekProductFragment : Fragment() {
                         if (productsArray.length() > 0){
                             for (i in 0 until productsArray.length()){
                                 val productObj = productsArray.getJSONObject(i)
-                                if (productObj.getInt("total_price") > 0) {
+                                if (!productObj.isNull("total_price")){
+                                if (productObj.getDouble("total_price") > 0.0) {
                                     val productName = productObj.getString("product_name")
                                     val totalPrice = productObj.getString("total_price")
                                     itemList.add(Pair(productName, totalPrice))
+                                }
                                 }
 
                             }

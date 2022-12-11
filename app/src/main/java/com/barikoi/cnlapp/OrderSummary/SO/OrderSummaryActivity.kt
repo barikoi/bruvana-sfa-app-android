@@ -7,11 +7,13 @@ import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
@@ -55,7 +57,21 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         listener = this
-        setDateFilter()
+        if (route_id!!.length > 0) {
+            setDateFilter()
+        }else{
+            setDateFilter()
+            ViewUtils.viewDialogResponse(applicationContext, resources.getString(R.string.no_route_selected_today), object : DialogListener{
+                override fun onConfirmed() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onCanceled() {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }
 
         btnBack.setOnClickListener {
             onBackPressed()
@@ -128,11 +144,12 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
     }
 
     private fun getAllOrders(url: String) {
-
+        progressBarOrder.visibility = View.VISIBLE
         ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
+                        progressBarOrder.visibility = View.GONE
                         val itemList: ArrayList<OrderList> = ArrayList()
 
                         val obj = JSONObject(response)
@@ -194,6 +211,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 
                     }
                 }catch (e: Exception){
+                    progressBarOrder.visibility = View.GONE
                     e.printStackTrace()
                 }
             }
@@ -207,11 +225,12 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
             }
 
             override fun onResponseFailure(error: VolleyError) {
+                progressBarOrder.visibility = View.GONE
                 ViewUtils.getErrorResponse(error, applicationContext)
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBarOrder.visibility = View.GONE
             }
 
         })

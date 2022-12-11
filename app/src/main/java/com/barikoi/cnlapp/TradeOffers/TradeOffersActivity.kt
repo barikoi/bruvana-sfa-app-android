@@ -31,6 +31,9 @@ class TradeOffersActivity : AppCompatActivity() {
     val itemList: ArrayList<ProductAll> = ArrayList()
     val filterList: ArrayList<ProductAll> = ArrayList()
     private var adapter: TradeOfferListAdapter? = null
+    var territoryId: String ? = ""
+    var srCode: String ? = ""
+    var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +43,15 @@ class TradeOffersActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
 
-        getProducts(Api.all_product_list+"?with_stock=1")
+        territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
+        srCode = prefs!!.getString(Api.SR_CODE, "")
+        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
+            getProducts(Api.all_product_list + "?with_stock=1&territory_id="+territoryId)
+        }else{
+            getProducts(Api.all_product_list + "?with_stock=1&sr_id="+srCode+"&route_id="+routeId)
+        }
         btnBack.setOnClickListener {
             onBackPressed()
             finish()
@@ -55,8 +66,8 @@ class TradeOffersActivity : AppCompatActivity() {
                     when(item!!.itemId){
                         R.id.menu_all_product->{
                             if (itemList.size > 0){
-                                adapter = TradeOfferListAdapter(itemList)
-                                productList.adapter = adapter
+                                val adapter = TradeOfferListAdapter(itemList)
+                                productList2.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
 
@@ -68,8 +79,8 @@ class TradeOffersActivity : AppCompatActivity() {
                             filterList.removeIf {
                                 it.tradeList.size == 0
                             }
-                            adapter = TradeOfferListAdapter(filterList)
-                            productList.adapter = adapter
+                            val adapter = TradeOfferListAdapter(filterList)
+                            productList2.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                             tvTitle.setText(resources.getString(R.string.title_trade_offers))
                         }
@@ -122,7 +133,7 @@ class TradeOffersActivity : AppCompatActivity() {
 
 
                         adapter = TradeOfferListAdapter(itemList)
-                        productList.adapter = adapter
+                        productList2.adapter = adapter
                         adapter!!.notifyDataSetChanged()
 
 

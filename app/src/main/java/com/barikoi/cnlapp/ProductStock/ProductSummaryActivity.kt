@@ -36,7 +36,9 @@ class ProductSummaryActivity : AppCompatActivity() {
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
     var token : String? = null
-    var territoryId : String? = null
+    var territoryId : String? = ""
+    var srCode: String ? = ""
+    var routeId: String ? = ""
     var territorySuffix : String? = ""
     var selectedTerritoryId : String? = null
     val dhList: ArrayList<Pair<String, String>> = ArrayList()
@@ -50,6 +52,8 @@ class ProductSummaryActivity : AppCompatActivity() {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
+        srCode = prefs!!.getString(Api.SR_CODE, "")
+        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         btnBack.setOnClickListener {
             onBackPressed()
@@ -84,6 +88,7 @@ class ProductSummaryActivity : AppCompatActivity() {
             }
 
         }else{
+            territorySuffix = "&sr_id="+srCode+"&route_id="+routeId
             spinnerLayout.visibility = View.GONE
             setDateFilter()
         }
