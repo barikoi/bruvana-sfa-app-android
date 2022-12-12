@@ -65,7 +65,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter.filter(s)
                 if (s!!.length == 0) {
-                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+ StartDate+"&end_date="+ EndDate+"&order_status=DELIVERED", queue!!, token!!, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+ StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=DELIVERED", queue!!, token!!, mCallback!!)
                 }
 
             }
@@ -109,9 +109,9 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
             if (mCallback!= null) {
                 if (sr_id.length == 0){
-                    getAllOrders(Api.get_orders_to+"?start_date="+start+"&end_date="+end+"&territory_id="+territory_id+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
                 }else{
-                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+"&end_date="+end+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
                 }
 
             }
@@ -261,7 +261,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             }
         }catch (e: Exception){
             e.printStackTrace()
-            Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
         }
 
     }
