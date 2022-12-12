@@ -111,7 +111,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 if (sr_id.length == 0){
                     getAllOrders(Api.get_orders_to+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
                 }else{
-                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
                 }
 
             }
@@ -463,7 +463,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     val message = response.getString("message")
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
-                            PendingOrderFragment.checkforOrders(
+                            checkforOrders(
                                 queue!!,
                                 token!!,
                                 sr_id!!,

@@ -430,7 +430,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                     val message = response.getString("message")
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
-                            PendingOrderFragment.checkforOrders(
+                            checkforOrders(
                                 queue!!,
                                 token!!,
                                 sr_id!!,

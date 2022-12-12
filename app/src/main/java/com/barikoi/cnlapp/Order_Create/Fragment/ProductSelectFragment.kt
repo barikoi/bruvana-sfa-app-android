@@ -611,12 +611,21 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
-                    progressBar.visibility = View.GONE
+                    try {
+                        ViewUtils.getErrorResponse(error, mContext!!)
+                        progressBar.visibility = View.GONE
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
                 }
 
                 override fun onException(e: Exception) {
-                    progressBar.visibility = View.GONE
+                    try {
+                        progressBar.visibility = View.GONE
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+
                 }
 
             })

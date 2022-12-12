@@ -121,11 +121,8 @@ class CreateOrderFragment : Fragment(){
                 if (position == 0) {
                     viewPager!!.setCurrentItem(0)
                     setCurrentFragment(SelectDokanFragment(), ACTIVITY)
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
-                    editor!!.commit()*/
                 } else if (position == 1) {
-                    //viewPager!!.setCurrentItem(1)
-                    //setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
+                    viewPager!!.setCurrentItem(1)
                     ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, srId!!, routeId!!)
                 }
             }

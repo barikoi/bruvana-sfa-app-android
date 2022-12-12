@@ -70,9 +70,11 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         super.onViewCreated(view, savedInstanceState)
         //checkforOrders()
         //progressBar!!.visibility =View.VISIBLE
-        adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
+        checkforOrders(queue!!, token!!, sr_id!!, route_id!!)
+        /*adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
         recylerView!!.adapter = adapter
-        adapter.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()*/
+
     }
     companion object{
         var mCallback: OrderListSuccessListener? = ConfirmOrderFragment()

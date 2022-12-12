@@ -1,14 +1,19 @@
 package com.barikoi.cnlapp.Utils.ApiService
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.cnlapp.Utils.InputStreamVolleyRequest
 import com.barikoi.cnlapp.Utils.VolleyMultipartRequest
 import org.json.JSONObject
-import java.util.ArrayList
+import java.io.File
+import java.io.FileOutputStream
 
 object ApiServices {
 
@@ -144,6 +149,46 @@ object ApiServices {
             override fun getParams(): Map<String, String>? {
                 return parameters
             }*/
+        }
+        request.retryPolicy = DefaultRetryPolicy(
+            60 * 1000, 0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        queue.add(request)
+    }
+
+    fun apiGETInputStream(url: String, queue: RequestQueue, mContext: Context, mListener: ApiServiceListener){
+        val request = object : InputStreamVolleyRequest(Request.Method.GET, url,
+            {
+                    response ->
+                try{
+                    //mListener.onResponseSuccess(response)
+                        if (response!=null) {
+
+                            var outputStream : FileOutputStream
+                            val name = "order_chalan.pdf"
+                            outputStream = mContext.openFileOutput(name, Context.MODE_PRIVATE)
+                            outputStream.write(response)
+                            outputStream.close()
+                            Toast.makeText(mContext, "Your Download is Complete.", Toast.LENGTH_LONG).show();
+                        }
+                }catch (e: Exception){
+                    mListener.onException(e)
+                }
+            },
+            {
+                    error ->
+                mListener.onResponseFailure(error)
+            }
+        ,null){
+            override fun getHeaders(): MutableMap<String, String> {
+                val parameters: MutableMap<String, String> = HashMap()
+                parameters["Accept"] = "application/json"
+                /*if (token != "") {
+                    parameters["Authorization"] = "bearer $token"
+                }*/
+                return parameters
+            }
         }
         request.retryPolicy = DefaultRetryPolicy(
             60 * 1000, 0,

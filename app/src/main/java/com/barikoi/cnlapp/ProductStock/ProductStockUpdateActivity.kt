@@ -84,7 +84,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
                                         productObj.getString("product_name"),
                                         productObj.getString("image"),
                                         productObj.getString("productive_outlets")+" "+resources.getString(R.string.shops_ordered_this_month),
-                                        productObj.getString("quantity"),
+                                        productObj.getString("current_available_stock"),
                                         productObj.getString("unit_name")
                                     )
                                 )

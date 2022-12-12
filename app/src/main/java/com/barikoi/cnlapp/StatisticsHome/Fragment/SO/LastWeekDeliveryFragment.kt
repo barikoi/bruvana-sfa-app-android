@@ -51,7 +51,6 @@ class LastWeekDeliveryFragment : Fragment() {
 
     private fun init() {
         getLastDeliveryItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_delivered=1&with_last_week_order=1")
-        //getLastDeliveryItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_delivered=1&with_last_week_order=1")
     }
 
     private fun getLastDeliveryItems(url: String) {
@@ -91,7 +90,7 @@ class LastWeekDeliveryFragment : Fragment() {
                                         outletObj.getString("outlet_name"),
                                         outletObj.getString("outlet_code"),
                                         outletObj.getString("outlet_category"),
-                                        outletObj.getString("order_delivery_date"),
+                                        outletObj.getString("ordered_at"),
                                         productList
                                     ))
                             }

@@ -78,6 +78,30 @@
             android:src="@drawable/ic_download">
 
         </ImageView>
+        <LinearLayout
+            android:id="@+id/layoutStatus2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone"
+            android:background="@drawable/button_bg_stroke"
+            android:backgroundTint="@color/cnl_color_1">
+            <TextView
+                android:id="@+id/tvOrderStatus"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_margin="2dp"
+                android:paddingRight="16dp"
+                android:paddingLeft="16dp"
+                android:gravity="center"
+                android:background="@drawable/button_bg_stroke"
+                android:text=""
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="10sp">
+            </TextView>
+        </LinearLayout>
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

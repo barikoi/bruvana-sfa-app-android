@@ -209,7 +209,13 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
-        for (i in 0 until /*data.size*/5) {
+        var size : Int = 0
+        if (data.size<5){
+            size = data.size
+        }else{
+            size = 5
+        }
+        for (i in 0 until size) {
             val tr = TableRow(applicationContext)
             val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
             val leftMargin = 0

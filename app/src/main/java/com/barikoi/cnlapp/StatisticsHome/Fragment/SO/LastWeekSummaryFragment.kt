@@ -55,7 +55,7 @@ class LastWeekSummaryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&sr_id="+srId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary+"?last_week_summary=1&sr_id="+srId+"&route_id="+routeId)
     }
 
     override fun onCreateView(
@@ -82,7 +82,7 @@ class LastWeekSummaryFragment : Fragment() {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val completedArray = obj.getJSONArray("target_completed")
+                        val completedArray = obj.getJSONArray("last_week_summary")
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
@@ -99,7 +99,7 @@ class LastWeekSummaryFragment : Fragment() {
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
                         itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio+"%"))
+                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
                         itemList.add(Pair(resources.getString(R.string.bounce), aiv_completed))

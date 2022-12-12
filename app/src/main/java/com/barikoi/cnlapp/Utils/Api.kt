@@ -69,4 +69,7 @@ object Api {
     /*TO Part*/
     val get_all_so_list = base_url+"api/v1/get-so"
     val get_dh_list = base_url+"api/v1/dh"
+
+    /*chalan download*/
+    val get_chalan_download = base_url+"api/memo-generate"
 }

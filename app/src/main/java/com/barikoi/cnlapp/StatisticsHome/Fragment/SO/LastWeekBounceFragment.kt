@@ -87,7 +87,7 @@ class LastWeekBounceFragment : Fragment() {
                                         outletObj.getString("outlet_name"),
                                         outletObj.getString("outlet_code"),
                                         outletObj.getString("outlet_category"),
-                                        outletObj.getString("order_delivery_date"),
+                                        outletObj.getString("ordered_at"),
                                         productList
                                     ))
                             }
