@@ -157,6 +157,8 @@
     <string name="bounce_reason">Reason of Bounce</string>
     <string name="product_return_reason">Product return reason...</string>
 
+    <string name="no_order_to_download_chalan">No order to download Chalan</string>
+
     <!--notice view-->
     <string name="see_more">See More...</string>
     <string name="see_less">See Less...</string>

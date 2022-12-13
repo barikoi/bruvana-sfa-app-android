@@ -51,6 +51,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     var sr_id : String? = null
     var route_id: String? = null
     var confirmOrder: AppCompatButton? = null
+    var downloadChalan: AppCompatButton? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -88,7 +89,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         }
 
         fun getAllOrders(url: String, queue: RequestQueue, token: String, callback: OrderListSuccessListener) {
-            ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
+            ApiServices.apiGET(url, queue, token, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {
                     try {
                         if (response != null){
@@ -131,6 +132,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         val view = inflater.inflate(R.layout.fragment_confirm_order, container, false)
 
         confirmOrder = view.findViewById(R.id.btnConfirm)
+        downloadChalan = view.findViewById(R.id.btndownloadChalan)
         recylerView = view.findViewById(R.id.orderListView)
         progressBar = view.findViewById(R.id.progressBar2)
         confirmOrder!!.setOnClickListener {
@@ -144,6 +146,49 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 }
 
             })
+        }
+
+        downloadChalan!!.setOnClickListener {
+            if (orderList.size> 0) {
+                var orderIDs = ""
+                for (i in 0 until orderList.size){
+                    if (orderIDs.length == 0){
+                        orderIDs = orderList[i].orderId
+                    }else{
+                        orderIDs = orderIDs+","+ orderList[i].orderId
+                    }
+                }
+                if (orderIDs.length > 0) {
+                    ApiServices.apiGETInputStream(
+                        Api.get_chalan_download + "?order_no=" + orderIDs,
+                        queue!!,
+                        mContext!!,
+                        object : ApiServiceListener {
+                            override fun onResponseSuccess(response: String) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onJSONResponseSuccess(response: JSONObject) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onResponseFailure(error: VolleyError) {
+                                ViewUtils.getErrorResponse(error, mContext!!)
+                            }
+
+                            override fun onException(e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                        })
+                }
+            }else{
+                Toast.makeText(mContext, resources.getString(R.string.no_order_to_download_chalan), Toast.LENGTH_SHORT).show()
+            }
         }
 
         return view

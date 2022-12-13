@@ -117,8 +117,10 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
                     PendingOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 } else if (position == 1) {
                     viewPager.setCurrentItem(1)
+                    DeliveredOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }else if (position == 2) {
                     viewPager.setCurrentItem(2)
+                    BouncedOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }
             }
         })

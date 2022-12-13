@@ -72,7 +72,7 @@ class HomeTOFragment : Fragment() {
         }
 
         lastweeksummary.setOnClickListener {
-            startActivity(Intent(requireActivity(), OrderSummaryTOActivity::class.java))
+            startActivity(Intent(requireActivity(), OrderSummaryTOActivity::class.java).putExtra("from", "lastweek"))
         }
 
         tryAgain.setOnClickListener {
@@ -397,24 +397,25 @@ class HomeTOFragment : Fragment() {
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
         tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         val StartDate = df.format(start)
-        val EndDate = df.format(end)
-        ApiServices.apiGET(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+"&end_date="+EndDate+"&to="+employeeId, mQueue!!, token!!, object : ApiServiceListener{
+        val EndDate = df.format(start)
+        ApiServices.apiGET(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to="+employeeId, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
                         progressBarHome.visibility = View.GONE
                         summaryLayout.visibility = View.VISIBLE
+                        tryAgain.visibility = View.GONE
                         val obj = JSONObject(response)
                         val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         if (ordersArray.length() >0){
                             for(i in 0 until ordersArray.length()){
                                 val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(orderObj.getString("sr_name"), orderObj.getString("productive_outlets")))
+                                itemList.add(Pair(orderObj.getString("sr_name"), dformat.format(orderObj.getString("so_ordered_value").toDouble())))
                             }
                         }
                         if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
@@ -426,6 +427,7 @@ class HomeTOFragment : Fragment() {
                 }catch (e: Exception){
                     e.printStackTrace()
                     progressBarHome.visibility = View.GONE
+                    summaryLayout.visibility = View.GONE
                     tryAgain.visibility = View.VISIBLE
                 }
 
@@ -443,6 +445,7 @@ class HomeTOFragment : Fragment() {
                 try{
                 ViewUtils.getErrorResponse(error, mContext!!)
                 progressBarHome.visibility = View.GONE
+                summaryLayout.visibility = View.GONE
                 tryAgain.visibility = View.VISIBLE
                 }catch (e:Exception){
                     e.printStackTrace()
@@ -452,6 +455,7 @@ class HomeTOFragment : Fragment() {
             override fun onException(e: Exception) {
                 try{
                 progressBarHome.visibility = View.GONE
+                summaryLayout.visibility = View.GONE
                 tryAgain.visibility = View.VISIBLE
                 }catch (e:Exception){
                     e.printStackTrace()

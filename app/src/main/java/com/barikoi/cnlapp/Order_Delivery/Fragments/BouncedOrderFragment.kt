@@ -65,7 +65,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter.filter(s)
                 if (s!!.length == 0) {
-                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+ StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=DELIVERED", queue!!, token!!, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+ StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=DELIVERED", queue!!, token!!, mCallback3!!)
                 }
 
             }
@@ -88,7 +88,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
 
     companion object{
-        var mCallback: OrderListSuccessListener? = BouncedOrderFragment()
+        var mCallback3: OrderListSuccessListener? = BouncedOrderFragment()
         var recylerView: RecyclerView? = null
         lateinit var progressBar: ProgressBar
         lateinit var ACTIVITY: OrderDeliveryUpdateActivity
@@ -107,11 +107,11 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val orderList: ArrayList<OrderList> = ArrayList()
         lateinit var adapter: OrderDeliveryListAdapter
         fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
-            if (mCallback!= null) {
+            if (mCallback3!= null) {
                 if (sr_id.length == 0){
-                    getAllOrders(Api.get_orders_to+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback3!!)
                 }else{
-                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback!!)
+                    getAllOrders(Api.get_orders_to+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED,CANCELLED", queue, token, mCallback3!!)
                 }
 
             }
@@ -168,6 +168,10 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         if (brandArray.length() > 0){
                             for (j in 0 until brandArray.length()){
                                 val brandObj = brandArray.getJSONObject(j)
+                                var bounce = 0
+                                if (brandObj.has("bounce")){
+                                    bounce = brandObj.getInt("bounce")
+                                }
                                 if (orderObj.getString("orders_status").equals("DELIVERED", true) && brandObj.getInt("bounce") > 0){
                                     productItems.add(
                                         Products(
@@ -180,8 +184,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                             0.0,"",
                                             brandObj.getString("unit_name"),
                                             "",0,0,
-                                            brandObj.getInt("bounce"),
-                                            brandObj.getInt("bounce"),
+                                            bounce,
+                                            bounce,
                                             /*brandObj.getInt("quantity"),*/
                                             (brandObj.getInt("bounce")*brandObj.getDouble("unit_price"))
                                         )
@@ -294,7 +298,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         mContext = context
         listener = this
         ACTIVITY = context as OrderDeliveryUpdateActivity
-        PendingOrderFragment.mCallback = this
+        mCallback3 = this
 
     }
 
@@ -356,6 +360,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         var itemCount = 0
         var brandsStatistics : ArrayList<ProductStatistics> = ArrayList()
         if (order.brands_array.size> 0){
+            brandsStatistics.clear()
             for (i in 0 until order.brands_array.size){
                 brandsStatistics.add(
                     ProductStatistics(

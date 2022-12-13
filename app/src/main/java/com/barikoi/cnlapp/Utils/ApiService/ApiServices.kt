@@ -1,19 +1,37 @@
 package com.barikoi.cnlapp.Utils.ApiService
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.FileProvider
 import com.android.volley.AuthFailureError
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
+import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.barikoi.cnlapp.BuildConfig
+import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.InputStreamVolleyRequest
 import com.barikoi.cnlapp.Utils.VolleyMultipartRequest
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 object ApiServices {
 
@@ -158,22 +176,41 @@ object ApiServices {
     }
 
     fun apiGETInputStream(url: String, queue: RequestQueue, mContext: Context, mListener: ApiServiceListener){
-        val request = object : InputStreamVolleyRequest(Request.Method.GET, url,
+        val mRequestQueue = Volley.newRequestQueue(
+            mContext,
+            HurlStack()
+        )
+        val request = @RequiresApi(Build.VERSION_CODES.KITKAT)
+        object : InputStreamVolleyRequest(Request.Method.GET, url,
             {
                     response ->
                 try{
                     //mListener.onResponseSuccess(response)
                         if (response!=null) {
-
+                            Log.d("Chalan", response.toString())
                             var outputStream : FileOutputStream
-                            val name = "order_chalan.pdf"
-                            outputStream = mContext.openFileOutput(name, Context.MODE_PRIVATE)
-                            outputStream.write(response)
-                            outputStream.close()
-                            Toast.makeText(mContext, "Your Download is Complete.", Toast.LENGTH_LONG).show();
+                            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                            val name = "order_chalan_$timeStamp.pdf"
+                            /*if(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).equals(Environment.MEDIA_MOUNTED)) {
+                                //baseFolder = mContext.getExternalFilesDir(null)!!.getAbsolutePath()
+                            }else {
+                                //baseFolder = mContext.getFilesDir().getAbsolutePath()
+                            }*/
+                            var baseFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+                            Log.d("Chalan", baseFolder)
+                            val file = File(baseFolder +File.separator+"CNL Documents"+File.separator+name)
+                            file.parentFile.mkdirs()
+                            val fos: FileOutputStream = FileOutputStream(file)
+                            fos.write(response)
+                            fos.close()
+                            Log.d("Chalan", file.absolutePath.toString())
+                            var filePath = baseFolder +File.separator+"CNL Documents"+File.separator
+                            Toast.makeText(mContext, "Your Download is Complete.", Toast.LENGTH_LONG).show()
+                            enableNotification(mContext, name, file)
                         }
                 }catch (e: Exception){
                     mListener.onException(e)
+                    Log.d("Chalan", "exception: " + e.message)
                 }
             },
             {
@@ -194,6 +231,39 @@ object ApiServices {
             60 * 1000, 0,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
-        queue.add(request)
+        mRequestQueue.add(request)
+    }
+
+    private fun enableNotification(context: Context, fileName: String, filePath: File) {
+        val CHANNEL_ID = "CNL Chalan_Download"
+        val CHANNEL_NAME = fileName+" is completed."
+        val notiManager = NotificationManagerCompat.from(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID, CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notiManager.createNotificationChannel(channel)
+        }
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_download)
+            .setContentTitle("Downloaded")
+            .setAutoCancel(true)
+            .setContentText(fileName+" is completed.")
+        val NOTIFICATION_ID = 12345
+
+        val uri = FileProvider.getUriForFile(
+            context,
+            BuildConfig.APPLICATION_ID + ".fileprovider",
+            filePath
+        )
+        val targetIntent = Intent()
+        targetIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        targetIntent.setAction(Intent.ACTION_VIEW)
+        targetIntent.setDataAndType(uri, "application/pdf")
+        val contentIntent = PendingIntent.getActivity(context, 0, targetIntent, PendingIntent.FLAG_IMMUTABLE)
+        builder.setContentIntent(contentIntent)
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nManager.notify(NOTIFICATION_ID, builder.build())
     }
 }

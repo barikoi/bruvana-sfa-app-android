@@ -27,6 +27,11 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_order_summary_to.*
+import kotlinx.android.synthetic.main.activity_order_summary_to.bpcCount
+import kotlinx.android.synthetic.main.activity_order_summary_to.lpcCount
+import kotlinx.android.synthetic.main.activity_order_summary_to.ovCount
+import kotlinx.android.synthetic.main.activity_order_summary_to.tvDateRange
+import kotlinx.android.synthetic.main.fragment_home_t_o.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -98,10 +103,13 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         StartDate = df.format(start)
-        EndDate = df.format(end)
-
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
-
+        if (intent.hasExtra("from")) {
+            EndDate = df.format(start)
+            tvDateRange.setText(simpleFormat.format(start) /*+ " - " + simpleFormat.format(end)*/)
+        }else{
+            EndDate = df.format(end)
+            tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        }
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -116,6 +124,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             dateRangeLayout.setEnabled(true)
+            summaryLayout2.visibility = View.GONE
+            tryAgain2.visibility = View.GONE
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
@@ -130,12 +140,12 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.commit()*/
             }
             //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_summary=1")
-            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&to="+employeeId)
+            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&to="+employeeId)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+"&end_date="+EndDate+"&to="+employeeId)
+        getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to="+employeeId)
         //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate+"&with_summary=1")
     }
 
@@ -157,7 +167,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         if (ordersArray.length() >0){
                             for(i in 0 until ordersArray.length()){
                                 val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("sr_id")), orderObj.getString("productive_outlets")))
+                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("sr_id")), dformat.format(orderObj.getString("so_ordered_value").toDouble())))
                                 sowithOrderList!!.add(
                                     OrdersSO(
                                         orderObj.getString("sr_id"),
@@ -179,6 +189,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 }catch (e: Exception){
                     e.printStackTrace()
                     progressBar4.visibility = View.GONE
+                    summaryLayout2.visibility = View.GONE
                     tryAgain2.visibility = View.VISIBLE
                 }
 
@@ -195,11 +206,13 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
                 progressBar4.visibility = View.GONE
+                summaryLayout2.visibility = View.GONE
                 tryAgain2.visibility = View.VISIBLE
             }
 
             override fun onException(e: Exception) {
                 progressBar4.visibility = View.GONE
+                summaryLayout2.visibility = View.GONE
                 tryAgain2.visibility = View.VISIBLE
             }
 

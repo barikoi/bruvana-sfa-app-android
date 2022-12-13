@@ -163,6 +163,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 }
 
                 override fun onException(e: Exception) {
+                    Log.d("Order", "exception: "+e.message)
                 }
 
             })
@@ -182,9 +183,14 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         val brandArray = orderObj.getJSONArray("brands")
                         //tvRouteName.setText(orderObj.getString("route_name"))
                         val productItems: ArrayList<Products> = ArrayList()
+
                         if (brandArray.length() > 0){
                             for (j in 0 until brandArray.length()){
                                 val brandObj = brandArray.getJSONObject(j)
+                                var bounce = 0
+                                if (brandObj.has("bounce")){
+                                    bounce = brandObj.getInt("bounce")
+                                }
                                 productItems.add(
                                     Products(
                                         brandObj.getString("product_id"),
@@ -196,7 +202,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                         0.0,"",
                                         brandObj.getString("unit_name"),
                                         "",0,0,
-                                        brandObj.getInt("bounce"),
+                                        bounce,
                                         brandObj.getInt("quantity"),
                                         brandObj.getDouble("total_price")
                                     )
@@ -341,6 +347,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val brandsStatistics : ArrayList<ProductStatistics> = ArrayList()
         if (order.brands_array.size> 0){
             brandsStatistics.clear()
+            updatedProducts!!.clear()
             for (i in 0 until order.brands_array.size){
                 brandsStatistics.add(
                     ProductStatistics(
@@ -357,6 +364,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 grandTotal = grandTotal+order.brands_array[i].ordered_total_price
                 itemCount = itemCount+order.brands_array[i].ordered_quantity
             }
+            updatedProducts!!.addAll(brandsStatistics)
             selected_outlet = order.outletId
             totalItemCount = itemCount
             grandTotalPrice = grandTotal
@@ -385,7 +393,13 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), object :
                 DialogListener {
                 override fun onConfirmed() {
-                    val status = itemValue.get(isChecked).uppercase(Locale.getDefault())
+                    var status = ""
+                    if (isChecked == 2){
+                        status = "CANCELLED"
+                    }else{
+                        status = itemValue.get(isChecked).uppercase(Locale.getDefault())
+                    }
+
                     if (order.orderStatus.equals(status, true)){
                         Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT).show()
                     }else{
@@ -433,7 +447,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             orderObj.put("order_no", order.orderId)
             orderObj.put("sr_id", sr_id)
             orderObj.put("distributor_office_code", order.distOfficeCode)
-            orderObj.put("grand_total", grandTotal)
+            /*if (status.equals("CANCELLED")) {
+                orderObj.put("paid_amount", "0")
+            }else{
+                orderObj.put("paid_amount", grandTotal)
+            }*/
             orderObj.put("orders_status", status)
             val brandsArray = JSONArray()
             for(i in 0 until updatedProducts!!.size){

@@ -61,7 +61,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
         val EndDate = df.format(end)
 
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
-            getProductStock(Api.all_product_list + "?start_date=" + StartDate +" 00:00:00"+ "&end_date=" + EndDate +" 23:59:59"+ "&with_stock=1&with_order=1&territory_id="+territoryId)
+            getProductStock(Api.all_product_list + "?start_date=" + EndDate +" 00:00:00"+ "&end_date=" + EndDate +" 23:59:59"+ "&with_stock=1&with_order=1&territory_id="+territoryId)
         }else{
             getProductStock(Api.all_product_list + "?start_date=" + StartDate  +" 00:00:00"+ "&end_date=" + EndDate +" 23:59:59"+ "&with_stock=1&with_order=1&sr_id="+srCode+"&route_id="+routeId)
         }

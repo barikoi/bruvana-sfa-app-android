@@ -83,6 +83,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var grandTotalPrice : Double? = 0.0
     var shopName : String? =  null
     var shopId : String? =  null
+    var routeId : String? =  null
     var listener: OnValueChangeListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ProductListAdapter? = null
@@ -114,10 +115,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     selectedShop = bundle.getSerializable("Shop") as Shops?
                     shopName = selectedShop!!.shop_name
                     shopId = selectedShop!!.shop_id
+                    routeId = selectedShop!!.route_code
                     addedProducts!!.clear()
                 }else if (bundle.getString("from").equals("Order")){
                     selectedOrder = bundle.getSerializable("Order") as OrderList?
                     shopName = selectedOrder!!.outletName
+                    routeId = selectedOrder!!.routeId
                     addedProducts!!.clear()
                     appDatabase!!.saveOrderDao().deleteALL()
                     var itemCountt = 0
@@ -230,7 +233,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 val outletObj = outletssArray.getJSONObject(i)
                 val brandArray = outletObj.getJSONArray("brands")
                 //val outletName = outletObj.getString("outlet_name")
-                lastDeliveryDate = outletObj.getString("order_delivery_date")
+                lastDeliveryDate = outletObj.getString("ordered_at")
                 if (brandArray.length() >0){
                     for (j in 0 until brandArray.length()){
                         val brandObj = brandArray.getJSONObject(j)
@@ -689,8 +692,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
+        val url = Api.all_product_list+"?with_stock=1&sr_id=" + sr_id + "&route_id=" + routeId
         val request = StringRequest(
-            Request.Method.GET, Api.all_product_list+"?with_stock=1&sr_id=" + sr_id + "&route_id=" + selectedShop!!.route_code,
+            Request.Method.GET, url,
             {
                     response ->
                 try {

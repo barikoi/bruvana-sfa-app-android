@@ -427,7 +427,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getDouble("longitude"),
                                         outletObj.getString("route_id"),
                                         outletObj.getString("route_name"),
-                                        outletObj.getString("last_delivered_at"),
+                                        outletObj.getString("last_ordered_at"),
                                         outletObj.getInt("ordered_today"),
                                         outletObj.getInt("is_no_order")
                                     )

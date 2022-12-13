@@ -311,10 +311,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         editor.remove(Api.SELECTED_SHOP)
         editor.remove(Api.SELECTED_SHOP_ID)
         editor.commit()
-
-        /*val home = Intent(context, SplashActivity::class.java)
-        home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        context.startActivity(home)*/
+        
         val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
         val request: StringRequest = object : StringRequest(
             Method.GET,
@@ -323,6 +320,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val home = Intent(context, SplashActivity::class.java)
                 home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 context.startActivity(home)
+                finish()
 
             },
             Response.ErrorListener { error: VolleyError? ->
@@ -354,6 +352,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val home = Intent(context, SplashActivity::class.java)
                 home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 context.startActivity(home)
+                finish()
             }) {
             override fun getHeaders(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
@@ -368,14 +367,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        val fm = supportFragmentManager
+        /*val fm = supportFragmentManager
         if (fm.getBackStackEntryCount() > 0) {
             Log.i("MainActivity", "popping backstack")
             fm.popBackStack()
         } else {
             Log.i("MainActivity", "nothing on backstack, calling super")
             super.onBackPressed()
-        }
+        }*/
+        super.onBackPressed()
     }
 
 }

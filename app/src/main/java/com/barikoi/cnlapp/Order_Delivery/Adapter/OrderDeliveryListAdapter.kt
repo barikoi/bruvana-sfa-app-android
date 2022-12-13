@@ -77,7 +77,11 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
         }
 
         if (from.equals("SO", true)){
-            holder.editItem.visibility = View.VISIBLE
+            if (mItem.orderStatus.equals("PENDING")) {
+                holder.editItem.visibility = View.VISIBLE
+            }else{
+                holder.editItem.visibility = View.GONE
+            }
         }else{
             holder.editItem.visibility = View.GONE
         }

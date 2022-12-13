@@ -108,7 +108,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
                 }
 
                 override fun onException(e: Exception) {
-                    TODO("Not yet implemented")
+                    e.printStackTrace()
                 }
 
             })

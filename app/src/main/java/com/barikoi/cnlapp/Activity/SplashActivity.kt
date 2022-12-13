@@ -131,9 +131,7 @@ class SplashActivity : AppCompatActivity() {
         }else{
             if (isFirst) {
                 hideProgress()
-                val prefs = PreferenceManager.getDefaultSharedPreferences(
-                    applicationContext
-                )
+                val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val editor = prefs.edit()
                 editor.putBoolean("isFirst", false)
                 editor.commit()

@@ -9,6 +9,8 @@ import android.view.MenuItem
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -70,12 +72,12 @@ class TradeOffersActivity : AppCompatActivity() {
                             if (itemList.size > 0){
                                 if (adapter != null) {
                                     adapter = TradeOfferListAdapter(itemList)
+                                    productList2.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
                                     productList2.adapter = adapter
                                     adapter!!.notifyDataSetChanged()
                                 }
 
                             }
-
                             tvTitle.setText(resources.getString(R.string.product_list))
                         }
                         R.id.menu_trade_offers->{
@@ -85,6 +87,7 @@ class TradeOffersActivity : AppCompatActivity() {
                                 it.tradeList.size == 0
                             }
                             adapter = TradeOfferListAdapter(filterList)
+                            productList2.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
                             productList2.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                             tvTitle.setText(resources.getString(R.string.title_trade_offers))
