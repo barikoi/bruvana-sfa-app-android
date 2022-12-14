@@ -102,8 +102,8 @@ class LastWeekSummaryFragment : Fragment() {
                         itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
-                        itemList.add(Pair(resources.getString(R.string.bounce), aiv_completed))
-                        itemList.add(Pair(resources.getString(R.string.delivery_value), aiv_completed))
+                        itemList.add(Pair(resources.getString(R.string.bounce), bounce))
+                        itemList.add(Pair(resources.getString(R.string.delivery_value), delivery_value))
 
                         createTable(itemList)
 

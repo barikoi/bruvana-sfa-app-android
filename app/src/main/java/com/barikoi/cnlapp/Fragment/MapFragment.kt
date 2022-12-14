@@ -132,11 +132,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     srCode = soList[p2].employeeId
                     if (cbVerified!!.isChecked){
                         if (srCode!!.length > 0) {
-                            getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode)
+                            getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode, "start")
                         }
                     }else{
                         if (userId!!.length > 0) {
-                            getShopList(Api.route_outlet_list + "?sr_id=" +userId)
+                            getShopList(Api.route_outlet_list + "?sr_id=" +userId, "start")
                         }
                     }
                 }
@@ -159,7 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 if (cbVerified!!.isChecked){
                     mMap!!.clear()
                     if (srCode!!.length > 0) {
-                        getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode)
+                        getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode, "")
                     }
                 }else{
                     nonVerifiedShopList!!.clear()
@@ -192,7 +192,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             if (isChecked) {
                 mMap!!.clear()
                 if (srCode!!.length > 0) {
-                    getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode)
+                    getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode, "checkbox")
                 }
             } else {
                 mMap!!.clear()
@@ -277,7 +277,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             e.printStackTrace()
         }
     }
-    fun getShopList(url: String){
+    fun getShopList(url: String, from: String){
         loading!!.visibility = View.VISIBLE
         allRouteList!!.clear()
         //routesList!!.clear()
@@ -395,13 +395,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     }
 
-                    if (spinner != null) {
-                        val adapter = ArrayAdapter(
-                            mContext!!,
-                            android.R.layout.simple_spinner_item, routeNameList!!
-                        )
-                        spinner!!.adapter = adapter
+                    if (from.equals("start")) {
+                        if (spinner != null) {
+                            val adapter = ArrayAdapter(
+                                mContext!!,
+                                android.R.layout.simple_spinner_item, routeNameList!!
+                            )
+                            spinner!!.adapter = adapter
 
+                        }
                     }
 
                 }catch (e: JSONException) {
@@ -549,7 +551,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val uiSettings: UiSettings = mapboxMap!!.uiSettings
         uiSettings.setCompassEnabled(false)
         if (userId!!.length > 0) {
-            getShopList(Api.route_outlet_list + "?sr_id=" + userId)
+            getShopList(Api.route_outlet_list + "?sr_id=" + userId, "start")
         }
 
         fab.setOnClickListener(View.OnClickListener {

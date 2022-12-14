@@ -120,9 +120,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }else if (bundle.getString("from").equals("Order")){
                     selectedOrder = bundle.getSerializable("Order") as OrderList?
                     shopName = selectedOrder!!.outletName
+                    shopId = selectedOrder!!.outletId
                     routeId = selectedOrder!!.routeId
                     addedProducts!!.clear()
                     appDatabase!!.saveOrderDao().deleteALL()
+                    grandTotalPrice = selectedOrder!!.grandTotal.toDouble()
                     var itemCountt = 0
                     for (i in 0 until selectedOrder!!.brands_array.size){
                         itemCountt = itemCountt+selectedOrder!!.brands_array[i].ordered_quantity
@@ -862,7 +864,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     override fun onValueChanged(products: Any, position: Int) {
-        var dformat = DecimalFormat("#.##")
+        val dformat = DecimalFormat("#.##")
         products as Products
         var itemCount = 0
         var grandTotal = 0.0

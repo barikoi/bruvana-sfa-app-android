@@ -456,7 +456,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             val brandsArray = JSONArray()
             for(i in 0 until updatedProducts!!.size){
                 val brandObj = JSONObject()
-                if (updatedProducts!![i].quantity > 0) {
+                if (updatedProducts[i].quantity > 0) {
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product", updatedProducts[i].product_name)
                     brandObj.put("brand_id", updatedProducts[i].brand_id)
