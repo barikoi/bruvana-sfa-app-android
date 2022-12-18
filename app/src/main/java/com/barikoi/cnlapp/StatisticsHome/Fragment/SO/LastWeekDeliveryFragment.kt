@@ -70,29 +70,34 @@ class LastWeekDeliveryFragment : Fragment() {
                                 if (brandArray.length() >0){
                                     for (j in 0 until brandArray.length()){
                                         val brandObj = brandArray.getJSONObject(j)
-                                        productList.add(
-                                            ProductStatistics(
-                                                brandObj.getString("product_id"),
-                                                brandObj.getString("product"),
-                                                brandObj.getString("unit_name"),
-                                                brandObj.getString("brand_id"),
-                                                brandObj.getDouble("unit_price"),
-                                                brandObj.getInt("quantity"),
-                                                brandObj.getInt("bounce"),
-                                                brandObj.getDouble("total_price")
+                                        if (brandObj.getInt("quantity") > 0) {
+                                            productList.add(
+                                                ProductStatistics(
+                                                    brandObj.getString("product_id"),
+                                                    brandObj.getString("product"),
+                                                    brandObj.getString("unit_name"),
+                                                    brandObj.getString("brand_id"),
+                                                    brandObj.getDouble("unit_price"),
+                                                    brandObj.getInt("quantity"),
+                                                    brandObj.getInt("bounce"),
+                                                    brandObj.getDouble("total_price")
+                                                )
                                             )
-                                        )
+                                        }
                                     }
                                 }
-                                itemList.add(
-                                    OutletStatistics(
-                                        outletObj.getString("outlet_id"),
-                                        outletObj.getString("outlet_name"),
-                                        outletObj.getString("outlet_code"),
-                                        outletObj.getString("outlet_category"),
-                                        outletObj.getString("ordered_at"),
-                                        productList
-                                    ))
+                                if (productList.size > 0) {
+                                    itemList.add(
+                                        OutletStatistics(
+                                            outletObj.getString("outlet_id"),
+                                            outletObj.getString("outlet_name"),
+                                            outletObj.getString("outlet_code"),
+                                            outletObj.getString("outlet_category"),
+                                            outletObj.getString("ordered_at"),
+                                            productList
+                                        )
+                                    )
+                                }
                             }
                         }
 

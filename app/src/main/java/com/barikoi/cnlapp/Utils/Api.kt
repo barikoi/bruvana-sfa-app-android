@@ -43,7 +43,7 @@ object Api {
 
     /*order create*/
     val routes_withfilter = base_url+"api/v1/routes"
-    val shops_byroutes = base_url+"api/v1/fetch-outlets"
+    val shops_byroutes = base_url+"api/v1/outlets"
     val all_product_list = base_url+"api/v1/products"
     val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"

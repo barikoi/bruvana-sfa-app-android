@@ -403,8 +403,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     loading!!.visibility = View.GONE
 
                     val data = JSONObject(response)
-                    if (data.has("fetch_outlets") && !data.isNull("fetch_outlets")){
-                        val outletsArray = data.getJSONArray("fetch_outlets")
+                    if (data.has("outlets") && !data.isNull("outlets")){
+                        val outletsArray = data.getJSONArray("outlets")
                         if (outletsArray.length() > 0){
                             shopList!!.clear()
                             if (outletsArray.length()>0){

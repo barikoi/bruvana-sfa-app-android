@@ -182,12 +182,12 @@ class HomeFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&sr_id="+srId+"&route_id="+routeId)
+            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&sr_id="+srId/*+"&route_id="+routeId*/)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
 
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&sr_id="+srId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&sr_id="+srId/*+"&route_id="+routeId*/)
 
         /*setSecondPartSummary()
         setThirdPartSummary()*/
@@ -207,6 +207,8 @@ class HomeFragment : Fragment() {
         var ads_completed = "--:--"
         var rds = "--:--"
         var rds_completed = "--:--"
+        var visit_completed = "--:--"
+        var visited = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
@@ -223,6 +225,7 @@ class HomeFragment : Fragment() {
                                 if(!targetObj.isNull("target_rds")) rds = dformat.format(targetObj.getString("target_rds").toDouble())
                                 if(!targetObj.isNull("target_sku_per_memo")) bpc = dformat.format(targetObj.getString("target_sku_per_memo").toDouble())
                                 if(!targetObj.isNull("target_number_of_memo")) lpc = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
+                                if(!targetObj.isNull("target_number_of_visits")) visited = dformat.format(targetObj.getString("number_of_visits").toDouble())
                                 if(!targetObj.isNull("target_aiv")) aiv = dformat.format(targetObj.getString("target_aiv").toDouble())
                             }
                         }
@@ -234,6 +237,7 @@ class HomeFragment : Fragment() {
                                 if(!targetObj.isNull("rds")) rds_completed = dformat.format(targetObj.getString("rds").toDouble())
                                 if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
                                 if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
                                 if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
                             }
                         }
@@ -244,13 +248,14 @@ class HomeFragment : Fragment() {
                         itemList.add(TargetValue(resources.getString(R.string.rds), rds, rds_completed))
                         itemList.add(TargetValue(resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
                         itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.visit_ratio), visited, visit_completed))
                         itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
 
                         val adapter = TargetAdapter(itemList, "SO")
                         targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setSecondPartSummary()
-                        setThirdPartSummary()
+                        //setThirdPartSummary()
 
                     }
                 }catch (e: Exception){
@@ -281,11 +286,13 @@ class HomeFragment : Fragment() {
 
     private fun setSecondPartSummary() {
         layoutSecond.visibility = View.VISIBLE
-        val titles = arrayOf(resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category))
+        val titles = arrayOf(resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category), resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
         val fragments = ArrayList<Fragment>()
         fragments.add(LastWeekSummaryFragment())
         fragments.add(LastWeekProductFragment())
         fragments.add(LastWeekCategoryFragment())
+        fragments.add(LastWeekDeliveryFragment())
+        fragments.add(LastWeekBounceFragment())
         addDots(fragments.size)
         viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator

@@ -26,6 +26,8 @@ import androidx.fragment.app.FragmentActivity
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
+import com.barikoi.cnlapp.BuildConfig
+import com.barikoi.cnlapp.BuildConfig.VERSION_NAME
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
@@ -48,7 +50,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.appcontent_main.*
-import kotlinx.android.synthetic.main.appcontent_main.tvTitle
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -128,6 +129,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         tvHeaderUserName = header.findViewById<TextView>(R.id.textView_username)
         val tvHeaderEmail = header.findViewById<TextView>(R.id.textView_useremail)
         val btnLogout = findViewById<AppCompatButton>(R.id.btnLogout)
+        val tvAppVersion = header.findViewById<TextView>(R.id.textView_version)
+        val versionName: String = BuildConfig.VERSION_NAME
+        tvAppVersion.setText("version $versionName")
         tvHeaderUserName!!.text = userName
         if (prefs!!.getString(Api.EMAIL, "")!!.length >0){
             tvHeaderEmail.visibility = View.VISIBLE
