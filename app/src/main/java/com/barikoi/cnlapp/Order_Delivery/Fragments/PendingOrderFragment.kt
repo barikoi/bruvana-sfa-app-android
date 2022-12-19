@@ -364,10 +364,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 grandTotal = grandTotal+order.brands_array[i].ordered_total_price
                 itemCount = itemCount+order.brands_array[i].ordered_quantity
             }
-            updatedProducts!!.addAll(brandsStatistics)
             selected_outlet = order.outletId
             totalItemCount = itemCount
             grandTotalPrice = grandTotal
+            updatedProducts!!.addAll(brandsStatistics)
             appDatabase!!.updateOrderDao().insertAll(
                 UpdateOrder(
                     null,
@@ -396,6 +396,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     var status = ""
                     if (isChecked == 2){
                         status = "CANCELLED"
+                        //updatedProducts!!.addAll(brandsStatistics)
+                        for (i in 0 until updatedProducts!!.size){
+                            updatedProducts!![i].bounced_quantity = updatedProducts!![i].quantity
+                            updatedProducts!![i].quantity = 0
+                        }
                     }else{
                         status = itemValue.get(isChecked).uppercase(Locale.getDefault())
                     }
@@ -456,7 +461,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             val brandsArray = JSONArray()
             for(i in 0 until updatedProducts!!.size){
                 val brandObj = JSONObject()
-                if (updatedProducts[i].quantity > 0) {
+                if (updatedProducts[i].quantity > 0 ) {
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product", updatedProducts[i].product_name)
                     brandObj.put("brand_id", updatedProducts[i].brand_id)
@@ -465,16 +470,32 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
                     brandObj.put("total_price", updatedProducts[i].total_price.toString())
                     brandObj.put("unit_name", updatedProducts[i].product_type)
+                    brandsArray.put(brandObj)
                 }
-                brandsArray.put(brandObj)
+                else if(updatedProducts[i].quantity == 0 && updatedProducts[i].bounced_quantity > 0){
+                    brandObj.put("product_id", updatedProducts[i].product_id)
+                    brandObj.put("product", updatedProducts[i].product_name)
+                    brandObj.put("brand_id", updatedProducts[i].brand_id)
+                    brandObj.put("quantity", updatedProducts[i].quantity.toString())
+                    brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
+                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
+                    brandObj.put("total_price", updatedProducts[i].total_price.toString())
+                    brandObj.put("unit_name", updatedProducts[i].product_type)
+                    brandsArray.put(brandObj)
+                }
+
             }
             orderObj.put("brands", brandsArray)
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
             if (obj1.length() >0){
-                Log.d("ConfirmOrder", "response: "+obj1)
-                submitOrder(obj1, dialog)
+                if (brandsArray.length() > 0) {
+                    Log.d("ConfirmOrder", "response: " + obj1)
+                    submitOrder(obj1, dialog)
+                }else{
+                    Toast.makeText(mContext, "No products on this order", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

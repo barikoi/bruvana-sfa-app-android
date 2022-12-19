@@ -72,7 +72,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         createShop.setBackgroundDrawable(gd)
 
 
-        sortTitle!!.setOnClickListener {
+        sortingLayout.setOnClickListener {
             val popup = PopupMenu(mContext, sortTitle)
             popup.menuInflater.inflate(R.menu.sort_menu_outlet, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
@@ -110,7 +110,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             popup.show()
         }
 
-        filterTitle.setOnClickListener {
+        filterLayout.setOnClickListener {
             val popup = PopupMenu(mContext, filterTitle)
             popup.menuInflater.inflate(R.menu.filter_menu_outlets, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,

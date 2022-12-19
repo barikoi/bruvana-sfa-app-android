@@ -66,6 +66,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var recylerView: RecyclerView? = null
     var shopTitle: TextView? = null
     var sortTitle: TextView? = null
+    var sort_layout: LinearLayout? = null
     private var totalItemCount: TextView? = null
     var tvgrandTotal: TextView? = null
     var saveOrder: AppCompatButton? = null
@@ -278,8 +279,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         noOrder = view.findViewById(R.id.no_order)
         loading = view.findViewById(R.id.progressBar)
         sortTitle = view.findViewById(R.id.sortTitle)
+        sort_layout = view.findViewById(R.id.sortingLayout)
 
-        sortTitle!!.setOnClickListener {
+        sort_layout!!.setOnClickListener {
             val popup = PopupMenu(mContext, sortTitle)
             popup.menuInflater.inflate(R.menu.sort_menu_product, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,

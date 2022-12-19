@@ -60,7 +60,7 @@ class TradeOffersActivity : AppCompatActivity() {
             onBackPressed()
             finish()
         }
-        filterTitle.setOnClickListener {
+        filterLayout.setOnClickListener {
             val popup = PopupMenu(applicationContext, filterTitle)
             popup.menuInflater.inflate(R.menu.filter_menu_trade, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,

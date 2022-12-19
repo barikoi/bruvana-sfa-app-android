@@ -471,7 +471,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 .title(shopname)
         )
         placemarkermap!![p.shop_code] = m
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 15.0))
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 12.0))
     }
 
     private fun enableLocation() {

@@ -1,6 +1,8 @@
 package com.barikoi.cnlapp.Order_Delivery.Adapter
 
 import android.os.Build
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -48,7 +50,26 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
         }
         holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
         holder.productCount.isEnabled = false
+        holder.productCount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
+                    holder.btnMinus.isEnabled = false
+                    holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
+                }else{
+                    holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
+                    holder.btnMinus.isEnabled = true
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+
+        })
         holder.btnMinus.setOnClickListener {
             val qtyValue = holder.productCount.text.toString().toInt() - 1
             holder.productCount.setText(qtyValue.toString())
