@@ -7,8 +7,10 @@
     android:background="@color/background_app"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
+        android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:orientation="vertical">
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -158,4 +160,38 @@
         android:layout_centerInParent="true"
         android:visibility="gone"
         app:SpinKit_Color="@color/cnl_color_1" />
+    <LinearLayout
+        android:id="@+id/no_route_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/no_route_selected_today"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:textSize="17sp"
+        android:textColor="@color/text_title">
+
+    </TextView>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_tryAgain"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:layout_margin="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/cardview_bg"
+        android:backgroundTint="@color/color_gray"
+        android:padding="2dp"
+        android:textAllCaps="false"
+        android:textColor="@color/text_title"
+        android:textStyle="bold"
+        android:textSize="12sp"
+        android:text="@string/try_again" />
+    </LinearLayout>
 </RelativeLayout>

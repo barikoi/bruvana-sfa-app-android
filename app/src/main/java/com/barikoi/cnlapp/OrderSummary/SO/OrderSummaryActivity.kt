@@ -59,9 +59,11 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         listener = this
         if (route_id!!.length > 0) {
             setDateFilter()
+            no_route_check.visibility =View.GONE
+            bodyLayout.visibility = View.VISIBLE
         }else{
-            setDateFilter()
-            ViewUtils.viewDialogResponse(applicationContext, resources.getString(R.string.no_route_selected_today), object : DialogListener{
+            //setDateFilter()
+            /*ViewUtils.viewDialogResponse(applicationContext, resources.getString(R.string.no_route_selected_today), object : DialogListener{
                 override fun onConfirmed() {
                     TODO("Not yet implemented")
                 }
@@ -70,7 +72,13 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                     TODO("Not yet implemented")
                 }
 
-            })
+            })*/
+
+            no_route_check.visibility =View.VISIBLE
+            bodyLayout.visibility = View.GONE
+            btn_tryAgain.setOnClickListener {
+                setDateFilter()
+            }
         }
 
         btnBack.setOnClickListener {
