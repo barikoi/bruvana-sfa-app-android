@@ -38,7 +38,8 @@ object Api {
     val loginurl = base_url + "api/v1/login"
     val logouturl = base_url + "api/v1/logout"
     val authUserCheck = base_url+ "api/v1/auth/user"
-    val route_outlet_list = base_url+"api/v1/route-list"
+    //val route_outlet_list = base_url+"api/v1/route-list"
+    val route_outlet_list = base_url+"api/v1/routes"
     val verified_shop_list = base_url+"api/v1/verified-outlets"
 
     /*order create*/

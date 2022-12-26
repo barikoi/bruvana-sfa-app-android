@@ -383,8 +383,12 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     }
 
     override fun onFailure(error: VolleyError) {
-        progressBar!!.visibility = View.GONE
-        ViewUtils.getErrorResponse(error, mContext!!)
+        try {
+            ViewUtils.getErrorResponse(error, mContext!!)
+            progressBar!!.visibility = View.GONE
+        }catch (e: Exception){
+
+        }
     }
 
     override fun onDataSet(StartDate: Date, EndDate: Date) {

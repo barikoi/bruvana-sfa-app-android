@@ -306,7 +306,9 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         }
 
                     }
-                    adapter!!.shopList=shops
+                    //adapter!!.shopList=shops
+                    adapter = ShopSelectAdapter(shops, listener!!)
+                    recylerView!!.adapter = adapter
                     adapter!!.notifyDataSetChanged()
                 }
 

@@ -130,14 +130,14 @@ class ShopListFragment : Fragment() {
             routesList!!.clear()
             val request = StringRequest(
                 Request.Method.GET,
-                Api.route_outlet_list+"?sr_id="+userId,
+                Api.route_outlet_list+"?sr_id="+userId+"&with_outlets=1",
                 { response ->
                     //success
                     Log.d("RouteFrag", response)
                     try {
                         progressBar2!!.visibility = View.GONE
                         val data = JSONObject(response)
-                        val routesArray = data.getJSONArray("so-routes")
+                        val routesArray = data.getJSONArray("routes")
                         shopList!!.clear()
                         routesList!!.clear()
                         for (i in 0 until routesArray.length()){

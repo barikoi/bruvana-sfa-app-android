@@ -62,14 +62,14 @@ class RouteFragment : Fragment() {
             arrayList!!.clear()
             progressBar!!.visibility = View.VISIBLE
             val request = StringRequest(GET,
-                Api.route_outlet_list+"?sr_id="+userId,
+                Api.route_outlet_list+"?sr_id="+userId+"&with_outlets=1",
                 { response ->
                     //success
                     Log.d("RouteFrag", response)
                     try {
                         progressBar!!.visibility = View.GONE
                         val data = JSONObject(response)
-                        val routesArray = data.getJSONArray("so-routes")
+                        val routesArray = data.getJSONArray("routes")
                         for (i in 0 until routesArray.length()){
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")

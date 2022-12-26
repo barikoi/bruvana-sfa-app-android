@@ -209,6 +209,8 @@ class HomeFragment : Fragment() {
         var rds_completed = "--:--"
         var visit_completed = "--:--"
         var visited = "--:--"
+        var bounce_completed = "--:--"
+        var bounced = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
@@ -239,6 +241,7 @@ class HomeFragment : Fragment() {
                                 if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                                 if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
                                 if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                if(!targetObj.isNull("bounce_amount")) bounce_completed = dformat.format(targetObj.getString("bounce_amount").toDouble())
                             }
                         }
 
@@ -250,6 +253,7 @@ class HomeFragment : Fragment() {
                         itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
                         itemList.add(TargetValue(resources.getString(R.string.visit_ratio), visited, visit_completed))
                         itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.bounce), bounced, bounce_completed))
 
                         val adapter = TargetAdapter(itemList, "SO")
                         targetListView.adapter = adapter
@@ -286,8 +290,9 @@ class HomeFragment : Fragment() {
 
     private fun setSecondPartSummary() {
         layoutSecond.visibility = View.VISIBLE
-        val titles = arrayOf(resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category), resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
+        val titles = arrayOf(resources.getString(R.string.today_summary),resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product), resources.getString(R.string.last_week_category), resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
         val fragments = ArrayList<Fragment>()
+        fragments.add(TodaysSummaryFragment())
         fragments.add(LastWeekSummaryFragment())
         fragments.add(LastWeekProductFragment())
         fragments.add(LastWeekCategoryFragment())

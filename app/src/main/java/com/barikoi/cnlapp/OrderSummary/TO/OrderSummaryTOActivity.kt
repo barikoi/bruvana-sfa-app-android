@@ -53,6 +53,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     var StartDate: String? = null
     var EndDate: String? = null
     var sowithOrderList: ArrayList<OrdersSO>? = ArrayList()
+    val itemList: ArrayList<OrderList> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +83,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0){
-                    //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate+"&with_summary=1")
+                    adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
+                    orderList.adapter = adapter
+                    adapter!!.notifyDataSetChanged()
                 }
             }
             override fun afterTextChanged(p0: Editable?) {
@@ -265,7 +268,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     private fun getAllOrders(orderArray: JSONArray) {
 
         try {
-                val itemList: ArrayList<OrderList> = ArrayList()
+                itemList.clear()
                 if (orderArray.length() > 0){
                     for (i in 0 until orderArray.length()){
                         //productItems.clear()

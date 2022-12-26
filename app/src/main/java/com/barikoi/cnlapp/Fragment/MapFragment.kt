@@ -136,7 +136,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         }
                     }else{
                         if (userId!!.length > 0) {
-                            getShopList(Api.route_outlet_list + "?sr_id=" +userId, "start")
+                            getShopList(Api.route_outlet_list + "?sr_id=" +userId+"&with_outlets=1", "start")
                         }
                     }
                 }
@@ -292,11 +292,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     verifiedShopList!!.clear()
                     //allRouteList!!.clear()
                     val data = JSONObject(response)
-                    if (data.has("so-routes")){
+                    if (data.has("routes")){
                         shopList!!.clear()
                         routesList!!.clear()
                         routeNameList!!.clear()
-                        val routesArray = data.getJSONArray("so-routes")
+                        val routesArray = data.getJSONArray("routes")
                         for (i in 0 until routesArray.length()){
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")
@@ -551,7 +551,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val uiSettings: UiSettings = mapboxMap!!.uiSettings
         uiSettings.setCompassEnabled(false)
         if (userId!!.length > 0) {
-            getShopList(Api.route_outlet_list + "?sr_id=" + userId, "start")
+            getShopList(Api.route_outlet_list + "?sr_id=" + userId+"&with_outlets=1", "start")
         }
 
         fab.setOnClickListener(View.OnClickListener {

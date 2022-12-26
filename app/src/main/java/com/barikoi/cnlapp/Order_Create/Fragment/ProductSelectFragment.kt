@@ -579,8 +579,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                    brandsArray.put(brandObj)
                 }
-                brandsArray.put(brandObj)
+
             }
 
             orderObj.put("brands", brandsArray)
@@ -741,6 +742,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         orderedQty = exist.ordered_quantity
                                         orderedTotalPrice = exist.ordered_total_price
                                     }
+                                }else if(addedProducts!!.size > 0){
+                                    val exist = addedProducts?.find {
+                                        it.product_id == productId
+                                    }
+
+                                    if (exist != null){
+                                        orderedQty = exist.ordered_quantity
+                                        orderedTotalPrice = exist.ordered_total_price
+                                    }
                                 }
                                 val products = Products(
                                     productId,
@@ -749,7 +759,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                                 productsList!!.add(products)
                                 if (orderedQty > 0){
-                                    addedProducts!!.add(products)
+                                    val exist = addedProducts?.find {
+                                        it.product_id == productId
+                                    }
+
+                                    if (exist == null){
+                                        addedProducts!!.add(products)
+                                    }
+
                                 }
                             }
 
@@ -898,7 +915,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
                 )
                 )
-
+                Log.d("Product", "addedProducts size 2: "+addedProducts!!.size)
             }else{
                 addedProducts!!.add(
                     Products(
@@ -911,6 +928,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
                 )
                 )
+                Log.d("Product", "addedProducts size 3: "+addedProducts!!.size)
             }
         }catch (e: Exception){
             Log.d("Product", "exception 2: "+e.message+" "+position)

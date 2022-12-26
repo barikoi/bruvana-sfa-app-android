@@ -128,7 +128,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
                     orderList = mValues
                 } else {
                     //val filteredList: ArrayList<RetailShops> = ArrayList<RetailShops>()
-                    for (row in orderList) {
+                    for (row in mValues) {
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match

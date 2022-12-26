@@ -11,22 +11,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TableRow
 import android.widget.TextView
-import com.android.volley.*
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils.getErrorResponse
+import com.barikoi.cnlapp.Utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_last_week_summary.*
+import kotlinx.android.synthetic.main.fragment_todays_summary.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
+class TodaysSummaryFragment : Fragment() {
 
-class LastWeekSummaryFragment : Fragment() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -37,6 +39,14 @@ class LastWeekSummaryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_todays_summary, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,15 +62,7 @@ class LastWeekSummaryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryTargets(Api.get_summary+"?last_week_summary=1&sr_id="+srId+"&route_id="+routeId)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_last_week_summary, container, false)
+        getSummaryTargets(Api.get_summary+"?today_summary=1&sr_id="+srId+"&route_id="+routeId)
     }
 
     private fun getSummaryTargets(url: String) {
@@ -69,8 +71,6 @@ class LastWeekSummaryFragment : Fragment() {
         var bpc_completed = "--:--"
         var aiv_completed = "--:--"
         var visit_ratio = "--:--"
-        var bounce = "--:--"
-        var delivery_value = "--:--"
 
         var dformat = DecimalFormat("#.##")
 
@@ -79,7 +79,7 @@ class LastWeekSummaryFragment : Fragment() {
                 try {
                     if (response != null){
                         val obj = JSONObject(response)
-                        val completedArray = obj.getJSONArray("last_week_summary")
+                        val completedArray = obj.getJSONArray("today_summary")
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
@@ -88,8 +88,6 @@ class LastWeekSummaryFragment : Fragment() {
                                 if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                                 if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
                                 if(!targetObj.isNull("number_of_visits")) visit_ratio = dformat.format(targetObj.getString("number_of_visits").toDouble())
-                                if(!targetObj.isNull("bounce_amount")) bounce = dformat.format(targetObj.getString("bounce_amount").toDouble())
-                                if(!targetObj.isNull("delivered_value")) delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
                             }
                         }
 
@@ -99,8 +97,6 @@ class LastWeekSummaryFragment : Fragment() {
                         itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
-                        itemList.add(Pair(resources.getString(R.string.bounce), bounce))
-                        itemList.add(Pair(resources.getString(R.string.delivery_value), delivery_value))
 
                         createTable(itemList)
 
@@ -121,7 +117,7 @@ class LastWeekSummaryFragment : Fragment() {
             }
 
             override fun onResponseFailure(error: VolleyError) {
-                getErrorResponse(error, mContext!!)
+                ViewUtils.getErrorResponse(error, mContext!!)
             }
 
             override fun onException(e: Exception) {
@@ -135,8 +131,8 @@ class LastWeekSummaryFragment : Fragment() {
 
 
     private fun createTable(data: ArrayList<Pair<String, String>>) {
-        tabLayout.isStretchAllColumns = true
-        tabLayout.bringToFront()
+        tabLayoutToday.isStretchAllColumns = true
+        tabLayoutToday.bringToFront()
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
             val c1 = TextView(mContext)
@@ -149,7 +145,7 @@ class LastWeekSummaryFragment : Fragment() {
             c2.setText(data.get(i).second)
             tr.addView(c1)
             tr.addView(c2)
-            tabLayout.addView(tr)
+            tabLayoutToday.addView(tr)
         }
     }
 

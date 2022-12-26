@@ -22,8 +22,9 @@ import com.barikoi.cnlapp.RoomDb.AppDatabase
 import java.text.DecimalFormat
 import java.util.*
 
-class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChangeListener): RecyclerView.Adapter<ProductListAdapter.ViewHolder>(),
-Filterable{
+class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChangeListener) :
+    RecyclerView.Adapter<ProductListAdapter.ViewHolder>(),
+    Filterable {
 
     var productList: List<Products> = mValues
     var dformat = DecimalFormat("#.##")
@@ -32,7 +33,8 @@ Filterable{
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_product_view, parent, false)
+        val v =
+            LayoutInflater.from(parent.context).inflate(R.layout.single_product_view, parent, false)
         return ViewHolder(v)
     }
 
@@ -47,17 +49,19 @@ Filterable{
         holder.productUnit.text = productList[position].unit_name
         holder.perUnitPrice.text = productList[position].unit_price.toString()
 
-        if (productObj.ordered_quantity > 0) {
+        if (productList[position].ordered_quantity > 0) {
             /*holder.layoutQty.visibility = View.VISIBLE
             holder.layoutAdd.visibility = View.GONE*/
-            holder.productCount.setText(productObj.ordered_quantity.toString())
+            holder.productCount.setText(productList[position].ordered_quantity.toString())
             holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
-        }else{
+        } else {
             holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
         }
 
-        if (productObj.ordered_total_price > 0.0) {
-            holder.tvSubtoal.setText(dformat.format(productObj.ordered_total_price).toString())
+        if (productList[position].ordered_total_price > 0.0) {
+            holder.tvSubtoal.setText(
+                dformat.format(productList[position].ordered_total_price).toString()
+            )
         }
 
 
@@ -66,9 +70,10 @@ Filterable{
             holder.layoutAdd.visibility = View.GONE
         }*/
 
-        if (productList[position].stock_available > 0){
-            holder.stockAvailable.text = productList[position].stock_available.toString()+ " in stock"
-        }else{
+        if (productList[position].stock_available > 0) {
+            holder.stockAvailable.text =
+                productList[position].stock_available.toString() + " in stock"
+        } else {
             holder.stockAvailable.text = holder.itemView.resources.getString(R.string.stock_out)
         }
 
@@ -79,21 +84,32 @@ Filterable{
         holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
 
         holder.btnAdd.setOnClickListener {
-            if (productList[position].stock_available > 0){
+            if (productList[position].stock_available > 0) {
                 val qtyValue = holder.productCount.text.toString().toInt() + 1
                 holder.productCount.setText(qtyValue.toString())
                 /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = subtotal.toString()*/
-                val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+                productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
+                productList[position].ordered_total_price = dformat.format(
+                    productList[position].unit_price * holder.productCount.text.toString().toInt()
+                ).toDouble()
+                productList[position].stock_available = productList[position].stock_available - 1
+                holder.stockAvailable.text =
+                    productList[position].stock_available.toString() + " in stock"
+                val prodList = appDatabase!!.saveOrderDao()
+                    .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
                 try {
-                    if (prodList!!.size > 0){
-                        Log.d("Product", "item count add: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
+                    if (prodList!!.size > 0) {
+                        Log.d(
+                            "Product",
+                            "item count add: " + prodList[0].itemsCount + " shopId: " + prodList[0].outletId + " Total Price: " + prodList[0].totalPrice
+                        )
                         appDatabase.saveOrderDao().update(
                             prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
                             prodList[0].itemsCount + 1,
-                            prodList[0].totalPrice+productObj.unit_price
+                            prodList[0].totalPrice + productList[position].unit_price
                         )
-                    }else{
+                    } else {
                         appDatabase.saveOrderDao().insertAll(
                             SaveOrder(
                                 null,
@@ -103,14 +119,19 @@ Filterable{
                             )
                         )
                     }
-                }catch (e:Exception){
-                    Log.d("Product", "exception: "+e.message)
+                } catch (e: Exception) {
+                    Log.d("Product", "exception: " + e.message)
                 }
 
 
                 mListener.onValueChanged(productList[position], position)
-            }else{
-                Toast.makeText(holder.itemView.context, holder.itemView.resources.getString(R.string.stock_out), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    holder.itemView.context,
+                    holder.itemView.resources.getString(R.string.stock_out),
+                    Toast.LENGTH_SHORT
+                ).show()
+                holder.stockAvailable.text = holder.itemView.resources.getString(R.string.stock_out)
             }
 
         }
@@ -120,15 +141,26 @@ Filterable{
             holder.productCount.setText(qtyValue.toString())
             /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
             holder.tvSubtoal.text = subtotal.toString()*/
-            val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
-            if (prodList!!.size > 0){
-                Log.d("Product", "item count minus: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
+            productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
+            productList[position].ordered_total_price = dformat.format(
+                productList[position].unit_price * holder.productCount.text.toString().toInt()
+            ).toDouble()
+            productList[position].stock_available = productList[position].stock_available + 1
+            holder.stockAvailable.text =
+                productList[position].stock_available.toString() + " in stock"
+            val prodList = appDatabase!!.saveOrderDao()
+                .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+            if (prodList!!.size > 0) {
+                Log.d(
+                    "Product",
+                    "item count minus: " + prodList[0].itemsCount + " shopId: " + prodList[0].outletId
+                )
                 appDatabase.saveOrderDao().update(
                     prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                    prodList[0].itemsCount-1,
-                    prodList[0].totalPrice-productObj.unit_price
+                    prodList[0].itemsCount - 1,
+                    prodList[0].totalPrice - productList[position].unit_price
                 )
-            }else{
+            } else {
                 appDatabase.saveOrderDao().insertAll(
                     SaveOrder(
                         null,
@@ -143,30 +175,35 @@ Filterable{
         }
 
         holder.productCount.isEnabled = false
-        holder.productCount.addTextChangedListener(object : TextWatcher{
+        holder.productCount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (holder.productCount.text.toString().trim().length>0){
-                val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
-                holder.tvSubtoal.text = dformat.format(subtotal).toString()
+                if (holder.productCount.text.toString().trim().length > 0) {
+                    val subtotal =
+                        productList[position].unit_price * holder.productCount.text.toString()
+                            .toInt()
+                    holder.tvSubtoal.text = dformat.format(subtotal).toString()
 
-                productObj.ordered_total_price = dformat.format(subtotal).toDouble()
-                productObj.ordered_quantity=  holder.productCount.text.toString().toInt()
+                    productList[position].ordered_total_price = dformat.format(subtotal).toDouble()
+                    productList[position].ordered_quantity =
+                        holder.productCount.text.toString().toInt()
 
-                if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
-                    holder.btnMinus.isEnabled = false
-                    /*holder.layoutQty.visibility = View.GONE
-                    holder.layoutAdd.visibility = View.VISIBLE*/
-                    holder.tvSubtoal.text = "0"
-                    holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
-                }else{
-                    holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
-                    holder.btnMinus.isEnabled = true
+                    if (holder.productCount.text.toString()
+                            .toInt() == 0 || holder.productCount.text.toString().toInt() < 0
+                    ) {
+                        holder.btnMinus.isEnabled = false
+                        /*holder.layoutQty.visibility = View.GONE
+                        holder.layoutAdd.visibility = View.VISIBLE*/
+                        holder.tvSubtoal.text = "0"
+                        holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
+                    } else {
+                        holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
+                        holder.btnMinus.isEnabled = true
+                    }
                 }
-            }
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -176,12 +213,11 @@ Filterable{
         })
 
 
-
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        Log.d("Product", "view holder: "+recyclerView.childCount)
+        Log.d("Product", "view holder: " + recyclerView.childCount)
         this.mRecyclerView = recyclerView
     }
 
@@ -198,7 +234,7 @@ Filterable{
                     productList = mValues
                 } else {
                     //val filteredList: ArrayList<RetailShops> = ArrayList<RetailShops>()
-                    for (row in productList) {
+                    for (row in mValues) {
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
@@ -226,11 +262,11 @@ Filterable{
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val productName: TextView
         internal val stockAvailable: TextView
-        internal val productUnit : TextView
-        internal val perUnitPrice : TextView
-        internal val tvSubtoal : TextView
-        internal val btnMinus : ImageButton
-        internal val btnAdd : ImageButton
+        internal val productUnit: TextView
+        internal val perUnitPrice: TextView
+        internal val tvSubtoal: TextView
+        internal val btnMinus: ImageButton
+        internal val btnAdd: ImageButton
         internal val productCount: EditText
         /*internal val layoutQty : LinearLayout
         internal val layoutAdd : LinearLayout*/
@@ -246,7 +282,6 @@ Filterable{
             productCount = itemView.findViewById(R.id.tvCount)
             /*layoutQty = itemView.findViewById(R.id.layoutQty)
             layoutAdd = itemView.findViewById(R.id.layoutAdd)*/
-
 
 
         }
