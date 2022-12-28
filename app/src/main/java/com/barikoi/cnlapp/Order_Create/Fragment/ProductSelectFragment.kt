@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
 import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
@@ -455,6 +454,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             "Location not available $location", Toast.LENGTH_SHORT
                         ).show()
                     }
+                    mFusedLocationClient!!.removeLocationUpdates(mLocationCallback!!)
                 }
             }
 

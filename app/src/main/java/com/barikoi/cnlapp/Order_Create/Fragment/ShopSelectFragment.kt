@@ -31,7 +31,6 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_shop_select.*
-import kotlinx.android.synthetic.main.fragment_shop_select.filterTitle
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -50,6 +49,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     var shopList: ArrayList<Shops>? = ArrayList()
     var filterList: ArrayList<Shops>? = ArrayList()
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+    val routesList = ArrayList<String>()
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var loading: ProgressBar? = null
@@ -258,7 +258,20 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         recylerView!!.adapter = adapter
 
         var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
+        if (routeNameList!!.size == 0) {
+            getAllRoutes(Api.routes_withfilter + "?with_geometry=0&sr_id=" + user_id)
+        }else{
+            if (spinner != null) {
+                if (spinner!!.adapter == null){
+                    val adapter = ArrayAdapter(
+                        mContext!!,
+                        android.R.layout.simple_spinner_item, routesList
+                    )
+                    spinner!!.adapter = adapter
+                }
 
+            }
+        }
         spinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 /*for (i in 0 until routeNameList!!.size) {
@@ -300,11 +313,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
                     val shops: ArrayList<Shops> = ArrayList()
-                    for (i in 0 until shopList!!.size) {
-                        if (shopList!![i].route_name == routeNameList!![spinner!!.selectedItemPosition].second) {
-                            shops.add(shopList!![i])
-                        }
+                    if (shopList!!.size >0) {
+                        for (i in 0 until shopList!!.size) {
+                            if (shopList!![i].route_name == routeNameList!![spinner!!.selectedItemPosition].second) {
+                                shops.add(shopList!![i])
+                            }
 
+                        }
                     }
                     //adapter!!.shopList=shops
                     adapter = ShopSelectAdapter(shops, listener!!)
@@ -326,6 +341,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     private fun getAllRoutes(url: String) {
         //loading!!.visibility = View.VISIBLE
         routeNameList!!.clear()
+        routesList.clear()
         val request = StringRequest(Request.Method.GET, url,
             {
                 response ->
@@ -333,7 +349,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     //loading!!.visibility = View.GONE
                     val data = JSONObject(response)
                     if (data.has("routes") && !data.isNull("routes")){
-                        val routesList = ArrayList<String>()
+
                         val routesArray = data.getJSONArray("routes")
                         if (routesArray.length() > 0){
 
@@ -511,9 +527,9 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         appDatabase = AppDatabase.getInstance(context)
         ACTIVITY = context as MainActivity
 
-        if (routeNameList!!.size == 0) {
+        /*if (routeNameList!!.size == 0) {
             getAllRoutes(Api.routes_withfilter + "?with_geometry=0&sr_id=" + user_id)
-        }
+        }*/
     }
 
     override fun onShopSelected(shop: Shops) {

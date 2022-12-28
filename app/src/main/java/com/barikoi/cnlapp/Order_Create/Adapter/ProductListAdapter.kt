@@ -137,41 +137,45 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
         }
 
         holder.btnMinus.setOnClickListener {
-            val qtyValue = holder.productCount.text.toString().toInt() - 1
-            holder.productCount.setText(qtyValue.toString())
-            /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
-            holder.tvSubtoal.text = subtotal.toString()*/
-            productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-            productList[position].ordered_total_price = dformat.format(
-                productList[position].unit_price * holder.productCount.text.toString().toInt()
-            ).toDouble()
-            productList[position].stock_available = productList[position].stock_available + 1
-            holder.stockAvailable.text =
-                productList[position].stock_available.toString() + " in stock"
-            val prodList = appDatabase!!.saveOrderDao()
-                .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
-            if (prodList!!.size > 0) {
-                Log.d(
-                    "Product",
-                    "item count minus: " + prodList[0].itemsCount + " shopId: " + prodList[0].outletId
-                )
-                appDatabase.saveOrderDao().update(
-                    prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                    prodList[0].itemsCount - 1,
-                    prodList[0].totalPrice - productList[position].unit_price
-                )
-            } else {
-                appDatabase.saveOrderDao().insertAll(
-                    SaveOrder(
-                        null,
-                        prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
-                        holder.productCount.text.toString().toInt(),
-                        holder.tvSubtoal.text.toString().toDouble()
+            if (holder.productCount.text.toString()
+                    .toInt() > 0
+            ) {
+                val qtyValue = holder.productCount.text.toString().toInt() - 1
+                holder.productCount.setText(qtyValue.toString())
+                /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                holder.tvSubtoal.text = subtotal.toString()*/
+                productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
+                productList[position].ordered_total_price = dformat.format(
+                    productList[position].unit_price * holder.productCount.text.toString().toInt()
+                ).toDouble()
+                productList[position].stock_available = productList[position].stock_available + 1
+                holder.stockAvailable.text =
+                    productList[position].stock_available.toString() + " in stock"
+                val prodList = appDatabase!!.saveOrderDao()
+                    .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+                if (prodList!!.size > 0) {
+                    Log.d(
+                        "Product",
+                        "item count minus: " + prodList[0].itemsCount + " shopId: " + prodList[0].outletId
                     )
-                )
-            }
+                    appDatabase.saveOrderDao().update(
+                        prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
+                        prodList[0].itemsCount - 1,
+                        prodList[0].totalPrice - productList[position].unit_price
+                    )
+                } else {
+                    appDatabase.saveOrderDao().insertAll(
+                        SaveOrder(
+                            null,
+                            prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
+                            holder.productCount.text.toString().toInt(),
+                            holder.tvSubtoal.text.toString().toDouble()
+                        )
+                    )
+                }
 
-            mListener.onValueChanged(productList[position], position)
+                mListener.onValueChanged(productList[position], position)
+            }
         }
 
         holder.productCount.isEnabled = false

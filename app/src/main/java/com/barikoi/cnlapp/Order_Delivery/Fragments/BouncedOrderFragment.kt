@@ -173,41 +173,45 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                     bounce = brandObj.getInt("bounce")
                                 }
                                 if (orderObj.getString("orders_status").equals("DELIVERED", true) && brandObj.getInt("bounce") > 0){
-                                    productItems.add(
-                                        Products(
-                                            brandObj.getString("product_id"),
-                                            brandObj.getString("product"),
-                                            "",
-                                            brandObj.getString("brand_id"),
-                                            "",
-                                            brandObj.getDouble("unit_price"),
-                                            0.0,"",
-                                            brandObj.getString("unit_name"),
-                                            "",0,0,
-                                            bounce,
-                                            bounce,
-                                            /*brandObj.getInt("quantity"),*/
-                                            (brandObj.getInt("bounce")*brandObj.getDouble("unit_price"))
+                                    if (bounce > 0) {
+                                        productItems.add(
+                                            Products(
+                                                brandObj.getString("product_id"),
+                                                brandObj.getString("product"),
+                                                "",
+                                                brandObj.getString("brand_id"),
+                                                "",
+                                                brandObj.getDouble("unit_price"),
+                                                0.0, "",
+                                                brandObj.getString("unit_name"),
+                                                "", 0, 0,
+                                                bounce,
+                                                bounce,
+                                                /*brandObj.getInt("quantity"),*/
+                                                (brandObj.getInt("bounce") * brandObj.getDouble("unit_price"))
+                                            )
                                         )
-                                    )
+                                    }
                                 }else if (orderObj.getString("orders_status").equals("CANCELLED", true)){
-                                    productItems.add(
-                                        Products(
-                                            brandObj.getString("product_id"),
-                                            brandObj.getString("product"),
-                                            "",
-                                            brandObj.getString("brand_id"),
-                                            "",
-                                            brandObj.getDouble("unit_price"),
-                                            0.0,"",
-                                            brandObj.getString("unit_name"),
-                                            "",0,0,
-                                            brandObj.getInt("bounce"),
-                                            brandObj.getInt("bounce"),
-                                            /*brandObj.getInt("quantity"),*/
-                                            (brandObj.getInt("bounce")*brandObj.getDouble("unit_price"))
+                                    if(brandObj.getInt("bounce") > 0) {
+                                        productItems.add(
+                                            Products(
+                                                brandObj.getString("product_id"),
+                                                brandObj.getString("product"),
+                                                "",
+                                                brandObj.getString("brand_id"),
+                                                "",
+                                                brandObj.getDouble("unit_price"),
+                                                0.0, "",
+                                                brandObj.getString("unit_name"),
+                                                "", 0, 0,
+                                                brandObj.getInt("bounce"),
+                                                brandObj.getInt("bounce"),
+                                                /*brandObj.getInt("quantity"),*/
+                                                (brandObj.getInt("bounce") * brandObj.getDouble("unit_price"))
+                                            )
                                         )
-                                    )
+                                    }
                                 }
 
                             }

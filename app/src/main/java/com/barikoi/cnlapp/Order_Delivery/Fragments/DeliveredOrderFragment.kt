@@ -179,22 +179,24 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                 if (brandObj.has("bounce")){
                                     bounce = brandObj.getInt("bounce")
                                 }
-                                productItems.add(
-                                    Products(
-                                        brandObj.getString("product_id"),
-                                        brandObj.getString("product"),
-                                        "",
-                                        brandObj.getString("brand_id"),
-                                        "",
-                                        brandObj.getDouble("unit_price"),
-                                        0.0,"",
-                                        brandObj.getString("unit_name"),
-                                        "",0,0,
-                                        bounce,
-                                        brandObj.getInt("quantity"),
-                                        brandObj.getDouble("total_price")
+                                if(brandObj.getInt("quantity") > 0) {
+                                    productItems.add(
+                                        Products(
+                                            brandObj.getString("product_id"),
+                                            brandObj.getString("product"),
+                                            "",
+                                            brandObj.getString("brand_id"),
+                                            "",
+                                            brandObj.getDouble("unit_price"),
+                                            0.0, "",
+                                            brandObj.getString("unit_name"),
+                                            "", 0, 0,
+                                            bounce,
+                                            brandObj.getInt("quantity"),
+                                            brandObj.getDouble("total_price")
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                         orderList.add(

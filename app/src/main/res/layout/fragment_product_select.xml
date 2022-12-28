@@ -23,7 +23,7 @@
             android:drawableLeft="@drawable/ic_shop_small"
             android:drawablePadding="8dp"
             android:layout_alignParentTop="true"
-            android:text="Hasadasdasdasda"
+            android:text=""
             android:textSize="17sp"
             android:textColor="@color/text_title"
             android:textStyle="bold">

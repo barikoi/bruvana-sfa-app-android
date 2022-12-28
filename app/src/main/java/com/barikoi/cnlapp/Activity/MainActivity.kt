@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val versionName: String = BuildConfig.VERSION_NAME
         tvAppVersion.setText("version $versionName")
         tvHeaderUserName!!.text = userName
-        if (prefs!!.getString(Api.EMAIL, "")!!.length >0){
+        if (prefs!!.getString(Api.EMAIL, "")!!.length >0 && !prefs!!.getString(Api.EMAIL, "")!!.equals("null")){
             tvHeaderEmail.visibility = View.VISIBLE
             tvHeaderEmail.text = prefs!!.getString(Api.EMAIL, "")
         }
@@ -318,7 +318,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         
         val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
         val request: StringRequest = object : StringRequest(
-            Method.GET,
+            Method.POST,
             Api.logouturl,
             Response.Listener { response: String? ->
                 val home = Intent(context, SplashActivity::class.java)
@@ -331,13 +331,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (error != null && error.networkResponse != null) {
                     try {
                         val s = String(error.networkResponse.data)
-                        Log.d("Verify", "message: \$s")
+                        Log.d("Verify", "message: $s")
                         var data: JSONObject? = null
                         try {
                             data = JSONObject(s)
                             Toast.makeText(
                                 context.applicationContext,
-                                "Error: "+data.getString("error"),
+                                "Error: "+data.getString("message"),
                                 Toast.LENGTH_SHORT
                             ).show()
                             /*handleResponse(

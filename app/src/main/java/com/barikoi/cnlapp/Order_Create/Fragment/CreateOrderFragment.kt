@@ -146,7 +146,7 @@ class CreateOrderFragment : Fragment(){
                 fragmentName.arguments = bundle
                 val fragmentManager = (activity as FragmentActivity).supportFragmentManager
                 fragmentManager.beginTransaction()
-                    .add(R.id.fragmentLayout2, fragmentName)
+                    .replace(R.id.fragmentLayout2, fragmentName)
                     .addToBackStack(fragmentName.toString())
                     .commit()
             }catch (e:Exception){

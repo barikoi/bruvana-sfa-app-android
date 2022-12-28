@@ -172,22 +172,24 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                 if (brandArray.length() > 0){
                                     for (j in 0 until brandArray.length()){
                                         val brandObj = brandArray.getJSONObject(j)
-                                        productItems.add(
-                                            Products(
-                                                brandObj.getString("product_id"),
-                                                brandObj.getString("product"),
-                                                "",
-                                                brandObj.getString("brand_id"),
-                                                "",
-                                                brandObj.getDouble("unit_price"),
-                                                0.0,"",
-                                                brandObj.getString("unit_name"),
-                                                "",0,0,
-                                                brandObj.getInt("bounce"),
-                                                brandObj.getInt("quantity"),
-                                                brandObj.getDouble("total_price")
+                                        if(brandObj.getInt("quantity") > 0) {
+                                            productItems.add(
+                                                Products(
+                                                    brandObj.getString("product_id"),
+                                                    brandObj.getString("product"),
+                                                    "",
+                                                    brandObj.getString("brand_id"),
+                                                    "",
+                                                    brandObj.getDouble("unit_price"),
+                                                    0.0, "",
+                                                    brandObj.getString("unit_name"),
+                                                    "", 0, 0,
+                                                    brandObj.getInt("bounce"),
+                                                    brandObj.getInt("quantity"),
+                                                    brandObj.getDouble("total_price")
+                                                )
                                             )
-                                        )
+                                        }
                                     }
 
                                 }
