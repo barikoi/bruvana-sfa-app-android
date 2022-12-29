@@ -25,6 +25,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -66,6 +69,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     private var imageRecyclerAdapter: ImageRecyclerAdapter? = null
     private val mRecyclerView: RecyclerView
     private val imageItems: ArrayList<ImageList> = ArrayList<ImageList>()
+    private var startCAMERA : ActivityResultLauncher<Intent>? = null
 
     /**
      * SHows an AlertDialog whether to pick the image from gallery or take from camera
@@ -165,7 +169,8 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                     photoFile
                 )
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                fragment!!.startActivityForResult(takePictureIntent, CAMERA)
+                //fragment!!.startActivityForResult(takePictureIntent, CAMERA)
+                getCameraLauncher().launch(takePictureIntent)
             }
         }
         }catch (e: Exception){
@@ -362,6 +367,12 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     fun setFragmetnt(fragmnt: Fragment) {
         fragment = fragmnt
     }
+    fun getCameraLauncher(): ActivityResultLauncher<Intent> {
+        return startCAMERA!!
+    }
+    fun setCameraLauncher(startCam: ActivityResultLauncher<Intent>) {
+        startCAMERA = startCam
+    }
 
     fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap {
         var width = image.width
@@ -495,12 +506,14 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         //        String imageFileName = "JPEG_" + timeStamp + "_";
         val imageFileName = "Task" + task_id + "_" + timeStamp + "_"
-        val image = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-            "Image_$timeStamp.jpg"
-        )
-
+        /*val image = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "CNL_$timeStamp.jpg"
+        )*/
+        var baseFolder = fragment!!.requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
+        val image = File(baseFolder +File.separator+"CNL Documents"+File.separator+"CNL_$timeStamp.jpg")
         Log.d("ImagePicker", "Image: $image")
+        image.parentFile.mkdirs()
         mCurrentPhotoPath = image.absolutePath
         editor.putString(ApiCall.IMAGE_PATH, mCurrentPhotoPath)
         editor.apply()

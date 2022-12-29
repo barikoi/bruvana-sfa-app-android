@@ -210,7 +210,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                 orderObj.getString("route_id"),
                                 orderObj.getString("route_name"),
                                 orderObj.getString("distributor_office_code"),
-                                orderObj.getString("grand_total"),
+                                orderObj.getString("paid_amount"),
                                 orderObj.getString("latitude"),
                                 orderObj.getString("longitude"),
                                 productItems
@@ -231,7 +231,9 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                 }
 
             }
-
+            orderList.sortByDescending {
+                it.orderId
+            }
 
             recylerView.apply {
                 if (user_type.equals("TO", true)) {

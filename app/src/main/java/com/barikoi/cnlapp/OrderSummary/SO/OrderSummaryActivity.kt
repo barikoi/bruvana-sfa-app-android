@@ -212,7 +212,9 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                 )
                             }
                         }
-
+                        itemList.sortByDescending {
+                            it.orderId
+                        }
 
                         adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
                         orderList.adapter = adapter

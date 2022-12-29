@@ -256,7 +256,9 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 }
 
             }
-
+            orderList.sortByDescending {
+                it.orderId
+            }
 
             recylerView.apply {
                 if (user_type.equals("TO", true)) {

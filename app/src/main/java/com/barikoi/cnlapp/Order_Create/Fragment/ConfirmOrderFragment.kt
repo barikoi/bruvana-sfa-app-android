@@ -366,6 +366,10 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                     )
                 }
             }
+
+            orderList.sortByDescending {
+                it.orderId
+            }
         }else{
             no_route_check.visibility = View.VISIBLE
             bodyLayout.visibility = View.GONE

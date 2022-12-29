@@ -196,7 +196,7 @@ object ApiServices {
                             }else {
                                 //baseFolder = mContext.getFilesDir().getAbsolutePath()
                             }*/
-                            var baseFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+                            var baseFolder = mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
                             Log.d("Chalan", baseFolder)
                             val file = File(baseFolder +File.separator+"CNL Documents"+File.separator+name)
                             file.parentFile.mkdirs()
@@ -204,7 +204,7 @@ object ApiServices {
                             fos.write(response)
                             fos.close()
                             Log.d("Chalan", file.absolutePath.toString())
-                            var filePath = baseFolder +File.separator+"CNL Documents"+File.separator
+                            //var filePath = baseFolder +File.separator+"CNL Documents"+File.separator
                             Toast.makeText(mContext, "Your Download is Complete.", Toast.LENGTH_LONG).show()
                             enableNotification(mContext, name, file)
                         }

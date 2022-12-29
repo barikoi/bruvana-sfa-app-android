@@ -2,6 +2,8 @@ package com.barikoi.cnlapp.Attendance.Fragment
 
 import android.Manifest
 import android.app.Activity
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -21,6 +23,9 @@ import android.view.animation.RotateAnimation
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -104,6 +109,7 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.CAMERA = 4
         imagepicker.setMainactivity(ACTIVITY)
         imagepicker.setFragmetnt(this)
+        imagepicker.setCameraLauncher(startCamera)
 
         if (user_type.equals("TO", true)){
             spinnerLayout.visibility = View.GONE
@@ -427,14 +433,57 @@ class CreateAttendanceFragment : Fragment() {
         }
     }
 
+    var startCamera = registerForActivityResult(
+        StartActivityForResult(),
+        ActivityResultCallback<ActivityResult> { result ->
+            val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+            if (result.getResultCode() == RESULT_CANCELED) {
+                if (filePath != null) {
+                    Log.d("Image", "Canceled: $filePath")
+                    imagepicker.deleteFileLocal(filePath)
+                    editor!!.putString(ApiCall.IMAGE_PATH, "")
+                    editor!!.apply()
+                }
+            }
+            if (result.getResultCode() == RESULT_OK) {
+                Log.e("imageUtils", "OnActivity result code 1: " + Activity.RESULT_OK)
+                var imagePosition = 0
+                var imageList: ArrayList<Images?>? = ArrayList()
+                imageList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images?>?
+                Log.d("Imagepos", "List: $imageList")
+                imagePosition = if (imageList!!.size > 0) {
+                    imageList[imageList.size - 1]!!.position + 1
+                } else {
+                    imagePosition + 1
+                }
+                imagepicker.AddNewImage(result.data, CAMERA, imagePosition)
+                try {
+                    val placeImage = Images(
+                        null, imagePosition,
+                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                    )
+                    isImageAdded = true
+                    if (imagePosition > 0) {
+                        Log.d("Imagepos", "insert")
+                        Executors.newSingleThreadExecutor().execute {
+                            appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                        }
+                        editor!!.putString(ApiCall.IMAGE_PATH, "")
+                        editor!!.apply()
+                    }
+                } catch (e: java.lang.Exception) {
+                    Log.e("imageUtils", "OnActivity result 2: $e")
+                    Sentry.captureException(e)
+                }
+            }
+        })
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         try{
             val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
 
-            if (resultCode == Activity.RESULT_CANCELED) {
+            /*if (resultCode == Activity.RESULT_CANCELED) {
                 if (filePath != null) {
-                    //bottomSheetBehaviorinput.setState(BottomSheetBehavior.STATE_EXPANDED)
                     Log.d("Image", "Canceled: $filePath")
                     imagepicker.deleteFileLocal(filePath)
                     editor!!.putString(ApiCall.IMAGE_PATH, "")
@@ -472,7 +521,7 @@ class CreateAttendanceFragment : Fragment() {
                     Log.e("imageUtils", "OnActivity result 2: $e")
                     Sentry.captureException(e)
                 }
-            }
+            }*/
         }catch (e: Exception){
             e.printStackTrace()
             Sentry.captureException(e)
