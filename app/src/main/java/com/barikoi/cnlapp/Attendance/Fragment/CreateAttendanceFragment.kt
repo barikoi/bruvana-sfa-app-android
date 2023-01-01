@@ -121,9 +121,13 @@ class CreateAttendanceFragment : Fragment() {
 
             spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    route_id = routeNameList!![p2].first.toInt()
-                    selectedRoute = routeNameList!![p2].second
-
+                    if (routeNameList!![p2].first.length > 0) {
+                        route_id = routeNameList!![p2].first.toInt()
+                        selectedRoute = routeNameList!![p2].second
+                    }else{
+                        route_id = null
+                        selectedRoute = ""
+                    }
                 }
 
                 override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -334,7 +338,8 @@ class CreateAttendanceFragment : Fragment() {
                         val routesList = ArrayList<String>()
                         val routesArray = data.getJSONArray("routes")
                         if (routesArray.length() > 0){
-
+                            routeNameList!!.add(Pair("", ""))
+                            routesList.add("")
                             for(i in 0 until routesArray.length()){
                                 val routeObj = routesArray.getJSONObject(i)
 
