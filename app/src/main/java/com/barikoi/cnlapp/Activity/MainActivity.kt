@@ -110,13 +110,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         c.set(Calendar.DAY_OF_MONTH, 1);
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
         userLayout.visibility = View.VISIBLE
         tvUserName.setText(userName)
-        getAuthUser(token, Api.authUserCheck+"?start_date=2022-04-30 00:00:00"/*+StartDate*/+"&end_date="+EndDate)
+        getAuthUser(token, Api.authUserCheck+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59")
         if (userType.equals("TO", true)){
             routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)

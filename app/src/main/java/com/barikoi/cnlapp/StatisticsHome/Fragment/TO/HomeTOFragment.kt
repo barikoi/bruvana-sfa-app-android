@@ -157,7 +157,7 @@ class HomeTOFragment : Fragment() {
         c.set(Calendar.DAY_OF_MONTH, 1)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
         tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         val StartDate = df.format(start)
@@ -190,12 +190,12 @@ class HomeTOFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_to_stats=1&territory_id="+territoryId)
+            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&with_to_stats=1&territory_id="+territoryId)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
 
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+"&end_date="+EndDate+"&with_to_stats=1&territory_id="+territoryId)
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&with_to_stats=1&territory_id="+territoryId)
 
     }
 
