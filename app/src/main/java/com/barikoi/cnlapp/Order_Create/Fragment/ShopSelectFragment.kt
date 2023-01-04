@@ -259,7 +259,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
         var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
         if (routeNameList!!.size == 0) {
-            getAllRoutes(Api.routes_withfilter + "?with_geometry=0&sr_id=" + user_id)
+            getAllRoutes(Api.routes_withfilter + "?with_geometry=0&user_id=" + user_id)
         }else{
             if (spinner != null) {
                 if (spinner!!.adapter == null){

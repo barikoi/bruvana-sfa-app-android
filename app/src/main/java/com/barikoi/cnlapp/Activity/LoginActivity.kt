@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
             //onLoginFailed()
             return
         }
-        val email = etSRCode!!.text.toString().replace(" ", "");
+        val employee_id = etSRCode!!.text.toString().replace(" ", "");
         val password = etPassword!!.text.toString()
         pd = ProgressDialog(this)
         pd!!.setMessage("Authenticating...")
@@ -98,11 +98,10 @@ class LoginActivity : AppCompatActivity() {
                         )
                         val editor = prefs.edit()
                         editor.putString(Api.EMAIL, userObj.getString("email"))
-                        editor.putString(Api.NAME, userObj.getString("name"))
+                        editor.putString(Api.NAME, userObj.getString("user_name"))
                         editor.putString(Api.USER_ID, userObj.getString("id"))
                         editor.putString(Api.USER_TYPE, userObj.getString("designation"))
                         editor.putString(Api.PHONE, userObj.getString("phone"))
-                        editor.putString(Api.SR_CODE, userObj.getString("sr_code"))
                         editor.putString(Api.TERRITORY_ID, userObj.getString("territory_id"))
                         editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
                         editor.putString(Api.TOKEN, token)
@@ -114,9 +113,9 @@ class LoginActivity : AppCompatActivity() {
                             options.beforeSend =
                                 SentryOptions.BeforeSendCallback { event: SentryEvent, hint: Any? ->
                                     val userSentry = User()
-                                    userSentry.id = userObj.getString("sr_code")
-                                    userSentry.email = email
-                                    userSentry.username = userObj.getString("name")
+                                    userSentry.id = userObj.getString("employee_id")
+                                    userSentry.email = employee_id
+                                    userSentry.username = userObj.getString("user_name")
                                     event.user = userSentry
                                     event
                                 }
@@ -172,9 +171,9 @@ class LoginActivity : AppCompatActivity() {
             override fun getParams(): Map<String, String>? {
                 val parameters: MutableMap<String, String> = HashMap()
                 //parameters.put("id", id.getText().toString());
-                Log.d("MainActivity", "login email: $email")
+                Log.d("MainActivity", "login email: $employee_id")
                 //parameters.put("device_ID",player_id);
-                parameters["sr_code"] = email
+                parameters["employee_id"] = employee_id
                 parameters["password"] = password
                 return parameters
             }
