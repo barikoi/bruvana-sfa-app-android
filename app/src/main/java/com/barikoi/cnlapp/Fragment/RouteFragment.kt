@@ -62,7 +62,7 @@ class RouteFragment : Fragment() {
             arrayList!!.clear()
             progressBar!!.visibility = View.VISIBLE
             val request = StringRequest(GET,
-                Api.route_outlet_list+"?sr_id="+userId+"&with_outlets=1",
+                Api.routes_withfilter+"?user_id="+userId+"&with_outlets=1",
                 { response ->
                     //success
                     Log.d("RouteFrag", response)

@@ -130,7 +130,7 @@ class ShopListFragment : Fragment() {
             routesList!!.clear()
             val request = StringRequest(
                 Request.Method.GET,
-                Api.route_outlet_list+"?sr_id="+userId+"&with_outlets=1",
+                Api.routes_withfilter+"?user_id="+userId+"&with_outlets=1",
                 { response ->
                     //success
                     Log.d("RouteFrag", response)

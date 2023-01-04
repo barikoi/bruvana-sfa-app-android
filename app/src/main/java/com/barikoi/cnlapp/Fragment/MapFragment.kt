@@ -132,11 +132,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     srCode = soList[p2].employeeId
                     if (cbVerified!!.isChecked){
                         if (srCode!!.length > 0) {
-                            getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode, "start")
+                            getShopList(Api.verified_shop_list + "?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId, "start")
                         }
                     }else{
                         if (userId!!.length > 0) {
-                            getShopList(Api.route_outlet_list + "?sr_id=" +userId+"&with_outlets=1", "start")
+                            getShopList(Api.routes_withfilter + "?user_id=" +userId+"&with_outlets=1", "start")
                         }
                     }
                 }
@@ -159,7 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 if (cbVerified!!.isChecked){
                     mMap!!.clear()
                     if (srCode!!.length > 0) {
-                        getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode, "")
+                        getShopList(Api.verified_shop_list +"?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId, "")
                     }
                 }else{
                     nonVerifiedShopList!!.clear()
@@ -192,7 +192,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             if (isChecked) {
                 mMap!!.clear()
                 if (srCode!!.length > 0) {
-                    getShopList(Api.verified_shop_list + "?route_id=" + routeId + "&sr_code=" + srCode, "checkbox")
+                    getShopList(Api.verified_shop_list + "?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId, "checkbox")
                 }
             } else {
                 mMap!!.clear()
@@ -551,7 +551,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val uiSettings: UiSettings = mapboxMap!!.uiSettings
         uiSettings.setCompassEnabled(false)
         if (userId!!.length > 0) {
-            getShopList(Api.route_outlet_list + "?sr_id=" + userId+"&with_outlets=1", "start")
+            getShopList(Api.routes_withfilter + "?user_id=" + userId+"&with_outlets=1", "start")
         }
 
         fab.setOnClickListener(View.OnClickListener {

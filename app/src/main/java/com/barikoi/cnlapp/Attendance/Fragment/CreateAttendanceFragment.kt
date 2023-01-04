@@ -117,7 +117,7 @@ class CreateAttendanceFragment : Fragment() {
         }else{
             spinnerLayout.visibility = View.VISIBLE
             titleRoute.visibility = View.VISIBLE
-            getAllRoutes(Api.routes_withfilter+"?with_geometry=0&sr_id="+user_id)
+            getAllRoutes(Api.routes_withfilter+"?with_geometry=0&user_id="+user_id)
 
             spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
