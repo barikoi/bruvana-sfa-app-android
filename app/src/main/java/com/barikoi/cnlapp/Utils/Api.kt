@@ -1,5 +1,7 @@
 package com.barikoi.cnlapp.Utils
 
+import com.barikoi.cnlapp.R
+
 object Api {
 
     val USER_ID = "user_id"
@@ -30,7 +32,7 @@ object Api {
     val START_DATE_ORDER = "start_date_order"
     val END_DATE_ORDER = "end_date_order"
 
-    val base_url = "http://cnl.bkoih3.ml:7000/"
+    val base_url = CNLApp.appContext.resources.getString(R.string.url_base)
 
     val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
     val APIKEY = "NDI5MzpIQzBBRjZFQ1ZF"

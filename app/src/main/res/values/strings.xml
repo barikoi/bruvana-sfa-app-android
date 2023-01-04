@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CNL App</string>
+    <!--<string name="app_name">CNL App</string>-->
     <string name="splash_title">Care Nutrition Limited</string>
 
     <!--bottom_nav-->

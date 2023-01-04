@@ -135,13 +135,13 @@ class ProductSummaryActivity : AppCompatActivity() {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getProductStock(Api.all_product_list+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_order=1"+territorySuffix)
+            getProductStock(Api.all_product_list+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&with_order=1"+territorySuffix)
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getProductStock(Api.all_product_list+"?start_date="+StartDate+"&end_date="+EndDate+"&with_order=1"+territorySuffix)
+        getProductStock(Api.all_product_list+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&with_order=1"+territorySuffix)
     }
 
     private fun getProductStock(url: String) {

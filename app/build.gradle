@@ -9,12 +9,11 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.barikoi.cnlapp"
         minSdk 16
         targetSdk 32
         versionCode 1
         multiDexEnabled true
-        versionName "1.0.4_20_1"
+        flavorDimensions "default"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,6 +30,29 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    productFlavors {
+        production{
+            applicationId "com.barikoi.cnlapp"
+            dimension "default"
+            versionName "1.0.4_21"
+            resValue "string", "app_name", "CNL App"
+            resValue "string", "url_base", "http://cnl.bkoih3.ml:7000/"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher"
+            ]
+        }
+        staging{
+            applicationId "com.barikoi.cnlappstaging"
+            dimension "default"
+            versionName "1.0.4_21_1"
+            resValue "string", "app_name", "CNL Staging App"
+            resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher_2"
+            ]
+        }
     }
 }
 
@@ -62,7 +84,6 @@ dependencies {
     /*map*/
     /*implementation 'com.graphhopper:graphhopper-navigation-android-ui:0.1.0-SNAPSHOT'
     implementation 'com.graphhopper:directions-api-client:0.10.1-4'*/
-    implementation 'com.google.android.gms:play-services-location:19.0.1'
     implementation 'org.maplibre.gl:android-sdk:9.2.1'
     //implementation 'com.github.maplibre:maplibre-navigation-android:1.1.1'
 
