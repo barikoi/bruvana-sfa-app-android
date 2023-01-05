@@ -37,7 +37,7 @@ class ProductSummaryActivity : AppCompatActivity() {
     var queue: RequestQueue? = null
     var token : String? = null
     var territoryId : String? = ""
-    var srCode: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
     var territorySuffix : String? = ""
     var selectedTerritoryId : String? = null
@@ -52,7 +52,7 @@ class ProductSummaryActivity : AppCompatActivity() {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
-        srCode = prefs!!.getString(Api.SR_CODE, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         btnBack.setOnClickListener {
@@ -88,7 +88,7 @@ class ProductSummaryActivity : AppCompatActivity() {
             }
 
         }else{
-            territorySuffix = "&sr_id="+srCode+"&route_id="+routeId
+            territorySuffix = "&user_id="+userId/*+"&route_id="+routeId*/
             spinnerLayout.visibility = View.GONE
             setDateFilter()
         }
@@ -160,9 +160,9 @@ class ProductSummaryActivity : AppCompatActivity() {
                                     ProductStock(
                                         productObj.getString("id"),
                                         productObj.getString("product_name"),
-                                        productObj.getString("image"),
+                                        productObj.getString("image_url"),
                                         resources.getString(R.string.sold_in)+" "+productObj.getString("productive_routes")+" "+resources.getString(R.string.route),
-                                        productObj.getString("quantity"),
+                                        productObj.getString("delivered_quantity"),
                                         productObj.getString("unit_name")
                                     )
                                 )

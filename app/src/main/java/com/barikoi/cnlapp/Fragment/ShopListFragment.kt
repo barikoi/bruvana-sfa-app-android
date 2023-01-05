@@ -153,14 +153,14 @@ class ShopListFragment : Fragment() {
                                 val outlet = route_outlet_list.getJSONObject(j)
                                 val outlet_id = outlet.getString("id")
                                 val outlet_name = outlet.getString("outlet_name")
-                                val outlet_status = outlet.getString("outlets_status")
+                                val outlet_status = outlet.getString("outlet_status")
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
-                                val outlet_type = outlet.getString("store_type")
+                                val outlet_type = outlet.getString("outlet_type")
                                 /*val outlet_category = outlet.getString("outlet_category")*/
                                 val owner_name = outlet.getString("owner_name")
-                                val distributor_office = outlet.getString("distributor_office")
-                                val distributor_office_code = outlet.getString("distributor_office_code")
+                                /*val distributor_office = outlet.getString("distributor_office")
+                                val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
                                 /*val last_order_date = outlet.getString("order_delivery_date")*/
@@ -175,8 +175,8 @@ class ShopListFragment : Fragment() {
                                         outlet_type,
                                         "",
                                         owner_name,
-                                        distributor_office,
-                                        distributor_office_code,
+                                        /*distributor_office,
+                                        distributor_office_code,*/
                                         territory_name,
                                         latitude,
                                         longitude,

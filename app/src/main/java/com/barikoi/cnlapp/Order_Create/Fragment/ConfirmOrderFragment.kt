@@ -71,7 +71,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         super.onViewCreated(view, savedInstanceState)
         //checkforOrders()
         //progressBar!!.visibility =View.VISIBLE
-        checkforOrders(queue!!, token!!, sr_id!!, route_id!!)
+        checkforOrders(queue!!, token!!, user_id!!, route_id!!)
         /*adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
         recylerView!!.adapter = adapter
         adapter.notifyDataSetChanged()*/
@@ -79,11 +79,11 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     }
     companion object{
         var mCallback: OrderListSuccessListener? = ConfirmOrderFragment()
-        fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String/*, listener: OrderListSuccessListener*/) {
+        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, route_id: String/*, listener: OrderListSuccessListener*/) {
             val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val today = df.format(Calendar.getInstance().time)
             if (mCallback!= null) {
-                getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=SAVED", queue, token, mCallback!!)
+                getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=SAVED", queue, token, mCallback!!)
             }
 
         }
@@ -203,9 +203,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 orderObj.put("outlet_id", orderList[i].outletId)
                 orderObj.put("order_no", orderList[i].orderId)
                 orderObj.put("sr_id", sr_id)
-                orderObj.put("distributor_office_code", orderList[i].distOfficeCode)
                 orderObj.put("grand_total", orderList[i].grandTotal)
-                orderObj.put("orders_status", "PENDING")
+                orderObj.put("order_status", "PENDING")
                 /*orderObj.put("longitude", orderList[i].longitude)
                 orderObj.put("latitude", orderList[i].latitude)*/
                 val brandsArray = JSONArray()
@@ -215,7 +214,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                     if (brandList[j].ordered_quantity > 0) {
                         brandObj.put("product_id", brandList[j].product_id)
                         brandObj.put("product", brandList[j].product_name)
-                        brandObj.put("brand_id", brandList[j].brand_id)
+                        /*brandObj.put("brand_id", brandList[j].brand_id)*/
                         brandObj.put("quantity", brandList[j].ordered_quantity.toString())
                         brandObj.put("bounce", "0")
                         brandObj.put("unit_price", brandList[j].unit_price.toString())
@@ -225,7 +224,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                     brandsArray.put(brandObj)
                 }
 
-                orderObj.put("brands", brandsArray)
+                orderObj.put("products", brandsArray)
                 ordersArray.put(orderObj)
             }
             obj1.put("orders", ordersArray)
@@ -253,7 +252,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                         override fun onConfirmed() {
                             //CreateOrderFragment.setCurrentFragment(ConfirmOrderFragment(), ACTIVITY)
                             //CreateOrderFragment.viewPager!!.setCurrentItem(1)
-                            checkforOrders(queue!!, token!!, sr_id!!, route_id!!/*, mCallback!!*/)
+                            checkforOrders(queue!!, token!!, user_id!!, route_id!!/*, mCallback!!*/)
                         }
 
                         override fun onCanceled() {
@@ -320,28 +319,28 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             bodyLayout.visibility = View.VISIBLE
             for (i in 0 until orderArray.length()){
                 val orderObj = orderArray.getJSONObject(i)
-                if (orderObj.getString("orders_status").equals("SAVED", true)){
-                    val brandArray = orderObj.getJSONArray("brands")
+                if (orderObj.getString("order_status").equals("SAVED", true)){
+                    val brandArray = orderObj.getJSONArray("products")
                     tvRouteName.setText(orderObj.getString("route_name"))
                     val productItems: ArrayList<Products> = ArrayList()
                     if (brandArray.length() > 0){
                         for (j in 0 until brandArray.length()){
                             val brandObj = brandArray.getJSONObject(j)
-                            if (brandObj.getInt("quantity") > 0) {
+                            if (brandObj.getInt("ordered_quantity") > 0) {
                                 productItems.add(
                                     Products(
                                         brandObj.getString("product_id"),
-                                        brandObj.getString("product"),
+                                        "NULL"/*brandObj.getString("product_name")*/,
                                         "",
-                                        brandObj.getString("brand_id"),
-                                        "",
+                                        /*brandObj.getString("brand_id"),
+                                        "",*/
                                         brandObj.getDouble("unit_price"),
-                                        0.0, "",
-                                        brandObj.getString("unit_name"),
+                                        /*0.0,*/ "",
+                                        "NULL"/*brandObj.getString("unit_name")*/,
                                         "", 0, 0,
-                                        brandObj.getInt("bounce"),
-                                        brandObj.getInt("quantity"),
-                                        brandObj.getDouble("total_price")
+                                        brandObj.getInt("bounced_quantity"),
+                                        brandObj.getInt("ordered_quantity"),
+                                        brandObj.getDouble("ordered_amount")
                                     )
                                 )
                             }
@@ -352,13 +351,14 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                             null,
                             orderObj.getString("order_no"),
                             orderObj.getString("ordered_at"),
-                            orderObj.getString("orders_status"),
+                            orderObj.getString("order_status"),
                             orderObj.getString("outlet_id"),
                             orderObj.getString("outlet_name"),
                             orderObj.getString("route_id"),
                             orderObj.getString("route_name"),
-                            orderObj.getString("distributor_office_code"),
-                            orderObj.getString("grand_total"),
+                            /*orderObj.getString("distributor_office_code"),*/
+                            orderObj.getString("total_ordered_amount"),
+                            orderObj.getString("total_ordered_quantity"),
                             orderObj.getString("latitude"),
                             orderObj.getString("longitude"),
                             productItems
@@ -375,7 +375,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             bodyLayout.visibility = View.GONE
 
             btn_tryAgain.setOnClickListener {
-                checkforOrders(queue!!, token!!, sr_id!!, route_id!!/*, mCallback!!*/)
+                checkforOrders(queue!!, token!!, user_id!!, route_id!!/*, mCallback!!*/)
             }
 
         }

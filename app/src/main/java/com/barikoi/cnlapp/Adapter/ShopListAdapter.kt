@@ -33,7 +33,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
         }
         holder.shopCode.text = shopList[position].shop_code
         holder.shopType.text = shopList[position].shop_type
-        holder.distributorName.text = shopList[position].distributor_office
+        //holder.distributorName.text = shopList[position].distributor_office
         holder.territoryName.text = shopList[position].territory_name
 
     }

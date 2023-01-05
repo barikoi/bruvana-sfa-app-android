@@ -148,14 +148,14 @@ class SummaryTOFragment : Fragment() {
                         soList.add(
                             SOList(
                                 soObj.getString("id"),
-                                soObj.getString("name"),
+                                soObj.getString("user_name"),
                                 soObj.getString("designation"),
                                 soObj.getString("employee_id"),
                                 soObj.getString("phone"),
-                                soObj.getString("image")
+                                soObj.getString("image_url")
                             )
                         )
-                        soNameList.add(soObj.getString("name"))
+                        soNameList.add(soObj.getString("user_name"))
 
                     }
                 }
@@ -272,12 +272,12 @@ class SummaryTOFragment : Fragment() {
                             ) {
                                 reasonList.add(
                                     Pair(
-                                        attendanceObj.getString("enter_time"),
+                                        attendanceObj.getString("checkin_time"),
                                         attendanceObj.getString("late_reason")
                                     )
                                 )
                             }
-                            if (attendanceObj.getString("enter_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
+                            if (attendanceObj.getString("checkin_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
                                 total -= 1
                             }
                             if (attendanceObj.getInt("is_late") == 1) late += 1
@@ -290,12 +290,12 @@ class SummaryTOFragment : Fragment() {
                                 ) {
                                     reasonList.add(
                                         Pair(
-                                            attendanceObj.getString("enter_time"),
+                                            attendanceObj.getString("checkin_time"),
                                             attendanceObj.getString("late_reason")
                                         )
                                     )
                                 }
-                                if (attendanceObj.getString("enter_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
+                                if (attendanceObj.getString("checkin_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
                                     total -= 1
                                 }
                                 if (attendanceObj.getInt("is_late") == 1) late += 1

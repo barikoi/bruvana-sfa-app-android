@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_margin="16dp"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         android:background="@color/background_app">
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/viewpagertab2"
@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone"
+        android:visibility="visible"
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"

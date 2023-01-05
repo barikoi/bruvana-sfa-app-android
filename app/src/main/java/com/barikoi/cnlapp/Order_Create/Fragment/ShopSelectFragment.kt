@@ -290,7 +290,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 val route_id = routeNameList!![p2].first
                 /*editor!!.putString(Api.SELECTED_ROUTE_ID, route_id)
                 editor!!.commit()*/
-                getShopListbyRoute(Api.shops_byroutes+"?route_id="+route_id+"&sr_id="+sr_id)
+                getShopListbyRoute(Api.verified_shop_list+"?route_id="+route_id+"&user_id="+user_id)
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -432,14 +432,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                     val shops = Shops(
                                         outletObj.getString("id"),
                                         outletObj.getString("outlet_name"),
-                                        outletObj.getString("outlets_status"),
+                                        outletObj.getString("outlet_status"),
                                         outletObj.getString("address"),
                                         outletObj.getString("outlet_code"),
-                                        outletObj.getString("store_type"),
+                                        outletObj.getString("outlet_type"),
                                         outletObj.getString("outlet_category"),
                                         outletObj.getString("owner_name"),
-                                        outletObj.getString("distributor_office"),
-                                        outletObj.getString("distributor_office_code"),
+                                        /*outletObj.getString("distributor_office"),
+                                        outletObj.getString("distributor_office_code"),*/
                                         "",
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),

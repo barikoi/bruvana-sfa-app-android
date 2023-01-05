@@ -166,7 +166,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                             for (i in 0 until orderArray.length()){
                                 //productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
-                                val brandArray = orderObj.getJSONArray("brands")
+                                val brandArray = orderObj.getJSONArray("products")
                                 tvRouteName.setText(orderObj.getString("route_name"))
                                 val productItems: ArrayList<Products> = ArrayList()
                                 if (brandArray.length() > 0){
@@ -178,10 +178,10 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                                     brandObj.getString("product_id"),
                                                     brandObj.getString("product"),
                                                     "",
-                                                    brandObj.getString("brand_id"),
-                                                    "",
+                                                    /*brandObj.getString("brand_id"),
+                                                    "",*/
                                                     brandObj.getDouble("unit_price"),
-                                                    0.0, "",
+                                                    /*0.0,*/ "",
                                                     brandObj.getString("unit_name"),
                                                     "", 0, 0,
                                                     brandObj.getInt("bounce"),
@@ -198,13 +198,14 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                         null,
                                         orderObj.getString("order_no"),
                                         orderObj.getString("ordered_at"),
-                                        orderObj.getString("orders_status"),
+                                        orderObj.getString("order_status"),
                                         orderObj.getString("outlet_id"),
                                         orderObj.getString("outlet_name"),
                                         orderObj.getString("route_id"),
                                         orderObj.getString("route_name"),
-                                        orderObj.getString("distributor_office_code"),
+                                        /*orderObj.getString("distributor_office_code"),*/
                                         orderObj.getString("grand_total"),
+                                        orderObj.getString("total_ordered_quantity"),
                                         orderObj.getString("latitude"),
                                         orderObj.getString("longitude"),
                                         productItems

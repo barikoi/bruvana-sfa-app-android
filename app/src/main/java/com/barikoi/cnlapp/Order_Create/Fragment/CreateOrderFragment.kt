@@ -45,6 +45,7 @@ class CreateOrderFragment : Fragment(){
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var token: String ? = ""
+    var userId: String ? = ""
     var srId: String ? = ""
     var routeId: String ? = ""
 
@@ -78,7 +79,8 @@ class CreateOrderFragment : Fragment(){
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.SR_CODE, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         ACTIVITY = context as MainActivity
@@ -123,7 +125,7 @@ class CreateOrderFragment : Fragment(){
                     setCurrentFragment(SelectDokanFragment(), ACTIVITY)
                 } else if (position == 1) {
                     viewPager!!.setCurrentItem(1)
-                    ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, srId!!, routeId!!)
+                    ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, userId!!, routeId!!)
                 }
             }
         })

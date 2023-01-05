@@ -11,8 +11,8 @@ class Shops(
     val shop_type: String,
     val category: String,
     val shop_owner: String,
-    val distributor_office: String,
-    val distributor_office_code: String,
+    /*val distributor_office: String,
+    val distributor_office_code: String,*/
     val territory_name: String,
     val latitude: Double,
     val longitude: Double,
