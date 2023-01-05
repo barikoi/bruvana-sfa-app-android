@@ -17,8 +17,9 @@ data class OrderList (
         @ColumnInfo(name = "OutletName") var outletName: String,
         @ColumnInfo(name = "RouteId") var routeId: String,
         @ColumnInfo(name = "RouteName") var routeName: String,
-        @ColumnInfo(name = "DistributorOfficeCode") var distOfficeCode: String,
+        /*@ColumnInfo(name = "DistributorOfficeCode") var distOfficeCode: String,*/
         @ColumnInfo(name = "GrandTotal") var grandTotal: String,
+        @ColumnInfo(name = "TotalQuantity") var totalQuantity: String,
         @ColumnInfo(name = "Latitude") var latitude: String,
         @ColumnInfo(name = "Longitude") var longitude: String,
         @TypeConverters(DataConvertor::class) var brands_array: ArrayList<Products>

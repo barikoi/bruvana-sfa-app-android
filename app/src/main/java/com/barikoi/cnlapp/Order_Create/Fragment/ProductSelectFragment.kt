@@ -81,6 +81,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var selectedOrder : OrderList? =  null
     var totalAmount : String? =  null
     var grandTotalPrice : Double? = 0.0
+    var totalCount : Int? = 0
     var shopName : String? =  null
     var shopId : String? =  null
     var routeId : String? =  null
@@ -125,6 +126,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     addedProducts!!.clear()
                     appDatabase!!.saveOrderDao().deleteALL()
                     grandTotalPrice = selectedOrder!!.grandTotal.toDouble()
+                    totalCount = selectedOrder!!.totalQuantity.toInt()
                     var itemCountt = 0
                     for (i in 0 until selectedOrder!!.brands_array.size){
                         itemCountt = itemCountt+selectedOrder!!.brands_array[i].ordered_quantity
@@ -244,7 +246,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 brandObj.getString("product_id"),
                                 brandObj.getString("product"),
                                 brandObj.getString("unit_name"),
-                                brandObj.getString("brand_id"),
+                                /*brandObj.getString("brand_id"),*/
                                 brandObj.getDouble("unit_price"),
                                 brandObj.getInt("quantity"),
                                 brandObj.getInt("bounce"),
@@ -482,33 +484,33 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val ordersArray = JSONArray()
             val orderObj = JSONObject()
             orderObj.put("outlet_id", shopId)
-            orderObj.put("sr_id", sr_id)
+            orderObj.put("user_id", user_id)
+            orderObj.put("employee_id", sr_id)
             //orderObj.put("ordered_at", "2022-10-25 09:22:00")
-            orderObj.put("order_no", selectedOrder!!.orderId)
-            orderObj.put("distributor_office_code", selectedOrder!!.distOfficeCode)
-            orderObj.put("grand_total", grandTotalPrice.toString())
+            orderObj.put("total_ordered_quantity", grandTotalPrice.toString())
+            orderObj.put("total_ordered_quantity", totalCount.toString())
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
             orderObj.put("orders_status", "SAVED")
             val brandsArray = JSONArray()
-            //val brandList = orderList[i].brands_array
             for (j in 0 until addedProducts!!.size){
                 val brandObj = JSONObject()
                 if (addedProducts!![j].ordered_quantity > 0) {
                     brandObj.put("product_id", addedProducts!![j].product_id)
-                    brandObj.put("product", addedProducts!![j].product_name)
-                    brandObj.put("brand_id", addedProducts!![j].brand_id)
-                    brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
-                    brandObj.put("bounce", "0")
-                    brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                    brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                    brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("delivered_quantity", "0")
+                    brandObj.put("bounced_quantity", "0")
+                    brandObj.put("ordered_amount", addedProducts!![j].ordered_total_price.toString())
+                    brandObj.put("delivered_amount", "0")
+                    brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
                 }
 
             }
 
-            orderObj.put("brands", brandsArray)
+            orderObj.put("products", brandsArray)
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
@@ -559,10 +561,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val ordersArray = JSONArray()
             val orderObj = JSONObject()
             orderObj.put("outlet_id", shopId)
-            orderObj.put("sr_id", sr_id)
+            orderObj.put("user_id", user_id)
+            orderObj.put("employee_id", sr_id)
             //orderObj.put("ordered_at", "2022-10-25 09:22:00")
-            orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)
-            orderObj.put("grand_total", grandTotalPrice.toString())
+            /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
+            orderObj.put("total_ordered_amount", grandTotalPrice.toString())
+            orderObj.put("total_ordered_quantity", totalCount.toString())
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
             //orderObj.put("orders_status", "SAVED")
@@ -572,19 +576,20 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 val brandObj = JSONObject()
                 if (addedProducts!![j].ordered_quantity >0) {
                     brandObj.put("product_id", addedProducts!![j].product_id)
-                    brandObj.put("product", addedProducts!![j].product_name)
-                    brandObj.put("brand_id", addedProducts!![j].brand_id)
-                    brandObj.put("quantity", addedProducts!![j].ordered_quantity.toString())
-                    brandObj.put("bounce", "0")
-                    brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                    brandObj.put("total_price", addedProducts!![j].ordered_total_price.toString())
+                    brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("delivered_quantity", "0")
+                    brandObj.put("bounced_quantity", "0")
+                    brandObj.put("ordered_amount", addedProducts!![j].ordered_total_price.toString())
+                    brandObj.put("delivered_amount", "0")
+                    brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
                 }
 
             }
 
-            orderObj.put("brands", brandsArray)
+            orderObj.put("products", brandsArray)
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
@@ -646,7 +651,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val ordersArray = JSONArray()
         val orderObj = JSONObject()
         orderObj.put("outlet_id", shopId)
-        orderObj.put("sr_id", sr_id)
+        orderObj.put("user_id", user_id)
+        orderObj.put("employee_id", sr_id)
         orderObj.put("longitude", location.longitude.toString())
         orderObj.put("latitude", location.latitude.toString())
         ordersArray.put(orderObj)
@@ -697,7 +703,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
-        val url = Api.all_product_list+"?with_stock=1&sr_id=" + sr_id + "&route_id=" + routeId
+        val url = Api.all_product_list+"?with_stock=1&user_id=" + user_id /*+ "&route_id=" + routeId*/
         val request = StringRequest(
             Request.Method.GET, url,
             {
@@ -717,18 +723,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val productId = productObj.getString("id")
                                 val productName = if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
                                 val productCode = if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
-                                val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
-                                val brandName = if (!productObj.isNull("brand__name")) productObj.getString("brand__name") else ""
-                                //val price = if (!productObj.isNull("price")) productObj.getDouble("price") else 0.0
-                                val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0
-                                val image = if (!productObj.isNull("image")) productObj.getString("image") else ""
+                                /*val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
+                                val brandName = if (!productObj.isNull("brand__name")) productObj.getString("brand__name") else ""*/
+                                /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
+                                val image = if (!productObj.isNull("image_url")) productObj.getString("image") else ""
                                 val unitName = if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
                                 val categoryName = if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
                                 val qtyLastMonth = if (!productObj.isNull("quantity_last_month")) productObj.getInt("quantity_last_month") else 0
                                 val availableStock = if (!productObj.isNull("current_available_stock")) productObj.getInt("current_available_stock") else 0
                                 var price = 0.0
-                                if (!productObj.isNull("price")) {
-                                    price = productObj.getDouble("price")
+                                if (!productObj.isNull("unit_price")) {
+                                    price = productObj.getDouble("unit_price")
                                 } else {
                                     price = 0.0
                                 }
@@ -754,8 +759,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 }
                                 val products = Products(
                                     productId,
-                                    productName, productCode, brandId, brandName, price, discount, image, unitName, categoryName,
-                                    qtyLastMonth, availableStock, 0, orderedQty, orderedTotalPrice)
+                                    productName, productCode, price, image, unitName, categoryName, qtyLastMonth, availableStock, 0, orderedQty, orderedTotalPrice)
 
                                 productsList!!.add(products)
                                 if (orderedQty > 0){
@@ -907,11 +911,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 addedProducts!!.add(
                     Products(
                     products.product_id, products.product_name,
-                    products.product_code, products.brand_id,
-                    products.brand_name, products.unit_price,
-                    products.discount, products.imageUrl,
-                    products.unit_name, products.category_name,
-                    products.quantity_last_month,
+                    products.product_code, products.unit_price,
+                    products.imageUrl, products.unit_name, products.category_name, products.quantity_last_month,
                     products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
                 )
                 )
@@ -920,11 +921,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 addedProducts!!.add(
                     Products(
                     products.product_id, products.product_name,
-                    products.product_code, products.brand_id,
-                    products.brand_name, products.unit_price,
-                    products.discount, products.imageUrl,
-                    products.unit_name, products.category_name,
-                    products.quantity_last_month,
+                    products.product_code, products.unit_price,
+                    products.imageUrl, products.unit_name, products.category_name, products.quantity_last_month,
                     products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
                 )
                 )
@@ -937,6 +935,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         tvgrandTotal!!.setText("Total "+dformat.format(grandTotal).toString())
         totalAmount = dformat.format(grandTotal).toString()
         grandTotalPrice = dformat.format(grandTotal).toDouble()
+        totalCount = itemCount
 
     }
 

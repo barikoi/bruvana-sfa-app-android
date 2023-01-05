@@ -63,7 +63,7 @@ class LastWeekBounceFragment : Fragment() {
                             for (i in 0 until outletssArray.length()){
                                 val productList: ArrayList<ProductStatistics> = ArrayList()
                                 val outletObj = outletssArray.getJSONObject(i)
-                                val brandArray = outletObj.getJSONArray("brands")
+                                val brandArray = outletObj.getJSONArray("products")
                                 if (brandArray.length() >0){
                                     for (j in 0 until brandArray.length()){
                                         val brandObj = brandArray.getJSONObject(j)
@@ -73,7 +73,7 @@ class LastWeekBounceFragment : Fragment() {
                                                     brandObj.getString("product_id"),
                                                     brandObj.getString("product"),
                                                     brandObj.getString("unit_name"),
-                                                    brandObj.getString("brand_id"),
+                                                    /*brandObj.getString("brand_id"),*/
                                                     brandObj.getDouble("unit_price"),
                                                     brandObj.getInt("bounce"),
                                                     brandObj.getInt("bounce"),

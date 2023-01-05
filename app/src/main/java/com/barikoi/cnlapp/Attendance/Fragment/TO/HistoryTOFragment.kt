@@ -216,14 +216,14 @@ class HistoryTOFragment : Fragment() {
                         soList.add(
                             SOList(
                                 soObj.getString("id"),
-                                soObj.getString("name"),
+                                soObj.getString("user_name"),
                                 soObj.getString("designation"),
                                 soObj.getString("employee_id"),
                                 soObj.getString("phone"),
-                                soObj.getString("image")
+                                soObj.getString("image_url")
                             )
                         )
-                        soNameList.add(soObj.getString("name"))
+                        soNameList.add(soObj.getString("user_name"))
 
                     }
                 }
@@ -250,24 +250,24 @@ class HistoryTOFragment : Fragment() {
                 if (attedanceArray.length() >0){
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
-                        if (!attendanceObj.getString("enter_time").equals("null")) {
+                        if (!attendanceObj.getString("checkin_time").equals("null")) {
                             if (!attendanceObj.getString("latitude").equals("null")) latitude =
                                 attendanceObj.getDouble("latitude")
                             if (!attendanceObj.getString("longitude").equals("null")) longitude =
                                 attendanceObj.getDouble("longitude")
                             historyList.add(
                                 HistoryList(
-                                    attendanceObj.getString("name"),
+                                    attendanceObj.getString("user_name"),
                                     attendanceObj.getString("user_id"),
                                     attendanceObj.getString("id"),
-                                    attendanceObj.getString("enter_time"),
-                                    attendanceObj.getString("exit_time"),
+                                    attendanceObj.getString("checkin_time"),
+                                    attendanceObj.getString("checkout_time"),
                                     attendanceObj.getInt("is_late"),
                                     attendanceObj.getInt("is_absent"),
                                     attendanceObj.getString("checkin_address"),
                                     latitude,
                                     longitude,
-                                    attendanceObj.getString("image"),
+                                    attendanceObj.getString("image_url"),
                                     attendanceObj.getString("late_reason"),
                                     attendanceObj.getString("route_id"),
                                     attendanceObj.getString("route_name")

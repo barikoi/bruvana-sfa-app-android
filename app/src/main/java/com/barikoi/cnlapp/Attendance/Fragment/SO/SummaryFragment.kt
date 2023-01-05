@@ -148,7 +148,7 @@ class SummaryFragment : Fragment() {
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
                         if (!attendanceObj.getString("late_reason").equals("null") && attendanceObj.getString("late_reason").length > 0){
-                            reasonList.add(Pair(attendanceObj.getString("enter_time"),
+                            reasonList.add(Pair(attendanceObj.getString("checkin_time"),
                                 attendanceObj.getString("late_reason")))
                         }
 

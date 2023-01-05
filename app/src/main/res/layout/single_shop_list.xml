@@ -80,6 +80,7 @@
                 android:drawableLeft="@drawable/ic_owner"
                 android:drawablePadding="8dp"
                 android:layout_margin="4dp"
+                android:visibility="gone"
                 android:text="distributor"
                 android:textColor="@color/text_title_2"
                 android:textSize="10sp"

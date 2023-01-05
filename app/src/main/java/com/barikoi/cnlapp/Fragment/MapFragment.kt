@@ -311,14 +311,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 val outlet = route_outlet_list.getJSONObject(j)
                                 val outlet_id = outlet.getString("id")
                                 val outlet_name = outlet.getString("outlet_name")
-                                val outlet_status = outlet.getString("outlets_status")
+                                val outlet_status = outlet.getString("outlet_status")
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
-                                val outlet_type = outlet.getString("store_type")
+                                val outlet_type = outlet.getString("outlet_type")
                                 /*val outlet_category = outlet.getString("outlet_category")*/
                                 val owner_name = outlet.getString("owner_name")
-                                val distributor_office = outlet.getString("distributor_office")
-                                val distributor_office_code = outlet.getString("distributor_office_code")
+                                /*val distributor_office = outlet.getString("distributor_office")
+                                val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
 
@@ -332,8 +332,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         outlet_type,
                                         "",
                                         owner_name,
-                                        distributor_office,
-                                        distributor_office_code,
+                                        /*distributor_office,
+                                        distributor_office_code,*/
                                         territory_name,
                                         latitude,
                                         longitude,
@@ -346,20 +346,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             }
                             Log.d("RouteList", "all 1 "+ shopList!!.size.toString())
                         }
-                    }else if (data.has("verified_outlet")){
-                        val routesOutletArray = data.getJSONArray("verified_outlet")
+                    }else if (data.has("outlets")){
+                        val routesOutletArray = data.getJSONArray("outlets")
                         for (i in 0 until routesOutletArray.length()){
                             val outlet = routesOutletArray.getJSONObject(i)
                             val outlet_id = outlet.getString("id")
                             val outlet_name = outlet.getString("outlet_name")
-                            val outlet_status = outlet.getString("outlets_status")
+                            val outlet_status = outlet.getString("outlet_status")
                             val outlet_address = outlet.getString("address")
                             val outlet_code = outlet.getString("outlet_code")
-                            val outlet_type = outlet.getString("store_type")
-                            /*val outlet_category = outlet.getString("outlet_category")*/
+                            val outlet_type = outlet.getString("outlet_type")
                             val owner_name = outlet.getString("owner_name")
-                            val distributor_office = outlet.getString("distributor_office")
-                            val distributor_office_code = outlet.getString("distributor_office_code")
+                            /*val distributor_office = outlet.getString("distributor_office")
+                            val distributor_office_code = outlet.getString("distributor_office_code")*/
                             val latitude = outlet.getDouble("latitude")
                             val longitude = outlet.getDouble("longitude")
                             val route_id = outlet.getString("route_id")
@@ -375,8 +374,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 outlet_type,
                                 "",
                                 owner_name,
-                                distributor_office,
-                                distributor_office_code,
+                                /*distributor_office,
+                                distributor_office_code,*/
                                 territory_name,
                                 latitude,
                                 longitude,
@@ -456,7 +455,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             srCode = ""
         }else{
             userId = prefs!!.getString(Api.USER_ID, "")
-            srCode = prefs!!.getString(Api.SR_CODE, "")
+            srCode = prefs!!.getString(Api.EMPLOYEE_ID, "")
         }
 
         token = prefs!!.getString(Api.TOKEN, "")

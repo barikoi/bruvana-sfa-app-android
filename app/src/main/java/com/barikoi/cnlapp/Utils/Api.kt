@@ -41,16 +41,14 @@ object Api {
     val logouturl = base_url + "api/v1/logout"
     val authUserCheck = base_url+ "api/v1/auth/user"
     //val route_outlet_list = base_url+"api/v1/route-list"
-    val verified_shop_list = base_url+"api/v1/outlets"
 
     /*order create*/
     val routes_withfilter = base_url+"api/v1/routes"
-    val shops_byroutes = base_url+"api/v1/outlets"
     val all_product_list = base_url+"api/v1/products"
+    val verified_shop_list = base_url+"api/v1/outlets"
     val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"
     val get_saved_order = base_url+"api/v1/orders"
-    val get_orders_to = base_url+"api/v1/orders"
     val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
 
@@ -64,7 +62,6 @@ object Api {
 
     /*home view*/
     val get_summary = base_url+"api/v1/get-overview-stats"
-    //val get_last_week_products = base_url+"api/v1/products"
     val get_last_week_category = base_url+"api/v1/get-category-outlets"
     val get_last_week_delivery_bounce = base_url+"api/v1/get-delivered-bounce-outlets"
 

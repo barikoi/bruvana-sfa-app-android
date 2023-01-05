@@ -27,7 +27,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
     var territoryId: String ? = ""
-    var srCode: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
         territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
-        srCode = prefs!!.getString(Api.SR_CODE, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         setDateFilter()
@@ -63,7 +63,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
             getProductStock(Api.all_product_list + "?start_date=" + EndDate +" 00:00:00"+ "&end_date=" + EndDate +" 23:59:59"+ "&with_stock=1&with_order=1&territory_id="+territoryId)
         }else{
-            getProductStock(Api.all_product_list + "?start_date=" + StartDate  +" 00:00:00"+ "&end_date=" + EndDate +" 23:59:59"+ "&with_stock=1&with_order=1&sr_id="+srCode+"&route_id="+routeId)
+            getProductStock(Api.all_product_list + "?start_date=" + StartDate  +" 00:00:00"+ "&end_date=" + EndDate +" 23:59:59"+ "&with_stock=1&with_order=1&user_id="+userId/*+"&route_id="+routeId*/)
         }
     }
 
@@ -82,7 +82,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
                                     ProductStock(
                                         productObj.getString("id"),
                                         productObj.getString("product_name"),
-                                        productObj.getString("image"),
+                                        productObj.getString("image_url"),
                                         productObj.getString("productive_outlets")+" "+resources.getString(R.string.shops_ordered_this_month),
                                         productObj.getString("current_available_stock"),
                                         productObj.getString("unit_name")
