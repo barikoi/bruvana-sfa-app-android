@@ -196,14 +196,26 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
     private fun createOrder(){
         if (orderList.size> 0){
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val today = df.format(Calendar.getInstance().time)
+            val cal = Calendar.getInstance()
+            cal.time = Calendar.getInstance().time
+            cal.add(Calendar.DATE, 1)
+            val nextDay = df.format(cal.time)
+
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             for(i in 0 until orderList.size){
                 val orderObj = JSONObject()
                 orderObj.put("outlet_id", orderList[i].outletId)
                 orderObj.put("order_no", orderList[i].orderId)
-                orderObj.put("sr_id", sr_id)
-                orderObj.put("grand_total", orderList[i].grandTotal)
+                orderObj.put("user_id", user_id)
+                orderObj.put("employee_id", sr_id)
+                orderObj.put("ordered_at", today)
+                /*orderObj.put("delivered_at", nextDay)*/
+                /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
+                orderObj.put("total_ordered_amount", orderList[i].grandTotal)
+                orderObj.put("total_ordered_quantity", orderList[i].totalQuantity)
                 orderObj.put("order_status", "PENDING")
                 /*orderObj.put("longitude", orderList[i].longitude)
                 orderObj.put("latitude", orderList[i].latitude)*/
@@ -213,15 +225,19 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                     val brandObj = JSONObject()
                     if (brandList[j].ordered_quantity > 0) {
                         brandObj.put("product_id", brandList[j].product_id)
-                        brandObj.put("product", brandList[j].product_name)
-                        /*brandObj.put("brand_id", brandList[j].brand_id)*/
-                        brandObj.put("quantity", brandList[j].ordered_quantity.toString())
-                        brandObj.put("bounce", "0")
-                        brandObj.put("unit_price", brandList[j].unit_price.toString())
-                        brandObj.put("total_price", brandList[j].ordered_total_price.toString())
+                        /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
+                        brandObj.put("product_name", brandList[j].product_name)
                         brandObj.put("unit_name", brandList[j].unit_name)
+                        brandObj.put("unit_price", brandList[j].unit_price.toString())
+                        brandObj.put("ordered_quantity", brandList[j].ordered_quantity.toString())
+                        brandObj.put("delivered_quantity", "0")
+                        brandObj.put("bounced_quantity", "0")
+                        brandObj.put("ordered_amount", brandList[j].ordered_total_price.toString())
+                        brandObj.put("delivered_amount", "0")
+                        brandObj.put("bounced_amount", "0")
+                        brandsArray.put(brandObj)
                     }
-                    brandsArray.put(brandObj)
+
                 }
 
                 orderObj.put("products", brandsArray)
@@ -330,13 +346,13 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                                 productItems.add(
                                     Products(
                                         brandObj.getString("product_id"),
-                                        "NULL"/*brandObj.getString("product_name")*/,
+                                        brandObj.getString("product_name"),
                                         "",
                                         /*brandObj.getString("brand_id"),
                                         "",*/
                                         brandObj.getDouble("unit_price"),
                                         /*0.0,*/ "",
-                                        "NULL"/*brandObj.getString("unit_name")*/,
+                                        brandObj.getString("unit_name"),
                                         "", 0, 0,
                                         brandObj.getInt("bounced_quantity"),
                                         brandObj.getInt("ordered_quantity"),

@@ -46,6 +46,7 @@ class HomeFragment : Fragment() {
     val dots: ArrayList<ImageView> = ArrayList()
     var token: String ? = ""
     var srId: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -182,12 +183,12 @@ class HomeFragment : Fragment() {
                 editor!!.commit()
             }
 
-            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&sr_id="+srId/*+"&route_id="+routeId*/)
+            getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&user_id="+userId/*+"&route_id="+routeId*/)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
 
-        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&sr_id="+srId/*+"&route_id="+routeId*/)
+        getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&user_id="+userId/*+"&route_id="+routeId*/)
 
         /*setSecondPartSummary()
         setThirdPartSummary()*/
@@ -410,7 +411,8 @@ class HomeFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.SR_CODE, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }
 }

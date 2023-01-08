@@ -75,6 +75,8 @@ class LastWeekBounceFragment : Fragment() {
                                                     brandObj.getString("unit_name"),
                                                     /*brandObj.getString("brand_id"),*/
                                                     brandObj.getDouble("unit_price"),
+                                                    brandObj.getDouble("total_price"),
+                                                    brandObj.getInt("bounce"),
                                                     brandObj.getInt("bounce"),
                                                     brandObj.getInt("bounce"),
                                                     brandObj.getDouble("total_price")

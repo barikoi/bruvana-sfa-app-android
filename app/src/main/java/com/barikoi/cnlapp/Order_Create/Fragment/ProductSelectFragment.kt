@@ -74,17 +74,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var longitude: Double? = 0.0
     var mContext: Context? = null
     var queue: RequestQueue? = null
-    var token : String? = null
-    var user_id : String? = null
-    var sr_id : String? = null
-    var selectedShop : Shops? =  null
-    var selectedOrder : OrderList? =  null
-    var totalAmount : String? =  null
-    var grandTotalPrice : Double? = 0.0
-    var totalCount : Int? = 0
-    var shopName : String? =  null
-    var shopId : String? =  null
-    var routeId : String? =  null
+    var token: String? = null
+    var user_id: String? = null
+    var sr_id: String? = null
+    var selectedShop: Shops? = null
+    var selectedOrder: OrderList? = null
+    var totalAmount: String? = null
+    var grandTotalPrice: Double? = 0.0
+    var totalCount: Int? = 0
+    var shopName: String? = null
+    var shopId: String? = null
+    var routeId: String? = null
     var listener: OnValueChangeListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ProductListAdapter? = null
@@ -95,6 +95,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     lateinit var ACTIVITY: MainActivity
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
+
     /*var itemCount = 0
     var grandTotal = 0.0*/
     private var mFusedLocationClient: FusedLocationProviderClient? = null
@@ -104,21 +105,21 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         super.onCreate(savedInstanceState)
 
 
-
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = this.arguments
 
         if (bundle != null) {
-            if (bundle.containsKey("from")){
-                if (bundle.getString("from").equals("Shop")){
+            if (bundle.containsKey("from")) {
+                if (bundle.getString("from").equals("Shop")) {
                     selectedShop = bundle.getSerializable("Shop") as Shops?
                     shopName = selectedShop!!.shop_name
                     shopId = selectedShop!!.shop_id
                     routeId = selectedShop!!.route_code
                     addedProducts!!.clear()
-                }else if (bundle.getString("from").equals("Order")){
+                } else if (bundle.getString("from").equals("Order")) {
                     selectedOrder = bundle.getSerializable("Order") as OrderList?
                     shopName = selectedOrder!!.outletName
                     shopId = selectedOrder!!.outletId
@@ -128,16 +129,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     grandTotalPrice = selectedOrder!!.grandTotal.toDouble()
                     totalCount = selectedOrder!!.totalQuantity.toInt()
                     var itemCountt = 0
-                    for (i in 0 until selectedOrder!!.brands_array.size){
-                        itemCountt = itemCountt+selectedOrder!!.brands_array[i].ordered_quantity
+                    for (i in 0 until selectedOrder!!.brands_array.size) {
+                        itemCountt = itemCountt + selectedOrder!!.brands_array[i].ordered_quantity
                     }
 
-                    if (itemCountt == 1 || itemCountt == 0){
-                        totalItemCount!!.setText(itemCountt.toString()+"Item")
-                    }else{
-                        totalItemCount!!.setText(itemCountt.toString()+"Items")
+                    if (itemCountt == 1 || itemCountt == 0) {
+                        totalItemCount!!.setText(itemCountt.toString() + "Item")
+                    } else {
+                        totalItemCount!!.setText(itemCountt.toString() + "Items")
                     }
-                    tvgrandTotal!!.setText("Total "+selectedOrder!!.grandTotal)
+                    tvgrandTotal!!.setText("Total " + selectedOrder!!.grandTotal)
                     appDatabase!!.saveOrderDao().insertAll(
                         SaveOrder(
                             null,
@@ -189,17 +190,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                     })
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 Sentry.captureException(e)
             }
         }
 
-        if (selectedOrder != null){
+        if (selectedOrder != null) {
             no_order.visibility = View.GONE
             save_order.visibility = View.GONE
             update_order.visibility = View.VISIBLE
-        }else{
+        } else {
             no_order.visibility = View.VISIBLE
             save_order.visibility = View.VISIBLE
             update_order.visibility = View.GONE
@@ -208,19 +209,28 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         update_order.setOnClickListener {
             appDatabase!!.saveOrderDao().deleteALL()
             val builder = SpannableStringBuilder()
-            val str1= SpannableString(shopName)
-            str1.setSpan(ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)), 0, str1.length, 0)
+            val str1 = SpannableString(shopName)
+            str1.setSpan(
+                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
+                0,
+                str1.length,
+                0
+            )
             builder.append(str1)
-            ViewUtils.viewDialog(mContext!!, "Are you sure want to update "+str1+"'s order?", object :
-                DialogListener {
-                override fun onConfirmed() {
-                    progressBar.visibility = View.VISIBLE
-                    getLocation("update_order")
-                }
-                override fun onCanceled() {
+            ViewUtils.viewDialog(
+                mContext!!,
+                "Are you sure want to update " + str1 + "'s order?",
+                object :
+                    DialogListener {
+                    override fun onConfirmed() {
+                        progressBar.visibility = View.VISIBLE
+                        getLocation("update_order")
+                    }
 
-                }
-            })
+                    override fun onCanceled() {
+
+                    }
+                })
 
         }
         getAllProducts()
@@ -231,15 +241,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         var productItems: ArrayList<ProductStatistics> = ArrayList()
         val obj = JSONObject(response)
         val outletssArray = obj.getJSONArray("previous_orders")
-        if (outletssArray.length() > 0){
-            for (i in 0 until outletssArray.length()){
+        if (outletssArray.length() > 0) {
+            for (i in 0 until outletssArray.length()) {
                 productItems.clear()
                 val outletObj = outletssArray.getJSONObject(i)
                 val brandArray = outletObj.getJSONArray("brands")
                 //val outletName = outletObj.getString("outlet_name")
                 lastDeliveryDate = outletObj.getString("ordered_at")
-                if (brandArray.length() >0){
-                    for (j in 0 until brandArray.length()){
+                if (brandArray.length() > 0) {
+                    for (j in 0 until brandArray.length()) {
                         val brandObj = brandArray.getJSONObject(j)
                         productItems.add(
                             ProductStatistics(
@@ -248,6 +258,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 brandObj.getString("unit_name"),
                                 /*brandObj.getString("brand_id"),*/
                                 brandObj.getDouble("unit_price"),
+                                brandObj.getDouble("total_price"),
+                                brandObj.getInt("quantity"),
                                 brandObj.getInt("quantity"),
                                 brandObj.getInt("bounce"),
                                 brandObj.getDouble("total_price")
@@ -288,12 +300,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when(item!!.itemId){
-                        R.id.menu_ztoa->{
+                    when (item!!.itemId) {
+                        R.id.menu_ztoa -> {
                             productsList!!.sortByDescending {
                                 it.product_name
                             }
-                            if (productsList!!.size > 0){
+                            if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 recylerView!!.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
@@ -301,22 +313,22 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             sortTitle!!.setText(resources.getString(R.string.ztoa))
                         }
-                        R.id.menu_atoz->{
+                        R.id.menu_atoz -> {
                             productsList!!.sortBy {
                                 it.product_name
                             }
-                            if (productsList!!.size > 0){
+                            if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 recylerView!!.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
                             sortTitle!!.setText(resources.getString(R.string.atoz))
                         }
-                        R.id.menu_mostfrequent->{
+                        R.id.menu_mostfrequent -> {
                             productsList!!.sortByDescending {
-                                    it.quantity_last_month
+                                it.quantity_last_month
                             }
-                            if (productsList!!.size > 0){
+                            if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 recylerView!!.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
@@ -324,11 +336,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             sortTitle!!.setText(resources.getString(R.string.most_frequent))
                         }
-                        R.id.menu_lowstock->{
+                        R.id.menu_lowstock -> {
                             productsList!!.sortBy {
                                 it.stock_available
                             }
-                            if (productsList!!.size > 0){
+                            if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 recylerView!!.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
@@ -346,17 +358,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         //adapter = ProductListAdapter(ArrayList(), listener!!)
 
 
-
-        et_search!!.addTextChangedListener(object : TextWatcher{
+        et_search!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
+
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 adapter!!.filter.filter(s)
-                if (s!!.length == 0){
+                if (s!!.length == 0) {
                     getAllProducts()
                 }
             }
+
             override fun afterTextChanged(p0: Editable?) {
 
             }
@@ -364,7 +377,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
-            if (addedProducts!!.size >0) {
+            if (addedProducts!!.size > 0) {
                 appDatabase!!.saveOrderDao().deleteALL()
                 val builder = SpannableStringBuilder()
                 val str1 = SpannableString(shopName)
@@ -390,7 +403,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                     })
-            }else{
+            } else {
                 ViewUtils.viewDialogResponse(
                     mContext!!,
                     "No products selected to order",
@@ -416,6 +429,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     progressBar.visibility = View.VISIBLE
                     getLocation("no_order")
                 }
+
                 override fun onCanceled() {
 
                 }
@@ -426,7 +440,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         return view
     }
 
-    fun getLocation(choice: String){
+    fun getLocation(choice: String) {
         val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
@@ -438,11 +452,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     val location = locationResult.lastLocation
                     if (!location.latitude.isNaN()) {
                         if (!location.isFromMockProvider) {
-                            if (choice.equals("no_order")){
+                            if (choice.equals("no_order")) {
                                 submitNoOrder(location)
-                            }else if(choice.equals("update_order")){
+                            } else if (choice.equals("update_order")) {
                                 updateOrder(location)
-                            }else{
+                            } else {
                                 submitOrder(location)
                             }
 
@@ -479,25 +493,36 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     private fun updateOrder(location: Location) {
-        if (addedProducts!!.size >0){
+        if (addedProducts!!.size > 0) {
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val today = df.format(Calendar.getInstance().time)
+            val cal = Calendar.getInstance()
+            cal.time = Calendar.getInstance().time
+            cal.add(Calendar.DATE, 1)
+            val nextDay = df.format(cal.time)
+
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             val orderObj = JSONObject()
             orderObj.put("outlet_id", shopId)
+            orderObj.put("order_no", selectedOrder!!.orderId)
             orderObj.put("user_id", user_id)
             orderObj.put("employee_id", sr_id)
-            //orderObj.put("ordered_at", "2022-10-25 09:22:00")
+            /*orderObj.put("ordered_at", today)
+            orderObj.put("delivered_at", nextDay)*/
             orderObj.put("total_ordered_quantity", grandTotalPrice.toString())
             orderObj.put("total_ordered_quantity", totalCount.toString())
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
-            orderObj.put("orders_status", "SAVED")
+            orderObj.put("order_status", "SAVED")
             val brandsArray = JSONArray()
-            for (j in 0 until addedProducts!!.size){
+            for (j in 0 until addedProducts!!.size) {
                 val brandObj = JSONObject()
                 if (addedProducts!![j].ordered_quantity > 0) {
                     brandObj.put("product_id", addedProducts!![j].product_id)
-                    /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
+                    brandObj.put("brand_id", null)
+                    brandObj.put("product_name", addedProducts!![j].product_name)
+                    brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
                     brandObj.put("delivered_quantity", "0")
@@ -509,26 +534,215 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
             }
+            orderObj.put("products", brandsArray)
+            ordersArray.put(orderObj)
+            obj1.put("orders", ordersArray)
+
+            if (obj1.length() > 0) {
+                Log.d("ConfirmOrder", "response: " + obj1)
+                ApiServices.apiJSONObjectPOST(
+                    Api.update_saved_order,
+                    queue!!,
+                    token!!,
+                    obj1,
+                    object : ApiServiceListener {
+                        override fun onResponseSuccess(response: String) {
+                            TODO("Not yet implemented")
+                        }
+
+                        override fun onJSONResponseSuccess(response: JSONObject) {
+                            progressBar.visibility = View.GONE
+                            val message = response.getString("message")
+                            //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+                            ViewUtils.viewDialogResponse(
+                                mContext!!,
+                                message,
+                                object : DialogListener {
+                                    override fun onConfirmed() {
+                                        CreateOrderFragment.setCurrentFragment(
+                                            ShopSelectFragment(),
+                                            ACTIVITY
+                                        )
+                                    }
+
+                                    override fun onCanceled() {
+                                        TODO("Not yet implemented")
+                                    }
+
+                                })
+                        }
+
+                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                        }
+
+                        override fun onResponseFailure(error: VolleyError) {
+                            progressBar.visibility = View.GONE
+                            ViewUtils.getErrorResponse(error, mContext!!)
+                        }
+
+                        override fun onException(e: Exception) {
+                            progressBar.visibility = View.GONE
+                        }
+
+                    })
+            }
+        }
+    }
+
+    private fun submitOrder(location: Location) {
+        if (addedProducts!!.size > 0) {
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val today = df.format(Calendar.getInstance().time)
+            val cal = Calendar.getInstance()
+            cal.time = Calendar.getInstance().time
+            cal.add(Calendar.DATE, 1)
+            val nextDay = df.format(cal.time)
+
+            val obj1 = JSONObject()
+            val ordersArray = JSONArray()
+            val orderObj = JSONObject()
+            orderObj.put("outlet_id", shopId)
+            orderObj.put("user_id", user_id)
+            orderObj.put("employee_id", sr_id)
+            orderObj.put("ordered_at", today)
+            /*orderObj.put("delivered_at", nextDay)*/
+            /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
+            orderObj.put("total_ordered_amount", grandTotalPrice.toString())
+            orderObj.put("total_ordered_quantity", totalCount.toString())
+            orderObj.put("longitude", location.longitude.toString())
+            orderObj.put("latitude", location.latitude.toString())
+            //orderObj.put("order_status", "SAVED")
+            val brandsArray = JSONArray()
+            //val brandList = orderList[i].brands_array
+            for (j in 0 until addedProducts!!.size) {
+                val brandObj = JSONObject()
+                if (addedProducts!![j].ordered_quantity > 0) {
+                    brandObj.put("product_id", addedProducts!![j].product_id)
+                    brandObj.put("brand_id", null)
+                    brandObj.put("product_name", addedProducts!![j].product_name)
+                    brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                    brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("delivered_quantity", "0")
+                    brandObj.put("bounced_quantity", "0")
+                    brandObj.put(
+                        "ordered_amount",
+                        addedProducts!![j].ordered_total_price.toString()
+                    )
+                    brandObj.put("delivered_amount", "0")
+                    brandObj.put("bounced_amount", "0")
+                    brandsArray.put(brandObj)
+                }
+
+            }
 
             orderObj.put("products", brandsArray)
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
-            if (obj1.length() >0){
-                Log.d("ConfirmOrder", "response: "+obj1)
-                ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, obj1, object : ApiServiceListener{
+            if (obj1.length() > 0) {
+                Log.d("ConfirmOrder", "response: " + obj1)
+                ApiServices.apiJSONObjectPOST(
+                    Api.confirm_order,
+                    queue!!,
+                    token!!,
+                    obj1,
+                    object : ApiServiceListener {
+                        override fun onResponseSuccess(response: String) {
+                            TODO("Not yet implemented")
+                        }
+
+                        override fun onJSONResponseSuccess(response: JSONObject) {
+                            val message = response.getString("message")
+                            progressBar.visibility = View.GONE
+                            //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                            appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
+                            appDatabase!!.orderListDao().deleteByShop(shopId!!)
+
+                            ViewUtils.viewDialogResponse(
+                                mContext!!,
+                                message,
+                                object : DialogListener {
+                                    override fun onConfirmed() {
+                                        CreateOrderFragment.setCurrentFragment(
+                                            ShopSelectFragment(),
+                                            ACTIVITY
+                                        )
+                                    }
+
+                                    override fun onCanceled() {
+                                        TODO("Not yet implemented")
+                                    }
+
+                                })
+                        }
+
+                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                        }
+
+                        override fun onResponseFailure(error: VolleyError) {
+                            try {
+                                ViewUtils.getErrorResponse(error, mContext!!)
+                                progressBar.visibility = View.GONE
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
+                        override fun onException(e: Exception) {
+                            try {
+                                progressBar.visibility = View.GONE
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                        }
+
+                    })
+            }
+        }
+    }
+
+    private fun submitNoOrder(location: Location) {
+        val obj1 = JSONObject()
+        val ordersArray = JSONArray()
+        val orderObj = JSONObject()
+        orderObj.put("outlet_id", shopId)
+        orderObj.put("user_id", user_id)
+        orderObj.put("employee_id", sr_id)
+        orderObj.put("longitude", location.longitude.toString())
+        orderObj.put("latitude", location.latitude.toString())
+        ordersArray.put(orderObj)
+        obj1.put("orders", ordersArray)
+
+        if (obj1.length() > 0) {
+            Log.d("ConfirmOrder", "response: " + obj1)
+            ApiServices.apiJSONObjectPOST(
+                Api.no_order,
+                queue!!,
+                token!!,
+                obj1,
+                object : ApiServiceListener {
                     override fun onResponseSuccess(response: String) {
                         TODO("Not yet implemented")
                     }
 
                     override fun onJSONResponseSuccess(response: JSONObject) {
-                        progressBar.visibility = View.GONE
                         val message = response.getString("message")
                         //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                        progressBar.visibility = View.GONE
 
                         ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                             override fun onConfirmed() {
-                                CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
+                                editor!!.putString(Api.ORDERED_ROUTE_ID, selectedShop!!.route_code)
+                                editor!!.commit()
+                                CreateOrderFragment.setCurrentFragment(
+                                    ShopSelectFragment(),
+                                    ACTIVITY
+                                )
                             }
 
                             override fun onCanceled() {
@@ -546,235 +760,111 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         progressBar.visibility = View.GONE
                         ViewUtils.getErrorResponse(error, mContext!!)
                     }
+
                     override fun onException(e: Exception) {
                         progressBar.visibility = View.GONE
                     }
 
                 })
-            }
-        }
-    }
-
-    private fun submitOrder(location: Location) {
-        if (addedProducts!!.size >0){
-        val obj1 = JSONObject()
-        val ordersArray = JSONArray()
-            val orderObj = JSONObject()
-            orderObj.put("outlet_id", shopId)
-            orderObj.put("user_id", user_id)
-            orderObj.put("employee_id", sr_id)
-            //orderObj.put("ordered_at", "2022-10-25 09:22:00")
-            /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
-            orderObj.put("total_ordered_amount", grandTotalPrice.toString())
-            orderObj.put("total_ordered_quantity", totalCount.toString())
-            orderObj.put("longitude", location.longitude.toString())
-            orderObj.put("latitude", location.latitude.toString())
-            //orderObj.put("orders_status", "SAVED")
-            val brandsArray = JSONArray()
-            //val brandList = orderList[i].brands_array
-            for (j in 0 until addedProducts!!.size){
-                val brandObj = JSONObject()
-                if (addedProducts!![j].ordered_quantity >0) {
-                    brandObj.put("product_id", addedProducts!![j].product_id)
-                    /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
-                    brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                    brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
-                    brandObj.put("delivered_quantity", "0")
-                    brandObj.put("bounced_quantity", "0")
-                    brandObj.put("ordered_amount", addedProducts!![j].ordered_total_price.toString())
-                    brandObj.put("delivered_amount", "0")
-                    brandObj.put("bounced_amount", "0")
-                    brandsArray.put(brandObj)
-                }
-
-            }
-
-            orderObj.put("products", brandsArray)
-            ordersArray.put(orderObj)
-            obj1.put("orders", ordersArray)
-
-        if (obj1.length() >0){
-            Log.d("ConfirmOrder", "response: "+obj1)
-            ApiServices.apiJSONObjectPOST(Api.confirm_order, queue!!, token!!, obj1, object : ApiServiceListener{
-                override fun onResponseSuccess(response: String) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    val message = response.getString("message")
-                    progressBar.visibility = View.GONE
-                    //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                    appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
-                    appDatabase!!.orderListDao().deleteByShop(shopId!!)
-
-                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
-                        override fun onConfirmed() {
-                            CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
-                        }
-
-                        override fun onCanceled() {
-                            TODO("Not yet implemented")
-                        }
-
-                    })
-                }
-
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-
-                }
-
-                override fun onResponseFailure(error: VolleyError) {
-                    try {
-                        ViewUtils.getErrorResponse(error, mContext!!)
-                        progressBar.visibility = View.GONE
-                    }catch (e: Exception){
-                        e.printStackTrace()
-                    }
-                }
-
-                override fun onException(e: Exception) {
-                    try {
-                        progressBar.visibility = View.GONE
-                    }catch (e: Exception){
-                        e.printStackTrace()
-                    }
-
-                }
-
-            })
-        }
-        }
-    }
-
-    private fun submitNoOrder(location: Location) {
-        val obj1 = JSONObject()
-        val ordersArray = JSONArray()
-        val orderObj = JSONObject()
-        orderObj.put("outlet_id", shopId)
-        orderObj.put("user_id", user_id)
-        orderObj.put("employee_id", sr_id)
-        orderObj.put("longitude", location.longitude.toString())
-        orderObj.put("latitude", location.latitude.toString())
-        ordersArray.put(orderObj)
-        obj1.put("orders", ordersArray)
-
-        if (obj1.length() >0){
-            Log.d("ConfirmOrder", "response: "+obj1)
-            ApiServices.apiJSONObjectPOST(Api.no_order, queue!!, token!!, obj1, object : ApiServiceListener{
-                override fun onResponseSuccess(response: String) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    val message = response.getString("message")
-                    //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                    progressBar.visibility = View.GONE
-
-                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener{
-                        override fun onConfirmed() {
-                            editor!!.putString(Api.ORDERED_ROUTE_ID, selectedShop!!.route_code)
-                            editor!!.commit()
-                            CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
-                        }
-
-                        override fun onCanceled() {
-                            TODO("Not yet implemented")
-                        }
-
-                    })
-                }
-
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-
-                }
-
-                override fun onResponseFailure(error: VolleyError) {
-                    progressBar.visibility = View.GONE
-                    ViewUtils.getErrorResponse(error, mContext!!)
-                }
-
-                override fun onException(e: Exception) {
-                    progressBar.visibility = View.GONE
-                }
-
-            })
         }
     }
 
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
-        val url = Api.all_product_list+"?with_stock=1&user_id=" + user_id /*+ "&route_id=" + routeId*/
+        val url =
+            Api.all_product_list + "?with_stock=1&user_id=" + user_id /*+ "&route_id=" + routeId*/
         val request = StringRequest(
             Request.Method.GET, url,
-            {
-                    response ->
+            { response ->
                 try {
                     loading!!.visibility = View.GONE
 
                     val data = JSONObject(response)
-                    if (data.has("products") && !data.isNull("products")){
+                    if (data.has("products") && !data.isNull("products")) {
                         val productArray = data.getJSONArray("products")
-                        if (productArray.length() > 0){
+                        if (productArray.length() > 0) {
                             productsList!!.clear()
                             for (i in 0 until productArray.length()) {
                                 var orderedQty = 0
                                 var orderedTotalPrice = 0.0
                                 val productObj = productArray.getJSONObject(i)
                                 val productId = productObj.getString("id")
-                                val productName = if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
-                                val productCode = if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
+                                val productName =
+                                    if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
+                                val productCode =
+                                    if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
                                 /*val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
                                 val brandName = if (!productObj.isNull("brand__name")) productObj.getString("brand__name") else ""*/
                                 /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
-                                val image = if (!productObj.isNull("image_url")) productObj.getString("image") else ""
-                                val unitName = if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
-                                val categoryName = if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
-                                val qtyLastMonth = if (!productObj.isNull("quantity_last_month")) productObj.getInt("quantity_last_month") else 0
-                                val availableStock = if (!productObj.isNull("current_available_stock")) productObj.getInt("current_available_stock") else 0
+                                val image =
+                                    if (!productObj.isNull("image_url")) productObj.getString("image") else ""
+                                val unitName =
+                                    if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
+                                val categoryName =
+                                    if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
+                                val qtyLastMonth =
+                                    if (!productObj.isNull("quantity_last_month")) productObj.getInt(
+                                        "quantity_last_month"
+                                    ) else 0
+                                val availableStock =
+                                    if (!productObj.isNull("current_available_stock")) productObj.getInt(
+                                        "current_available_stock"
+                                    ) else 0
                                 var price = 0.0
                                 if (!productObj.isNull("unit_price")) {
                                     price = productObj.getDouble("unit_price")
                                 } else {
                                     price = 0.0
                                 }
-                                if (selectedOrder != null){
+                                if (selectedOrder != null) {
                                     //var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
                                     val exist = selectedOrder!!.brands_array.find {
                                         it.product_id == productId
                                     }
 
-                                    if (exist != null){
+                                    if (exist != null) {
                                         orderedQty = exist.ordered_quantity
                                         orderedTotalPrice = exist.ordered_total_price
                                     }
-                                }else if(addedProducts!!.size > 0){
+                                } else if (addedProducts!!.size > 0) {
                                     val exist = addedProducts?.find {
                                         it.product_id == productId
                                     }
 
-                                    if (exist != null){
+                                    if (exist != null) {
                                         orderedQty = exist.ordered_quantity
                                         orderedTotalPrice = exist.ordered_total_price
                                     }
                                 }
                                 val products = Products(
                                     productId,
-                                    productName, productCode, price, image, unitName, categoryName, qtyLastMonth, availableStock, 0, orderedQty, orderedTotalPrice)
+                                    productName,
+                                    productCode,
+                                    price,
+                                    image,
+                                    unitName,
+                                    categoryName,
+                                    qtyLastMonth,
+                                    availableStock,
+                                    0,
+                                    orderedQty,
+                                    orderedTotalPrice
+                                )
 
                                 productsList!!.add(products)
-                                if (orderedQty > 0){
+                                if (orderedQty > 0) {
                                     val exist = addedProducts?.find {
                                         it.product_id == productId
                                     }
 
-                                    if (exist == null){
+                                    if (exist == null) {
                                         addedProducts!!.add(products)
                                     }
 
                                 }
                             }
 
-                            if (productsList!!.size > 0){
+                            if (productsList!!.size > 0) {
                                 productsList!!.sortBy { it.product_name }
                                 sortTitle!!.setText(resources.getString(R.string.atoz))
                                 adapter = ProductListAdapter(productsList!!, listener!!)
@@ -784,7 +874,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                     }
-                }catch (e:Exception){
+                } catch (e: Exception) {
                     Sentry.captureException(e)
                     e.printStackTrace()
                 }
@@ -793,11 +883,19 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 loading!!.visibility = View.GONE
                 if (error is TimeoutError) {
                     //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                    Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        mContext,
+                        "Request timeout!! Check your internet connection or Contact Admin",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
                 if (error is NoConnectionError) {
                     //mListerner.onFailure("Turn on your internet connection and Try again")
-                    Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        mContext,
+                        "Turn on your internet connection and Try again",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
                 if (error != null && error.networkResponse != null) {
                     try {
@@ -806,7 +904,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         val data = JSONObject(s)
                         //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
                         //mListerner.onFailure(data.getString("message"))
-                        Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
+                        Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
+                            .show()
                     } catch (e: UnsupportedEncodingException) {
                         Sentry.captureException(e)
                         e.printStackTrace()
@@ -824,7 +923,13 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         )
         queue!!.add(request)
     }
-    fun viewDialog(mContext: Context, outlet_name: String, lastOrder: String, listItem: ArrayList<ProductStatistics>){
+
+    fun viewDialog(
+        mContext: Context,
+        outlet_name: String,
+        lastOrder: String,
+        listItem: ArrayList<ProductStatistics>
+    ) {
         val dialog = Dialog(mContext)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -844,12 +949,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val orderDate = df.format(oldDate.parse(lastOrder))
             tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
         }
-        tvItemCount.setText(listItem.size.toString()+mContext.resources.getString(R.string.items))
+        tvItemCount.setText(listItem.size.toString() + mContext.resources.getString(R.string.items))
 
         var grandTotal = 0.0
-        if (listItem.size> 0){
-            for (i in 0 until listItem.size){
-                grandTotal = grandTotal+listItem[i].total_price
+        if (listItem.size > 0) {
+            for (i in 0 until listItem.size) {
+                grandTotal = grandTotal + listItem[i].total_price
             }
 
             val adapter = OutletProductAdapter(listItem)
@@ -870,6 +975,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         )
 
     }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -891,48 +997,65 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         products as Products
         var itemCount = 0
         var grandTotal = 0.0
-        val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+        val prodList =
+            appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
         itemCount = prodList!![0].itemsCount
         grandTotal = prodList[0].totalPrice
-        if (itemCount == 1 || itemCount == 0){
-            totalItemCount!!.setText(itemCount.toString()+"Item")
-        }else{
-            totalItemCount!!.setText(itemCount.toString()+"Items")
+        if (itemCount == 1 || itemCount == 0) {
+            totalItemCount!!.setText(itemCount.toString() + "Item")
+        } else {
+            totalItemCount!!.setText(itemCount.toString() + "Items")
         }
-        try{
-            Log.d("Product", "addedProducts size: "+addedProducts!!.size)
+        try {
+            Log.d("Product", "addedProducts size: " + addedProducts!!.size)
             //val exists = products.product_id in arrayOf(addedProducts)
             val exists = addedProducts?.find {
                 it.product_id == products.product_id
             }
-            Log.d("Product", "addedProducts size: "+exists)
-            if (exists != null){
+            Log.d("Product", "addedProducts size: " + exists)
+            if (exists != null) {
                 addedProducts!!.remove(exists)
                 addedProducts!!.add(
                     Products(
-                    products.product_id, products.product_name,
-                    products.product_code, products.unit_price,
-                    products.imageUrl, products.unit_name, products.category_name, products.quantity_last_month,
-                    products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
+                        products.product_id,
+                        products.product_name,
+                        products.product_code,
+                        products.unit_price,
+                        products.imageUrl,
+                        products.unit_name,
+                        products.category_name,
+                        products.quantity_last_month,
+                        products.stock_available,
+                        products.bounced_quantity,
+                        products.ordered_quantity,
+                        products.ordered_total_price
+                    )
                 )
-                )
-                Log.d("Product", "addedProducts size 2: "+addedProducts!!.size)
-            }else{
+                Log.d("Product", "addedProducts size 2: " + addedProducts!!.size)
+            } else {
                 addedProducts!!.add(
                     Products(
-                    products.product_id, products.product_name,
-                    products.product_code, products.unit_price,
-                    products.imageUrl, products.unit_name, products.category_name, products.quantity_last_month,
-                    products.stock_available, products.bounced_quantity, products.ordered_quantity, products.ordered_total_price
+                        products.product_id,
+                        products.product_name,
+                        products.product_code,
+                        products.unit_price,
+                        products.imageUrl,
+                        products.unit_name,
+                        products.category_name,
+                        products.quantity_last_month,
+                        products.stock_available,
+                        products.bounced_quantity,
+                        products.ordered_quantity,
+                        products.ordered_total_price
+                    )
                 )
-                )
-                Log.d("Product", "addedProducts size 3: "+addedProducts!!.size)
+                Log.d("Product", "addedProducts size 3: " + addedProducts!!.size)
             }
-        }catch (e: Exception){
-            Log.d("Product", "exception 2: "+e.message+" "+position)
+        } catch (e: Exception) {
+            Log.d("Product", "exception 2: " + e.message + " " + position)
             e.printStackTrace()
         }
-        tvgrandTotal!!.setText("Total "+dformat.format(grandTotal).toString())
+        tvgrandTotal!!.setText("Total " + dformat.format(grandTotal).toString())
         totalAmount = dformat.format(grandTotal).toString()
         grandTotalPrice = dformat.format(grandTotal).toDouble()
         totalCount = itemCount

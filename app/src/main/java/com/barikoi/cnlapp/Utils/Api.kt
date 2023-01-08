@@ -70,5 +70,5 @@ object Api {
     val get_dh_list = base_url+"api/v1/dh"
 
     /*chalan download*/
-    val get_chalan_download = base_url+"api/memo-generate"
+    val get_chalan_download = base_url+"api/v1/memo-generate"
 }
