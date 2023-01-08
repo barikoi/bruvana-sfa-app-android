@@ -61,7 +61,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+        checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -113,12 +113,12 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         val orderList: ArrayList<OrderList> = ArrayList()
         lateinit var adapter: OrderDeliveryListAdapter
 
-        fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
+        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
             if (mCallback2!= null) {
                 if (sr_id.length == 0){
                     getAllOrders(Api.get_saved_order+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED", queue, token, mCallback2!!)
                 }else{
-                    getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED", queue, token, mCallback2!!)
+                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED", queue, token, mCallback2!!)
                 }
 
             }
@@ -176,14 +176,14 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                             for (j in 0 until brandArray.length()){
                                 val brandObj = brandArray.getJSONObject(j)
                                 var bounce = 0
-                                if (brandObj.has("bounce")){
-                                    bounce = brandObj.getInt("bounce")
+                                if (brandObj.has("bounced_quantity")){
+                                    bounce = brandObj.getInt("bounced_quantity")
                                 }
-                                if(brandObj.getInt("quantity") > 0) {
+                                if(brandObj.getInt("ordered_quantity") > 0) {
                                     productItems.add(
                                         Products(
                                             brandObj.getString("product_id"),
-                                            brandObj.getString("product"),
+                                            brandObj.getString("product_name"),
                                             "",
                                             /*brandObj.getString("brand_id"),
                                             "",*/
@@ -192,8 +192,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                             brandObj.getString("unit_name"),
                                             "", 0, 0,
                                             bounce,
-                                            brandObj.getInt("quantity"),
-                                            brandObj.getDouble("total_price")
+                                            brandObj.getInt("delivered_quantity"),
+                                            brandObj.getDouble("delivered_amount")
                                         )
                                     )
                                 }
@@ -210,8 +210,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                 orderObj.getString("route_id"),
                                 orderObj.getString("route_name"),
                                 /*orderObj.getString("distributor_office_code"),*/
-                                orderObj.getString("paid_amount"),
-                                orderObj.getString("total_ordered_quantity"),
+                                orderObj.getString("total_delivered_amount"),
+                                orderObj.getString("total_delivered_quantity"),
                                 orderObj.getString("latitude"),
                                 orderObj.getString("longitude"),
                                 productItems
@@ -272,7 +272,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             sr_id = ""
             route_id = ""
         }else{
-            sr_id = prefs!!.getString(Api.SR_CODE, "")
+            sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         }
         territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
@@ -344,6 +344,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                         order.brands_array[i].unit_name,
                         /*order.brands_array[i].brand_id,*/
                         order.brands_array[i].unit_price,
+                        order.brands_array[i].ordered_total_price,
+                        order.brands_array[i].ordered_quantity,
                         order.brands_array[i].ordered_quantity,
                         order.brands_array[i].bounced_quantity,
                         order.brands_array[i].ordered_total_price
@@ -443,6 +445,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                             checkforOrders(
                                 queue!!,
                                 token!!,
+                                user_id!!,
                                 sr_id!!,
                                 route_id!!,
                                 territory_id!!,

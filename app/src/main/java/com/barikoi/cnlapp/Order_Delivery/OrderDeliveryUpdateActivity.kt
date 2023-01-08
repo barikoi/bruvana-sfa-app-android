@@ -76,7 +76,7 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
             sr_id = ""
             route_id = ""
         }else{
-            sr_id = prefs!!.getString(Api.SR_CODE, "")
+            sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         }
         btnBack.setOnClickListener {
@@ -114,13 +114,13 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
                     viewPager.setCurrentItem(0)
-                    PendingOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                    PendingOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 } else if (position == 1) {
                     viewPager.setCurrentItem(1)
-                    DeliveredOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                    DeliveredOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }else if (position == 2) {
                     viewPager.setCurrentItem(2)
-                    BouncedOrderFragment.checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                    BouncedOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }
             }
         })

@@ -61,6 +61,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     private var tvGrandTotal: TextView? = null
     private var totalItemCount : Int? =  0
     private var grandTotalPrice : Double? = 0.0
+    var totalOrderedPrice: String? = null
+    var totalOrderedQuantity: String? = null
     lateinit var ACTIVITY: OrderDeliveryUpdateActivity
     var token : String? = null
     var user_id : String? = null
@@ -86,7 +88,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+        checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -122,12 +124,12 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     companion object{
         var mCallback: OrderListSuccessListener? = PendingOrderFragment()
-        fun checkforOrders(queue: RequestQueue, token: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
+        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
             if (mCallback!= null) {
                 if (sr_id.length == 0){
                     getAllOrders(Api.get_saved_order+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING", queue, token, mCallback!!)
                 }else{
-                    getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
+                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
                 }
 
             }
@@ -188,14 +190,14 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             for (j in 0 until brandArray.length()){
                                 val brandObj = brandArray.getJSONObject(j)
                                 var bounce = 0
-                                if (brandObj.has("bounce")){
-                                    bounce = brandObj.getInt("bounce")
+                                if (brandObj.has("bounced_quantity")){
+                                    bounce = brandObj.getInt("bounced_quantity")
                                 }
-                                if (brandObj.getInt("quantity") > 0) {
+                                if (brandObj.getInt("ordered_quantity") > 0) {
                                     productItems.add(
                                         Products(
                                             brandObj.getString("product_id"),
-                                            brandObj.getString("product"),
+                                            brandObj.getString("product_name"),
                                             "",
                                             /*brandObj.getString("brand_id"),
                                             "",*/
@@ -204,8 +206,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                             brandObj.getString("unit_name"),
                                             "", 0, 0,
                                             bounce,
-                                            brandObj.getInt("quantity"),
-                                            brandObj.getDouble("total_price")
+                                            brandObj.getInt("ordered_quantity"),
+                                            brandObj.getDouble("ordered_amount")
                                         )
                                     )
                                 }
@@ -222,7 +224,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                 orderObj.getString("route_id"),
                                 orderObj.getString("route_name"),
                                 /*orderObj.getString("distributor_office_code"),*/
-                                orderObj.getString("grand_total"),
+                                orderObj.getString("total_ordered_amount"),
                                 orderObj.getString("total_ordered_quantity"),
                                 orderObj.getString("latitude"),
                                 orderObj.getString("longitude"),
@@ -286,7 +288,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             sr_id = ""
             route_id = ""
         }else{
-            sr_id = prefs!!.getString(Api.SR_CODE, "")
+            sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         }
         territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
@@ -361,6 +363,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         order.brands_array[i].unit_name,
                         /*order.brands_array[i].brand_id,*/
                         order.brands_array[i].unit_price,
+                        order.brands_array[i].ordered_total_price,
+                        order.brands_array[i].ordered_quantity,
                         order.brands_array[i].ordered_quantity,
                         0,
                         /*order.brands_array[i].bounced_quantity,*/
@@ -450,46 +454,78 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     private fun createOrder(order: OrderList, status: String, grandTotal: String,updatedProducts: ArrayList<ProductStatistics>, dialog: Dialog){
         if (updatedProducts.size> 0){
+            var deliveredQuantity = 0
+            var deliveredAmount = 0.0
+            var bouncedQuantity = 0
+            var bouncedAmount = 0.0
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val today = df.format(Calendar.getInstance().time)
+            val cal = Calendar.getInstance()
+            cal.time = Calendar.getInstance().time
+            cal.add(Calendar.DATE, 1)
+            val nextDay = df.format(cal.time)
+
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             val orderObj = JSONObject()
             orderObj.put("outlet_id", order.outletId)
             orderObj.put("order_no", order.orderId)
-            orderObj.put("sr_id", sr_id)
+            orderObj.put("user_id", user_id)
+            orderObj.put("employee_id", sr_id)
+            /*orderObj.put("ordered_at", today)*/
+            orderObj.put("delivered_at", today)
             /*orderObj.put("distributor_office_code", order.distOfficeCode)*/
-            /*if (status.equals("CANCELLED")) {
-                orderObj.put("paid_amount", "0")
-            }else{
-                orderObj.put("paid_amount", grandTotal)
-            }*/
+            orderObj.put("total_ordered_amount", order.grandTotal)
+            orderObj.put("total_ordered_quantity", order.totalQuantity)
             orderObj.put("order_status", status)
             val brandsArray = JSONArray()
             for(i in 0 until updatedProducts!!.size){
                 val brandObj = JSONObject()
                 if (updatedProducts[i].quantity > 0 ) {
+                    val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
-                    brandObj.put("product", updatedProducts[i].product_name)
-                    /*brandObj.put("brand_id", updatedProducts[i].brand_id)*/
-                    brandObj.put("quantity", updatedProducts[i].quantity.toString())
-                    brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
-                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
-                    brandObj.put("total_price", updatedProducts[i].total_price.toString())
+                    /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
+                    brandObj.put("product_name", updatedProducts[i].product_name)
                     brandObj.put("unit_name", updatedProducts[i].product_type)
+                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
+                    brandObj.put("ordered_quantity", updatedProducts[i].ordered_quantity.toString())
+                    brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
+                    brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
+                    brandObj.put("ordered_amount", updatedProducts[i].ordered_price.toString())
+                    brandObj.put("delivered_amount", updatedProducts[i].total_price.toString())
+                    brandObj.put("bounced_amount", bounceAmount.toString())
                     brandsArray.put(brandObj)
+                    deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
+                    deliveredAmount = deliveredAmount + updatedProducts[i].total_price
+                    bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
+                    bouncedAmount = bounceAmount + bounceAmount
                 }
                 else if(updatedProducts[i].quantity == 0 && updatedProducts[i].bounced_quantity > 0){
+                    val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
-                    brandObj.put("product", updatedProducts[i].product_name)
-                    /*brandObj.put("brand_id", updatedProducts[i].brand_id)*/
-                    brandObj.put("quantity", updatedProducts[i].quantity.toString())
-                    brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
-                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
-                    brandObj.put("total_price", updatedProducts[i].total_price.toString())
+                    /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
+                    brandObj.put("product_name", updatedProducts[i].product_name)
                     brandObj.put("unit_name", updatedProducts[i].product_type)
+                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
+                    brandObj.put("ordered_quantity", updatedProducts[i].ordered_quantity.toString())
+                    brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
+                    brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
+                    brandObj.put("ordered_amount", updatedProducts[i].ordered_price.toString())
+                    brandObj.put("delivered_amount", updatedProducts[i].total_price.toString())
+                    brandObj.put("bounced_amount", bounceAmount.toString())
                     brandsArray.put(brandObj)
+                    deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
+                    deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
+                    deliveredAmount = deliveredAmount + updatedProducts[i].total_price
+                    bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
+                    bouncedAmount = bounceAmount + bounceAmount
                 }
 
             }
+            orderObj.put("total_delivered_amount", deliveredAmount)
+            orderObj.put("total_delivered_quantity", deliveredQuantity)
+            orderObj.put("total_bounced_amount", bouncedAmount)
+            orderObj.put("total_bounced_quantity", bouncedQuantity)
             orderObj.put("products", brandsArray)
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
@@ -497,7 +533,20 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             if (obj1.length() >0){
                 if (brandsArray.length() > 0) {
                     Log.d("ConfirmOrder", "response: " + obj1)
-                    submitOrder(obj1, dialog)
+                    if (deliveredQuantity > 0) {
+                        submitOrder(obj1, dialog)
+                    }else{
+                        ViewUtils.viewDialogResponse(mContext!!, "Kindly change the status to BOUNCED option to continue", object : DialogListener{
+                            override fun onConfirmed() {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onCanceled() {
+                                TODO("Not yet implemented")
+                            }
+
+                        })
+                    }
                 }else{
                     Toast.makeText(mContext, "No products on this order", Toast.LENGTH_SHORT).show()
                 }
@@ -519,7 +568,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     val message = response.getString("message")
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
-                            checkforOrders(queue!!, token!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                            checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
                         }
 
                         override fun onCanceled() {
@@ -570,7 +619,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     ProductStatistics(
                         products.product_id, products.product_name,
                         products.product_type, /*products.brand_id,*/
-                        products.unit_price, products.quantity,
+                        products.unit_price, products.total_price,
+                        products.quantity, products.quantity,
                         products.bounced_quantity, products.total_price)
                 )
 
@@ -579,7 +629,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     ProductStatistics(
                         products.product_id, products.product_name,
                         products.product_type, /*products.brand_id,*/
-                        products.unit_price, products.quantity,
+                        products.unit_price, products.total_price,
+                        products.quantity, products.quantity,
                         products.bounced_quantity, products.total_price
                     )
                 )

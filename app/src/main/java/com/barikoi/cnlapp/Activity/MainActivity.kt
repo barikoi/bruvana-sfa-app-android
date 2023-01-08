@@ -52,6 +52,7 @@ import io.sentry.Sentry
 import kotlinx.android.synthetic.main.appcontent_main.*
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -252,7 +253,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, applicationContext)
+                if (error is TimeoutError) {
+                    //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
+                    Toast.makeText(applicationContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+                }
+                if (error is NoConnectionError) {
+                    //mListerner.onFailure("Turn on your internet connection and Try again")
+                    Toast.makeText(applicationContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+                }
+                if (error is AuthFailureError){
+                    logout(applicationContext)
+                }
+                if (error != null && error.networkResponse != null) {
+                    try {
+                        val s = String(error.networkResponse.data)
+                        Log.d("Routes", "message: $s")
+                        val data = JSONObject(s)
+                        //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
+                        //mListerner.onFailure(data.getString("message"))
+                        Toast.makeText(applicationContext, data.getString("message"), Toast.LENGTH_LONG).show()
+                    } catch (e: UnsupportedEncodingException) {
+                        Sentry.captureException(e)
+                        e.printStackTrace()
+                    } catch (e: JSONException) {
+                        //mListerner.onFailure(e.message)
+                        Sentry.captureException(e)
+                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                        e.printStackTrace()
+                    }
+                }
             }
 
             override fun onException(e: Exception) {
