@@ -30,6 +30,7 @@ class LastWeekBounceFragment : Fragment() {
     var mQueue: RequestQueue? = null
     var token : String? = null
     var srId: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     var itemList : ArrayList<OutletStatistics> = ArrayList()
@@ -46,7 +47,7 @@ class LastWeekBounceFragment : Fragment() {
     }
 
     private fun init() {
-        getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id="+srId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
+        getLastBounceItems(Api.get_last_week_delivery_bounce+"?user_id="+userId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
         //getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_bounce=1&with_last_week_order=1")
     }
 
@@ -149,7 +150,8 @@ class LastWeekBounceFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.SR_CODE, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }
 }
