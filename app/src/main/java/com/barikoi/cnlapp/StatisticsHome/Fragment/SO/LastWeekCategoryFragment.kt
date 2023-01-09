@@ -79,7 +79,7 @@ class LastWeekCategoryFragment : Fragment() {
                     if (response != null){
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         val obj = JSONObject(response)
-                        val categoryArray = obj.getJSONArray("categories")
+                        val categoryArray = obj.getJSONArray("outlet_categories")
                         if (categoryArray.length() > 0){
                             for (i in 0 until categoryArray.length()){
                                 val productObj = categoryArray.getJSONObject(i)

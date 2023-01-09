@@ -118,7 +118,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                 if (sr_id.length == 0){
                     getAllOrders(Api.get_saved_order+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED", queue, token, mCallback2!!)
                 }else{
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED", queue, token, mCallback2!!)
+                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED", queue, token, mCallback2!!)
                 }
 
             }

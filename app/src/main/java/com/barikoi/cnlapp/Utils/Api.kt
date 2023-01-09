@@ -62,7 +62,7 @@ object Api {
 
     /*home view*/
     val get_summary = base_url+"api/v1/get-overview-stats"
-    val get_last_week_category = base_url+"api/v1/get-category-outlets"
+    val get_last_week_category = base_url+"api/v1/outlet-categories"
     val get_last_week_delivery_bounce = base_url+"api/v1/get-delivered-bounce-outlets"
 
     /*TO Part*/

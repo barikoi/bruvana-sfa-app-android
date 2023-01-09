@@ -129,7 +129,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 if (sr_id.length == 0){
                     getAllOrders(Api.get_saved_order+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING", queue, token, mCallback!!)
                 }else{
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
+                    getAllOrders(Api.get_saved_order+"?user_id="+user_id/*+"&route_id="+route_id*/+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
                 }
 
             }
@@ -533,19 +533,23 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             if (obj1.length() >0){
                 if (brandsArray.length() > 0) {
                     Log.d("ConfirmOrder", "response: " + obj1)
+                    if (status.equals("DELIVERED", true)){
                     if (deliveredQuantity > 0) {
                         submitOrder(obj1, dialog)
                     }else{
                         ViewUtils.viewDialogResponse(mContext!!, "Kindly change the status to BOUNCED option to continue", object : DialogListener{
                             override fun onConfirmed() {
-                                TODO("Not yet implemented")
+
                             }
 
                             override fun onCanceled() {
-                                TODO("Not yet implemented")
+
                             }
 
                         })
+                    }
+                    }else{
+                        submitOrder(obj1, dialog)
                     }
                 }else{
                     Toast.makeText(mContext, "No products on this order", Toast.LENGTH_SHORT).show()

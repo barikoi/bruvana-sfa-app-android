@@ -142,13 +142,13 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&order_status=PENDING, DELIVERED")
+            getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&order_status=PENDING, DELIVERED")
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=PENDING, DELIVERED")
+        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=PENDING, DELIVERED")
     }
 
     private fun getAllOrders(url: String) {
@@ -172,11 +172,11 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                 if (brandArray.length() > 0){
                                     for (j in 0 until brandArray.length()){
                                         val brandObj = brandArray.getJSONObject(j)
-                                        if(brandObj.getInt("quantity") > 0) {
+                                        if(brandObj.getInt("ordered_quantity") > 0) {
                                             productItems.add(
                                                 Products(
                                                     brandObj.getString("product_id"),
-                                                    brandObj.getString("product"),
+                                                    brandObj.getString("product_name"),
                                                     "",
                                                     /*brandObj.getString("brand_id"),
                                                     "",*/
@@ -184,9 +184,9 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                                     /*0.0,*/ "",
                                                     brandObj.getString("unit_name"),
                                                     "", 0, 0,
-                                                    brandObj.getInt("bounce"),
-                                                    brandObj.getInt("quantity"),
-                                                    brandObj.getDouble("total_price")
+                                                    brandObj.getInt("bounced_quantity"),
+                                                    brandObj.getInt("ordered_quantity"),
+                                                    brandObj.getDouble("ordered_amount")
                                                 )
                                             )
                                         }
@@ -204,7 +204,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                         orderObj.getString("route_id"),
                                         orderObj.getString("route_name"),
                                         /*orderObj.getString("distributor_office_code"),*/
-                                        orderObj.getString("grand_total"),
+                                        orderObj.getString("total_ordered_amount"),
                                         orderObj.getString("total_ordered_quantity"),
                                         orderObj.getString("latitude"),
                                         orderObj.getString("longitude"),
