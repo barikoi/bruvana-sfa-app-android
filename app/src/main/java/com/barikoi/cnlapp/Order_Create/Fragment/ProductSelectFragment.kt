@@ -34,6 +34,7 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
+import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
@@ -50,6 +51,8 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_product_select.*
+import kotlinx.android.synthetic.main.fragment_product_select.progressBar
+import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -162,10 +165,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         previous_order.setOnClickListener {
             try {
                 ApiServices.apiGET(
-                    Api.previous_order + "?sr_id=" + sr_id + "&route_id=" + selectedShop!!.route_code + "&outlet_id=" + shopId,
+                    Api.get_saved_order + "?user_id=" + user_id + "&outlet_id=" + shopId+"&last_week_orders=1",
                     queue!!,
                     token!!,
                     object : ApiServiceListener {
+                        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
                         override fun onResponseSuccess(response: String) {
                             getPreviousOrders(response)
                         }
@@ -236,42 +240,46 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         getAllProducts()
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun getPreviousOrders(response: String) {
         var lastDeliveryDate = ""
-        var productItems: ArrayList<ProductStatistics> = ArrayList()
+        var orderStatus = ""
+        var brandArray = JSONArray()
+        //val productItems: ArrayList<ProductStatistics> = ArrayList()
         val obj = JSONObject(response)
-        val outletssArray = obj.getJSONArray("previous_orders")
-        if (outletssArray.length() > 0) {
-            for (i in 0 until outletssArray.length()) {
-                productItems.clear()
-                val outletObj = outletssArray.getJSONObject(i)
-                val brandArray = outletObj.getJSONArray("brands")
+        val ordersArray = obj.getJSONArray("orders")
+        if (ordersArray.length() > 0) {
+            for (i in 0 until ordersArray.length()) {
+                //productItems.clear()
+                val outletObj = ordersArray.getJSONObject(i)
+                brandArray = outletObj.getJSONArray("products")
                 //val outletName = outletObj.getString("outlet_name")
                 lastDeliveryDate = outletObj.getString("ordered_at")
-                if (brandArray.length() > 0) {
+                orderStatus = outletObj.getString("order_status")
+                /*if (brandArray.length() > 0) {
                     for (j in 0 until brandArray.length()) {
                         val brandObj = brandArray.getJSONObject(j)
                         productItems.add(
                             ProductStatistics(
                                 brandObj.getString("product_id"),
-                                brandObj.getString("product"),
+                                brandObj.getString("product_name"),
                                 brandObj.getString("unit_name"),
-                                /*brandObj.getString("brand_id"),*/
+                                *//*brandObj.getString("brand_id"),*//*
                                 brandObj.getDouble("unit_price"),
-                                brandObj.getDouble("total_price"),
-                                brandObj.getInt("quantity"),
-                                brandObj.getInt("quantity"),
-                                brandObj.getInt("bounce"),
-                                brandObj.getDouble("total_price")
+                                brandObj.getDouble("ordered_amount"),
+                                brandObj.getInt("ordered_quantity"),
+                                brandObj.getInt("delivered_quantity"),
+                                brandObj.getInt("bounced_quantity"),
+                                brandObj.getDouble("delivered_amount")
                             )
                         )
                     }
-                }
+                }*/
 
             }
 
         }
-        viewDialog(mContext!!, shopName!!, lastDeliveryDate, productItems)
+        viewDialog(mContext!!, shopName!!, lastDeliveryDate, orderStatus, brandArray)
 
 
     }
@@ -924,23 +932,32 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         queue!!.add(request)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun viewDialog(
         mContext: Context,
         outlet_name: String,
         lastOrder: String,
-        listItem: ArrayList<ProductStatistics>
+        statusOrder: String,
+        brands_array: JSONArray
+        /*listItem: ArrayList<ProductStatistics>*/
     ) {
         val dialog = Dialog(mContext)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
-        dialog.setContentView(R.layout.popup_product_list)
+        dialog.setContentView(R.layout.popup_previous_order_list)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
+        val tvOrderStatus = dialog.findViewById<TextView>(R.id.tvOrderStatus)
+        val statusLayout = dialog.findViewById<LinearLayout>(R.id.layoutStatus)
+        val filterLayout = dialog.findViewById<LinearLayout>(R.id.filterLayout)
+        val filterTitle = dialog.findViewById<TextView>(R.id.filterTitle)
+
+        val productItems: ArrayList<ProductStatistics> = ArrayList()
         var dformat = DecimalFormat("#.##")
         outletName.setText(outlet_name)
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
@@ -949,24 +966,192 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val orderDate = df.format(oldDate.parse(lastOrder))
             tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
         }
-        tvItemCount.setText(listItem.size.toString() + mContext.resources.getString(R.string.items))
 
-        var grandTotal = 0.0
-        if (listItem.size > 0) {
-            for (i in 0 until listItem.size) {
-                grandTotal = grandTotal + listItem[i].total_price
+        if (statusOrder.equals("DELIVERED")){
+            filterLayout.visibility = View.VISIBLE
+            filterLayout.setOnClickListener {
+                val popup = PopupMenu(mContext, filterTitle)
+                popup.menuInflater.inflate(R.menu.filter_menu_orderstatus, popup.menu)
+                popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
+                    PopupMenu.OnMenuItemClickListener {
+                    @RequiresApi(Build.VERSION_CODES.N)
+                    override fun onMenuItemClick(item: MenuItem?): Boolean {
+                        when(item!!.itemId){
+                            R.id.menu_delivered_product->{
+                                productItems.clear()
+                                filterTitle.setText(mContext.resources.getString(R.string.delivered))
+                                if (brands_array.length() > 0) {
+                                    for (j in 0 until brands_array.length()) {
+                                        val brandObj = brands_array.getJSONObject(j)
+                                        if (brandObj.getInt("delivered_quantity") > 0) {
+                                            productItems.add(
+                                                ProductStatistics(
+                                                    brandObj.getString("product_id"),
+                                                    brandObj.getString("product_name"),
+                                                    brandObj.getString("unit_name"),
+                                                    /*brandObj.getString("brand_id"),*/
+                                                    brandObj.getDouble("unit_price"),
+                                                    brandObj.getDouble("ordered_amount"),
+                                                    brandObj.getInt("ordered_quantity"),
+                                                    brandObj.getInt("delivered_quantity"),
+                                                    brandObj.getInt("bounced_quantity"),
+                                                    brandObj.getDouble("delivered_amount")
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                                tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+
+                                var grandTotal = 0.0
+                                if (productItems.size > 0) {
+                                    for (i in 0 until productItems.size) {
+                                        grandTotal = grandTotal + productItems[i].total_price
+                                    }
+
+                                    val adapter = OutletProductAdapter(productItems)
+                                    listView.adapter = adapter
+                                    adapter.notifyDataSetChanged()
+                                }
+
+                                tvGrandTotal.setText(dformat.format(grandTotal).toString())
+                            }
+                            R.id.menu_bounced_product->{
+                                productItems.clear()
+                                filterTitle.setText(mContext.resources.getString(R.string.bounced))
+                                if (brands_array.length() > 0) {
+                                    for (j in 0 until brands_array.length()) {
+                                        val brandObj = brands_array.getJSONObject(j)
+                                        if (brandObj.getInt("bounced_quantity") > 0) {
+                                            productItems.add(
+                                                ProductStatistics(
+                                                    brandObj.getString("product_id"),
+                                                    brandObj.getString("product_name"),
+                                                    brandObj.getString("unit_name"),
+                                                    /*brandObj.getString("brand_id"),*/
+                                                    brandObj.getDouble("unit_price"),
+                                                    brandObj.getDouble("ordered_amount"),
+                                                    brandObj.getInt("ordered_quantity"),
+                                                    brandObj.getInt("bounced_quantity"),
+                                                    brandObj.getInt("bounced_quantity"),
+                                                    brandObj.getDouble("bounced_amount")
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                                tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+
+                                var grandTotal = 0.0
+                                if (productItems.size > 0) {
+                                    for (i in 0 until productItems.size) {
+                                        grandTotal = grandTotal + productItems[i].total_price
+                                    }
+
+                                    val adapter = OutletProductAdapter(productItems)
+                                    listView.adapter = adapter
+                                    adapter.notifyDataSetChanged()
+                                }
+
+                                tvGrandTotal.setText(dformat.format(grandTotal).toString())
+                            }
+                        }
+                        return true
+                    }
+
+                })
+                popup.show()
+            }
+            productItems.clear()
+            filterTitle.setText(mContext.resources.getString(R.string.delivered))
+            if (brands_array.length() > 0) {
+                for (j in 0 until brands_array.length()) {
+                    val brandObj = brands_array.getJSONObject(j)
+                    if (brandObj.getInt("delivered_quantity") > 0) {
+                        productItems.add(
+                            ProductStatistics(
+                                brandObj.getString("product_id"),
+                                brandObj.getString("product_name"),
+                                brandObj.getString("unit_name"),
+                                /*brandObj.getString("brand_id"),*/
+                                brandObj.getDouble("unit_price"),
+                                brandObj.getDouble("ordered_amount"),
+                                brandObj.getInt("ordered_quantity"),
+                                brandObj.getInt("delivered_quantity"),
+                                brandObj.getInt("bounced_quantity"),
+                                brandObj.getDouble("delivered_amount")
+                            )
+                        )
+                    }
+                }
+            }
+            tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+
+            var grandTotal = 0.0
+            if (productItems.size > 0) {
+                for (i in 0 until productItems.size) {
+                    grandTotal = grandTotal + productItems[i].total_price
+                }
+
+                val adapter = OutletProductAdapter(productItems)
+                listView.adapter = adapter
+                adapter.notifyDataSetChanged()
             }
 
-            val adapter = OutletProductAdapter(listItem)
+            tvGrandTotal.setText(dformat.format(grandTotal).toString())
+        }else{
+            filterLayout.visibility = View.GONE
+        }
+
+        /*tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+
+        var grandTotal = 0.0
+        if (productItems.size > 0) {
+            for (i in 0 until productItems.size) {
+                grandTotal = grandTotal + productItems[i].total_price
+            }
+
+            val adapter = OutletProductAdapter(productItems)
             listView.adapter = adapter
             adapter.notifyDataSetChanged()
         }
 
-        tvGrandTotal.setText(dformat.format(grandTotal).toString())
+        tvGrandTotal.setText(dformat.format(grandTotal).toString())*/
 
         btnClose.setOnClickListener {
             dialog.dismiss()
         }
+
+        if (!statusOrder.equals("null")) {
+            if (statusOrder.equals("PENDING")) {
+                tvOrderStatus.text = mContext.resources.getString(R.string.pending)
+                statusLayout.background.setTint(mContext.resources.getColor(R.color.status_pending_stroke))
+                val gd = GradientDrawable()
+                gd.setColor(mContext.resources.getColor(R.color.status_pending))
+                gd.cornerRadius = 5f
+                gd.setStroke(2, mContext.resources.getColor(R.color.white))
+                tvOrderStatus.setBackgroundDrawable(gd)
+            } else if (statusOrder.equals("DELIVERED")) {
+                tvOrderStatus.text = mContext.resources.getString(R.string.delivered)
+                statusLayout.background.setTint(mContext.resources.getColor(R.color.status_delivered_stroke))
+                val gd = GradientDrawable()
+                gd.setColor(mContext.resources.getColor(R.color.status_delivered))
+                gd.cornerRadius = 5f
+                gd.setStroke(2, mContext.resources.getColor(R.color.white))
+                tvOrderStatus.setBackgroundDrawable(gd)
+            } else if (statusOrder.equals("CANCELLED")){
+                tvOrderStatus.text = mContext.resources.getString(R.string.bounced)
+                statusLayout.background.setTint(mContext.resources.getColor(R.color.status_bounced_stroke))
+                val gd = GradientDrawable()
+                gd.setColor(mContext.resources.getColor(R.color.status_bounced))
+                gd.cornerRadius = 5f
+                gd.setStroke(2, mContext.resources.getColor(R.color.white))
+                tvOrderStatus.setBackgroundDrawable(gd)
+            }else{
+                statusLayout.visibility = View.GONE
+            }
+        }
+
         dialog.show()
         val window = dialog.window
         window!!.setLayout(

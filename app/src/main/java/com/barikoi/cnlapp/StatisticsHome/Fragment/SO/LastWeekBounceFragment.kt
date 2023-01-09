@@ -28,12 +28,12 @@ class LastWeekBounceFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var token : String? = null
-    var srId: String ? = ""
-    var userId: String ? = ""
-    var routeId: String ? = ""
+    var token: String? = null
+    var srId: String? = ""
+    var userId: String? = ""
+    var routeId: String? = ""
 
-    var itemList : ArrayList<OutletStatistics> = ArrayList()
+    var itemList: ArrayList<OutletStatistics> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,14 +41,14 @@ class LastWeekBounceFragment : Fragment() {
 
         }
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
     }
 
     private fun init() {
-        getLastBounceItems(Api.get_last_week_delivery_bounce+"?user_id="+userId+"&route_id="+routeId+"&with_bounce=1&with_last_week_order=1")
-        //getLastBounceItems(Api.get_last_week_delivery_bounce+"?sr_id=4107"+"&route_id=92"+"&with_bounce=1&with_last_week_order=1")
+        getLastBounceItems(Api.verified_shop_list + "?user_id=" + userId + "&route_id=" + routeId + "&with_last_week_order=1")
     }
 
     private fun getLastBounceItems(url: String) {
@@ -56,47 +56,81 @@ class LastWeekBounceFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    if (response != null){
+                    if (response != null) {
                         itemList.clear()
                         val obj = JSONObject(response)
                         val outletssArray = obj.getJSONArray("outlets")
-                        if (outletssArray.length() > 0){
-                            for (i in 0 until outletssArray.length()){
+                        if (outletssArray.length() > 0) {
+                            for (i in 0 until outletssArray.length()) {
                                 val productList: ArrayList<ProductStatistics> = ArrayList()
                                 val outletObj = outletssArray.getJSONObject(i)
-                                val brandArray = outletObj.getJSONArray("products")
-                                if (brandArray.length() >0){
-                                    for (j in 0 until brandArray.length()){
-                                        val brandObj = brandArray.getJSONObject(j)
-                                        if (brandObj.getInt("bounce") > 0) {
-                                            productList.add(
-                                                ProductStatistics(
-                                                    brandObj.getString("product_id"),
-                                                    brandObj.getString("product"),
-                                                    brandObj.getString("unit_name"),
-                                                    /*brandObj.getString("brand_id"),*/
-                                                    brandObj.getDouble("unit_price"),
-                                                    brandObj.getDouble("total_price"),
-                                                    brandObj.getInt("bounce"),
-                                                    brandObj.getInt("bounce"),
-                                                    brandObj.getInt("bounce"),
-                                                    brandObj.getDouble("total_price")
-                                                )
-                                            )
+                                val ordersArray = outletObj.getJSONArray("orders")
+                                if (ordersArray.length() > 0) {
+                                    for (j in 0 until ordersArray.length()) {
+                                        val orderObj = ordersArray.getJSONObject(j)
+                                        if (orderObj.getString("order_status").equals("DELIVERED", true)){
+                                            val brandArray = orderObj.getJSONArray("products")
+                                            if (brandArray.length() > 0) {
+                                                for (k in 0 until brandArray.length()) {
+                                                    val brandObj = brandArray.getJSONObject(k)
+                                                    if (brandObj.getInt("bounced_quantity") > 0) {
+                                                        productList.add(
+                                                            ProductStatistics(
+                                                                brandObj.getString("product_id"),
+                                                                brandObj.getString("product_name"),
+                                                                brandObj.getString("unit_name"),
+                                                                /*brandObj.getString("brand_id"),*/
+                                                                brandObj.getDouble("unit_price"),
+                                                                brandObj.getDouble("ordered_amount"),
+                                                                brandObj.getInt("ordered_quantity"),
+                                                                brandObj.getInt("bounced_quantity"),
+                                                                brandObj.getInt("bounced_quantity"),
+                                                                brandObj.getDouble("bounced_amount")
+                                                            )
+                                                        )
+                                                    }
+                                                }
+                                            }
                                         }
+                                        else if (orderObj.getString("order_status")
+                                                .equals("CANCELLED", true)
+                                        ) {
+                                            val brandArray = orderObj.getJSONArray("products")
+                                            if (brandArray.length() > 0) {
+                                                for (k in 0 until brandArray.length()) {
+                                                    val brandObj = brandArray.getJSONObject(k)
+                                                    if (brandObj.getInt("bounced_quantity") > 0) {
+                                                        productList.add(
+                                                            ProductStatistics(
+                                                                brandObj.getString("product_id"),
+                                                                brandObj.getString("product_name"),
+                                                                brandObj.getString("unit_name"),
+                                                                /*brandObj.getString("brand_id"),*/
+                                                                brandObj.getDouble("unit_price"),
+                                                                brandObj.getDouble("ordered_amount"),
+                                                                brandObj.getInt("ordered_quantity"),
+                                                                brandObj.getInt("bounced_quantity"),
+                                                                brandObj.getInt("bounced_quantity"),
+                                                                brandObj.getDouble("bounced_amount")
+                                                            )
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                            if (productList.size > 0) {
+                                                itemList.add(
+                                                    OutletStatistics(
+                                                        outletObj.getString("id"),
+                                                        outletObj.getString("outlet_name"),
+                                                        outletObj.getString("outlet_code"),
+                                                        outletObj.getString("outlet_category"),
+                                                        orderObj.getString("ordered_at"),
+                                                        productList
+                                                    )
+                                                )
+                                            }
                                     }
-                                }
-                                if (productList.size > 0) {
-                                    itemList.add(
-                                        OutletStatistics(
-                                            outletObj.getString("outlet_id"),
-                                            outletObj.getString("outlet_name"),
-                                            outletObj.getString("outlet_code"),
-                                            outletObj.getString("outlet_category"),
-                                            outletObj.getString("ordered_at"),
-                                            productList
-                                        )
-                                    )
                                 }
                             }
                         }
@@ -107,7 +141,7 @@ class LastWeekBounceFragment : Fragment() {
 
 
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
 
