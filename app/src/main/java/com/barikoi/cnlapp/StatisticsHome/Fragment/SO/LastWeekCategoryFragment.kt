@@ -37,6 +37,7 @@ class LastWeekCategoryFragment : Fragment() {
     var mQueue: RequestQueue? = null
     var token : String? = null
     var srId: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +67,7 @@ class LastWeekCategoryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryCategory(Api.get_last_week_category+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+"&sr_id="+srId+"&route_id="+routeId)
+        getSummaryCategory(Api.get_last_week_category+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+"&user_id="+userId+"&route_id="+routeId)
     }
 
     private fun getSummaryCategory(url: String) {
@@ -149,7 +150,8 @@ class LastWeekCategoryFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.SR_CODE, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }
 

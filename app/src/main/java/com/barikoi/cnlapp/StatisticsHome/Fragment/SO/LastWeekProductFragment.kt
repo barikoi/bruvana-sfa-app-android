@@ -31,6 +31,7 @@ class LastWeekProductFragment : Fragment() {
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var srId: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,7 @@ class LastWeekProductFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryProducts(Api.all_product_list+"?sr_id="+srId+"&route_id="+routeId+"&with_last_week_order=1")
+        getSummaryProducts(Api.all_product_list+"?user_id="+userId+"&route_id="+routeId+"&with_last_week_order=1")
     }
 
 
@@ -139,7 +140,8 @@ class LastWeekProductFragment : Fragment() {
         editor = prefs!!.edit()
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
-        srId = prefs!!.getString(Api.SR_CODE, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }
 }

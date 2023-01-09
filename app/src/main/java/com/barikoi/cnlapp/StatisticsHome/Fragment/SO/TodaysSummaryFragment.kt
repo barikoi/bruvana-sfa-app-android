@@ -35,6 +35,7 @@ class TodaysSummaryFragment : Fragment() {
     var mQueue: RequestQueue? = null
     var token : String? = null
     var srId: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +63,7 @@ class TodaysSummaryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryTargets(Api.get_summary+"?today_summary=1&sr_id="+srId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary+"?today_summary=1&user_id="+userId+"&route_id="+routeId)
     }
 
     private fun getSummaryTargets(url: String) {
@@ -157,7 +158,8 @@ class TodaysSummaryFragment : Fragment() {
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
         token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.SR_CODE, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
     }
 
