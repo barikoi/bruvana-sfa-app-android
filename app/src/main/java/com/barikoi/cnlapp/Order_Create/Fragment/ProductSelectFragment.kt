@@ -795,6 +795,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             for (i in 0 until productArray.length()) {
                                 var orderedQty = 0
                                 var orderedTotalPrice = 0.0
+                                var imageUrl = "null"
                                 val productObj = productArray.getJSONObject(i)
                                 val productId = productObj.getString("id")
                                 val productName =
@@ -804,8 +805,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 /*val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
                                 val brandName = if (!productObj.isNull("brand__name")) productObj.getString("brand__name") else ""*/
                                 /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
-                                val image =
-                                    if (!productObj.isNull("image_url")) productObj.getString("image") else ""
+                                if (productObj.has("images") && !productObj.isNull("images")){
+                                    val imageArray = productObj.getJSONArray("images")
+                                    if (imageArray.length() > 0){
+                                        for (j in 0 until imageArray.length()) {
+                                            val imageobj = imageArray.getJSONObject(j)
+                                            if (imageobj.has("image_url")){
+                                                imageUrl =
+                                                if (!productObj.isNull("image_url")) productObj.getString("image") else ""
+                                            }
+                                        }
+                                    }
+                                }
                                 val unitName =
                                     if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
                                 val categoryName =
@@ -849,7 +860,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                     productName,
                                     productCode,
                                     price,
-                                    image,
+                                    imageUrl,
                                     unitName,
                                     categoryName,
                                     qtyLastMonth,

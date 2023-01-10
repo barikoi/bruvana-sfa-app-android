@@ -65,6 +65,18 @@ class LastWeekBounceFragment : Fragment() {
                                 val productList: ArrayList<ProductStatistics> = ArrayList()
                                 val outletObj = outletssArray.getJSONObject(i)
                                 val ordersArray = outletObj.getJSONArray("orders")
+                                var imageUrl = "null"
+                                if (outletObj.has("images") && !outletObj.isNull("images")){
+                                    val imageArray = outletObj.getJSONArray("images")
+                                    if (imageArray.length() > 0){
+                                        for (j in 0 until imageArray.length()) {
+                                            val imageobj = imageArray.getJSONObject(j)
+                                            if (imageobj.has("image_url")){
+                                                imageUrl = imageobj.getString("image_url")
+                                            }
+                                        }
+                                    }
+                                }
                                 if (ordersArray.length() > 0) {
                                     for (j in 0 until ordersArray.length()) {
                                         val orderObj = ordersArray.getJSONObject(j)
@@ -124,6 +136,7 @@ class LastWeekBounceFragment : Fragment() {
                                                         outletObj.getString("id"),
                                                         outletObj.getString("outlet_name"),
                                                         outletObj.getString("outlet_code"),
+                                                        imageUrl,
                                                         outletObj.getString("outlet_category"),
                                                         orderObj.getString("ordered_at"),
                                                         productList

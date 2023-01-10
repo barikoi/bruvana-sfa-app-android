@@ -428,7 +428,19 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                             if (outletsArray.length()>0){
 
                                 for (i in 0 until outletsArray.length()){
+                                    var imageUrl = "null"
                                     val outletObj = outletsArray.getJSONObject(i)
+                                    if (outletObj.has("images") && !outletObj.isNull("images")){
+                                        val imageArray = outletObj.getJSONArray("images")
+                                        if (imageArray.length() > 0){
+                                            for (j in 0 until imageArray.length()) {
+                                                val imageobj = imageArray.getJSONObject(j)
+                                                if (imageobj.has("image_url")){
+                                                    imageUrl = imageobj.getString("image_url")
+                                                }
+                                            }
+                                        }
+                                    }
                                     val shops = Shops(
                                         outletObj.getString("id"),
                                         outletObj.getString("outlet_name"),
@@ -440,7 +452,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("owner_name"),
                                         /*outletObj.getString("distributor_office"),
                                         outletObj.getString("distributor_office_code"),*/
-                                        "",
+                                        imageUrl,"",
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
                                         outletObj.getString("route_id"),

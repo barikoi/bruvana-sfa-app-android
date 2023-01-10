@@ -79,12 +79,24 @@ class ActiveInactiveActivity : AppCompatActivity() {
                                 for (i in 0 until attendanceArray!!.length()){
                                     var latitude: Double= 0.0
                                     var longitude: Double= 0.0
+                                    var imageUrl = "null"
                                     val attendanceobj = attendanceArray.getJSONObject(i)
                                     if (!attendanceobj.isNull("latitude")){
                                         latitude = attendanceobj.getDouble("latitude")
                                     }
                                     if (!attendanceobj.isNull("longitude")){
                                         longitude = attendanceobj.getDouble("longitude")
+                                    }
+                                    if (attendanceobj.has("images") && !attendanceobj.isNull("images")){
+                                        val imageArray = attendanceobj.getJSONArray("images")
+                                        if (imageArray.length() > 0){
+                                            for (j in 0 until imageArray.length()) {
+                                                val imageobj = imageArray.getJSONObject(j)
+                                                if (imageobj.has("image_url")){
+                                                    imageUrl = imageobj.getString("image_url")
+                                                }
+                                            }
+                                        }
                                     }
                                     itemList.add(
                                         ActiveInactiveSO(
@@ -94,7 +106,7 @@ class ActiveInactiveActivity : AppCompatActivity() {
                                             attendanceobj.getString("checkin_address"),
                                             latitude,
                                             longitude,
-                                            attendanceobj.getString("image")
+                                            imageUrl
                                     )
                                     )
                                 }

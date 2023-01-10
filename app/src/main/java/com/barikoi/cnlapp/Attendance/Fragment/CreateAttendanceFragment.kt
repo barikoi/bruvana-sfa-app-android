@@ -193,7 +193,7 @@ class CreateAttendanceFragment : Fragment() {
                 val imagename = imagesList[0].filePath.substring(
                     imagesList[0].filePath.lastIndexOf("/")
                 )
-                byteparams["image"] = VolleyMultipartRequest.DataPart(
+                byteparams["images[0]"] = VolleyMultipartRequest.DataPart(
                     imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
                 )
             }
@@ -203,7 +203,7 @@ class CreateAttendanceFragment : Fragment() {
         params["latitude"] = location.latitude.toString()
         params["longitude"] = location.longitude.toString()
         if(route_id != null) params["route_id"] = route_id.toString()
-        if(editTextReason.text.toString().length > 0) params["late_reason"] = editTextReason.text.toString()
+        if(editTextReason.text.toString().length > 0) params["remarks"] = editTextReason.text.toString()
 
         ApiServices.apiPOSTMultipart(Api.create_attendance, mQueue!!, token!!, params, byteparams, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {

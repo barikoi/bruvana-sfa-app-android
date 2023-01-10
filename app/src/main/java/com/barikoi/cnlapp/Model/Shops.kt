@@ -13,6 +13,7 @@ class Shops(
     val shop_owner: String,
     /*val distributor_office: String,
     val distributor_office_code: String,*/
+    val imageUrl: String,
     val territory_name: String,
     val latitude: Double,
     val longitude: Double,

@@ -75,14 +75,26 @@ class ProductStockUpdateActivity : AppCompatActivity() {
                         val itemList: ArrayList<ProductStock> = ArrayList()
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
+                        var imageUrl = "null"
                         if (productsArray.length() > 0){
                             for (i in 0 until productsArray.length()){
                                 val productObj = productsArray.getJSONObject(i)
+                                if (productObj.has("images") && !productObj.isNull("images")){
+                                    val imageArray = productObj.getJSONArray("images")
+                                    if (imageArray.length() > 0){
+                                        for (j in 0 until imageArray.length()) {
+                                            val imageobj = imageArray.getJSONObject(j)
+                                            if (imageobj.has("image_url")){
+                                                imageUrl = imageobj.getString("image_url")
+                                            }
+                                        }
+                                    }
+                                }
                                 itemList.add(
                                     ProductStock(
                                         productObj.getString("id"),
                                         productObj.getString("product_name"),
-                                        productObj.getString("image_url"),
+                                        imageUrl,
                                         productObj.getString("productive_outlets")+" "+resources.getString(R.string.shops_ordered_this_month),
                                         productObj.getString("current_available_stock"),
                                         productObj.getString("unit_name")

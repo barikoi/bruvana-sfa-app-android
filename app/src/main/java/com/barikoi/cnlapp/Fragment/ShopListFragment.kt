@@ -151,6 +151,18 @@ class ShopListFragment : Fragment() {
                             val route_outlet_list = route.getJSONArray("outlets")
                             for (j in 0 until route_outlet_list.length()) {
                                 val outlet = route_outlet_list.getJSONObject(j)
+                                var imageUrl = "null"
+                                if (outlet.has("images") && !outlet.isNull("images")){
+                                    val imageArray = outlet.getJSONArray("images")
+                                    if (imageArray.length() > 0){
+                                        for (j in 0 until imageArray.length()) {
+                                            val imageobj = imageArray.getJSONObject(j)
+                                            if (imageobj.has("image_url")){
+                                                imageUrl = imageobj.getString("image_url")
+                                            }
+                                        }
+                                    }
+                                }
                                 val outlet_id = outlet.getString("id")
                                 val outlet_name = outlet.getString("outlet_name")
                                 val outlet_status = outlet.getString("outlet_status")
@@ -175,6 +187,7 @@ class ShopListFragment : Fragment() {
                                         outlet_type,
                                         "",
                                         owner_name,
+                                        imageUrl,
                                         /*distributor_office,
                                         distributor_office_code,*/
                                         territory_name,
