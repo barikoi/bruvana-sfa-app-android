@@ -155,11 +155,9 @@ class ShopListFragment : Fragment() {
                                 if (outlet.has("images") && !outlet.isNull("images")){
                                     val imageArray = outlet.getJSONArray("images")
                                     if (imageArray.length() > 0){
-                                        for (j in 0 until imageArray.length()) {
-                                            val imageobj = imageArray.getJSONObject(j)
-                                            if (imageobj.has("image_url")){
-                                                imageUrl = imageobj.getString("image_url")
-                                            }
+                                        val imageobj = imageArray.getJSONObject(0)
+                                        if (imageobj.has("image_url")){
+                                            imageUrl = imageobj.getString("image_url")
                                         }
                                     }
                                 }

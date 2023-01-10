@@ -4,8 +4,11 @@ package com.barikoi.cnlapp.Utils
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.provider.Settings
 import android.util.Log
+import android.view.Window
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
@@ -46,6 +49,8 @@ object ViewUtils {
     fun viewDialog(mContext: Context, message: String, listener: DialogListener){
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_dialog)
         val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
         val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
@@ -75,6 +80,8 @@ object ViewUtils {
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_dialog_response)
         val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
         val btnOk = dialog.findViewById<AppCompatButton>(R.id.btn_ok)
