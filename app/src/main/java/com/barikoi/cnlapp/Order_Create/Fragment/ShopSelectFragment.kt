@@ -65,12 +65,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val gd = GradientDrawable()
-        gd.setColor(mContext!!.resources.getColor(R.color.white))
-        gd.cornerRadius = 5f
-        gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
-        createShop.setBackgroundDrawable(gd)
-
 
         sortingLayout.setOnClickListener {
             val popup = PopupMenu(mContext, sortTitle)

@@ -1,7 +1,10 @@
 package com.barikoi.cnlapp.Fragment
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
@@ -11,6 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
@@ -18,6 +24,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.cnlapp.Activity.CreateShopActivity
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
@@ -26,6 +33,7 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_shop_list.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -111,6 +119,32 @@ class ShopListFragment : Fragment() {
         })
         return view
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val gd = GradientDrawable()
+        gd.setColor(mContext!!.resources.getColor(R.color.white))
+        gd.cornerRadius = 5f
+        gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
+        createShop.setBackgroundDrawable(gd)
+
+        createShop.setOnClickListener {
+            startActivityResult.launch(Intent(requireActivity(), CreateShopActivity::class.java).putExtra("requestCode", 55))
+        }
+    }
+
+    var startActivityResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(), ActivityResultCallback<ActivityResult>{
+            result ->
+            if (result.getResultCode() == Activity.RESULT_OK){
+                val intent = result.data
+                if (intent!!.getIntExtra("requestCode", 0) == 55){
+                    getShopList(userId!!)
+                }
+            }
+        }
+    )
 
     companion object{
         var routesList: ArrayList<String>? = ArrayList()
