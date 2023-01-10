@@ -217,11 +217,9 @@ class HistoryTOFragment : Fragment() {
                         if (soObj.has("images") && !soObj.isNull("images")){
                             val imageArray = soObj.getJSONArray("images")
                             if (imageArray.length() > 0){
-                                for (j in 0 until imageArray.length()) {
-                                    val imageobj = imageArray.getJSONObject(j)
-                                    if (imageobj.has("image_url")){
-                                        imageUrl = imageobj.getString("image_url")
-                                    }
+                                val imageobj = imageArray.getJSONObject(0)
+                                if (imageobj.has("image_url")){
+                                    imageUrl = imageobj.getString("image_url")
                                 }
                             }
                         }
@@ -271,11 +269,9 @@ class HistoryTOFragment : Fragment() {
                             if (attendanceObj.has("images") && !attendanceObj.isNull("images")){
                                 val imageArray = attendanceObj.getJSONArray("images")
                                 if (imageArray.length() > 0){
-                                    for (j in 0 until imageArray.length()) {
-                                        val imageobj = imageArray.getJSONObject(j)
-                                        if (imageobj.has("image_url")){
-                                            imageUrl = imageobj.getString("image_url")
-                                        }
+                                    val imageobj = imageArray.getJSONObject(0)
+                                    if (imageobj.has("image_url")){
+                                        imageUrl = imageobj.getString("image_url")
                                     }
                                 }
                             }

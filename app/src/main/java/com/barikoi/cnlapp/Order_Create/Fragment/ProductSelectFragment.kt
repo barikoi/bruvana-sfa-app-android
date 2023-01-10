@@ -5,6 +5,8 @@ import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.location.LocationManager
@@ -18,10 +20,7 @@ import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
@@ -808,12 +807,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 if (productObj.has("images") && !productObj.isNull("images")){
                                     val imageArray = productObj.getJSONArray("images")
                                     if (imageArray.length() > 0){
-                                        for (j in 0 until imageArray.length()) {
-                                            val imageobj = imageArray.getJSONObject(j)
-                                            if (imageobj.has("image_url")){
-                                                imageUrl =
-                                                if (!productObj.isNull("image_url")) productObj.getString("image") else ""
-                                            }
+                                        val imageobj = imageArray.getJSONObject(0)
+                                        if (imageobj.has("image_url")){
+                                            imageUrl = imageobj.getString("image_url")
                                         }
                                     }
                                 }
@@ -956,6 +952,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_previous_order_list)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
