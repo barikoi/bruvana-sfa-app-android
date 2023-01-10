@@ -165,6 +165,22 @@
     <string name="see_less">See Less...</string>
     <string name="add_notice">Add Notice</string>
     <string name="type_notice_here">Type notice here...</string>
+    
+    <string name="new_shop_creation">New Shop Creation</string>
+    <string name="adjust_shop_location">Adjust Shop Location</string>
+    <string name="adjust_shop_location_link"><a href="http://www.bla.com">Adjust Shop Location</a></string>
+    <string name="selection_location">Select Location</string>
+    <string name="select_shop_type">Select Shop Type</string>
+    <string name="shop_name">Shop Name</string>
+    <string name="select_category_of_outlet">Select Category of Outlet</string>
+    <string name="select_market_opportunity">Select Market Opportunity</string>
+    <string name="select_buyer">Select Buyer</string>
+    <string name="address">Address</string>
+    <string name="owner_name">Owner Name</string>
+    <string name="contact_number">Contact Number</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>

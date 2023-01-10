@@ -10,7 +10,9 @@ import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
+import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ViewUtils
+import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,7 +41,10 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
             val orderDate = df.format(oldDate.parse(shopList[position].lastOrderDate))
             holder.lastOrderDate.text = holder.itemView.context.resources.getString(com.barikoi.cnlapp.R.string.last_order_date)+orderDate
         }
-        holder.tvCategory.text = shopList[position].category.get(0).toString().uppercase(Locale.getDefault())
+        if (shopList[position].category.length > 0 && shopList[position].category.equals("null", true)) {
+            holder.tvCategory.text =
+                shopList[position].category.get(0).toString().uppercase(Locale.getDefault())
+        }
 
         if (shopList[position].isOrdered == 1){
             holder.isOrdered.setImageResource(R.drawable.ic_ordered)
@@ -50,7 +55,14 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         } else{
             holder.isOrdered.visibility = View.GONE
         }
-
+        if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
+            Glide.with(holder.itemView.context)
+                .load(Api.base_url+shopList[position].imageUrl)
+                .error(R.drawable.shop)
+                .into(holder.imageShop)
+        }else{
+            //holder.imageProduct.visibility = View.INVISIBLE
+        }
 
 
         holder.btnDetails.setOnClickListener {

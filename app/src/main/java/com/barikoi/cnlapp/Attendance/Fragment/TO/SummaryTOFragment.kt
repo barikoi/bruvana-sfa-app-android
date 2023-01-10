@@ -142,9 +142,21 @@ class SummaryTOFragment : Fragment() {
                 val soArray = obj.getJSONArray("so")
                 val soNameList: ArrayList<String> = ArrayList()
                 soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
+                var imageUrl = "null"
                 if (soArray.length() > 0) {
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
+                        if (soObj.has("images")  && !soObj.isNull("images")){
+                            val imageArray = soObj.getJSONArray("images")
+                            if (imageArray.length() > 0){
+                                for (j in 0 until imageArray.length()) {
+                                    val imageobj = imageArray.getJSONObject(j)
+                                    if (imageobj.has("image_url")){
+                                        imageUrl = imageobj.getString("image_url")
+                                    }
+                                }
+                            }
+                        }
                         soList.add(
                             SOList(
                                 soObj.getString("id"),
@@ -152,7 +164,7 @@ class SummaryTOFragment : Fragment() {
                                 soObj.getString("designation"),
                                 soObj.getString("employee_id"),
                                 soObj.getString("phone"),
-                                soObj.getString("image_url")
+                                imageUrl
                             )
                         )
                         soNameList.add(soObj.getString("user_name"))
@@ -267,13 +279,13 @@ class SummaryTOFragment : Fragment() {
                         val attendanceObj = attedanceArray.getJSONObject(i)
                         if (attendanceObj.getString("user_id").equals(selected_so_id)) {
                             total +=1
-                            if (!attendanceObj.getString("late_reason")
-                                    .equals("null") && attendanceObj.getString("late_reason").length > 0
+                            if (!attendanceObj.getString("remarks")
+                                    .equals("null") && attendanceObj.getString("remarks").length > 0
                             ) {
                                 reasonList.add(
                                     Pair(
                                         attendanceObj.getString("checkin_time"),
-                                        attendanceObj.getString("late_reason")
+                                        attendanceObj.getString("remarks")
                                     )
                                 )
                             }
@@ -285,13 +297,13 @@ class SummaryTOFragment : Fragment() {
                         }else{
                             if (selected_so == 0){
                                 total +=1
-                                if (!attendanceObj.getString("late_reason")
-                                        .equals("null") && attendanceObj.getString("late_reason").length > 0
+                                if (!attendanceObj.getString("remarks")
+                                        .equals("null") && attendanceObj.getString("remarks").length > 0
                                 ) {
                                     reasonList.add(
                                         Pair(
                                             attendanceObj.getString("checkin_time"),
-                                            attendanceObj.getString("late_reason")
+                                            attendanceObj.getString("remarks")
                                         )
                                     )
                                 }

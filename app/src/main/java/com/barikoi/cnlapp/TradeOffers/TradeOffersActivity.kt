@@ -126,6 +126,18 @@ class TradeOffersActivity : AppCompatActivity() {
                                         )
                                     }
                                 }
+                                var imageUrl = "null"
+                                if (productObj.has("images") && !productObj.isNull("images")){
+                                    val imageArray = productObj.getJSONArray("images")
+                                    if (imageArray.length() > 0){
+                                        for (j in 0 until imageArray.length()) {
+                                            val imageobj = imageArray.getJSONObject(j)
+                                            if (imageobj.has("image_url")){
+                                                imageUrl = imageobj.getString("image_url")
+                                            }
+                                        }
+                                    }
+                                }
                                 itemList.add(
                                     ProductAll(
                                         productObj.getString("id"),
@@ -133,7 +145,7 @@ class TradeOffersActivity : AppCompatActivity() {
                                         productObj.getString("unit_name"),
                                         productObj.getString("current_available_stock"),
                                         productObj.getString("price"),
-                                        productObj.getString("image"),
+                                        imageUrl,
                                         tradeProducts)
                                 )
                             }

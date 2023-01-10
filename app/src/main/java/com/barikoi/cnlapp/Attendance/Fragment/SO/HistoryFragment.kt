@@ -146,6 +146,7 @@ class HistoryFragment : Fragment() {
                 val attedanceArray = obj.getJSONArray("attendances")
                 var latitude = 0.0
                 var longitude = 0.0
+                var imageUrl = "null"
                 historyList.clear()
                 if (attedanceArray.length() >0){
                     for (i in 0 until attedanceArray.length()) {
@@ -155,6 +156,17 @@ class HistoryFragment : Fragment() {
                                 attendanceObj.getDouble("latitude")
                             if (!attendanceObj.getString("longitude").equals("null")) longitude =
                                 attendanceObj.getDouble("longitude")
+                            if (attendanceObj.has("images") && !attendanceObj.isNull("images")){
+                                val imageArray = attendanceObj.getJSONArray("images")
+                                if (imageArray.length() > 0){
+                                    for (j in 0 until imageArray.length()) {
+                                        val imageobj = imageArray.getJSONObject(j)
+                                        if (imageobj.has("image_url")){
+                                            imageUrl = imageobj.getString("image_url")
+                                        }
+                                    }
+                                }
+                            }
                             historyList.add(
                                 HistoryList(
                                     attendanceObj.getString("user_name"),
@@ -167,8 +179,8 @@ class HistoryFragment : Fragment() {
                                     attendanceObj.getString("checkin_address"),
                                     latitude,
                                     longitude,
-                                    attendanceObj.getString("image_url"),
-                                    attendanceObj.getString("late_reason"),
+                                    imageUrl,
+                                    attendanceObj.getString("remarks"),
                                     attendanceObj.getString("route_id"),
                                     attendanceObj.getString("route_name")
                                 )

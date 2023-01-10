@@ -153,14 +153,26 @@ class ProductSummaryActivity : AppCompatActivity() {
                         val itemList: ArrayList<ProductStock> = ArrayList()
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
+                        var imageUrl = "null"
                         if (productsArray.length() > 0){
                             for (i in 0 until productsArray.length()){
                                 val productObj = productsArray.getJSONObject(i)
+                                if (productObj.has("images") && !productObj.isNull("images")){
+                                    val imageArray = productObj.getJSONArray("images")
+                                    if (imageArray.length() > 0){
+                                        for (j in 0 until imageArray.length()) {
+                                            val imageobj = imageArray.getJSONObject(j)
+                                            if (imageobj.has("image_url")){
+                                                imageUrl = imageobj.getString("image_url")
+                                            }
+                                        }
+                                    }
+                                }
                                 itemList.add(
                                     ProductStock(
                                         productObj.getString("id"),
                                         productObj.getString("product_name"),
-                                        productObj.getString("image_url"),
+                                        imageUrl,
                                         resources.getString(R.string.sold_in)+" "+productObj.getString("productive_routes")+" "+resources.getString(R.string.route),
                                         productObj.getString("delivered_quantity"),
                                         productObj.getString("unit_name")

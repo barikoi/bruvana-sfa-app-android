@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <queries>
 
         <!-- Camera -->
@@ -24,6 +25,7 @@
             <action android:name="android.intent.action.GET_CONTENT" />
         </intent>
     </queries>
+
     <application
         android:name=".Utils.CNLApp"
         android:allowBackup="false"
@@ -38,11 +40,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.CreateShopActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
             android:name=".StatisticsHome.Activity.ActiveInactiveActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".OrderSummary.TO.OrderSummaryTOActivity"
             android:exported="false"

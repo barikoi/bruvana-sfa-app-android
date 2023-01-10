@@ -16,6 +16,8 @@ import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.Utils.Api
+import com.bumptech.glide.Glide
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -32,9 +34,9 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
     override fun onBindViewHolder(holder: OutletAdapter.ViewHolder, position: Int) {
         val item = outlets[position]
         holder.divider.visibility = View.VISIBLE
-        if (!item.category.equals("null") && item.category.length> 0){
+        if (!item.category.equals("null", true) && item.category.length> 0){
             holder.tvCategory.visibility = View.VISIBLE
-            holder.tvCategory.setText(item.category)
+            holder.tvCategory.setText(item.category.get(0).toString().uppercase(Locale.getDefault()))
         }else{
             holder.tvCategory.visibility = View.GONE
         }
@@ -50,6 +52,15 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
             holder.btnDetails.setText("Bounce Item")
         }else{
             holder.btnDetails.setText("Details")
+        }
+
+        if (!item.shop_image.isNullOrEmpty() && !item.shop_image.equals("null")){
+            Glide.with(holder.itemView.context)
+                .load(Api.base_url+item.shop_image)
+                .error(R.drawable.shop)
+                .into(holder.imageShop)
+        }else{
+            //holder.imageProduct.visibility = View.INVISIBLE
         }
 
         holder.btnDetails.setOnClickListener {

@@ -7,6 +7,7 @@ class OutletStatistics (
     val shop_id: String,
     val shop_name: String,
     val shop_code: String,
+    val shop_image: String,
     val category: String,
     val lastOrderDate: String,
     val products: ArrayList<ProductStatistics>

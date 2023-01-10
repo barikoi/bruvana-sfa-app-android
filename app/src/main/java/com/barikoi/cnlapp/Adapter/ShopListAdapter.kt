@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.Utils.Api
+import com.bumptech.glide.Glide
 import java.util.*
 
 class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),
@@ -36,6 +38,15 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
         //holder.distributorName.text = shopList[position].distributor_office
         holder.territoryName.text = shopList[position].territory_name
 
+        if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
+            Glide.with(holder.itemView.context)
+                .load(Api.base_url+shopList[position].imageUrl)
+                .error(R.drawable.shop)
+                .into(holder.imageShop)
+        }else{
+            //holder.imageProduct.visibility = View.INVISIBLE
+        }
+
     }
 
     override fun getItemCount(): Int {
@@ -50,6 +61,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
         internal val distributorName: TextView
         internal val shopType: TextView
         internal val territoryName: TextView
+        internal val imageShop:ImageView
         init {
             shopName = itemView.findViewById(R.id.shop_name)
             shopState = itemView.findViewById(R.id.shop_state)
@@ -58,6 +70,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
             shopCode = itemView.findViewById(R.id.shop_code)
             shopType = itemView.findViewById(R.id.shop_type)
             distributorName = itemView.findViewById(R.id.distributor_name)
+            imageShop = itemView.findViewById(R.id.imageShop)
 
         }
     }

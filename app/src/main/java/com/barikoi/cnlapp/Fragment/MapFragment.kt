@@ -332,6 +332,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         outlet_type,
                                         "",
                                         owner_name,
+                                        "",
                                         /*distributor_office,
                                         distributor_office_code,*/
                                         territory_name,
@@ -374,6 +375,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 outlet_type,
                                 "",
                                 owner_name,
+                                "",
                                 /*distributor_office,
                                 distributor_office_code,*/
                                 territory_name,
