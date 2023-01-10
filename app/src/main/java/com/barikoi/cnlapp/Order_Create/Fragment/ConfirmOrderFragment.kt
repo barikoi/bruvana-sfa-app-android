@@ -211,7 +211,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 orderObj.put("order_no", orderList[i].orderId)
                 orderObj.put("user_id", user_id)
                 orderObj.put("employee_id", sr_id)
-                orderObj.put("ordered_at", today)
+                /*orderObj.put("ordered_at", today)*/
                 /*orderObj.put("delivered_at", nextDay)*/
                 /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
                 orderObj.put("total_ordered_amount", orderList[i].grandTotal)
