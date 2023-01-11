@@ -57,7 +57,7 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         }
         if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
             Glide.with(holder.itemView.context)
-                .load(Api.base_url+shopList[position].imageUrl)
+                .load(shopList[position].imageUrl)
                 .error(R.drawable.shop)
                 .into(holder.imageShop)
         }else{

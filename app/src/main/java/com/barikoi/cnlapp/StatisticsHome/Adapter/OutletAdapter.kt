@@ -59,7 +59,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
 
         if (!item.shop_image.isNullOrEmpty() && !item.shop_image.equals("null")){
             Glide.with(holder.itemView.context)
-                .load(Api.base_url+item.shop_image)
+                .load(item.shop_image)
                 .error(R.drawable.shop)
                 .into(holder.imageShop)
         }else{

@@ -53,7 +53,7 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
             val bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream())
             holder.imageUser.setImageBitmap(bitmap)*/
             Glide.with(holder.itemView.context)
-                .load(Api.base_url+mItem.imageLink)
+                .load(mItem.imageLink)
                 .into(holder.imageUser)
         }else{
             holder.imageUser.visibility = View.GONE

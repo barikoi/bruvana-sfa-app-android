@@ -34,7 +34,7 @@ class TradeOfferListAdapter (var mValues: List<ProductAll>) : RecyclerView.Adapt
 
         if (!mItem.imageUrl.isNullOrEmpty() && !mItem.imageUrl.equals("null")){
             Glide.with(holder.itemView.context)
-                .load(Api.base_url+mItem.imageUrl)
+                .load(mItem.imageUrl)
                 .error(R.drawable.product)
                 .into(holder.imageProduct)
         }else{

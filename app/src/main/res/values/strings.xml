@@ -51,6 +51,7 @@
     <string name="sure_log_out">Are you sure you want to log out?</string>
 
     <string name="confirm">Confirm</string>
+    <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -165,7 +166,8 @@
     <string name="see_less">See Less...</string>
     <string name="add_notice">Add Notice</string>
     <string name="type_notice_here">Type notice here...</string>
-    
+
+    <!--create shop-->
     <string name="new_shop_creation">New Shop Creation</string>
     <string name="adjust_shop_location">Adjust Shop Location</string>
     <string name="adjust_shop_location_link"><a href="http://www.bla.com">Adjust Shop Location</a></string>
@@ -180,6 +182,8 @@
     <string name="contact_number">Contact Number</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
+    <string name="need_more_zoom">Need to zoom more to get better view at your shop location!</string>
+    <string name="this_field_is_required">This field is required</string>
 
 
     <!--imageCapture-->

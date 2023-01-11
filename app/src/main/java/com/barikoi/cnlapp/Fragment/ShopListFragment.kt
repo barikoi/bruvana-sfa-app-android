@@ -61,13 +61,15 @@ class ShopListFragment : Fragment() {
         spinner = view.findViewById(R.id.spinnerRoutes)
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
-        adapter = ShopListAdapter( ArrayList<Shops>())
+        adapter = ShopListAdapter(ArrayList<Shops>())
         recylerView!!.adapter = adapter
 
         spinner!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>,
-                                        view: View, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
 
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
@@ -76,7 +78,7 @@ class ShopListFragment : Fragment() {
                     }
 
                 }
-                adapter!!.shopList=shops
+                adapter!!.shopList = shops
                 adapter!!.notifyDataSetChanged()
 
             }
@@ -100,13 +102,17 @@ class ShopListFragment : Fragment() {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
                     val shops: ArrayList<Shops> = ArrayList()
-                    for (i in 0 until shopList!!.size) {
-                        if (shopList!![i].route_name == routesList!![spinner!!.selectedItemPosition]) {
-                            shops.add(shopList!![i])
-                        }
+                    if (shopList!!.size > 0) {
+                        for (i in 0 until shopList!!.size) {
+                            if (routesList!!.size > 0) {
+                                if (shopList!![i].route_name == routesList!![spinner!!.selectedItemPosition]) {
+                                    shops.add(shopList!![i])
+                                }
+                            }
 
+                        }
                     }
-                    adapter!!.shopList=shops
+                    adapter!!.shopList = shops
                     adapter!!.notifyDataSetChanged()
                 }
 
@@ -130,23 +136,28 @@ class ShopListFragment : Fragment() {
         createShop.setBackgroundDrawable(gd)
 
         createShop.setOnClickListener {
-            startActivityResult.launch(Intent(requireActivity(), CreateShopActivity::class.java).putExtra("requestCode", 55))
+            startActivityResult.launch(
+                Intent(
+                    requireActivity(),
+                    CreateShopActivity::class.java
+                ).putExtra("requestCode", 55)
+            )
         }
     }
 
     var startActivityResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(), ActivityResultCallback<ActivityResult>{
-            result ->
-            if (result.getResultCode() == Activity.RESULT_OK){
+        ActivityResultContracts.StartActivityForResult(),
+        ActivityResultCallback<ActivityResult> { result ->
+            if (result.getResultCode() == Activity.RESULT_OK) {
                 val intent = result.data
-                if (intent!!.getIntExtra("requestCode", 0) == 55){
+                if (intent!!.getIntExtra("requestCode", 0) == 55) {
                     getShopList(userId!!)
                 }
             }
         }
     )
 
-    companion object{
+    companion object {
         var routesList: ArrayList<String>? = ArrayList()
         var allRouteList: ArrayList<Routes>? = ArrayList()
         var shopList: ArrayList<Shops>? = ArrayList()
@@ -154,17 +165,17 @@ class ShopListFragment : Fragment() {
         var progressBar2: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
-        var spinner : MoreSpinner? = null
+        var spinner: MoreSpinner? = null
         var et_search: AutoCompleteTextView? = null
 
-        fun getShopList(userId: String){
+        fun getShopList(userId: String) {
             allRouteList!!.clear()
             //progressBar2!!.visibility = View.VISIBLE
             queue = RequestQueueSingleton.getInstance(mContext).getRequestQueue()
             routesList!!.clear()
             val request = StringRequest(
                 Request.Method.GET,
-                Api.routes_withfilter+"?user_id="+userId+"&with_outlets=1",
+                Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
                 { response ->
                     //success
                     Log.d("RouteFrag", response)
@@ -174,7 +185,7 @@ class ShopListFragment : Fragment() {
                         val routesArray = data.getJSONArray("routes")
                         shopList!!.clear()
                         routesList!!.clear()
-                        for (i in 0 until routesArray.length()){
+                        for (i in 0 until routesArray.length()) {
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")
                             val route_name = route.getString("route_name")
@@ -186,11 +197,11 @@ class ShopListFragment : Fragment() {
                             for (j in 0 until route_outlet_list.length()) {
                                 val outlet = route_outlet_list.getJSONObject(j)
                                 var imageUrl = "null"
-                                if (outlet.has("images") && !outlet.isNull("images")){
+                                if (outlet.has("images") && !outlet.isNull("images")) {
                                     val imageArray = outlet.getJSONArray("images")
-                                    if (imageArray.length() > 0){
+                                    if (imageArray.length() > 0) {
                                         val imageobj = imageArray.getJSONObject(0)
-                                        if (imageobj.has("image_url")){
+                                        if (imageobj.has("image_url")) {
                                             imageUrl = imageobj.getString("image_url")
                                         }
                                     }
@@ -232,15 +243,31 @@ class ShopListFragment : Fragment() {
                                     )
                                 )
                             }
-                            Log.d("RouteList", "all 1 "+shopList!!.size.toString())
-                            allRouteList!!.add(Routes(route_id, route_code, route_name, "", "", "", shopList!!))
+                            Log.d("RouteList", "all 1 " + shopList!!.size.toString())
+                            allRouteList!!.add(
+                                Routes(
+                                    route_id,
+                                    route_code,
+                                    route_name,
+                                    "",
+                                    "",
+                                    "",
+                                    shopList!!
+                                )
+                            )
                             for (i in 0 until allRouteList!!.size) {
-                                Log.d("RouteList", "all 2 "+allRouteList!![i].route_name+" "+allRouteList!![i].shopList.size.toString())
+                                Log.d(
+                                    "RouteList",
+                                    "all 2 " + allRouteList!![i].route_name + " " + allRouteList!![i].shopList.size.toString()
+                                )
                             }
                         }
                         if (spinner != null) {
                             for (i in 0 until allRouteList!!.size) {
-                                Log.d("RouteList", "all 3 "+allRouteList!![i].route_name+" "+allRouteList!![i].shopList.size.toString())
+                                Log.d(
+                                    "RouteList",
+                                    "all 3 " + allRouteList!![i].route_name + " " + allRouteList!![i].shopList.size.toString()
+                                )
                             }
                             val adapter = ArrayAdapter(
                                 mContext!!,
@@ -250,7 +277,7 @@ class ShopListFragment : Fragment() {
 
                         }
 
-                    }catch (e: JSONException) {
+                    } catch (e: JSONException) {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     }
@@ -262,11 +289,19 @@ class ShopListFragment : Fragment() {
                     progressBar2!!.visibility = View.GONE
                     if (error is TimeoutError) {
                         //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                        Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            mContext,
+                            "Request timeout!! Check your internet connection or Contact Admin",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                     if (error is NoConnectionError) {
                         //mListerner.onFailure("Turn on your internet connection and Try again")
-                        Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            mContext,
+                            "Turn on your internet connection and Try again",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                     if (error != null && error.networkResponse != null) {
                         try {
@@ -275,7 +310,8 @@ class ShopListFragment : Fragment() {
                             val data = JSONObject(s)
                             //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
                             //mListerner.onFailure(data.getString("message"))
-                            Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
+                            Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
+                                .show()
                         } catch (e: UnsupportedEncodingException) {
                             e.printStackTrace()
                             Sentry.captureException(e)
