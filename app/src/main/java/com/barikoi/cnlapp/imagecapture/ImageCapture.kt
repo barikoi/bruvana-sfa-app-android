@@ -132,7 +132,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                         photoFile
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    activity!!.startActivityForResult(takePictureIntent, CAMERA)
+                    getCameraLauncher().launch(takePictureIntent)
                 }
                 //activity.startActivityForResult(takePictureIntent, CAMERA);
             }
@@ -510,7 +510,12 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
             "CNL_$timeStamp.jpg"
         )*/
-        var baseFolder = fragment!!.requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
+        var baseFolder = ""
+        if (fragment != null) {
+            baseFolder = fragment!!.requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
+        }else{
+            baseFolder = activity!!.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
+        }
         val image = File(baseFolder +File.separator+"CNL Documents"+File.separator+"CNL_$timeStamp.jpg")
         Log.d("ImagePicker", "Image: $image")
         image.parentFile.mkdirs()

@@ -44,7 +44,7 @@ class ActiveInactiveAdapter(val histories: List<ActiveInactiveSO>) : RecyclerVie
         }
         if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
             Glide.with(holder.itemView.context)
-                .load(Api.base_url+mItem.imageLink)
+                .load(mItem.imageLink)
                 .into(holder.imageUser)
         }else{
             holder.imageUser.visibility = View.GONE

@@ -23,6 +23,7 @@
     <color name="card_blue">#7328EFBB</color>
     <color name="progress_track">#CC4E7471</color>
     <color name="blue_cnl">#056DFA</color>
+    <color name="required_field">#F48484</color>
 
     <color name="colorPrimary">#00DE97</color>
     <color name="colorPrimaryDark">#00B56F</color>

@@ -2,21 +2,42 @@ package com.barikoi.cnlapp.Activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Location
+import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.Utils.*
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
+import com.barikoi.cnlapp.imagecapture.RoomDb.Images
+import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
@@ -34,6 +55,16 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
+import kotlinx.android.synthetic.main.activity_create_shop.imagepicker
+import kotlinx.android.synthetic.main.activity_create_shop.spinnerRoutes
+import org.json.JSONObject
+import java.io.File
+import java.nio.charset.StandardCharsets
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
     private var mapView: MapView? = null
@@ -42,36 +73,754 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var permissionsManager: PermissionsManager? = null
     private var locationEngine: LocationEngine? = null
     private var locationEngineRequest: LocationEngineRequest? = null
+    private var latitude: Double? = 0.0
+    private var longitude: Double? = 0.0
+
+    private var prefs: SharedPreferences? = null
+    private var editor: SharedPreferences.Editor? = null
+    var queue: RequestQueue? = null
+    var token: String? = null
+    var userId: String? = ""
+    var srId: String? = ""
+    var appDatabase: ImageDatabase? = null
+    private var isImageAdded = false
+    private val CAMERA = 4
+
+    private var selectedRoute: String? = ""
+    private var selectedShopType: String? = ""
+    private var selectedCategory: String? = ""
+    private var selectedMarketOpportunity: String? = ""
+    private var selectedBuyer: Int? = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_shop)
 
-        val dialog = Dialog(applicationContext)
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.popup_map_view)
-        val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
-        Mapbox.getInstance(applicationContext, null)
-        mapView = dialog.findViewById<MapView>(R.id.mapview)
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync(this)
+        queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
+        prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        editor = prefs!!.edit()
+        token = prefs!!.getString(Api.TOKEN, "")
+        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
+        appDatabase = ImageDatabase.getInstance(applicationContext)
+
+        val gd = GradientDrawable()
+        gd.setColor(resources.getColor(R.color.white))
+        gd.cornerRadius = 10f
+        gd.setStroke(2, resources.getColor(R.color.required_field))
+
+        spinnerLayoutRoutes.setBackgroundDrawable(gd)
+        //imagepickerLayout.setBackgroundDrawable(gd)
+        etShopName.setBackgroundDrawable(gd)
+        spinnerLayoutType.setBackgroundDrawable(gd)
+        spinnerLayoutCategory.setBackgroundDrawable(gd)
+        etAddress.setBackgroundDrawable(gd)
+        etOwnerName.setBackgroundDrawable(gd)
+
+
+        getRoutes()
+        getShopType()
+        getShopCategory()
+        getMarketOpportunity()
+        getBuyer()
+
+        imagepicker.taskId = "taskId"
+        imagepicker.CAMERA = 4
+        imagepicker.setMainactivity(this@CreateShopActivity)
+        imagepicker.setCameraLauncher(startCamera)
+
+        btnBack.setOnClickListener {
+            onBackPressed()
+            finish()
+        }
 
         locationMap.setOnClickListener {
+            Mapbox.getInstance(applicationContext, null)
+            val dialog = Dialog(this)
+            dialog.setCancelable(false)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setContentView(R.layout.popup_map_view)
+            val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
+            val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
+
+            mapView = dialog.findViewById<MapView>(R.id.mapview)
+            mapView!!.onCreate(savedInstanceState)
+            mapView!!.getMapAsync(this)
+            mapView!!.onStart()
 
             fab = dialog.findViewById(R.id.fab)
 
             btnSubmit.setOnClickListener {
-                dialog.dismiss()
+                if (mMap!!.cameraPosition.zoom >= 17.0f) {
+                    val target = mMap!!.cameraPosition.target
+                    latitude = target.latitude
+                    longitude = target.longitude
+                    var dformat = DecimalFormat("#.#####")
+                    if (latitude!! > 0.0 && longitude!! > 0.0) {
+                        etLatitude.setText(dformat.format(latitude).toString())
+                        etLongitude.setText(dformat.format(longitude).toString())
+                    }
+                    dialog.dismiss()
+                    mapView!!.onStop()
+                } else {
+                    Toast.makeText(
+                        applicationContext, resources.getString(R.string.need_more_zoom),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
-
+            btnClose.setOnClickListener {
+                dialog.dismiss()
+                //mapView!!.onStop()
+            }
             dialog.show()
             val window = dialog.window
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
+        }
+
+        btnSubmitShop.setOnClickListener {
+            submitAttendance()
+        }
+    }
+
+    var startCamera = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        ActivityResultCallback<ActivityResult> { result ->
+            val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+            if (result.getResultCode() == RESULT_CANCELED) {
+                if (filePath != null) {
+                    Log.d("Image", "Canceled: $filePath")
+                    imagepicker.deleteFileLocal(filePath)
+                    editor!!.putString(ApiCall.IMAGE_PATH, "")
+                    editor!!.apply()
+                }
+            }
+            if (result.getResultCode() == RESULT_OK) {
+                Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
+                var imagePosition = 0
+                var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
+                imageList = appDatabase!!.imagesDao()!!.getAllImageDB() as java.util.ArrayList<Images?>?
+                imageCounter.visibility = View.VISIBLE
+                imageCounter.text = (imageList!!.size+1).toString() + " Photos Added"
+                /*if (imageList!!.size > 0){
+                    imageCounter.visibility = View.VISIBLE
+                    imageCounter.text = (imageList.size+1).toString() + " Photos Added"
+                }else{
+                    imageCounter.visibility = View.GONE
+                }*/
+                Log.d("Imagepos", "List: $imageList")
+                imagePosition = if (imageList!!.size > 0) {
+                    imageList[imageList.size - 1]!!.position + 1
+                } else {
+                    imagePosition + 1
+                }
+                imagepicker.AddNewImage(result.data, CAMERA, imagePosition)
+                try {
+                    val placeImage = Images(
+                        null, imagePosition,
+                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                    )
+                    isImageAdded = true
+                    if (imagePosition > 0) {
+                        Log.d("Imagepos", "insert")
+                        Executors.newSingleThreadExecutor().execute {
+                            appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                        }
+                        editor!!.putString(ApiCall.IMAGE_PATH, "")
+                        editor!!.apply()
+                    }
+                } catch (e: java.lang.Exception) {
+                    Log.e("imageUtils", "OnActivity result 2: $e")
+                    Sentry.captureException(e)
+                }
+            }
+        })
+
+    fun getRoutes() {
+        ApiServices.apiGET(
+            Api.routes_withfilter + "?with_geometry=0&user_id=" + userId,
+            queue!!,
+            "",
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    if (response != null) {
+                        try {
+                            val data = JSONObject(response)
+                            var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
+                            if (data.has("routes") && !data.isNull("routes")) {
+                                val routesList = java.util.ArrayList<String>()
+                                val routesArray = data.getJSONArray("routes")
+                                if (routesArray.length() > 0) {
+                                    routeNameList!!.add(
+                                        Pair(
+                                            "",
+                                            resources.getString(R.string.select_route)
+                                        )
+                                    )
+                                    routesList.add(resources.getString(R.string.select_route))
+                                    for (i in 0 until routesArray.length()) {
+                                        val routeObj = routesArray.getJSONObject(i)
+
+                                        routeNameList.add(
+                                            Pair(
+                                                routeObj.getString("id"),
+                                                routeObj.getString("route_name")
+                                            )
+                                        )
+                                        routesList.add(routeObj.getString("route_name"))
+                                    }
+                                    if (spinnerRoutes != null) {
+                                        if (spinnerRoutes.adapter == null) {
+                                            val adapter = object : ArrayAdapter<String>(applicationContext,
+                                                android.R.layout.simple_spinner_item, routesList){
+                                                override fun isEnabled(position: Int): Boolean {
+                                                    return position != 0
+                                                }
+                                                override fun getDropDownView(
+                                                    position: Int,
+                                                    convertView: View?,
+                                                    parent: ViewGroup
+                                                ): View {
+                                                    val view: TextView = super.getDropDownView(position, convertView, parent) as TextView
+                                                    //set the color of first item in the drop down list to gray
+                                                    if(position == 0) {
+                                                        view.setTextColor(resources.getColor(R.color.text_title_2))
+                                                        view.visibility = View.GONE
+                                                    } else {
+                                                        //here it is possible to define color for other items by
+                                                        //view.setTextColor(Color.RED)
+                                                        view.setTextColor(resources.getColor(R.color.black))
+                                                    }
+                                                    return view
+                                                }
+                                            }
+                                            spinnerRoutes.adapter = adapter
+                                        }
+
+                                        spinnerRoutes.onItemSelectedListener =
+                                            object : AdapterView.OnItemSelectedListener {
+                                                override fun onItemSelected(
+                                                    p0: AdapterView<*>?,
+                                                    p1: View?,
+                                                    p2: Int,
+                                                    p3: Long
+                                                ) {
+                                                    if (p2 > 0) {
+                                                        val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                        view1.setTextColor(resources.getColor(R.color.black))
+                                                        if (routeNameList[p2].first.length > 0) {
+                                                            selectedRoute = routeNameList[p2].first
+                                                        } else {
+                                                            selectedRoute = ""
+                                                        }
+                                                    } else {
+                                                        val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                        view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                        selectedRoute = ""
+                                                    }
+                                                }
+
+                                                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                                                }
+
+                                            }
+
+                                    }
+                                }
+
+                            }
+                        } catch (e: Exception) {
+                            Sentry.captureException(e)
+                            e.printStackTrace()
+                        }
+                    }
+
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                }
+
+                override fun onException(e: Exception) {
+                    e.printStackTrace()
+                    Sentry.captureException(e)
+                }
+
+            })
+    }
+
+    fun getShopType() {
+        ApiServices.apiGET(Api.get_shop_type, queue!!, "", object : ApiServiceListener {
+            override fun onResponseSuccess(response: String) {
+                if (response != null) {
+                    try {
+                        val typeList: ArrayList<String> = ArrayList()
+                        val obj = JSONObject(response)
+                        if (obj.has("outlet_types") && !obj.isNull("outlet_types")) {
+                            val typesArray = obj.getJSONArray("outlet_types")
+                            if (typesArray.length() > 0) {
+                                typeList.add(resources.getString(R.string.select_shop_type))
+                                for (i in 0 until typesArray.length()) {
+                                    typeList.add(typesArray.getString(i))
+                                }
+
+                                val shopTypeAdapter = object : ArrayAdapter<String>(applicationContext,
+                                    android.R.layout.simple_spinner_item, typeList){
+                                    override fun isEnabled(position: Int): Boolean {
+                                        return position != 0
+                                    }
+                                    override fun getDropDownView(
+                                        position: Int,
+                                        convertView: View?,
+                                        parent: ViewGroup
+                                    ): View {
+                                        val view: TextView = super.getDropDownView(position, convertView, parent) as TextView
+                                        //set the color of first item in the drop down list to gray
+                                        if(position == 0) {
+                                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                                            view.visibility = View.GONE
+                                        } else {
+                                            //here it is possible to define color for other items by
+                                            //view.setTextColor(Color.RED)
+                                            view.setTextColor(resources.getColor(R.color.black))
+                                        }
+                                        return view
+                                    }
+                                }
+                                spinnerShopType.adapter = shopTypeAdapter
+
+                                spinnerShopType.onItemSelectedListener =
+                                    object : AdapterView.OnItemSelectedListener {
+                                        override fun onItemSelected(
+                                            p0: AdapterView<*>?,
+                                            p1: View?,
+                                            p2: Int,
+                                            p3: Long
+                                        ) {
+                                            if (p2 > 0) {
+                                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(resources.getColor(R.color.black))
+                                                selectedShopType = typeList[p2]
+                                            } else {
+                                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                selectedShopType = ""
+                                            }
+                                        }
+
+                                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                                        }
+
+                                    }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Sentry.captureException(e)
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, applicationContext)
+            }
+
+            override fun onException(e: Exception) {
+                e.printStackTrace()
+                Sentry.captureException(e)
+            }
+
+        })
+    }
+
+    fun getShopCategory() {
+        ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
+            override fun onResponseSuccess(response: String) {
+                if (response != null) {
+                    try {
+                        val categoryList: ArrayList<String> = ArrayList()
+                        val obj = JSONObject(response)
+                        if (obj.has("outlet_categories") && !obj.isNull("outlet_categories")) {
+                            val categoryArray = obj.getJSONArray("outlet_categories")
+                            if (categoryArray.length() > 0) {
+                                categoryList.add(resources.getString(R.string.select_category_of_outlet))
+                                for (i in 0 until categoryArray.length()) {
+                                    categoryList.add(categoryArray.getString(i))
+                                }
+
+                                val shopCategoryAdapter = object : ArrayAdapter<String>(applicationContext,
+                                    android.R.layout.simple_spinner_item, categoryList){
+                                    override fun isEnabled(position: Int): Boolean {
+                                        return position != 0
+                                    }
+                                    override fun getDropDownView(
+                                        position: Int,
+                                        convertView: View?,
+                                        parent: ViewGroup
+                                    ): View {
+                                        val view: TextView = super.getDropDownView(position, convertView, parent) as TextView
+                                        //set the color of first item in the drop down list to gray
+                                        if(position == 0) {
+                                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                                            view.visibility = View.GONE
+                                        } else {
+                                            //here it is possible to define color for other items by
+                                            //view.setTextColor(Color.RED)
+                                            view.setTextColor(resources.getColor(R.color.black))
+                                        }
+                                        return view
+                                    }
+                                }
+                                spinnerCatOutlets.adapter = shopCategoryAdapter
+
+                                spinnerCatOutlets.onItemSelectedListener =
+                                    object : AdapterView.OnItemSelectedListener {
+                                        override fun onItemSelected(
+                                            p0: AdapterView<*>?,
+                                            p1: View?,
+                                            p2: Int,
+                                            p3: Long
+                                        ) {
+                                            if (p2 > 0) {
+                                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(resources.getColor(R.color.black))
+                                                selectedCategory = categoryList[p2]
+                                            } else {
+                                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                selectedCategory = ""
+                                            }
+                                        }
+
+                                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                                        }
+
+                                    }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Sentry.captureException(e)
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, applicationContext)
+            }
+
+            override fun onException(e: Exception) {
+                e.printStackTrace()
+                Sentry.captureException(e)
+            }
+
+        })
+    }
+
+    fun getMarketOpportunity() {
+        ApiServices.apiGET(Api.get_market_opportunity, queue!!, "", object : ApiServiceListener {
+            override fun onResponseSuccess(response: String) {
+                if (response != null) {
+                    try {
+                        val marketOpportunityList: ArrayList<String> = ArrayList()
+                        val obj = JSONObject(response)
+                        if (obj.has("outlet_market_opportunities") && !obj.isNull("outlet_market_opportunities")) {
+                            val marketArray = obj.getJSONArray("outlet_market_opportunities")
+                            if (marketArray.length() > 0) {
+                                marketOpportunityList.add(resources.getString(R.string.select_market_opportunity))
+                                for (i in 0 until marketArray.length()) {
+                                    marketOpportunityList.add(marketArray.getString(i))
+                                }
+
+                                val marketOpportunityAdapter = object : ArrayAdapter<String>(applicationContext,
+                                    android.R.layout.simple_spinner_item, marketOpportunityList){
+                                    override fun isEnabled(position: Int): Boolean {
+                                        return position != 0
+                                    }
+                                    override fun getDropDownView(
+                                        position: Int,
+                                        convertView: View?,
+                                        parent: ViewGroup
+                                    ): View {
+                                        val view: TextView = super.getDropDownView(position, convertView, parent) as TextView
+                                        //set the color of first item in the drop down list to gray
+                                        if(position == 0) {
+                                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                                            view.visibility = View.GONE
+                                        } else {
+                                            //here it is possible to define color for other items by
+                                            //view.setTextColor(Color.RED)
+                                            view.setTextColor(resources.getColor(R.color.black))
+                                        }
+                                        return view
+                                    }
+                                }
+                                spinnerMarketOpportunity.adapter = marketOpportunityAdapter
+
+                                spinnerMarketOpportunity.onItemSelectedListener =
+                                    object : AdapterView.OnItemSelectedListener {
+                                        override fun onItemSelected(
+                                            p0: AdapterView<*>?,
+                                            p1: View?,
+                                            p2: Int,
+                                            p3: Long
+                                        ) {
+                                            if (p2 > 0) {
+                                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(resources.getColor(R.color.black))
+                                                selectedMarketOpportunity =
+                                                    marketOpportunityList[p2]
+                                            } else {
+                                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                selectedMarketOpportunity = ""
+                                            }
+                                        }
+
+                                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                                        }
+
+                                    }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Sentry.captureException(e)
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, applicationContext)
+            }
+
+            override fun onException(e: Exception) {
+                e.printStackTrace()
+                Sentry.captureException(e)
+            }
+
+        })
+    }
+
+    fun getBuyer() {
+        val buyerList: ArrayList<String> = ArrayList()
+        buyerList.add(resources.getString(R.string.select_buyer))
+        buyerList.add(resources.getString(R.string.yes))
+        buyerList.add(resources.getString(R.string.no))
+
+        val buyerAdapter = object : ArrayAdapter<String>(applicationContext,
+            android.R.layout.simple_spinner_item, buyerList){
+            override fun isEnabled(position: Int): Boolean {
+                return position != 0
+            }
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                val view: TextView = super.getDropDownView(position, convertView, parent) as TextView
+                //set the color of first item in the drop down list to gray
+                if(position == 0) {
+                    view.setTextColor(resources.getColor(R.color.text_title_2))
+                    view.visibility = View.GONE
+                } else {
+                    //here it is possible to define color for other items by
+                    //view.setTextColor(Color.RED)
+                    view.setTextColor(resources.getColor(R.color.black))
+                }
+                return view
+            }
+        }
+        spinnerBuyer.adapter = buyerAdapter
+
+        spinnerBuyer.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 > 0) {
+                    val view1: TextView = p0!!.getChildAt(0) as TextView
+                    view1.setTextColor(resources.getColor(R.color.black))
+
+                    if (p2 == 1) {
+                        selectedBuyer = 1
+                    } else {
+                        selectedBuyer = 0
+                    }
+                } else {
+                    val view1: TextView = p0!!.getChildAt(0) as TextView
+                    view1.setTextColor(resources.getColor(R.color.text_title_2))
+                    selectedBuyer = -1
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
+    }
+
+    fun submitAttendance(){
+        showProgress(progressBarShop)
+        var inputOk = true
+        if (etShopName.text.trim().length == 0) {
+            inputOk = false
+            etShopName.setError(getString(R.string.this_field_is_required))
+            hideProgress(progressBarShop)
+        }
+        if (etAddress.text.trim().length == 0) {
+            inputOk = false
+            etAddress.setError(getString(R.string.this_field_is_required))
+            hideProgress(progressBarShop)
+        }
+        if (etOwnerName.text.trim().length == 0) {
+            inputOk = false
+            etOwnerName.setError(getString(R.string.this_field_is_required))
+            hideProgress(progressBarShop)
+        }
+        if (selectedRoute!!.length == 0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
+            hideProgress(progressBarShop)
+        }
+        if (selectedShopType!!.length == 0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
+            hideProgress(progressBarShop)
+        }
+        if (selectedCategory!!.length == 0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG).show()
+            hideProgress(progressBarShop)
+        }
+        if (latitude == 0.0 || longitude == 0.0){
+            inputOk = false
+            Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG).show()
+            hideProgress(progressBarShop)
+        }
+
+        if (inputOk && isImageAdded){
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val today = df.format(Calendar.getInstance().time)
+        val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = java.util.HashMap()
+        var imagesList = java.util.ArrayList<Images>()
+        imagesList = appDatabase!!.imagesDao()!!.getAllImageDB() as java.util.ArrayList<Images>
+        if (imagesList.size > 0) {
+            for (i in 0 until imagesList.size) {
+                val fileExist = File(imagesList[i].filePath).canRead()
+                if (fileExist) {
+                    val imagename = imagesList[i].filePath.substring(
+                        imagesList[i].filePath.lastIndexOf("/")
+                    )
+                    byteparams["images["+i+"]"] = VolleyMultipartRequest.DataPart(
+                        imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
+                    )
+                }
+            }
+        }
+        val params: MutableMap<String, String> = java.util.HashMap()
+        params["outlet_name"] = etShopName.text.toString()
+        params["outlet_type"] = selectedShopType!!
+        params["outlet_category"] = selectedCategory!!
+        params["address"] = etAddress.text.toString()
+        params["owner_name"] = etOwnerName.text.toString()
+        if (etContactNumber.text.trim().length > 0) params["phone_number"] = etContactNumber.text.toString()
+        if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] = selectedMarketOpportunity!!
+        if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
+        params["outlet_created_at"] = today
+        params["created_by_user_id"] = userId!!
+        params["created_by_employee_id"] = srId!!
+        params["route_id"] = selectedRoute!!
+        params["latitude"] = latitude.toString()
+        params["longitude"] = longitude.toString()
+
+        ApiServices.apiPOSTMultipart(Api.create_attendance, queue!!, token!!, params, byteparams, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                hideProgress(progressBarShop)
+                val data = JSONObject(String(response.data))
+                val message = data.getString("message")
+                appDatabase!!.imagesDao()!!.deleteAllImages()
+                ViewUtils.viewDialogResponse(applicationContext, message, object : DialogListener {
+                    override fun onConfirmed() {
+                        finish();
+                        startActivity(getIntent());
+                    }
+
+                    override fun onCanceled() {
+                        TODO("Not yet implemented")
+                    }
+
+                })
+            }
+
+            @RequiresApi(Build.VERSION_CODES.KITKAT)
+            override fun onResponseFailure(error: VolleyError) {
+                hideProgress(progressBarShop)
+                val s = String(
+                    error.networkResponse.data,
+                    StandardCharsets.UTF_8
+                )
+                val data = JSONObject(s)
+                val message = data.getString("message")
+                Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onException(e: Exception) {
+                hideProgress(progressBarShop)
+                Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+            }
+
+        })
+        }else{
+            if (!isImageAdded){
+                Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -85,7 +834,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
             // Activate with options
             locationComponent.activateLocationComponent(
-                LocationComponentActivationOptions.builder(applicationContext, loadedMapStyle).build()
+                LocationComponentActivationOptions.builder(applicationContext, loadedMapStyle)
+                    .build()
             )
             // Enable to make component visible
             locationComponent.isLocationComponentEnabled = true
@@ -104,7 +854,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     override fun onSuccess(result: LocationEngineResult?) {
                         val lastLocation = result!!.lastLocation
                         if (lastLocation != null) {
-                            setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
+                            setCameraPosition(
+                                LatLng(lastLocation.latitude, lastLocation.longitude),
+                                17.0
+                            )
                         } else {
                             //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, )
                         }
@@ -123,6 +876,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             permissionsManager!!.requestLocationPermissions(this@CreateShopActivity)
         }
     }
+
     private fun setCameraPosition(location: LatLng, zoom: Double?) {
         mMap?.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
@@ -136,20 +890,25 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         mMap = mapboxMap
-        mMap!!.setStyle(Style.Builder().fromUrl(getString(R.string.map_view_styleUrl)))
+        mMap!!.setStyle(
+            Style.Builder().fromUrl(getString(R.string.map_view_styleUrl)),
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(p0: Style) {
+                    enableLocation(p0)
+                }
+
+            })
 
 
         val uiSettings: UiSettings = mapboxMap!!.uiSettings
         uiSettings.setCompassEnabled(false)
 
-        try {
-            mapboxMap.style?.let { it1 ->
-                enableLocation(it1)
-            }
+        /*try {
+            mapboxMap.style?.let { it1 -> enableLocation(it1) }
         }catch (e: Exception){
             e.printStackTrace()
             Sentry.captureException(e)
-        }
+        }*/
 
         fab.setOnClickListener(View.OnClickListener {
             if (locationEngine != null) {
@@ -170,11 +929,15 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     // for ActivityCompat#requestPermissions for more details.
                     return@OnClickListener
                 }
-                locationEngine!!.getLastLocation(object : LocationEngineCallback<LocationEngineResult>{
+                locationEngine!!.getLastLocation(object :
+                    LocationEngineCallback<LocationEngineResult> {
                     override fun onSuccess(result: LocationEngineResult?) {
                         val lastLocation = result!!.lastLocation
                         if (lastLocation != null) {
-                            setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 17.0)
+                            setCameraPosition(
+                                LatLng(lastLocation.latitude, lastLocation.longitude),
+                                19.0
+                            )
                         } else {
                             //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, )
                         }
@@ -201,44 +964,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         mMap!!.style?.let { enableLocation(it) }
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onStart() {
-        super.onStart()
-
-        mapView!!.onStart()
+    private fun showProgress(progressBar: ProgressBar) {
+        progressBar.visibility = View.VISIBLE
     }
 
-    override fun onStop() {
-        super.onStop()
-        mapView!!.onStop()
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView!!.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView!!.onLowMemory()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView!!.onResume()
-        Log.d("Verify", "onResume")
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView!!.onPause()
-        Log.d("Verify", "onPause")
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
+    private fun hideProgress(progressBar: ProgressBar) {
+        progressBar.visibility = View.GONE
     }
 }

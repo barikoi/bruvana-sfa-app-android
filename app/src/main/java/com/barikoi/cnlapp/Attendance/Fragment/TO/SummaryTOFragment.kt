@@ -69,7 +69,7 @@ class SummaryTOFragment : Fragment() {
                         selected_so_id = soList[p2 - 1].id
                         if (!soList[p2 - 1].imageUrl.equals("null")) {
                             Glide.with(mContext!!)
-                                .load(Api.base_url + soList[p2 - 1].imageUrl)
+                                .load(soList[p2 - 1].imageUrl)
                                 .into(imageUser)
                         } else {
                             imageUser.visibility = View.GONE

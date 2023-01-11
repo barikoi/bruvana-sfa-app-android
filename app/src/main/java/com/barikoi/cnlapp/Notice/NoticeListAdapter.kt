@@ -40,7 +40,7 @@ class NoticeListAdapter (val notices: List<Notice>) : RecyclerView.Adapter<Notic
 
         if (!mItem.imageUrl.isNullOrEmpty() && !mItem.imageUrl.equals("null")){
             Glide.with(holder.itemView.context)
-                .load(Api.base_url+mItem.imageUrl)
+                .load(mItem.imageUrl)
                 .into(holder.imageUser)
         }else{
             holder.imageUser.visibility = View.GONE

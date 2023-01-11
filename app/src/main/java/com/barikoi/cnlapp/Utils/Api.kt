@@ -71,4 +71,9 @@ object Api {
 
     /*chalan download*/
     val get_chalan_download = base_url+"api/v1/memo-generate"
+
+    /*create shop*/
+    val get_shop_type = base_url+"api/v1/outlet-type"
+    val get_category_outlet = base_url+"api/v1/outlet-category"
+    val get_market_opportunity = base_url+"api/v1/outlet-market-opportunity"
 }
