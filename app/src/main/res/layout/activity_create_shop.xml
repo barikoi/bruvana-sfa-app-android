@@ -78,17 +78,18 @@
             android:id="@+id/spinnerLayoutRoutes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
             android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
             android:visibility="visible"
-            android:background="@drawable/cardview_bg"
-            android:backgroundTint="@color/white">
+            android:background="@drawable/cardview_bg_required">
             <com.barikoi.cnlapp.Utils.MoreSpinner
                 android:id="@+id/spinnerRoutes"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-
                 android:theme="@style/spinnerItemStyle"
                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
             </com.barikoi.cnlapp.Utils.MoreSpinner>
@@ -98,7 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_margin="8dp"
-            android:background="@drawable/cardview_bg">
+            android:background="@drawable/cardview_bg_required">
 
             <com.barikoi.cnlapp.imagecapture.ImageCapture
                 android:id="@+id/imagepicker"
@@ -140,10 +141,10 @@
             android:paddingEnd="8dp"
             android:paddingBottom="16dp"
             android:paddingTop="16dp"
-            android:background="@drawable/cardview_bg"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/cardview_bg_required"
             android:textColorHint="@color/text_title_2"
             android:hint="@string/shop_name"
+            android:textSize="15sp"
             android:textColor="@color/text_title"
             android:inputType="text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -151,12 +152,14 @@
             android:id="@+id/spinnerLayoutType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
             android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
             android:visibility="visible"
-            android:background="@drawable/cardview_bg"
-            android:backgroundTint="@color/white">
+            android:background="@drawable/cardview_bg_required">
             <com.barikoi.cnlapp.Utils.MoreSpinner
                 android:id="@+id/spinnerShopType"
                 android:layout_width="match_parent"
@@ -169,12 +172,14 @@
             android:id="@+id/spinnerLayoutCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
             android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
             android:visibility="visible"
-            android:background="@drawable/cardview_bg"
-            android:backgroundTint="@color/white">
+            android:background="@drawable/cardview_bg_required">
             <com.barikoi.cnlapp.Utils.MoreSpinner
                 android:id="@+id/spinnerCatOutlets"
                 android:layout_width="match_parent"
@@ -187,7 +192,10 @@
             android:id="@+id/spinnerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
             android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
             android:visibility="visible"
@@ -206,7 +214,10 @@
             android:id="@+id/spinnerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
             android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
             android:visibility="visible"
@@ -216,7 +227,6 @@
                 android:id="@+id/spinnerBuyer"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-
                 android:theme="@style/spinnerItemStyle"
                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
             </com.barikoi.cnlapp.Utils.MoreSpinner>
@@ -237,11 +247,11 @@
             android:paddingEnd="8dp"
             android:paddingBottom="16dp"
             android:paddingTop="16dp"
-            android:background="@drawable/cardview_bg"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/cardview_bg_required"
             android:textColorHint="@color/text_title_2"
             android:hint="@string/address"
             android:textColor="@color/text_title"
+            android:textSize="15sp"
             android:inputType="text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <EditText
@@ -260,11 +270,11 @@
             android:paddingEnd="8dp"
             android:paddingBottom="16dp"
             android:paddingTop="16dp"
-            android:background="@drawable/cardview_bg"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/cardview_bg_required"
             android:textColorHint="@color/text_title_2"
             android:hint="@string/owner_name"
             android:textColor="@color/text_title"
+            android:textSize="15sp"
             android:inputType="text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <EditText
@@ -288,6 +298,7 @@
             android:textColorHint="@color/text_title_2"
             android:hint="@string/contact_number"
             android:textColor="@color/text_title"
+            android:textSize="15sp"
             android:inputType="phone"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <EditText
@@ -298,7 +309,7 @@
             android:layout_weight="4"
             android:layout_gravity="center_vertical"
             android:gravity="top"
-            android:editable="false"
+            android:enabled="false"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"
@@ -312,6 +323,7 @@
             android:textColorHint="@color/text_title_2"
             android:hint="@string/latitude"
             android:textColor="@color/text_title"
+            android:textSize="15sp"
             android:inputType="text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <EditText
@@ -322,7 +334,7 @@
             android:layout_weight="4"
             android:layout_gravity="center_vertical"
             android:gravity="top"
-            android:editable="false"
+            android:enabled="false"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"
@@ -336,6 +348,7 @@
             android:textColorHint="@color/text_title_2"
             android:hint="@string/longitude"
             android:textColor="@color/text_title"
+            android:textSize="15sp"
             android:inputType="text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
@@ -354,6 +367,7 @@
             android:layout_alignParentEnd="true"
             android:text="@string/adjust_shop_location_link"
             android:textAllCaps="false"
+            android:textStyle="bold"
             android:textColor="@color/text_title_blue"
             android:textSize="15sp"
             android:textColorLink="@color/text_title_blue"

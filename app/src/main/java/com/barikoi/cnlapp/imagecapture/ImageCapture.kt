@@ -179,13 +179,13 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         }
     }
 
-    fun AddNewImage(imageReturnedIntent: Intent?, source: Int, position: Int) {
+    fun AddNewImage(imageReturnedIntent: Intent?, source: Int, position: Int, type: String) {
         var bitmap: Bitmap? = null
         try {
             bitmap = getRotateImage(mCurrentPhotoPath)
             //Sentry.captureMessage("Add Image Clicked pos: "+position+" "+bitmap)
             val lt = ImageList(bitmap, prefs.getString(ApiCall.IMAGE_PATH, "")!!, position,
-                "captured_image", prefs.getString(ApiCall.IMAGE_PATH, "")!!)
+                type, prefs.getString(ApiCall.IMAGE_PATH, "")!!)
             imageItems.add(lt)
             imageRecyclerAdapter = ImageRecyclerAdapter(imageItems, taskId!!)
             mRecyclerView.adapter = imageRecyclerAdapter
@@ -205,11 +205,11 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         layoutImageScroller.visibility = GONE
     }
 
-    fun setLocalImage(bitmap: Bitmap?, path: String?, position: Int, filename: String?) {
+    fun setLocalImage(bitmap: Bitmap?, path: String?, position: Int, filename: String?, type: String) {
         layoutImagePick.visibility = GONE
         layoutImageAdd.visibility = VISIBLE
         layoutImageScroller.visibility = VISIBLE
-        val lt = ImageList(bitmap!!, path!!, position, "ImagePicker", filename!!)
+        val lt = ImageList(bitmap!!, path!!, position, type, filename!!)
         imageItems.add(lt)
         imageRecyclerAdapter = ImageRecyclerAdapter(imageItems, taskId!!)
         mRecyclerView.adapter = imageRecyclerAdapter
@@ -282,13 +282,13 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
             Log.d("Imagepos", "fmap: $bitmap")
 
             /*get lat lon from image*/
-            val latLong = FloatArray(2)
+            /*val latLong = FloatArray(2)
             val hasLatLong: Boolean = exif.getLatLong(latLong)
             if (hasLatLong) {
                 Log.d("Imagepos", "Longitude: $latLong")
                 Log.d("Imagepos", "Latitude: " + latLong[0])
                 Log.d("Imagepos", "Longitude: " + latLong[1])
-            }
+            }*/
         } catch (e: Exception) {
             e.printStackTrace()
         }

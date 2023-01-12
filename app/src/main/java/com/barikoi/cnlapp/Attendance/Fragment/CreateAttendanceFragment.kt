@@ -186,7 +186,7 @@ class CreateAttendanceFragment : Fragment() {
     fun submitAttendance(location: Location){
         val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = java.util.HashMap()
         var imagesList = ArrayList<Images>()
-        imagesList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images>
+        imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
         if (imagesList.size > 0) {
             val fileExist = File(imagesList[0].filePath).canRead()
             if (fileExist) {
@@ -454,18 +454,18 @@ class CreateAttendanceFragment : Fragment() {
                 Log.e("imageUtils", "OnActivity result code 1: " + Activity.RESULT_OK)
                 var imagePosition = 0
                 var imageList: ArrayList<Images?>? = ArrayList()
-                imageList = appDatabase!!.imagesDao()!!.getAllImageDB() as ArrayList<Images?>?
+                imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
                 Log.d("Imagepos", "List: $imageList")
                 imagePosition = if (imageList!!.size > 0) {
                     imageList[imageList.size - 1]!!.position + 1
                 } else {
                     imagePosition + 1
                 }
-                imagepicker.AddNewImage(result.data, CAMERA, imagePosition)
+                imagepicker.AddNewImage(result.data, CAMERA, imagePosition, "Attendance")
                 try {
                     val placeImage = Images(
                         null, imagePosition,
-                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Attendance"
                     )
                     isImageAdded = true
                     if (imagePosition > 0) {
