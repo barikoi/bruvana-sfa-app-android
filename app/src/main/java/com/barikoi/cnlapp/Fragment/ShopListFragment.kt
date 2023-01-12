@@ -328,6 +328,11 @@ class ShopListFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        getShopList(userId!!)
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 

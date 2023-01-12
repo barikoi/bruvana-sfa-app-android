@@ -22,6 +22,7 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
@@ -49,7 +50,11 @@ import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.activity_create_shop.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
+import kotlinx.android.synthetic.main.fragment_create_attendance.imagepicker
+import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerLayout
+import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerRoutes
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -111,6 +116,8 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.setFragmetnt(this)
         imagepicker.setCameraLauncher(startCamera)
 
+        getImageFromDB()
+
         if (user_type.equals("TO", true)){
             spinnerLayout.visibility = View.GONE
             titleRoute.visibility = View.GONE
@@ -121,10 +128,21 @@ class CreateAttendanceFragment : Fragment() {
 
             spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    if (routeNameList!![p2].first.length > 0) {
-                        route_id = routeNameList!![p2].first.toInt()
-                        selectedRoute = routeNameList!![p2].second
-                    }else{
+                    if (p2 > 0) {
+                        val view1: TextView =
+                            p0!!.getChildAt(0) as TextView
+                        view1.setTextColor(resources.getColor(R.color.black))
+                        if (routeNameList!![p2].first.length > 0) {
+                            route_id = routeNameList!![p2].first.toInt()
+                            selectedRoute = routeNameList!![p2].second
+                        }else{
+                            route_id = null
+                            selectedRoute = ""
+                        }
+                    } else {
+                        val view1: TextView =
+                            p0!!.getChildAt(0) as TextView
+                        view1.setTextColor(resources.getColor(R.color.text_title_2))
                         route_id = null
                         selectedRoute = ""
                     }
@@ -138,6 +156,7 @@ class CreateAttendanceFragment : Fragment() {
         }
 
         getLocation("reversegeo")
+
         imgRefresh.setOnClickListener {
             rotateAnimation(imgRefresh, 0f, 380f)
             getLocation("reversegeo")
@@ -183,6 +202,35 @@ class CreateAttendanceFragment : Fragment() {
         v.startAnimation(an)
     }
 
+    private fun getImageFromDB() {
+        var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
+        imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as java.util.ArrayList<Images?>?
+        if (imageList!!.size > 0){
+            for(p in 0 until imageList.size){
+                val dbPhotoPath = imageList[p]!!.filePath
+                val fileExist : Boolean = File(dbPhotoPath).canRead()
+                if(fileExist) {
+                    try {
+                        var bitmap = imagepicker.getRotateImage(dbPhotoPath)
+                        imagepicker.setLocalImage(bitmap, dbPhotoPath, imageList[p]!!.position, "", "Attendance")
+                    } catch (e:Exception ) {
+                        e.printStackTrace()
+                    }
+                    Log.d("Imagepos", "ImageList Pos: " + imageList[p]!!.position + "p: " +(p + 1))
+                    if (imageList[p]!!.position != p + 1) {
+                        Executors.newSingleThreadExecutor().execute {
+                            appDatabase!!.imagesDao()!!.updatePosition(dbPhotoPath, p + 1, "Attendance")
+                        }
+                    }
+                }else{
+                    Executors.newSingleThreadExecutor()
+                        .execute { appDatabase!!.imagesDao()!!.deleteImage(p+1, "Attendance") }
+                }
+
+
+            }
+        }
+    }
     fun submitAttendance(location: Location){
         val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = java.util.HashMap()
         var imagesList = ArrayList<Images>()
@@ -338,8 +386,8 @@ class CreateAttendanceFragment : Fragment() {
                         val routesList = ArrayList<String>()
                         val routesArray = data.getJSONArray("routes")
                         if (routesArray.length() > 0){
-                            routeNameList!!.add(Pair("", ""))
-                            routesList.add("")
+                            routeNameList!!.add(Pair("", resources.getString(R.string.select_route)))
+                            routesList.add(resources.getString(R.string.select_route))
                             for(i in 0 until routesArray.length()){
                                 val routeObj = routesArray.getJSONObject(i)
 
@@ -348,10 +396,36 @@ class CreateAttendanceFragment : Fragment() {
                             }
                             if (spinnerRoutes != null) {
                                 if (spinnerRoutes.adapter == null){
-                                    val adapter = ArrayAdapter(
+                                    val adapter = object : ArrayAdapter<String>(
                                         mContext!!,
                                         android.R.layout.simple_spinner_item, routesList
-                                    )
+                                    ) {
+                                        override fun isEnabled(position: Int): Boolean {
+                                            return position != 0
+                                        }
+
+                                        override fun getDropDownView(
+                                            position: Int,
+                                            convertView: View?,
+                                            parent: ViewGroup
+                                        ): View {
+                                            val view: TextView = super.getDropDownView(
+                                                position,
+                                                convertView,
+                                                parent
+                                            ) as TextView
+                                            //set the color of first item in the drop down list to gray
+                                            if (position == 0) {
+                                                view.setTextColor(resources.getColor(R.color.text_title_2))
+                                                view.visibility = View.GONE
+                                            } else {
+                                                //here it is possible to define color for other items by
+                                                //view.setTextColor(Color.RED)
+                                                view.setTextColor(resources.getColor(R.color.black))
+                                            }
+                                            return view
+                                        }
+                                    }
                                     spinnerRoutes.adapter = adapter
                                 }
 

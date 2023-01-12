@@ -4,13 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
-import android.content.Intent
+import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -26,7 +25,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -38,6 +36,10 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
@@ -55,8 +57,6 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
-import kotlinx.android.synthetic.main.activity_create_shop.imagepicker
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerRoutes
 import org.json.JSONObject
 import java.io.File
 import java.net.URLEncoder
@@ -65,7 +65,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
     private var mapView: MapView? = null
@@ -134,6 +133,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
         btnBack.setOnClickListener {
             onBackPressed()
+            setResult(55)
             finish()
         }
 
@@ -935,18 +935,19 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     LocationEngineCallback<LocationEngineResult> {
                     override fun onSuccess(result: LocationEngineResult?) {
                         val lastLocation = result!!.lastLocation
-                        if (lastLocation != null) {
+                        if (lastLocation != null && !lastLocation.equals("null")) {
                             setCameraPosition(
                                 LatLng(lastLocation.latitude, lastLocation.longitude),
                                 17.0
                             )
                         } else {
-                            //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, )
+                            //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, null)
+                            showEnableLocationSetting(this@CreateShopActivity)
                         }
                     }
 
                     override fun onFailure(exception: Exception) {
-                        TODO("Not yet implemented")
+                        Toast.makeText(this@CreateShopActivity, exception.message, Toast.LENGTH_SHORT).show()
                     }
 
                 })
@@ -954,8 +955,40 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
             }
         } else {
-            permissionsManager = PermissionsManager(this)
+            permissionsManager = PermissionsManager(this@CreateShopActivity)
             permissionsManager!!.requestLocationPermissions(this@CreateShopActivity)
+            //showEnableLocationSetting(this@CreateShopActivity)
+        }
+    }
+
+    fun showEnableLocationSetting(activity: Activity?) {
+        val locationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+        val task = LocationServices.getSettingsClient(
+            activity!!
+        )
+            .checkLocationSettings(builder.build())
+        task.addOnSuccessListener(
+            activity
+        ) { response ->
+            val states = response.locationSettingsStates
+            if (states!!.isLocationPresent) {
+                //Do something
+            }
+        }
+        task.addOnFailureListener(activity) { e ->
+            if (e is ResolvableApiException) {
+                try {
+                    e.startResolutionForResult(
+                        activity,
+                        999
+                    )
+                } catch (sendEx: SendIntentException) {
+                    // Ignore the error.
+                }
+            }
         }
     }
 
