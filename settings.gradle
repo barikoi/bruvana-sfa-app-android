@@ -18,5 +18,5 @@ dependencyResolutionManagement {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 }
-rootProject.name = "CNL App"
+rootProject.name = "CNL SFA"
 include ':app'

@@ -120,8 +120,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_A->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("A", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("A", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             if (filterList!!.size > 0){
                                 adapter = ShopSelectAdapter(filterList!!, listener!!)
@@ -132,8 +136,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_B->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("B", true)
+
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("B", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -142,8 +151,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_C->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("C", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("C", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -152,8 +165,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_D->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("D", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("D", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -162,8 +179,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_E->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("E", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("E", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -172,8 +193,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_F->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("F", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("F", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -182,8 +207,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_pharmacy->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("P", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("P", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -192,8 +221,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_mpharma->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("M", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("M", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter
@@ -202,8 +235,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         R.id.menu_warehouse->{
                             filterList!!.clear()
                             filterList!!.addAll(shopList!!)
-                            filterList!!.removeIf {
-                                !it.category.get(0).toString().equals("W", true)
+                            try {
+                                filterList!!.removeIf {
+                                    !it.category.get(0).toString().equals("W", true)
+                                }
+                            }catch (e: Exception){
+                                e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
                             shoplist.adapter = adapter

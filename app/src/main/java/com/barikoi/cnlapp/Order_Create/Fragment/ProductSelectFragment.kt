@@ -417,7 +417,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     object :
                         DialogListener {
                         override fun onConfirmed() {
-
+                            progressBar.visibility = View.GONE
                         }
 
                         override fun onCanceled() {
@@ -731,7 +731,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }else{
                     ViewUtils.viewDialogResponse(mContext!!, "No products selected to order", object : DialogListener{
                         override fun onConfirmed() {
-
+                            progressBar.visibility = View.GONE
                         }
 
                         override fun onCanceled() {

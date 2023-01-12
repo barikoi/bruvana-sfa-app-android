@@ -230,6 +230,7 @@ class HomeFragment : Fragment() {
                                 if(!targetObj.isNull("target_number_of_memo")) lpc = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
                                 if(!targetObj.isNull("target_number_of_visits")) visited = dformat.format(targetObj.getString("target_number_of_visits").toDouble())
                                 if(!targetObj.isNull("target_aiv")) aiv = dformat.format(targetObj.getString("target_aiv").toDouble())
+                                if(!targetObj.isNull("threshold_bounce_percentage")) bounced = dformat.format(targetObj.getString("threshold_bounce_percentage").toDouble())
                             }
                         }
                         if (completedArray.length() > 0){
@@ -242,7 +243,7 @@ class HomeFragment : Fragment() {
                                 if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                                 if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
                                 if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
-                                if(!targetObj.isNull("bounce_amount")) bounce_completed = dformat.format(targetObj.getString("bounce_amount").toDouble())
+                                if(!targetObj.isNull("bounce_quantity_percentage")) bounce_completed = dformat.format(targetObj.getString("bounce_quantity_percentage").toDouble())
                             }
                         }
 
@@ -254,7 +255,7 @@ class HomeFragment : Fragment() {
                         itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
                         itemList.add(TargetValue(resources.getString(R.string.visit_ratio), visited, visit_completed))
                         itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.bounce), bounced, bounce_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.bounce)+" (%)", bounced, bounce_completed))
 
                         val adapter = TargetAdapter(itemList, "SO")
                         targetListView.adapter = adapter
