@@ -501,6 +501,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     private fun updateOrder(location: Location) {
         if (addedProducts!!.size > 0) {
+            var deliveredQuantity = 0
             val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
@@ -538,6 +539,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
+                    deliveredQuantity = deliveredQuantity + addedProducts!![j].ordered_quantity
                 }
 
             }
@@ -547,59 +549,74 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             if (obj1.length() > 0) {
                 Log.d("ConfirmOrder", "response: " + obj1)
-                ApiServices.apiJSONObjectPOST(
-                    Api.update_saved_order,
-                    queue!!,
-                    token!!,
-                    obj1,
-                    object : ApiServiceListener {
-                        override fun onResponseSuccess(response: String) {
-                            TODO("Not yet implemented")
+                if (deliveredQuantity > 0) {
+                    ApiServices.apiJSONObjectPOST(
+                        Api.update_saved_order,
+                        queue!!,
+                        token!!,
+                        obj1,
+                        object : ApiServiceListener {
+                            override fun onResponseSuccess(response: String) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onJSONResponseSuccess(response: JSONObject) {
+                                progressBar.visibility = View.GONE
+                                val message = response.getString("message")
+                                //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+                                ViewUtils.viewDialogResponse(
+                                    mContext!!,
+                                    message,
+                                    object : DialogListener {
+                                        override fun onConfirmed() {
+                                            CreateOrderFragment.setCurrentFragment(
+                                                ShopSelectFragment(),
+                                                ACTIVITY
+                                            )
+                                        }
+
+                                        override fun onCanceled() {
+                                            TODO("Not yet implemented")
+                                        }
+
+                                    })
+                            }
+
+                            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                            }
+
+                            override fun onResponseFailure(error: VolleyError) {
+                                progressBar.visibility = View.GONE
+                                ViewUtils.getErrorResponse(error, mContext!!)
+                            }
+
+                            override fun onException(e: Exception) {
+                                progressBar.visibility = View.GONE
+                            }
+
+                        })
+                }else{
+                    ViewUtils.viewDialogResponse(mContext!!, "No products selected to order", object : DialogListener{
+                        override fun onConfirmed() {
+
                         }
 
-                        override fun onJSONResponseSuccess(response: JSONObject) {
-                            progressBar.visibility = View.GONE
-                            val message = response.getString("message")
-                            //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                        override fun onCanceled() {
 
-                            ViewUtils.viewDialogResponse(
-                                mContext!!,
-                                message,
-                                object : DialogListener {
-                                    override fun onConfirmed() {
-                                        CreateOrderFragment.setCurrentFragment(
-                                            ShopSelectFragment(),
-                                            ACTIVITY
-                                        )
-                                    }
-
-                                    override fun onCanceled() {
-                                        TODO("Not yet implemented")
-                                    }
-
-                                })
-                        }
-
-                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
-
-                        }
-
-                        override fun onResponseFailure(error: VolleyError) {
-                            progressBar.visibility = View.GONE
-                            ViewUtils.getErrorResponse(error, mContext!!)
-                        }
-
-                        override fun onException(e: Exception) {
-                            progressBar.visibility = View.GONE
                         }
 
                     })
+                }
+
             }
         }
     }
 
     private fun submitOrder(location: Location) {
         if (addedProducts!!.size > 0) {
+            var deliveredQuantity = 0
             val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
@@ -641,6 +658,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
+                    deliveredQuantity = deliveredQuantity + addedProducts!![j].ordered_quantity
                 }
 
             }
@@ -651,64 +669,78 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             if (obj1.length() > 0) {
                 Log.d("ConfirmOrder", "response: " + obj1)
-                ApiServices.apiJSONObjectPOST(
-                    Api.confirm_order,
-                    queue!!,
-                    token!!,
-                    obj1,
-                    object : ApiServiceListener {
-                        override fun onResponseSuccess(response: String) {
-                            TODO("Not yet implemented")
-                        }
-
-                        override fun onJSONResponseSuccess(response: JSONObject) {
-                            val message = response.getString("message")
-                            progressBar.visibility = View.GONE
-                            //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                            appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
-                            appDatabase!!.orderListDao().deleteByShop(shopId!!)
-
-                            ViewUtils.viewDialogResponse(
-                                mContext!!,
-                                message,
-                                object : DialogListener {
-                                    override fun onConfirmed() {
-                                        CreateOrderFragment.setCurrentFragment(
-                                            ShopSelectFragment(),
-                                            ACTIVITY
-                                        )
-                                    }
-
-                                    override fun onCanceled() {
-                                        TODO("Not yet implemented")
-                                    }
-
-                                })
-                        }
-
-                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
-
-                        }
-
-                        override fun onResponseFailure(error: VolleyError) {
-                            try {
-                                ViewUtils.getErrorResponse(error, mContext!!)
-                                progressBar.visibility = View.GONE
-                            } catch (e: Exception) {
-                                e.printStackTrace()
+                if (deliveredQuantity > 0) {
+                    ApiServices.apiJSONObjectPOST(
+                        Api.confirm_order,
+                        queue!!,
+                        token!!,
+                        obj1,
+                        object : ApiServiceListener {
+                            override fun onResponseSuccess(response: String) {
+                                TODO("Not yet implemented")
                             }
+
+                            override fun onJSONResponseSuccess(response: JSONObject) {
+                                val message = response.getString("message")
+                                progressBar.visibility = View.GONE
+                                //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                                appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
+                                appDatabase!!.orderListDao().deleteByShop(shopId!!)
+
+                                ViewUtils.viewDialogResponse(
+                                    mContext!!,
+                                    message,
+                                    object : DialogListener {
+                                        override fun onConfirmed() {
+                                            CreateOrderFragment.setCurrentFragment(
+                                                ShopSelectFragment(),
+                                                ACTIVITY
+                                            )
+                                        }
+
+                                        override fun onCanceled() {
+                                            TODO("Not yet implemented")
+                                        }
+
+                                    })
+                            }
+
+                            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                            }
+
+                            override fun onResponseFailure(error: VolleyError) {
+                                try {
+                                    ViewUtils.getErrorResponse(error, mContext!!)
+                                    progressBar.visibility = View.GONE
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+
+                            override fun onException(e: Exception) {
+                                try {
+                                    progressBar.visibility = View.GONE
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+
+                            }
+
+                        })
+                }else{
+                    ViewUtils.viewDialogResponse(mContext!!, "No products selected to order", object : DialogListener{
+                        override fun onConfirmed() {
+
                         }
 
-                        override fun onException(e: Exception) {
-                            try {
-                                progressBar.visibility = View.GONE
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
+                        override fun onCanceled() {
 
                         }
 
                     })
+                }
+
             }
         }
     }

@@ -94,11 +94,6 @@ class ShopListFragment : Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                /*if (s!!.length>0){
-                    adapter!!.filter.filter(s)
-                }else{
-                    getShopList(userId!!)
-                }*/
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
                     val shops: ArrayList<Shops> = ArrayList()
@@ -112,7 +107,8 @@ class ShopListFragment : Fragment() {
 
                         }
                     }
-                    adapter!!.shopList = shops
+                    adapter = ShopListAdapter(shops)
+                    recylerView!!.adapter = adapter
                     adapter!!.notifyDataSetChanged()
                 }
 
