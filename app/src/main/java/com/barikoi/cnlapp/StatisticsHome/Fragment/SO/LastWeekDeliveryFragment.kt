@@ -4,10 +4,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TableLayout
+import android.widget.TextView
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -125,10 +129,20 @@ class LastWeekDeliveryFragment : Fragment() {
                             }
                         }
 
-                        val adapter = OutletAdapter(itemList, "delivery")
-                        listView.adapter = adapter
-                        adapter.notifyDataSetChanged()
-
+                        if (itemList.size > 0) {
+                            listView.visibility = View.VISIBLE
+                            val adapter = OutletAdapter(itemList, "delivery")
+                            listView.adapter = adapter
+                            adapter.notifyDataSetChanged()
+                        }else{
+                            val valueTV = TextView(mContext)
+                            valueTV.text = "No Order on the list"
+                            valueTV.textSize = 20f
+                            valueTV.gravity = Gravity.CENTER
+                            valueTV.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                            listView.visibility = View.GONE
+                            deliveryLayout.addView(valueTV)
+                        }
 
                     }
                 } catch (e: Exception) {

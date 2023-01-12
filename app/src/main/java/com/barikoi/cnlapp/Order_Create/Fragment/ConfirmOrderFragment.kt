@@ -83,7 +83,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val today = df.format(Calendar.getInstance().time)
             if (mCallback!= null) {
-                getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&route_id="+route_id+"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=SAVED", queue, token, mCallback!!)
+                getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=SAVED", queue, token, mCallback!!)
             }
 
         }

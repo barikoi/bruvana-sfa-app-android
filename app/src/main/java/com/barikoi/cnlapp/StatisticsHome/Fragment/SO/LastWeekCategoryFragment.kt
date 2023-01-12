@@ -83,9 +83,11 @@ class LastWeekCategoryFragment : Fragment() {
                         if (categoryArray.length() > 0){
                             for (i in 0 until categoryArray.length()){
                                 val productObj = categoryArray.getJSONObject(i)
-                                val outletCatName = productObj.getString("outlet_category")
-                                val outletCount = productObj.getString("outlet_count")
-                                itemList.add(Pair(outletCatName, outletCount))
+                                if (!productObj.getString("outlet_category").equals("") && !productObj.getString("outlet_category").equals("null")) {
+                                    val outletCatName = productObj.getString("outlet_category")
+                                    val outletCount = productObj.getString("outlet_count")
+                                    itemList.add(Pair(outletCatName, outletCount))
+                                }
                             }
                         }
                         createTable(itemList)

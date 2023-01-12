@@ -186,6 +186,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
 
         btnSubmitShop.setOnClickListener {
+            btnSubmitShop.isEnabled = false
             createShop()
         }
     }
@@ -871,6 +872,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                 message,
                                 object : DialogListener {
                                     override fun onConfirmed() {
+                                        btnSubmitShop.isEnabled = true
                                         finish()
                                         startActivity(getIntent())
                                     }
@@ -884,6 +886,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                         @RequiresApi(Build.VERSION_CODES.KITKAT)
                         override fun onResponseFailure(error: VolleyError) {
+                            btnSubmitShop.isEnabled = true
                             hideProgress(progressBarShop)
                             val s = String(
                                 error.networkResponse.data,
@@ -895,15 +898,19 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         }
 
                         override fun onException(e: Exception) {
+                            btnSubmitShop.isEnabled = true
                             hideProgress(progressBarShop)
                             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                         }
 
                     })
             }else{
+                btnSubmitShop.isEnabled = true
                 Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
                     .show()
             }
+        }else{
+            btnSubmitShop.isEnabled = true
         }
         /*else {
             if (!isImageAdded) {
