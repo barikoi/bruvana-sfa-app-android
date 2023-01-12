@@ -198,6 +198,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 val dbPhotoPath = imageList[p]!!.filePath
                 val fileExist : Boolean = File(dbPhotoPath).canRead()
                 if(fileExist) {
+                    isImageAdded = true
                     imageCounter.visibility = View.VISIBLE
                     imageCounter.text = (imageList.size).toString() + " Photos Added"
                     try {
@@ -809,7 +810,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             hideProgress(progressBarShop)
         }
 
-        if (inputOk && isImageAdded) {
+        if (inputOk) {
             val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val today = df.format(Calendar.getInstance().time)
             val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
@@ -844,66 +845,72 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
 
-            ApiServices.apiPOSTMultipart(
-                Api.create_shop,
-                queue!!,
-                "",
-                params,
-                byteparams,
-                object : ApiServiceListener {
-                    override fun onResponseSuccess(response: String) {
+            if (isImageAdded) {
+                ApiServices.apiPOSTMultipart(
+                    Api.create_shop,
+                    queue!!,
+                    "",
+                    params,
+                    byteparams,
+                    object : ApiServiceListener {
+                        override fun onResponseSuccess(response: String) {
 
-                    }
+                        }
 
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                        TODO("Not yet implemented")
-                    }
+                        override fun onJSONResponseSuccess(response: JSONObject) {
+                            TODO("Not yet implemented")
+                        }
 
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                        hideProgress(progressBarShop)
-                        val data = JSONObject(String(response.data))
-                        val message = data.getString("message")
-                        appDatabase!!.imagesDao()!!.deleteAllImages()
-                        ViewUtils.viewDialogResponse(
-                            this@CreateShopActivity,
-                            message,
-                            object : DialogListener {
-                                override fun onConfirmed() {
-                                    finish()
-                                    startActivity(getIntent())
-                                }
+                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                            hideProgress(progressBarShop)
+                            val data = JSONObject(String(response.data))
+                            val message = data.getString("message")
+                            appDatabase!!.imagesDao()!!.deleteAllImages()
+                            ViewUtils.viewDialogResponse(
+                                this@CreateShopActivity,
+                                message,
+                                object : DialogListener {
+                                    override fun onConfirmed() {
+                                        finish()
+                                        startActivity(getIntent())
+                                    }
 
-                                override fun onCanceled() {
-                                    TODO("Not yet implemented")
-                                }
+                                    override fun onCanceled() {
+                                        TODO("Not yet implemented")
+                                    }
 
-                            })
-                    }
+                                })
+                        }
 
-                    @RequiresApi(Build.VERSION_CODES.KITKAT)
-                    override fun onResponseFailure(error: VolleyError) {
-                        hideProgress(progressBarShop)
-                        val s = String(
-                            error.networkResponse.data,
-                            StandardCharsets.UTF_8
-                        )
-                        val data = JSONObject(s)
-                        val message = data.getString("message")
-                        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-                    }
+                        @RequiresApi(Build.VERSION_CODES.KITKAT)
+                        override fun onResponseFailure(error: VolleyError) {
+                            hideProgress(progressBarShop)
+                            val s = String(
+                                error.networkResponse.data,
+                                StandardCharsets.UTF_8
+                            )
+                            val data = JSONObject(s)
+                            val message = data.getString("message")
+                            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                        }
 
-                    override fun onException(e: Exception) {
-                        hideProgress(progressBarShop)
-                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                    }
+                        override fun onException(e: Exception) {
+                            hideProgress(progressBarShop)
+                            Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                        }
 
-                })
-        } else {
-            if (!isImageAdded) {
+                    })
+            }else{
                 Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
                     .show()
             }
         }
+        /*else {
+            if (!isImageAdded) {
+                Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }*/
     }
 
     @SuppressLint("MissingPermission")

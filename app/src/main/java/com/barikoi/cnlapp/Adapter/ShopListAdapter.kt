@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.Adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
     Filterable {
 
     var shopList: List<Shops> = mValues
+    lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.single_shop_list, parent, false)
@@ -48,6 +50,11 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
             //holder.imageProduct.visibility = View.INVISIBLE
         }
 
+    }
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        Log.d("Product", "view holder: " + recyclerView.childCount)
+        this.mRecyclerView = recyclerView
     }
 
     override fun getItemCount(): Int {
