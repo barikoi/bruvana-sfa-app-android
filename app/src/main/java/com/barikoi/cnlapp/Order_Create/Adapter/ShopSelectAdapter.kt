@@ -33,6 +33,8 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         holder.btnDetails.text = holder.itemView.resources.getString(R.string.select)
         holder.ownerName.visibility = View.VISIBLE
 
+        holder.setIsRecyclable(false)
+
         holder.shopName.text= shopList[position].shop_name
         holder.ownerName.text = shopList[position].shop_owner
         if (!shopList[position].lastOrderDate.equals("null")){

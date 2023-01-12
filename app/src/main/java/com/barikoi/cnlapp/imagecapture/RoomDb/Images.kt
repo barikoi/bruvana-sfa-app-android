@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class Images(
     @PrimaryKey(autoGenerate = true) var id: Int?,
     @ColumnInfo(name = "Position") var position: Int,
-    @ColumnInfo(name = "FilePath") var filePath: String
+    @ColumnInfo(name = "FilePath") var filePath: String,
+    @ColumnInfo(name = "FileType") var fileType: String
 )
 

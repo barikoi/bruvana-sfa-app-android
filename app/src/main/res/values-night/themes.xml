@@ -31,7 +31,6 @@
         <item name="fontFamily">@font/ceraprofontfamily</item>
         <item name="popupMenuStyle">@style/AppTheme.Popup</item>
     </style>
-
     <style name="AppTheme.Popup" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="android:listPreferredItemHeightSmall">20dp</item>
         <item name="background">@drawable/rounded_corner_lightgray</item>

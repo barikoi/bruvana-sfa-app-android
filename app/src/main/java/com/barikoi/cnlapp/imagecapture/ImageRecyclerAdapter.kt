@@ -63,8 +63,8 @@ class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private v
                 //editor.putString(Api.FILE_NAME, "")
                 editor.apply()
                 Log.d("ImageAdapter", "selected pos: " +item.selectedPos)
-                ImageDatabase.getInstance(holder.mView.context)!!.imagesDao()!!.deleteImage(item.selectedPos)
-                updateAt(holder.mView.context, item.selectedPos)
+                ImageDatabase.getInstance(holder.mView.context)!!.imagesDao()!!.deleteImage(item.selectedPos, item.selected)
+                updateAt(holder.mView.context, item.selectedPos, item.selected)
 
                 nagDialog.dismiss()
                 holder.itemView.visibility = View.GONE
@@ -75,13 +75,13 @@ class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private v
 
     }
 
-    fun updateAt(context: Context, position: Int){
-        val imagesList: List<Images> = ImageDatabase.getInstance(context)!!.imagesDao()!!.getImageDBPos(position) as List<Images>
+    fun updateAt(context: Context, position: Int, type: String){
+        val imagesList: List<Images> = ImageDatabase.getInstance(context)!!.imagesDao()!!.getImageDBPos(position, type) as List<Images>
         Log.d("ImageAdapter", "update pos: " + imagesList.size)
         if ( imagesList.size > 0) {
             for (i in 0 until  imagesList.size) {
                 Log.d("ImageAdapter", "update pos i: " +i)
-                ImageDatabase.getInstance(context)!!.imagesDao()!!.updatePosition(imagesList[i].filePath, i + 1)
+                ImageDatabase.getInstance(context)!!.imagesDao()!!.updatePosition(imagesList[i].filePath, i + 1, imagesList[i].fileType)
                 if (i + 1 ==  imagesList.size) {
                     editor.putInt(ApiCall.IMAGE_POSITION, i + 1)
                     editor.apply()

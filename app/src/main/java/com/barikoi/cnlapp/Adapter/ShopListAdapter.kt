@@ -25,6 +25,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
     }
 
     override fun onBindViewHolder(holder: ShopListAdapter.ViewHolder, position: Int) {
+        holder.setIsRecyclable(false)
         holder.shopName.text = shopList[position].shop_name
         holder.address.text = shopList[position].address
         /*holder.shopState.text = shopList[position].state*/
