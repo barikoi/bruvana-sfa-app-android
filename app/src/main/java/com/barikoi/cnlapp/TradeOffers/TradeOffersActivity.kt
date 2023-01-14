@@ -37,6 +37,7 @@ class TradeOffersActivity : AppCompatActivity() {
     private var adapter: TradeOfferListAdapter? = null
     var territoryId: String ? = ""
     var srCode: String ? = ""
+    var userId: String ? = ""
     var routeId: String ? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,13 +49,14 @@ class TradeOffersActivity : AppCompatActivity() {
         editor = prefs!!.edit()
 
         territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
         srCode = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
             getProducts(Api.all_product_list + "?with_stock=1&territory_id="+territoryId)
         }else{
-            getProducts(Api.all_product_list + "?with_stock=1&sr_id="+srCode+"&route_id="+routeId)
+            getProducts(Api.all_product_list + "?with_stock=1&user_id="+userId/*+"&route_id="+routeId*/)
         }
         btnBack.setOnClickListener {
             onBackPressed()
@@ -115,7 +117,7 @@ class TradeOffersActivity : AppCompatActivity() {
                             for (i in 0 until productsArray.length()){
                                 val tradeProducts: ArrayList<TradeProduct> = ArrayList()
                                 val productObj = productsArray.getJSONObject(i)
-                                if (productObj.has("trade") && !productObj.isNull("trade")){
+                                /*if (productObj.has("trade") && !productObj.isNull("trade")){
                                     if (productObj.getJSONArray("trade").length()>0){
                                         tradeProducts.add(
                                             TradeProduct(
@@ -125,7 +127,7 @@ class TradeOffersActivity : AppCompatActivity() {
                                             )
                                         )
                                     }
-                                }
+                                }*/
                                 var imageUrl = "null"
                                 if (productObj.has("images") && !productObj.isNull("images")){
                                     val imageArray = productObj.getJSONArray("images")
@@ -142,7 +144,7 @@ class TradeOffersActivity : AppCompatActivity() {
                                         productObj.getString("product_name"),
                                         productObj.getString("unit_name"),
                                         productObj.getString("current_available_stock"),
-                                        productObj.getString("price"),
+                                        productObj.getString("unit_price"),
                                         imageUrl,
                                         tradeProducts)
                                 )

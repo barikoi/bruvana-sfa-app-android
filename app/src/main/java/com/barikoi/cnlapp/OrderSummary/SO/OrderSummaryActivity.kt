@@ -142,7 +142,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+*/route_id+"&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&order_status=PENDING, DELIVERED")
+            getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&order_status=PENDING, DELIVERED")
 
         }
 
