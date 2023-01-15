@@ -1,11 +1,14 @@
 package com.barikoi.cnlapp.StatisticsHome.Adapter
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
@@ -22,6 +25,7 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         return ViewHolder(v)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: OutletProductAdapter.ViewHolder, position: Int) {
         val item = products[position]
         holder.productName.setText(item.product_name)
@@ -31,6 +35,9 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         holder.tvCount.isEnabled = false
         var dformat = DecimalFormat("#.##")
         holder.subTotal.setText(dformat.format(item.total_price).toString())
+
+        holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
+        holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
     }
 
     override fun getItemCount(): Int {
@@ -43,12 +50,16 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         internal val perUnitPrice: TextView
         internal val tvCount: EditText
         internal val subTotal: TextView
+        internal val btnMinus: ImageButton
+        internal val btnAdd: ImageButton
         init {
             productName = itemView.findViewById(R.id.productName)
             productType = itemView.findViewById(R.id.tvProductVariation)
             perUnitPrice = itemView.findViewById(R.id.tvPerUnit)
             tvCount = itemView.findViewById(R.id.tvCount)
             subTotal = itemView.findViewById(R.id.tvSubTotal)
+            btnMinus = itemView.findViewById(R.id.btnminus)
+            btnAdd = itemView.findViewById(R.id.btnPlus)
         }
     }
 }

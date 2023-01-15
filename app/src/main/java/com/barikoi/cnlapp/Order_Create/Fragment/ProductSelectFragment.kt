@@ -600,7 +600,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }else{
                     ViewUtils.viewDialogResponse(mContext!!, "No products selected to order", object : DialogListener{
                         override fun onConfirmed() {
-
+                            progressBar.visibility = View.GONE
                         }
 
                         override fun onCanceled() {
@@ -1050,10 +1050,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         grandTotal = grandTotal + productItems[i].total_price
                                     }
 
-                                    val adapter = OutletProductAdapter(productItems)
-                                    listView.adapter = adapter
-                                    adapter.notifyDataSetChanged()
                                 }
+                                val adapter = OutletProductAdapter(productItems)
+                                listView.adapter = adapter
+                                adapter.notifyDataSetChanged()
 
                                 tvGrandTotal.setText(dformat.format(grandTotal).toString())
                             }
@@ -1089,10 +1089,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         grandTotal = grandTotal + productItems[i].total_price
                                     }
 
-                                    val adapter = OutletProductAdapter(productItems)
-                                    listView.adapter = adapter
-                                    adapter.notifyDataSetChanged()
                                 }
+                                val adapter = OutletProductAdapter(productItems)
+                                listView.adapter = adapter
+                                adapter.notifyDataSetChanged()
 
                                 tvGrandTotal.setText(dformat.format(grandTotal).toString())
                             }
@@ -1134,10 +1134,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     grandTotal = grandTotal + productItems[i].total_price
                 }
 
-                val adapter = OutletProductAdapter(productItems)
-                listView.adapter = adapter
-                adapter.notifyDataSetChanged()
             }
+            val adapter = OutletProductAdapter(productItems)
+            listView.adapter = adapter
+            adapter.notifyDataSetChanged()
 
             tvGrandTotal.setText(dformat.format(grandTotal).toString())
         }else{

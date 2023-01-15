@@ -89,7 +89,7 @@
             android:backgroundTint="@color/cnl_color_1">
             <TextView
                 android:id="@+id/tvOrderStatus"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_margin="2dp"
                 android:paddingRight="16dp"
