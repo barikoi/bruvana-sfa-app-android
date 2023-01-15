@@ -1,16 +1,20 @@
 package com.barikoi.cnlapp.OrderSummary.TO
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.core.view.get
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -143,12 +147,12 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.commit()*/
             }
             //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_summary=1")
-            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&to="+employeeId)
+            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&to_id="+user_id)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to="+employeeId)
+        getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
         //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate+"&with_summary=1")
     }
 
@@ -170,14 +174,14 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         if (ordersArray.length() >0){
                             for(i in 0 until ordersArray.length()){
                                 val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("sr_id")), dformat.format(orderObj.getString("so_ordered_value").toDouble())))
+                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("user_id")), dformat.format(orderObj.getString("so_ordered_value").toDouble())))
                                 sowithOrderList!!.add(
                                     OrdersSO(
-                                        orderObj.getString("sr_id"),
+                                        orderObj.getString("user_id"),
                                         orderObj.getString("sr_name"),
                                         orderObj.getString("productive_outlets"),
                                         orderObj.getString("total_outlets"),
-                                        dformat.format(orderObj.getDouble("bounce_amount")).toDouble(),
+                                        dformat.format(orderObj.getDouble("total_bounced_amount")).toDouble(),
                                         orderObj.getJSONArray("orders")
                                     )
                                 )
@@ -242,6 +246,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
             tr.setLayoutParams(tableRowParams)
             tr.gravity = Gravity.CENTER_VERTICAL
+            tr.tag = i
             val c1 = TextView(applicationContext)
             c1.gravity = Gravity.START
             c1.setTextColor(resources.getColor(R.color.text_title))
@@ -257,6 +262,24 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             //tr.setOnClickListener(this@OrderSummaryTOActivity)
             tr.setOnClickListener {
                 //Log.d("OrderSummary", "clicked: "+i)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Log.d("OrderSummary", "row count: "+tab_Layout.childCount)
+                    for (t in 0 until tab_Layout.childCount){
+                        Log.d("OrderSummary", "row count 1: "+tab_Layout.getChildAt(t).tag)
+                        Log.d("OrderSummary", "row count 2: "+it.tag)
+                        if (tab_Layout.getChildAt(t).tag == it.tag){
+                            /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
+                            tab_Layout.getChildAt(t).background.setTint(resources.getColor(R.color.light_yellow))*/
+                            tab_Layout.getChildAt(t).setBackgroundColor(resources.getColor(R.color.light_yellow))
+                        }else{
+                            /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
+                            tab_Layout.getChildAt(t).background.setTint(resources.getColor(R.color.white))*/
+                            tab_Layout.getChildAt(t).setBackgroundColor(resources.getColor(R.color.white))
+                        }
+                    }
+
+                }
+
                 collectionLayout.visibility = View.VISIBLE
                 order_collection_count.setText(sowithOrderList!!.get(i).order_collected+"/"+sowithOrderList!!.get(i).total_outlets)
                 total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
@@ -281,7 +304,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                 productItems.add(
                                     Products(
                                         brandObj.getString("product_id"),
-                                        brandObj.getString("product"),
+                                        brandObj.getString("product_name"),
                                         "",
                                         /*brandObj.getString("brand_id"),
                                         "",*/
@@ -289,9 +312,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                         /*0.0,*/"",
                                         brandObj.getString("unit_name"),
                                         "",0,0,
-                                        brandObj.getInt("bounce"),
-                                        brandObj.getInt("quantity"),
-                                        brandObj.getDouble("total_price")
+                                        brandObj.getInt("bounced_quantity"),
+                                        brandObj.getInt("ordered_quantity"),
+                                        brandObj.getDouble("ordered_amount")
                                     )
                                 )
                             }
@@ -308,7 +331,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                 "",
                                 "",
                                 /*orderObj.getString("distributor_office_code"),*/
-                                orderObj.getString("grand_total"),
+                                orderObj.getString("total_ordered_amount"),
                                 orderObj.getString("total_ordered_quantity"),
                                 orderObj.getString("latitude"),
                                 orderObj.getString("longitude"),

@@ -76,7 +76,7 @@ class ProductSummaryActivity : AppCompatActivity() {
                             setDateFilter("")
                         }*/
                         selectedTerritoryId = dhList.get(p2).second
-                        territorySuffix = "&territory_id="+selectedTerritoryId
+                        territorySuffix = "&db_house_id="+selectedTerritoryId
                         setDateFilter()
                     }
                 }
@@ -242,15 +242,15 @@ class ProductSummaryActivity : AppCompatActivity() {
             if (response != null){
                 dhList.clear()
                 val obj = JSONObject(response)
-                val dhArray = obj.getJSONArray("distributor_houses")
+                val dhArray = obj.getJSONArray("db_houses")
                 val dhNameList: ArrayList<String> = ArrayList()
                 if (dhArray.length() >0){
                     for (i in 0 until dhArray.length()) {
                         val dhObj = dhArray.getJSONObject(i)
                         dhList.add(
-                            Pair(dhObj.getString("dh_name"), dhObj.getString("territory_id"))
+                            Pair(dhObj.getString("db_house_name"), dhObj.getString("id"))
                         )
-                        dhNameList.add(dhObj.getString("dh_name"))
+                        dhNameList.add(dhObj.getString("db_house_name"))
 
                     }
                 }

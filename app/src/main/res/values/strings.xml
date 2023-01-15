@@ -116,7 +116,7 @@
     <string name="active">Active</string>
     <string name="inactive">Inactive</string>
     <string name="live_stock_update"><a href="http://www.bla.com">Live Stock Update</a></string>
-    <string name="last_week_summary_link"><a href="http://www.bla.com">Last Week Summary</a></string>
+    <string name="summary_link"><a href="http://www.bla.com">Summary</a></string>
     <string name="ov">OV:</string>
     <string name="bpc">BPC:</string>
     <string name="lpc">LPC:</string>

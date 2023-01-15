@@ -6,20 +6,24 @@ import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
+import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.*
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -27,13 +31,9 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_order_summary_to.*
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_home_t_o.*
-import kotlinx.android.synthetic.main.fragment_home_t_o.bpcCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.lpcCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.ovCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.tvDateRange
-import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -48,6 +48,7 @@ class HomeTOFragment : Fragment() {
     var token: String ? = ""
     var territoryId: String ? = ""
     var employeeId: String? = ""
+    var userId: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,9 +76,6 @@ class HomeTOFragment : Fragment() {
             startActivity(Intent(requireActivity(), OrderSummaryTOActivity::class.java).putExtra("from", "lastweek"))
         }
 
-        tryAgain.setOnClickListener {
-            setLastWeekSummary()
-        }
 
     }
     private fun checkforAttendanceToday() {
@@ -247,8 +245,8 @@ class HomeTOFragment : Fragment() {
                         targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setActiveInactiveView()
-                        setLiveStockView()
-                        setLastWeekSummary()
+                        //setLiveStockView()
+                        setSummary()
 
                     }
                 }catch (e: Exception){
@@ -389,83 +387,41 @@ class HomeTOFragment : Fragment() {
 
         })
     }
-    private fun setLastWeekSummary() {
-        try{
-        progressBarHome.visibility = View.VISIBLE
-        val dformat = DecimalFormat("#.##")
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -7)
-        val end = Calendar.getInstance().time
-        val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
-        val StartDate = df.format(start)
-        val EndDate = df.format(start)
-        ApiServices.apiGET(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to="+employeeId, mQueue!!, token!!, object : ApiServiceListener{
-            override fun onResponseSuccess(response: String) {
-                try {
-                    if (response != null){
-                        progressBarHome.visibility = View.GONE
-                        summaryLayout.visibility = View.VISIBLE
-                        tryAgain.visibility = View.GONE
-                        val obj = JSONObject(response)
-                        val ordersArray = obj.getJSONArray("so_list")
-                        val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        if (ordersArray.length() >0){
-                            for(i in 0 until ordersArray.length()){
-                                val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(orderObj.getString("sr_name"), dformat.format(orderObj.getString("so_ordered_value").toDouble())))
-                            }
-                        }
-                        if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
-                        if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(obj.getString("sku_per_memo").toDouble()))
-                        if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(obj.getString("number_of_memo").toDouble()))
-                        createTable(itemList, tabLayout2)
+    private fun setSummary() {
+        layoutFourth.visibility = View.VISIBLE
+        val titles = arrayOf(resources.getString(R.string.today_summary),resources.getString(R.string.last_week_summary))
+        val fragments = ArrayList<Fragment>()
+        fragments.add(TodaysSummaryTOFragment())
+        fragments.add(LastWeekSummaryTOFragment())
+        viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        // attaching tab mediator
+        TabLayoutMediator(viewpagertab, viewPager,
+            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
+                tab.text = titles[position]
+            }).attach()
+        viewPager.setCurrentItem(0);
 
-                    }
-                }catch (e: Exception){
-                    e.printStackTrace()
-                    progressBarHome.visibility = View.GONE
-                    summaryLayout.visibility = View.GONE
-                    tryAgain.visibility = View.VISIBLE
-                }
-
-            }
-
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onResponseFailure(error: VolleyError) {
-                try{
-                ViewUtils.getErrorResponse(error, mContext!!)
-                progressBarHome.visibility = View.GONE
-                summaryLayout.visibility = View.GONE
-                tryAgain.visibility = View.VISIBLE
-                }catch (e:Exception){
-                    e.printStackTrace()
-                }
-            }
-
-            override fun onException(e: Exception) {
-                try{
-                progressBarHome.visibility = View.GONE
-                summaryLayout.visibility = View.GONE
-                tryAgain.visibility = View.VISIBLE
-                }catch (e:Exception){
-                    e.printStackTrace()
-                }
-            }
-
-        })
-        }catch (e:Exception){
-            e.printStackTrace()
+        //viewPager.setUserInputEnabled(false)
+        for (i in 0 until viewpagertab.getTabCount()) {
+            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+            val p = tab.layoutParams as ViewGroup.MarginLayoutParams
+            p.setMargins(12, 12, 8, 12)
+            tab.requestLayout()
         }
+        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                Log.d("Fragment", "viewpager tab pos: $position")
+                if (position == 0) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
+                    editor!!.commit()*/
+                } else if (position == 1) {
+                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
+                    editor!!.commit()*/
+                }
+            }
+        })
     }
 
     private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {
@@ -515,6 +471,7 @@ class HomeTOFragment : Fragment() {
         token = prefs!!.getString(Api.TOKEN, "")
         employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
         territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
+        userId = prefs!!.getString(Api.USER_ID, "")
     }
 
 

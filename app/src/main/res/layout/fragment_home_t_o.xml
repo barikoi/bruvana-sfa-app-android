@@ -20,19 +20,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:gravity="start"
                     android:text="@string/summary"
-                    android:textStyle="bold"
                     android:textAllCaps="true"
                     android:textColor="@color/text_title"
                     android:textSize="20sp"
-                    android:layout_alignParentLeft="true">
+                    android:textStyle="bold">
+
                 </TextView>
 
                 <LinearLayout
@@ -186,7 +188,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:orientation="vertical"
-                android:visibility="visible"
+                android:visibility="gone"
                 >
                 <TextView
                     android:id="@+id/liveStockUpdate"
@@ -229,7 +231,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:orientation="vertical"
-                android:visibility="visible"
+                android:visibility="gone"
                 >
                 <TextView
                     android:id="@+id/lastweeksummary"
@@ -240,7 +242,7 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
                     android:gravity="start"
-                    android:text="@string/last_week_summary_link"
+                    android:text="@string/summary_link"
                     android:textStyle="bold"
                     android:textAllCaps="true"
                     android:textColor="@color/text_title_blue"
@@ -251,163 +253,39 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/white"
-                    android:background="@drawable/rounded_corner_lightgray">
-                    <LinearLayout
-                        android:id="@+id/summaryLayout"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="35dp"
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    android:background="@drawable/rounded_corner_lightgray"
+                    android:backgroundTint="@color/white">
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/viewpagertab"
+                        style="@style/TabLayoutStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:orientation="vertical"
-                        >
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
+                        app:tabGravity="fill"
+                        android:fillViewport="false"
+                        android:layout_alignParentTop="true"
+                        app:tabBackground="@drawable/tab_indicator_bg_gray"
+                        app:tabMinWidth="120dp"
+                        app:tabMode="scrollable"
+                        app:tabSelectedTextColor="@color/white"
+                        app:tabTextColor="@color/text_title" />
 
-                            android:padding="8dp"
-                            android:background="@drawable/rounded_corner_bg_stroke">
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="2dp"
-                                    android:layout_marginStart="4dp"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="start"
-                                    android:text="@string/ov"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/cnl_color_1"
-                                    android:textSize="16sp"
-                                    android:layout_alignParentLeft="true">
-                                </TextView>
-                                <TextView
-                                    android:id="@+id/ovCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_marginStart="2dp"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="start"
-                                    android:text=""
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/text_title"
-                                    android:textSize="16sp"
-                                    android:layout_alignParentLeft="true">
-                                </TextView>
-                            </LinearLayout>
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="2dp"
-                                    android:layout_marginStart="4dp"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="start"
-                                    android:text="@string/bpc"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/cnl_color_1"
-                                    android:textSize="16sp"
-                                    android:layout_alignParentLeft="true">
-                                </TextView>
-                                <TextView
-                                    android:id="@+id/bpcCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_marginStart="2dp"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="start"
-                                    android:text=""
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/text_title"
-                                    android:textSize="16sp"
-                                    android:layout_alignParentLeft="true">
-                                </TextView>
-                            </LinearLayout>
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="2dp"
-                                    android:layout_marginStart="4dp"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="start"
-                                    android:text="@string/lpc"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/cnl_color_1"
-                                    android:textSize="16sp"
-                                    android:layout_alignParentLeft="true">
-                                </TextView>
-                                <TextView
-                                    android:id="@+id/lpcCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_marginStart="2dp"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="start"
-                                    android:text=""
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/text_title"
-                                    android:textSize="16sp"
-                                    android:layout_alignParentLeft="true">
-                                </TextView>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <TableLayout
-                            android:id="@+id/tabLayout2"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/white"
-                            android:layout_margin="4dp">
-                        </TableLayout>
-
-                    </LinearLayout>
-                    <com.github.ybq.android.spinkit.SpinKitView
-                        android:id="@+id/progressBarHome"
-                        style="@style/SpinKitView.Small.Circle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:visibility="visible"
-                        android:layout_centerInParent="true"
-                        app:SpinKit_Color="@color/cnl_color_1" />
-                    <TextView
-                        android:id="@+id/tryAgain"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/viewPager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/viewpagertab"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginTop="8dp"
                         android:layout_marginEnd="4dp"
-                        android:layout_marginStart="2dp"
-                        android:layout_centerInParent="true"
-                        android:visibility="gone"
-                        android:background="@drawable/rounded_stroke_bg"
-                        android:text="@string/try_again"
-                        android:textStyle="bold"
-                        android:textAllCaps="true"
-                        android:textColor="@color/text_title"
-                        android:textSize="16sp">
-                    </TextView>
-                </RelativeLayout>
+                        android:layout_marginRight="4dp"
+                        android:layout_marginBottom="12dp" />
 
+                </RelativeLayout>
 
             </LinearLayout>
         </LinearLayout>

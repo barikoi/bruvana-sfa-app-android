@@ -98,7 +98,7 @@ class ActiveInactiveActivity : AppCompatActivity() {
                                     }
                                     itemList.add(
                                         ActiveInactiveSO(
-                                            attendanceobj.getString("name"),
+                                            attendanceobj.getString("user_name"),
                                             attendanceobj.getString("user_id"),
                                             status!!, attendanceobj.getString("updated_at"),
                                             attendanceobj.getString("checkin_address"),
