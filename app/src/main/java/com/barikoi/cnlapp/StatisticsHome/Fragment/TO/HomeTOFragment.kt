@@ -200,12 +200,20 @@ class HomeTOFragment : Fragment() {
     private fun getSummaryTargets(url: String) {
         var total_target = "--:--"
         var total_target_completed = "--:--"
-        var target_ads = "--:--"
+        var lpc = "--:--"
+        var lpc_completed = "--:--"
+        var bpc = "--:--"
+        var bpc_completed = "--:--"
+        var aiv = "--:--"
+        var aiv_completed = "--:--"
+        var ads = "--:--"
         var ads_completed = "--:--"
-        var target_rds = "--:--"
+        var rds = "--:--"
         var rds_completed = "--:--"
-        var number_of_memo = "--:--"
-        var number_of_memo_completed = "--:--"
+        var visit_completed = "--:--"
+        var visited = "--:--"
+        var bounce_completed = "--:--"
+        var bounced = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
@@ -219,27 +227,39 @@ class HomeTOFragment : Fragment() {
                         if (targetsArray.length() > 0){
                             for (i in 0 until targetsArray.length()){
                                 val targetObj =targetsArray.getJSONObject(i)
-                                if(!targetObj.isNull("target_amount"))total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
-                                if(!targetObj.isNull("target_ads"))target_ads = dformat.format(targetObj.getString("target_ads").toDouble())
-                                if(!targetObj.isNull("target_rds"))target_rds = dformat.format(targetObj.getString("target_rds").toDouble())
-                                if(!targetObj.isNull("target_number_of_memo"))number_of_memo = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
+                                if(!targetObj.isNull("target_amount")) total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
+                                if(!targetObj.isNull("target_ads")) ads = dformat.format(targetObj.getString("target_ads").toDouble())
+                                if(!targetObj.isNull("target_rds")) rds = dformat.format(targetObj.getString("target_rds").toDouble())
+                                if(!targetObj.isNull("target_sku_per_memo")) bpc = dformat.format(targetObj.getString("target_sku_per_memo").toDouble())
+                                if(!targetObj.isNull("target_number_of_memo")) lpc = dformat.format(targetObj.getString("target_number_of_memo").toDouble())
+                                if(!targetObj.isNull("target_number_of_visits")) visited = dformat.format(targetObj.getString("target_number_of_visits").toDouble())
+                                if(!targetObj.isNull("target_aiv")) aiv = dformat.format(targetObj.getString("target_aiv").toDouble())
+                                if(!targetObj.isNull("threshold_bounce_percentage")) bounced = dformat.format(targetObj.getString("threshold_bounce_percentage").toDouble())
                             }
                         }
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
                                 if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                if(!targetObj.isNull("ads"))ads_completed = dformat.format(targetObj.getString("ads").toDouble())
-                                if(!targetObj.isNull("rds"))rds_completed = dformat.format(targetObj.getString("rds").toDouble())
-                                if(!targetObj.isNull("number_of_memo"))number_of_memo_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if(!targetObj.isNull("ads")) ads_completed = dformat.format(targetObj.getString("ads").toDouble())
+                                if(!targetObj.isNull("rds")) rds_completed = dformat.format(targetObj.getString("rds").toDouble())
+                                if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
+                                if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                if(!targetObj.isNull("bounce_quantity_percentage")) bounce_completed = dformat.format(targetObj.getString("bounce_quantity_percentage").toDouble())
                             }
                         }
 
                         val itemList: ArrayList<TargetValue> = ArrayList()
                         itemList.add(TargetValue(resources.getString(R.string.total_target), total_target, total_target_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.ads), target_ads, ads_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.rds), target_rds, rds_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.number_of_memo), number_of_memo, number_of_memo_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.ads), ads, ads_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.rds), rds, rds_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.visit_ratio), visited, visit_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
+                        itemList.add(TargetValue(resources.getString(R.string.bounce)+" (%)", bounced, bounce_completed))
 
                         val adapter = TargetAdapter(itemList, "TO")
                         targetListView.adapter = adapter
