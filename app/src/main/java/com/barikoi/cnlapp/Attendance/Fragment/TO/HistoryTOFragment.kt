@@ -309,11 +309,14 @@ class HistoryTOFragment : Fragment() {
                     filteredsoList.removeIf {
                         !it.userId.equals(selected_so_id, true)
                     }
-                    if (filteredsoList.size > 0){
+                    /*if (filteredsoList.size > 0){
                         adapter = HistoryListTOAdapter(filteredsoList)
                         historyTOListView.adapter = adapter
                         adapter!!.notifyDataSetChanged()
-                    }
+                    }*/
+                    adapter = HistoryListTOAdapter(filteredsoList)
+                    historyTOListView.adapter = adapter
+                    adapter!!.notifyDataSetChanged()
                 }
 
                 /*adapter = HistoryListTOAdapter(historyList)

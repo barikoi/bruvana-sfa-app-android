@@ -253,17 +253,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 if (soArray.length() >0){
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
+                        var imageUrl = "null"
+                        if (soObj.has("images") && !soObj.isNull("images")){
+                            val imageArray = soObj.getJSONArray("images")
+                            if (imageArray.length() > 0){
+                                val imageobj = imageArray.getJSONObject(0)
+                                if (imageobj.has("image_url")){
+                                    imageUrl = imageobj.getString("image_url")
+                                }
+                            }
+                        }
                         soList.add(
                             SOList(
                                 soObj.getString("id"),
-                                soObj.getString("name"),
+                                soObj.getString("user_name"),
                                 soObj.getString("designation"),
                                 soObj.getString("employee_id"),
                                 soObj.getString("phone"),
-                                soObj.getString("image")
+                                imageUrl
                             )
                         )
-                        soNameList.add(soObj.getString("name"))
+                        soNameList.add(soObj.getString("user_name"))
 
                     }
                 }

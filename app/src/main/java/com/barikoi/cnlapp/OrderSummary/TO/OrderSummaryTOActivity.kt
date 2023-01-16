@@ -10,14 +10,13 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.core.view.get
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Fragment.RouteFragment
+import com.barikoi.cnlapp.Fragment.ShopListFragment
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
@@ -30,12 +29,8 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
+import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_order_summary_to.*
-import kotlinx.android.synthetic.main.activity_order_summary_to.bpcCount
-import kotlinx.android.synthetic.main.activity_order_summary_to.lpcCount
-import kotlinx.android.synthetic.main.activity_order_summary_to.ovCount
-import kotlinx.android.synthetic.main.activity_order_summary_to.tvDateRange
-import kotlinx.android.synthetic.main.fragment_home_t_o.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -73,7 +68,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
 
         listener = this
-        setDateFilter()
+        //setDateFilter()
 
         btnBack.setOnClickListener {
             onBackPressed()
@@ -98,25 +93,71 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
         })
         tryAgain2.setOnClickListener {
-            setDateFilter()
+            setDateFilter(spinnerMenu.selectedItemPosition)
+        }
+
+        val menuList = arrayOf(resources.getString(R.string.today_summary), resources.getString(R.string.last_week_summary), resources.getString(R.string.custom))
+        val adapter = ArrayAdapter(
+            applicationContext,
+            android.R.layout.simple_spinner_item, menuList
+        )
+        spinnerMenu.adapter = adapter
+        spinnerMenu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (spinnerMenu.adapter.count >0) {
+                    bodyLayout.visibility = View.GONE
+                    if (p2 == 2){
+                        //tvDateRange.setText("Select date range")
+                    }else{
+                        setDateFilter(p2)
+                    }
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
+
+        spinnerMenu.onItemClickListener = object : AdapterView.OnItemClickListener{
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 == 2){
+                    tvDateRange.setText("Select date range")
+                }
+            }
+
         }
     }
 
-    private fun setDateFilter() {
+    private fun setDateFilter(position: Int) {
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-        StartDate = df.format(start)
-        if (intent.hasExtra("from")) {
+        if (position == 0){
+            StartDate = df.format(end)
+            EndDate = df.format(end)
+            tvDateRange.setText(simpleFormat.format(end))
+            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
+        }else if(position == 1){
+            StartDate = df.format(start)
             EndDate = df.format(start)
-            tvDateRange.setText(simpleFormat.format(start) /*+ " - " + simpleFormat.format(end)*/)
+            tvDateRange.setText(simpleFormat.format(start))
+            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
+        }else{
+            //tvDateRange.setText("Select date range")
+        }
+        /*if (intent.hasExtra("from")) {
+            EndDate = df.format(start)
+            tvDateRange.setText(simpleFormat.format(start) *//*+ " - " + simpleFormat.format(end)*//*)
         }else{
             EndDate = df.format(end)
             tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
-        }
+        }*/
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -130,11 +171,15 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
+            spinnerMenu.setSelection(2)
             dateRangeLayout.setEnabled(true)
             summaryLayout2.visibility = View.GONE
             tryAgain2.visibility = View.GONE
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
+            StartDate = df.format(s_date)
+            EndDate = df.format(e_date)
+            //spinnerMenu.setSelection(2)
             if (s_date.compareTo(e_date) == 0) {
                 tvDateRange.setText(simpleFormat.format(s_date))
                 /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
@@ -146,14 +191,12 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+df.format(s_date)+"&end_date="+df.format(e_date)+"&with_summary=1")
+
             getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&to_id="+user_id)
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
-        //getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+"&route_id="+route_id+"&start_date="+StartDate+"&end_date="+EndDate+"&with_summary=1")
     }
 
     fun getOrderSummary(url: String){
@@ -166,7 +209,11 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     if (response != null){
                         progressBar4.visibility = View.GONE
                         summaryLayout2.visibility = View.VISIBLE
+                        collectionLayout.visibility = View.GONE
+                        summaryLayout.visibility = View.GONE
+                        bodyLayoutScroll.visibility = View.GONE
                         tryAgain2.visibility = View.GONE
+                        bodyLayout.visibility = View.VISIBLE
                         val obj = JSONObject(response)
                         val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
@@ -189,14 +236,18 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                             if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
                             if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(obj.getString("sku_per_memo").toDouble()))
                             if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(obj.getString("number_of_memo").toDouble()))
-                            createTable(itemList, tabLayoutOrder)
+                            createTableClickable(itemList, tabLayoutOrder)
                         }
 
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    bodyLayout.visibility = View.GONE
                     progressBar4.visibility = View.GONE
                     summaryLayout2.visibility = View.GONE
+                    summaryLayout.visibility = View.GONE
+                    bodyLayoutScroll.visibility = View.GONE
+                    collectionLayout.visibility = View.GONE
                     tryAgain2.visibility = View.VISIBLE
                 }
 
@@ -214,18 +265,24 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 ViewUtils.getErrorResponse(error, applicationContext)
                 progressBar4.visibility = View.GONE
                 summaryLayout2.visibility = View.GONE
+                summaryLayout.visibility = View.GONE
+                collectionLayout.visibility = View.GONE
+                bodyLayout.visibility = View.GONE
+                bodyLayoutScroll.visibility = View.GONE
                 tryAgain2.visibility = View.VISIBLE
             }
 
             override fun onException(e: Exception) {
                 progressBar4.visibility = View.GONE
                 summaryLayout2.visibility = View.GONE
+                collectionLayout.visibility = View.GONE
+                bodyLayoutScroll.visibility = View.GONE
                 tryAgain2.visibility = View.VISIBLE
             }
 
         })
     }
-    private fun createTable(data: ArrayList<Pair<Pair<String, String>, String>>, tab_Layout: TableLayout) {
+    private fun createTableClickable(data: ArrayList<Pair<Pair<String, String>, String>>, tab_Layout: TableLayout) {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
@@ -235,61 +292,75 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         }else{
             size = 5
         }
-        for (i in 0 until size) {
-            val tr = TableRow(applicationContext)
-            val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
-            val leftMargin = 0
-            val topMargin = 0
-            val rightMargin = 0
-            val bottomMargin = 8
+        if (data.size >0) {
+            for (i in 0 until size) {
+                val tr = TableRow(applicationContext)
+                val tableRowParams = TableLayout.LayoutParams(
+                    TableLayout.LayoutParams.FILL_PARENT,
+                    TableLayout.LayoutParams.WRAP_CONTENT
+                )
+                val leftMargin = 0
+                val topMargin = 0
+                val rightMargin = 0
+                val bottomMargin = 8
 
-            tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
-            tr.setLayoutParams(tableRowParams)
-            tr.gravity = Gravity.CENTER_VERTICAL
-            tr.tag = i
-            val c1 = TextView(applicationContext)
-            c1.gravity = Gravity.START
-            c1.setTextColor(resources.getColor(R.color.text_title))
-            c1.setText(data.get(i).first.first)
-            val c2 = TextView(applicationContext)
-            c2.gravity = Gravity.END
-            c2.setTextColor(resources.getColor(R.color.text_title))
-            c2.setText(data.get(i).second)
-            c2.gravity = Gravity.CENTER
-            c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
-            tr.addView(c1)
-            tr.addView(c2)
-            //tr.setOnClickListener(this@OrderSummaryTOActivity)
-            tr.setOnClickListener {
-                //Log.d("OrderSummary", "clicked: "+i)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Log.d("OrderSummary", "row count: "+tab_Layout.childCount)
-                    for (t in 0 until tab_Layout.childCount){
-                        Log.d("OrderSummary", "row count 1: "+tab_Layout.getChildAt(t).tag)
-                        Log.d("OrderSummary", "row count 2: "+it.tag)
-                        if (tab_Layout.getChildAt(t).tag == it.tag){
-                            /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
+                tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
+                tr.setLayoutParams(tableRowParams)
+                tr.gravity = Gravity.CENTER_VERTICAL
+                tr.tag = i
+                val c1 = TextView(applicationContext)
+                c1.gravity = Gravity.START
+                c1.setTextColor(resources.getColor(R.color.text_title))
+                c1.setText(data.get(i).first.first)
+                val c2 = TextView(applicationContext)
+                c2.gravity = Gravity.END
+                c2.setTextColor(resources.getColor(R.color.text_title))
+                c2.setText(data.get(i).second)
+                c2.gravity = Gravity.CENTER
+                c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
+                tr.addView(c1)
+                tr.addView(c2)
+                //tr.setOnClickListener(this@OrderSummaryTOActivity)
+                tr.setOnClickListener {
+                    try {
+                        //Log.d("OrderSummary", "clicked: "+i)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            progressBar5.visibility = View.VISIBLE
+                            Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
+                            for (t in 0 until tab_Layout.childCount) {
+                                if (tab_Layout.getChildAt(t).tag == it.tag) {
+                                    /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
                             tab_Layout.getChildAt(t).background.setTint(resources.getColor(R.color.light_yellow))*/
-                            tab_Layout.getChildAt(t).setBackgroundColor(resources.getColor(R.color.light_yellow))
-                        }else{
-                            /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
+                                    tab_Layout.getChildAt(t)
+                                        .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                } else {
+                                    /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
                             tab_Layout.getChildAt(t).background.setTint(resources.getColor(R.color.white))*/
-                            tab_Layout.getChildAt(t).setBackgroundColor(resources.getColor(R.color.white))
+                                    tab_Layout.getChildAt(t)
+                                        .setBackgroundColor(resources.getColor(R.color.white))
+                                }
+                            }
+
                         }
+                        bodyLayoutScroll.visibility = View.VISIBLE
+                        collectionLayout.visibility = View.VISIBLE
+                        order_collection_count.setText(
+                            sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(i).total_outlets
+                        )
+                        total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
+                        getAllOrders(sowithOrderList!!.get(i).ordersArray)
+                        getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                        Sentry.captureException(e)
                     }
-
                 }
-
-                collectionLayout.visibility = View.VISIBLE
-                order_collection_count.setText(sowithOrderList!!.get(i).order_collected+"/"+sowithOrderList!!.get(i).total_outlets)
-                total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
-                getAllOrders(sowithOrderList!!.get(i).ordersArray)
+                tab_Layout.addView(tr)
             }
-            tab_Layout.addView(tr)
         }
     }
     private fun getAllOrders(orderArray: JSONArray) {
-
+        progressBar5.visibility = View.GONE
         try {
                 itemList.clear()
                 if (orderArray.length() > 0){
@@ -351,8 +422,114 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         }
     }
 
+    private fun getSummaryTargets(url: String) {
+        progressBarHome.visibility = View.VISIBLE
+        var total_target = "--:--"
+        var total_target_completed = "--:--"
+        var lpc = "--:--"
+        var lpc_completed = "--:--"
+        var bpc = "--:--"
+        var bpc_completed = "--:--"
+        var aiv = "--:--"
+        var aiv_completed = "--:--"
+        var ads = "--:--"
+        var ads_completed = "--:--"
+        var rds = "--:--"
+        var rds_completed = "--:--"
+        var visit_completed = "--:--"
+        var visited = "--:--"
+        var bounce_completed = "--:--"
+        var bounced = "--:--"
+        var dformat = DecimalFormat("#.##")
+        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+                try {
+                    if (response != null){
+                        val obj = JSONObject(response)
+                        val targetsArray = obj.getJSONArray("targets")
+                        val completedArray = obj.getJSONArray("target_completed")
+                        progressBarHome.visibility = View.GONE
+                        summaryLayout.visibility = View.VISIBLE
+
+                        if (completedArray.length() > 0){
+                            for (i in 0 until completedArray.length()){
+                                val targetObj =completedArray.getJSONObject(i)
+                                if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                if(!targetObj.isNull("ads")) ads_completed = dformat.format(targetObj.getString("ads").toDouble())
+                                if(!targetObj.isNull("rds")) rds_completed = dformat.format(targetObj.getString("rds").toDouble())
+                                if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
+                                if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
+                                if(!targetObj.isNull("bounce_quantity_percentage")) bounce_completed = dformat.format(targetObj.getString("bounce_quantity_percentage").toDouble())
+                            }
+                        }
+
+                        val itemList: ArrayList<Pair<String, String>> = ArrayList()
+                        itemList.add(Pair(resources.getString(R.string.total_target), total_target_completed))
+                        itemList.add(Pair(resources.getString(R.string.ads), ads_completed))
+                        itemList.add(Pair(resources.getString(R.string.rds), rds_completed))
+                        itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
+                        itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
+                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_completed))
+                        itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
+                        itemList.add(Pair(resources.getString(R.string.bounce)+" (%)", bounce_completed))
+
+                        createTable(itemList, tabLayoutTarget)
+                    }
+                }catch (e: Exception){
+                    e.printStackTrace()
+                    progressBarHome.visibility = View.GONE
+                }
+
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                ViewUtils.getErrorResponse(error, applicationContext)
+                progressBarHome.visibility = View.GONE
+            }
+
+            override fun onException(e: Exception) {
+                progressBarHome.visibility = View.GONE
+            }
+
+        })
+
+    }
+
+    private fun createTable(data: ArrayList<Pair<String, String>>, tabLayout: TableLayout) {
+        tabLayout.isStretchAllColumns = true
+        tabLayout.bringToFront()
+        tabLayout.removeAllViews()
+        if (data.size >0) {
+            //bodyLayoutScroll.scrollTo(0, 0)
+            bodyLayoutScroll.smoothScrollTo(0, 0)
+            for (i in 0 until data.size) {
+                val tr = TableRow(applicationContext)
+                val c1 = TextView(applicationContext)
+                c1.gravity = Gravity.START
+                c1.setTextColor(resources.getColor(R.color.text_title))
+                c1.setText(data.get(i).first)
+                val c2 = TextView(applicationContext)
+                c2.gravity = Gravity.END
+                c2.setTextColor(resources.getColor(R.color.text_title))
+                c2.setText(data.get(i).second)
+                tr.addView(c1)
+                tr.addView(c2)
+                tabLayout.addView(tr)
+            }
+        }
+    }
     override fun onEdit(order: OrderList) {
-        TODO("Not yet implemented")
+
     }
 
     /*override fun onClick(v: View?) {

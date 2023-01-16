@@ -90,6 +90,7 @@
     <string name="last_week_category">Last Week Category</string>
     <string name="last_week_delivery">Last Week Delivery</string>
     <string name="bounce_list">Last Week Bounce</string>
+    <string name="custom">Custom</string>
 
     <string name="summary">Summary</string>
     <string name="total_order_value">Total Order Value</string>
@@ -118,8 +119,8 @@
     <string name="live_stock_update"><a href="http://www.bla.com">Live Stock Update</a></string>
     <string name="summary_link"><a href="http://www.bla.com">Summary</a></string>
     <string name="ov">OV:</string>
-    <string name="bpc">BPC:</string>
-    <string name="lpc">LPC:</string>
+    <string name="bpc">SPM:</string>
+    <string name="lpc">NM:</string>
 
     <!--Create Order-->
     <string name="order_collection">Order Collection</string>
@@ -160,6 +161,10 @@
     <string name="product_return_reason">Product return reason...</string>
 
     <string name="no_order_to_download_chalan">No order to download Chalan</string>
+
+    <string name="order_selection">Order Selection</string>
+    <string name="today">Today</string>
+    <string name="lwsd">LWSD</string>
 
     <!--notice view-->
     <string name="see_more">See More...</string>

@@ -88,7 +88,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_notice.xml" value="0.8175182481751825" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_order_delivery_update.xml" value="0.25" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_order_summary.xml" value="0.18" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_order_summary_to.xml" value="0.25" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_order_summary_to.xml" value="0.1" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_product_stock_update.xml" value="0.67" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_product_summary.xml" value="0.33" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_route.xml" value="0.715625" />
@@ -164,7 +164,9 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/filter_menu_outlets.xml" value="0.17149122807017544" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/filter_menu_trade.xml" value="0.16926406926406926" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/mainactivity_drawer_menu.xml" value="0.5" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/menu_order_summary_to.xml" value="0.22" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/sort_menu.xml" value="0.8145833333333333" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/sort_menu_outlet.xml" value="0.17149122807017544" />
       </map>
     </option>
   </component>
