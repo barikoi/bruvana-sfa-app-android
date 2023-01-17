@@ -51,6 +51,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     private var adapter: ConfirmOrderListAdapter? = null
     var StartDate: String? = null
     var EndDate: String? = null
+    var customDate: String? = null
     var sowithOrderList: ArrayList<OrdersSO>? = ArrayList()
     val itemList: ArrayList<OrderList> = ArrayList()
 
@@ -120,15 +121,6 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             }
 
         }
-
-        spinnerMenu.onItemClickListener = object : AdapterView.OnItemClickListener{
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (p2 == 2){
-                    tvDateRange.setText("Select date range")
-                }
-            }
-
-        }
     }
 
     private fun setDateFilter(position: Int) {
@@ -149,7 +141,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             tvDateRange.setText(simpleFormat.format(start))
             getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
         }else{
-            //tvDateRange.setText("Select date range")
+            tvDateRange.setText("Select date range")
+            tvDateRange.setText(customDate)
         }
         /*if (intent.hasExtra("from")) {
             EndDate = df.format(start)
@@ -182,14 +175,10 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             //spinnerMenu.setSelection(2)
             if (s_date.compareTo(e_date) == 0) {
                 tvDateRange.setText(simpleFormat.format(s_date))
-                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.commit()*/
+                customDate = simpleFormat.format(s_date)
             } else {
                 tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
-                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
-                editor!!.commit()*/
+                customDate = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
             }
 
             getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&to_id="+user_id)
@@ -389,7 +378,6 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                     )
                                 )
                             }
-
                         }
                         itemList.add(
                             OrderList(
