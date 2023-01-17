@@ -16,7 +16,7 @@
         android:visibility="gone"
         android:background="@color/background_app">
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/viewpagertab2"
+            android:id="@+id/viewpagertabOrder"
             style="@style/TabLayoutStyle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -28,6 +28,8 @@
             android:layout_alignParentTop="true"
             app:tabMinWidth="120dp"
             app:tabMode="fixed"
+            android:elevation="2dp"
+            app:tabInlineLabel="true"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/text_title" />
 
@@ -35,7 +37,7 @@
             android:id="@+id/viewPager3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/viewpagertab2"
+            android:layout_below="@+id/viewpagertabOrder"
             />
 
     </RelativeLayout>

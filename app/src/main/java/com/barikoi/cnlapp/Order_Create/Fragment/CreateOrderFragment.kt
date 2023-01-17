@@ -1,14 +1,18 @@
 package com.barikoi.cnlapp.Order_Create.Fragment
 
+import android.app.ActionBar
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TableLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -18,15 +22,13 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
-import com.barikoi.cnlapp.Order_Create.Fragment.ConfirmOrderFragment.Companion.mCallback
-import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment.Companion.viewPager
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import com.barikoi.cnlapp.callback.OnBackPressedListener
+import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
@@ -35,13 +37,12 @@ import org.json.JSONObject
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class CreateOrderFragment : Fragment(){
     lateinit var ACTIVITY: MainActivity
-    var viewpagertab: TabLayout? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
+    var viewpagertab: TabLayout? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var token: String ? = ""
@@ -67,7 +68,7 @@ class CreateOrderFragment : Fragment(){
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_create_order, container, false)
-        viewpagertab = view.findViewById(R.id.viewpagertab2)
+        viewpagertab = view.findViewById(R.id.viewpagertabOrder)
         viewPager = view.findViewById(R.id.viewPager3)
         return view
     }
@@ -104,16 +105,30 @@ class CreateOrderFragment : Fragment(){
         TabLayoutMediator(viewpagertab!!, viewPager!!,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
+                //tab.icon = resources.getDrawable(R.drawable.ic_dot)
+                if (position == 1){
+                    tabBadge = tab
+                }
             }).attach()
         viewPager!!.setCurrentItem(0)
 
         viewPager!!.setUserInputEnabled(false)
-
+        viewpagertab!!.isInlineLabel = true
+        /*Log.d("Fragment", "viewpager tab: ${viewpagertab!!.getTabAt(1)!!}")
+        if (viewpagertab!!.getTabAt(1)!!.badge != null){
+            Log.d("Fragment", "viewpager tab 2: ${viewpagertab!!.getTabAt(1)!!.badge}")
+            viewpagertab!!.getTabAt(1)!!.badge!!.number = 3
+        }*/
         for (i in 0 until viewpagertab!!.getTabCount()) {
             val tab = (viewpagertab!!.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(12, 12, 8, 12)
             tab.requestLayout()
+            /*if (i == 1) {
+                val badge = BadgeView(mContext, tab)
+                badge.setText("3")
+                badge.show()
+            }*/
         }
         Log.d("Fragment", "viewpager current Item: " + viewPager!!.getCurrentItem())
         viewPager!!.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -126,6 +141,10 @@ class CreateOrderFragment : Fragment(){
                 } else if (position == 1) {
                     viewPager!!.setCurrentItem(1)
                     ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, userId!!, routeId!!)
+                    /*Log.d("Fragment", "viewpager tab 3: ${viewpagertab!!.getTabAt(1)!!.badge}")
+                    if (viewpagertab!!.getTabAt(1)!!.badge != null){
+                        viewpagertab!!.getTabAt(1)!!.badge!!.number = 3
+                    }*/
                 }
             }
         })
@@ -134,6 +153,7 @@ class CreateOrderFragment : Fragment(){
 
     companion object{
         var viewPager: ViewPager2? = null
+        var tabBadge: TabLayout.Tab? = null
         fun startFragmentWithValue(
             key: String,
             value: Serializable,

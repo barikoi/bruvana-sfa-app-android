@@ -32,8 +32,10 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_confirm_order.*
+import kotlinx.android.synthetic.main.fragment_confirm_order.bodyLayout
 import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
 import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
+import kotlinx.android.synthetic.main.fragment_create_order.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -330,7 +332,18 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     override fun onSuccess(orderArray: JSONArray) {
         progressBar!!.visibility = View.GONE
         orderList.clear()
+        /*val badgeDrawable = CreateOrderFragment.tabBadge!!.orCreateBadge
+        badgeDrawable.number = orderArray.length()
+        badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
+        badgeDrawable.setVisible(true)
+        badgeDrawable.maxCharacterCount = 3*/
+        val badgeDrawable = CreateOrderFragment.tabBadge!!.orCreateBadge
+        badgeDrawable.number = orderArray.length()
+        badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
+        badgeDrawable.setVisible(true)
+        badgeDrawable.maxCharacterCount = 3
         if (orderArray.length() > 0){
+            //viewpagertab!!.getTabAt(1)!!.badge!!.number = 3
             no_route_check.visibility = View.GONE
             bodyLayout.visibility = View.VISIBLE
             for (i in 0 until orderArray.length()){

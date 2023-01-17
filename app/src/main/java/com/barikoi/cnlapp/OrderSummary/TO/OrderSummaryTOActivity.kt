@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.OrderSummary.TO
 
+import android.app.ProgressDialog
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -54,6 +55,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     var customDate: String? = null
     var sowithOrderList: ArrayList<OrdersSO>? = ArrayList()
     val itemList: ArrayList<OrderList> = ArrayList()
+    var pd: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +72,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
         listener = this
         //setDateFilter()
+        pd = ProgressDialog(this)
+        pd!!.setMessage("Processing...")
+        pd!!.setCancelable(false)
 
         btnBack.setOnClickListener {
             onBackPressed()
@@ -314,7 +319,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     try {
                         //Log.d("OrderSummary", "clicked: "+i)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            progressBar5.visibility = View.VISIBLE
+                            //progressBar5.visibility = View.VISIBLE
+                            pd!!.show()
                             Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
                             for (t in 0 until tab_Layout.childCount) {
                                 if (tab_Layout.getChildAt(t).tag == it.tag) {
@@ -349,7 +355,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         }
     }
     private fun getAllOrders(orderArray: JSONArray) {
-        progressBar5.visibility = View.GONE
+        //progressBar5.visibility = View.GONE
         try {
                 itemList.clear()
                 if (orderArray.length() > 0){
@@ -400,7 +406,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     }
                 }
 
-
+                pd!!.dismiss()
                 adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
                 orderList.adapter = adapter
                 adapter!!.notifyDataSetChanged()
