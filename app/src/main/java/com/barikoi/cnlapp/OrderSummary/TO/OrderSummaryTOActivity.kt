@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.OrderSummary.TO
 import android.app.ProgressDialog
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
@@ -11,13 +10,13 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Fragment.RouteFragment
-import com.barikoi.cnlapp.Fragment.ShopListFragment
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
@@ -37,23 +36,24 @@ import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
-    var token : String? = null
-    var user_id : String? = null
-    var sr_id : String? = null
+    var token: String? = null
+    var user_id: String? = null
+    var sr_id: String? = null
     var route_id: String? = null
     var employeeId: String? = ""
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
-    var listener : OnEditOrderListener? =null
+    var listener: OnEditOrderListener? = null
     private var adapter: ConfirmOrderListAdapter? = null
     var StartDate: String? = null
     var EndDate: String? = null
     var customDate: String? = null
     var sowithOrderList: ArrayList<OrdersSO>? = ArrayList()
+    var orderArray: JSONArray? = null
     val itemList: ArrayList<OrderList> = ArrayList()
     var pd: ProgressDialog? = null
 
@@ -85,14 +85,16 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
+
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 adapter!!.filter.filter(s)
-                if (s!!.length == 0){
+                if (s!!.length == 0) {
                     adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
                     orderList.adapter = adapter
                     adapter!!.notifyDataSetChanged()
                 }
             }
+
             override fun afterTextChanged(p0: Editable?) {
 
             }
@@ -102,20 +104,24 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             setDateFilter(spinnerMenu.selectedItemPosition)
         }
 
-        val menuList = arrayOf(resources.getString(R.string.today_summary), resources.getString(R.string.last_week_summary), resources.getString(R.string.custom))
+        val menuList = arrayOf(
+            resources.getString(R.string.today_summary),
+            resources.getString(R.string.last_week_summary),
+            resources.getString(R.string.custom)
+        )
         val adapter = ArrayAdapter(
             applicationContext,
             android.R.layout.simple_spinner_item, menuList
         )
         spinnerMenu.adapter = adapter
-        spinnerMenu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        spinnerMenu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerMenu.adapter.count >0) {
+                if (spinnerMenu.adapter.count > 0) {
                     bodyLayout.visibility = View.GONE
-                    if (p2 == 2){
+                    if (p2 == 2) {
                         //tvDateRange.setText("Select date range")
-                    }else{
+                    } else {
                         setDateFilter(p2)
                     }
                 }
@@ -135,17 +141,17 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
-        if (position == 0){
+        if (position == 0) {
             StartDate = df.format(end)
             EndDate = df.format(end)
             tvDateRange.setText(simpleFormat.format(end))
-            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
-        }else if(position == 1){
+            getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
+        } else if (position == 1) {
             StartDate = df.format(start)
             EndDate = df.format(start)
             tvDateRange.setText(simpleFormat.format(start))
-            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+user_id)
-        }else{
+            getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
+        } else {
             tvDateRange.setText("Select date range")
             tvDateRange.setText(customDate)
         }
@@ -169,6 +175,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
+            pd!!.show()
             spinnerMenu.setSelection(2)
             dateRangeLayout.setEnabled(true)
             summaryLayout2.visibility = View.GONE
@@ -186,21 +193,25 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 customDate = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
             }
 
-            getOrderSummary(Api.get_all_so_list+"?last_week_summary=1&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&to_id="+user_id)
+            getOrderSummary(
+                Api.get_all_so_list + "?last_week_summary=1&start_date=" + df.format(
+                    s_date
+                ) + " 00:00:00" + "&end_date=" + df.format(e_date) + " 23:59:59" + "&to_id=" + user_id
+            )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
     }
 
-    fun getOrderSummary(url: String){
+    fun getOrderSummary(url: String) {
         progressBar4.visibility = View.VISIBLE
         val dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, queue!!, token!!, object :
             ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    if (response != null){
+                    if (response != null) {
                         progressBar4.visibility = View.GONE
                         summaryLayout2.visibility = View.VISIBLE
                         collectionLayout.visibility = View.GONE
@@ -212,29 +223,46 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         val ordersArray = obj.getJSONArray("so_list")
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
                         sowithOrderList!!.clear()
-                        if (ordersArray.length() >0){
-                            for(i in 0 until ordersArray.length()){
+                        if (ordersArray.length() > 0) {
+                            for (i in 0 until ordersArray.length()) {
                                 val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(Pair(Pair(orderObj.getString("sr_name"),orderObj.getString("user_id")), dformat.format(orderObj.getString("so_ordered_value").toDouble())))
+                                itemList.add(
+                                    Pair(
+                                        Pair(
+                                            orderObj.getString("sr_name"),
+                                            orderObj.getString("user_id")
+                                        ),
+                                        dformat.format(
+                                            orderObj.getString("so_ordered_value").toDouble()
+                                        )
+                                    )
+                                )
                                 sowithOrderList!!.add(
                                     OrdersSO(
                                         orderObj.getString("user_id"),
                                         orderObj.getString("sr_name"),
                                         orderObj.getString("productive_outlets"),
                                         orderObj.getString("total_outlets"),
-                                        dformat.format(orderObj.getDouble("total_bounced_amount")).toDouble(),
+                                        dformat.format(orderObj.getDouble("total_bounced_amount"))
+                                            .toDouble(),
                                         orderObj.getJSONArray("orders")
                                     )
                                 )
                             }
-                            if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
-                            if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(obj.getString("sku_per_memo").toDouble()))
-                            if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(obj.getString("number_of_memo").toDouble()))
+                            if (!obj.getString("order_amount").equals("null")) ovCount.setText(
+                                dformat.format(obj.getString("order_amount").toDouble())
+                            )
+                            if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(
+                                dformat.format(obj.getString("sku_per_memo").toDouble())
+                            )
+                            if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(
+                                dformat.format(obj.getString("number_of_memo").toDouble())
+                            )
                             createTableClickable(itemList, tabLayoutOrder)
                         }
 
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
                     bodyLayout.visibility = View.GONE
                     progressBar4.visibility = View.GONE
@@ -276,17 +304,21 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
         })
     }
-    private fun createTableClickable(data: ArrayList<Pair<Pair<String, String>, String>>, tab_Layout: TableLayout) {
+
+    private fun createTableClickable(
+        data: ArrayList<Pair<Pair<String, String>, String>>,
+        tab_Layout: TableLayout
+    ) {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
-        var size : Int = 0
-        if (data.size<5){
+        var size: Int = 0
+        if (data.size < 5) {
             size = data.size
-        }else{
+        } else {
             size = 5
         }
-        if (data.size >0) {
+        if (data.size > 0) {
             for (i in 0 until size) {
                 val tr = TableRow(applicationContext)
                 val tableRowParams = TableLayout.LayoutParams(
@@ -316,36 +348,37 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 tr.addView(c2)
                 //tr.setOnClickListener(this@OrderSummaryTOActivity)
                 tr.setOnClickListener {
+                    pd!!.show()
+                    Log.d("OrderSummary", "pd.isShowing: " + pd!!.isShowing)
+                    bodyLayoutScroll.visibility = View.VISIBLE
+                    collectionLayout.visibility = View.VISIBLE
+                    orderList.removeAllViews()
                     try {
                         //Log.d("OrderSummary", "clicked: "+i)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             //progressBar5.visibility = View.VISIBLE
-                            pd!!.show()
+
                             Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
                             for (t in 0 until tab_Layout.childCount) {
                                 if (tab_Layout.getChildAt(t).tag == it.tag) {
-                                    /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
-                            tab_Layout.getChildAt(t).background.setTint(resources.getColor(R.color.light_yellow))*/
                                     tab_Layout.getChildAt(t)
                                         .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                    orderArray = sowithOrderList!!.get(t).ordersArray
+                                    order_collection_count.setText(sowithOrderList!!.get(t).order_collected + "/" + sowithOrderList!!.get(t).total_outlets)
+                                    total_bounce_count.setText(sowithOrderList!!.get(t).total_bounce.toString())
+                                    getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[t].first.second/*+"&route_id="+routeId*/)
+
+
                                 } else {
-                                    /*tab_Layout.getChildAt(t).background = resources.getDrawable(R.drawable.rounded_corner_lightgray)
-                            tab_Layout.getChildAt(t).background.setTint(resources.getColor(R.color.white))*/
                                     tab_Layout.getChildAt(t)
                                         .setBackgroundColor(resources.getColor(R.color.white))
                                 }
                             }
 
                         }
-                        bodyLayoutScroll.visibility = View.VISIBLE
-                        collectionLayout.visibility = View.VISIBLE
-                        order_collection_count.setText(
-                            sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(i).total_outlets
-                        )
-                        total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
-                        getAllOrders(sowithOrderList!!.get(i).ordersArray)
-                        getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
-                    }catch (e: Exception){
+
+
+                    } catch (e: Exception) {
                         e.printStackTrace()
                         Sentry.captureException(e)
                     }
@@ -353,71 +386,88 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 tab_Layout.addView(tr)
             }
         }
+        pd!!.dismiss()
     }
+
     private fun getAllOrders(orderArray: JSONArray) {
         //progressBar5.visibility = View.GONE
         try {
-                itemList.clear()
-                if (orderArray.length() > 0){
-                    for (i in 0 until orderArray.length()){
-                        //productItems.clear()
-                        val orderObj = orderArray.getJSONObject(i)
-                        val brandArray = orderObj.getJSONArray("products")
-                        val productItems: ArrayList<Products> = ArrayList()
-                        if (brandArray.length() > 0){
-                            for (j in 0 until brandArray.length()){
-                                val brandObj = brandArray.getJSONObject(j)
-                                productItems.add(
-                                    Products(
-                                        brandObj.getString("product_id"),
-                                        brandObj.getString("product_name"),
-                                        "",
-                                        /*brandObj.getString("brand_id"),
-                                        "",*/
-                                        brandObj.getDouble("unit_price"),
-                                        /*0.0,*/"",
-                                        brandObj.getString("unit_name"),
-                                        "",0,0,
-                                        brandObj.getInt("bounced_quantity"),
-                                        brandObj.getInt("ordered_quantity"),
-                                        brandObj.getDouble("ordered_amount")
-                                    )
+            itemList.clear()
+            if (orderArray.length() > 0) {
+                for (i in 0 until orderArray.length()) {
+                    //productItems.clear()
+                    val orderObj = orderArray.getJSONObject(i)
+                    val brandArray = orderObj.getJSONArray("products")
+                    val productItems: ArrayList<Products> = ArrayList()
+                    if (brandArray.length() > 0) {
+                        for (j in 0 until brandArray.length()) {
+                            val brandObj = brandArray.getJSONObject(j)
+                            productItems.add(
+                                Products(
+                                    brandObj.getString("product_id"),
+                                    brandObj.getString("product_name"),
+                                    "",
+                                    /*brandObj.getString("brand_id"),
+                                    "",*/
+                                    brandObj.getDouble("unit_price"),
+                                    /*0.0,*/"",
+                                    brandObj.getString("unit_name"),
+                                    "", 0, 0,
+                                    brandObj.getInt("bounced_quantity"),
+                                    brandObj.getInt("ordered_quantity"),
+                                    brandObj.getDouble("ordered_amount")
                                 )
-                            }
-                        }
-                        itemList.add(
-                            OrderList(
-                                null,
-                                orderObj.getString("order_no"),
-                                orderObj.getString("ordered_at"),
-                                orderObj.getString("order_status"),
-                                orderObj.getString("outlet_id"),
-                                orderObj.getString("outlet_name"),
-                                "",
-                                "",
-                                /*orderObj.getString("distributor_office_code"),*/
-                                orderObj.getString("total_ordered_amount"),
-                                orderObj.getString("total_ordered_quantity"),
-                                orderObj.getString("latitude"),
-                                orderObj.getString("longitude"),
-                                productItems
                             )
-                        )
+                        }
                     }
+                    itemList.add(
+                        OrderList(
+                            null,
+                            orderObj.getString("order_no"),
+                            orderObj.getString("ordered_at"),
+                            orderObj.getString("order_status"),
+                            orderObj.getString("outlet_id"),
+                            orderObj.getString("outlet_name"),
+                            "",
+                            "",
+                            /*orderObj.getString("distributor_office_code"),*/
+                            orderObj.getString("total_ordered_amount"),
+                            orderObj.getString("total_ordered_quantity"),
+                            orderObj.getString("latitude"),
+                            orderObj.getString("longitude"),
+                            productItems
+                        )
+                    )
                 }
+            }
+            adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
+            orderList.adapter = adapter
+            adapter!!.notifyDataSetChanged()
 
-                pd!!.dismiss()
-                adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
-                orderList.adapter = adapter
-                adapter!!.notifyDataSetChanged()
+            orderList
+                .getViewTreeObserver()
+                .addOnGlobalLayoutListener(
+                    object : OnGlobalLayoutListener {
+                        override fun onGlobalLayout() {
+                            // At this point the layout is complete and the
+                            // dimensions of recyclerView and any child views
+                            // are known.
+                            /*orderList
+                                .getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this)*/
+                            pd!!.dismiss()
+                        }
+                    })
 
-        }catch (e: Exception){
+
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     private fun getSummaryTargets(url: String) {
-        progressBarHome.visibility = View.VISIBLE
+        pd!!.show()
+        //progressBarHome.visibility = View.VISIBLE
         var total_target = "--:--"
         var total_target_completed = "--:--"
         var lpc = "--:--"
@@ -435,43 +485,80 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         var bounce_completed = "--:--"
         var bounced = "--:--"
         var dformat = DecimalFormat("#.##")
-        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
+        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    if (response != null){
+                    if (response != null) {
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
                         progressBarHome.visibility = View.GONE
                         summaryLayout.visibility = View.VISIBLE
 
-                        if (completedArray.length() > 0){
-                            for (i in 0 until completedArray.length()){
-                                val targetObj =completedArray.getJSONObject(i)
-                                if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
-                                if(!targetObj.isNull("ads")) ads_completed = dformat.format(targetObj.getString("ads").toDouble())
-                                if(!targetObj.isNull("rds")) rds_completed = dformat.format(targetObj.getString("rds").toDouble())
-                                if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
-                                if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
-                                if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
-                                if(!targetObj.isNull("bounce_quantity_percentage")) bounce_completed = dformat.format(targetObj.getString("bounce_quantity_percentage").toDouble())
+                        if (completedArray.length() > 0) {
+                            for (i in 0 until completedArray.length()) {
+                                val targetObj = completedArray.getJSONObject(i)
+                                if (!targetObj.isNull("revenue")) total_target_completed =
+                                    Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                if (!targetObj.isNull("ads")) ads_completed =
+                                    dformat.format(targetObj.getString("ads").toDouble())
+                                if (!targetObj.isNull("rds")) rds_completed =
+                                    dformat.format(targetObj.getString("rds").toDouble())
+                                if (!targetObj.isNull("sku_per_memo")) bpc_completed =
+                                    dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if (!targetObj.isNull("number_of_memo")) lpc_completed =
+                                    dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if (!targetObj.isNull("number_of_visits")) visit_completed =
+                                    dformat.format(
+                                        targetObj.getString("number_of_visits").toDouble()
+                                    )
+                                if (!targetObj.isNull("aiv")) aiv_completed =
+                                    dformat.format(targetObj.getString("aiv").toDouble())
+                                if (!targetObj.isNull("bounce_quantity_percentage")) bounce_completed =
+                                    dformat.format(
+                                        targetObj.getString("bounce_quantity_percentage").toDouble()
+                                    )
                             }
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        itemList.add(Pair(resources.getString(R.string.total_target), total_target_completed))
+                        itemList.add(
+                            Pair(
+                                resources.getString(R.string.total_target),
+                                total_target_completed
+                            )
+                        )
                         itemList.add(Pair(resources.getString(R.string.ads), ads_completed))
                         itemList.add(Pair(resources.getString(R.string.rds), rds_completed))
-                        itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_completed))
+                        itemList.add(
+                            Pair(
+                                resources.getString(R.string.sku_per_memo),
+                                bpc_completed
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                resources.getString(R.string.number_of_memo),
+                                lpc_completed
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                resources.getString(R.string.visit_ratio),
+                                visit_completed
+                            )
+                        )
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
-                        itemList.add(Pair(resources.getString(R.string.bounce)+" (%)", bounce_completed))
+                        itemList.add(
+                            Pair(
+                                resources.getString(R.string.bounce) + " (%)",
+                                bounce_completed
+                            )
+                        )
 
                         createTable(itemList, tabLayoutTarget)
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
                     progressBarHome.visibility = View.GONE
                 }
@@ -503,7 +590,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         tabLayout.isStretchAllColumns = true
         tabLayout.bringToFront()
         tabLayout.removeAllViews()
-        if (data.size >0) {
+        if (data.size > 0) {
             //bodyLayoutScroll.scrollTo(0, 0)
             bodyLayoutScroll.smoothScrollTo(0, 0)
             for (i in 0 until data.size) {
@@ -521,7 +608,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 tabLayout.addView(tr)
             }
         }
+        getAllOrders(orderArray!!)
     }
+
     override fun onEdit(order: OrderList) {
 
     }

@@ -295,6 +295,7 @@ class HomeTOFragment : Fragment() {
 
     }
     private fun setActiveInactiveView() {
+        layoutSecond.visibility = View.VISIBLE
         val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 16f
