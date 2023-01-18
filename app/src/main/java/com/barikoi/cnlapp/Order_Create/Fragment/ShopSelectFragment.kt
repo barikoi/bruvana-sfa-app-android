@@ -43,6 +43,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     var spinner : MoreSpinner? = null
     var user_id : String? = null
     var sr_id : String? = null
+    var routeId: String ? = null
+    var token: String ? = null
     var listener: OnSelectListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ShopSelectAdapter? = null
@@ -560,9 +562,10 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
-        //token = prefs.getString("token", "")
+        token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         sr_id = prefs!!.getString(Api.SR_CODE, "")
+        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         mContext = context
         listener = this
         appDatabase = AppDatabase.getInstance(context)
@@ -578,5 +581,11 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         editor!!.commit()
         appDatabase!!.saveOrderDao().deleteByShop(shop.shop_id)
         CreateOrderFragment.startFragmentWithValue("Shop", shop, ProductSelectFragment(), ACTIVITY)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Order", "onResume Shop Select")
+        ConfirmOrderFragment.checkforOrders(queue!!, token!!, user_id!!, routeId!!)
     }
 }

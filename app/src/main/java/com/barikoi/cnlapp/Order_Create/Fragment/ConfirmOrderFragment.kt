@@ -330,19 +330,15 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     }
 
     override fun onSuccess(orderArray: JSONArray) {
-        progressBar!!.visibility = View.GONE
-        orderList.clear()
-        /*val badgeDrawable = CreateOrderFragment.tabBadge!!.orCreateBadge
-        badgeDrawable.number = orderArray.length()
-        badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
-        badgeDrawable.setVisible(true)
-        badgeDrawable.maxCharacterCount = 3*/
         val badgeDrawable = CreateOrderFragment.tabBadge!!.orCreateBadge
-        badgeDrawable.number = orderArray.length()
-        badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
-        badgeDrawable.setVisible(true)
-        badgeDrawable.maxCharacterCount = 3
+
         if (orderArray.length() > 0){
+            badgeDrawable.number = orderArray.length()
+            badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
+            badgeDrawable.setVisible(true)
+            badgeDrawable.maxCharacterCount = 3
+            progressBar!!.visibility = View.GONE
+            orderList.clear()
             //viewpagertab!!.getTabAt(1)!!.badge!!.number = 3
             no_route_check.visibility = View.GONE
             bodyLayout.visibility = View.VISIBLE
@@ -402,7 +398,9 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         }else{
             no_route_check.visibility = View.VISIBLE
             bodyLayout.visibility = View.GONE
-
+            badgeDrawable.setVisible(false)
+            progressBar!!.visibility = View.GONE
+            orderList.clear()
             btn_tryAgain.setOnClickListener {
                 checkforOrders(queue!!, token!!, user_id!!, route_id!!/*, mCallback!!*/)
             }
@@ -430,4 +428,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         TODO("Not yet implemented")
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d("Order", "onResume Confirm")
+    }
 }

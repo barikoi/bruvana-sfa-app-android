@@ -14,7 +14,7 @@ android {
         versionCode 1
         multiDexEnabled true
         flavorDimensions "default"
-
+        resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

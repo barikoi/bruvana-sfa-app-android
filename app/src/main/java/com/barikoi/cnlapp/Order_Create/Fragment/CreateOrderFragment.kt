@@ -263,5 +263,9 @@ class CreateOrderFragment : Fragment(){
             })
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d("Order", "onResume")
+    }
 
 }
