@@ -80,7 +80,7 @@ class HomeTOFragment : Fragment() {
     }
     private fun checkforAttendanceToday() {
         val today = Calendar.getInstance().time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
             Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
             mQueue!!, token!!, object : ApiServiceListener {
@@ -155,8 +155,8 @@ class HomeTOFragment : Fragment() {
         c.set(Calendar.DAY_OF_MONTH, 1)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("LLL dd", Locale.ENGLISH)
         tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         val StartDate = df.format(start)
         val EndDate = df.format(end)
@@ -307,7 +307,7 @@ class HomeTOFragment : Fragment() {
         inactiveLayout.setBackgroundDrawable(gd2)
 
         val today = Calendar.getInstance().time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
             Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today)+"&with_active_inactive_so=1", mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
@@ -357,7 +357,7 @@ class HomeTOFragment : Fragment() {
     private fun setLiveStockView() {
         val itemList: ArrayList<Pair<String, String>> = ArrayList()
         val today = Calendar.getInstance().time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(Api.all_product_list+"?start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&with_stock=1&territory_id="+territoryId, mQueue!!, token!!, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
                 try {

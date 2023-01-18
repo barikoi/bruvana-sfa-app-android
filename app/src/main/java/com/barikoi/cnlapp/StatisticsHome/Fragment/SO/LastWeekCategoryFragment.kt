@@ -64,7 +64,7 @@ class LastWeekCategoryFragment : Fragment() {
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
         getSummaryCategory(Api.get_last_week_category+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+"&user_id="+userId+"&route_id="+routeId)

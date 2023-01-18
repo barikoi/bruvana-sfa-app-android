@@ -196,7 +196,7 @@ class CreateOrderFragment : Fragment(){
 
     private fun checkforAttendanceToday() {
         val today = Calendar.getInstance().time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
             Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
             mQueue!!, token!!, object : ApiServiceListener {

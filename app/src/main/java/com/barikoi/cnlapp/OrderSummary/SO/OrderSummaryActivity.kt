@@ -108,8 +108,8 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
         StartDate = df.format(start)
         EndDate = df.format(end)
 

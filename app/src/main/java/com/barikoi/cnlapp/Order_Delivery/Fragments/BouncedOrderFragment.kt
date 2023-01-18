@@ -408,7 +408,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), object :
                 DialogListener {
                 override fun onConfirmed() {
-                    val status = itemValue.get(isChecked).uppercase(Locale.getDefault())
+                    val status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
                     if (order.orderStatus.equals(status, true)){
                         Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT).show()
                     }else{

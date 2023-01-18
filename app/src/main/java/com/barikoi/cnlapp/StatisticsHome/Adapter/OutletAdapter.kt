@@ -39,7 +39,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         holder.divider.visibility = View.VISIBLE
         if (!item.category.equals("null", true) && item.category.length> 0){
             holder.tvCategory.visibility = View.VISIBLE
-            holder.tvCategory.setText(item.category.get(0).toString().uppercase(Locale.getDefault()))
+            holder.tvCategory.setText(item.category.get(0).toString().uppercase(Locale.ENGLISH))
         }else{
             holder.tvCategory.visibility = View.GONE
         }

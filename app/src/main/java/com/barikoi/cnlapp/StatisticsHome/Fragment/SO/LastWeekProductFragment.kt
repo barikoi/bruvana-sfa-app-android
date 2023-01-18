@@ -61,7 +61,7 @@ class LastWeekProductFragment : Fragment() {
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
         getSummaryProducts(Api.all_product_list + "?user_id=" + userId + "&route_id=" + routeId + "&with_last_week_order=1")

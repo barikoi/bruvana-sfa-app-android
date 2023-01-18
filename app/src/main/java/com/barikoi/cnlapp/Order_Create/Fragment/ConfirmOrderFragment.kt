@@ -82,7 +82,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     companion object{
         var mCallback: OrderListSuccessListener? = ConfirmOrderFragment()
         fun checkforOrders(queue: RequestQueue, token: String, user_id: String, route_id: String/*, listener: OrderListSuccessListener*/) {
-            val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             if (mCallback!= null) {
                 getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=SAVED", queue, token, mCallback!!)
@@ -198,7 +198,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
     private fun createOrder(){
         if (orderList.size> 0){
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time

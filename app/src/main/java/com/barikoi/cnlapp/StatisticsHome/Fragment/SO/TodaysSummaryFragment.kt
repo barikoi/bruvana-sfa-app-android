@@ -60,7 +60,7 @@ class TodaysSummaryFragment : Fragment() {
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
         getSummaryTargets(Api.get_summary+"?today_summary=1&user_id="+userId+"&route_id="+routeId)

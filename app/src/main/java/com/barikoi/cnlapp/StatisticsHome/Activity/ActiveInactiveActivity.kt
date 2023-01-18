@@ -61,7 +61,7 @@ class ActiveInactiveActivity : AppCompatActivity() {
     private fun getListSO(status: String?) {
         val itemList : ArrayList<ActiveInactiveSO> = ArrayList()
         val today = Calendar.getInstance().time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
             Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today)+"&with_active_inactive_so=1", queue!!, token!!, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {

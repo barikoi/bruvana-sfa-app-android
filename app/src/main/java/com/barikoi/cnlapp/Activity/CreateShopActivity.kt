@@ -812,7 +812,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
 
         if (inputOk) {
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
             var imagesList = ArrayList<Images>()

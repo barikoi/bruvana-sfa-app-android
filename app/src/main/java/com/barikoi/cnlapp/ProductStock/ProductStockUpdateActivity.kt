@@ -55,7 +55,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
         c.set(Calendar.DAY_OF_MONTH, 1);
         val end = Calendar.getInstance().time
         val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         //val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)

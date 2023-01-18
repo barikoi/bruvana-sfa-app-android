@@ -70,7 +70,7 @@ class HomeFragment : Fragment() {
 
     private fun checkforAttendanceToday() {
         val today = Calendar.getInstance().time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
             mQueue!!, token!!, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {
@@ -150,8 +150,8 @@ class HomeFragment : Fragment() {
         val end = Calendar.getInstance().time
         val start = c.time
         //val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("LLL dd", Locale.ENGLISH)
         tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         val StartDate = df.format(start)
         val EndDate = df.format(end)

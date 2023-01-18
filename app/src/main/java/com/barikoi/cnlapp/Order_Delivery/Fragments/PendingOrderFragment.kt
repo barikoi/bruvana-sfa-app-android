@@ -416,7 +416,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             updatedProducts!![i].quantity = 0
                         }
                     }else{
-                        status = itemValue.get(isChecked).uppercase(Locale.getDefault())
+                        status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
                     }
 
                     if (order.orderStatus.equals(status, true)){
@@ -463,7 +463,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             var deliveredAmount = 0.0
             var bouncedQuantity = 0
             var bouncedAmount = 0.0
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time

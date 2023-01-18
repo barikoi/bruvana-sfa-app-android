@@ -67,10 +67,10 @@ import java.util.concurrent.Executors
 
 class CreateAttendanceFragment : Fragment() {
 
-    private val _sdfWatchTime = SimpleDateFormat("HH:mm")
-    private val _sdfWatchDay = SimpleDateFormat("EEEE")
-    private val _sdfWatchDate = SimpleDateFormat("MMMM dd")
-    private val _sdfWatchYear = SimpleDateFormat("yyyy")
+    private val _sdfWatchTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+    private val _sdfWatchDay = SimpleDateFormat("EEEE", Locale.ENGLISH)
+    private val _sdfWatchDate = SimpleDateFormat("MMMM dd", Locale.ENGLISH)
+    private val _sdfWatchYear = SimpleDateFormat("yyyy", Locale.ENGLISH)
     lateinit var ACTIVITY: MainActivity
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null

@@ -503,7 +503,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     private fun createImageFile(task_id: String?): File {
         // Create an image file name
         Log.d("ImagePicker", "TaskId 3: $task_id")
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
         //        String imageFileName = "JPEG_" + timeStamp + "_";
         val imageFileName = "Task" + task_id + "_" + timeStamp + "_"
         /*val image = File(

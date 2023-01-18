@@ -502,7 +502,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun updateOrder(location: Location) {
         if (addedProducts!!.size > 0) {
             var deliveredQuantity = 0
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time
@@ -617,7 +617,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun submitOrder(location: Location) {
         if (addedProducts!!.size > 0) {
             var deliveredQuantity = 0
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time

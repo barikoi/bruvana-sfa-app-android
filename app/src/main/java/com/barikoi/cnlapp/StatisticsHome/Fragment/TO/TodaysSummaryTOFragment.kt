@@ -67,8 +67,8 @@ class TodaysSummaryTOFragment : Fragment() {
             c.add(Calendar.DAY_OF_WEEK, -7)
             val end = Calendar.getInstance().time
             val start = c.time
-            val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
+            val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+            val simpleFormat = SimpleDateFormat("LLL dd", Locale.ENGLISH)
             //tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
             val StartDate = df.format(start)
             val EndDate = df.format(end)
