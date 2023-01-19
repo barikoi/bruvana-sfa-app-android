@@ -1,6 +1,7 @@
 package com.barikoi.cnlapp.OrderSummary.TO
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -215,7 +216,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         progressBar4.visibility = View.GONE
                         summaryLayout2.visibility = View.VISIBLE
                         collectionLayout.visibility = View.GONE
-                        summaryLayout.visibility = View.GONE
+                        targetLayout.visibility = View.GONE
                         bodyLayoutScroll.visibility = View.GONE
                         tryAgain2.visibility = View.GONE
                         bodyLayout.visibility = View.VISIBLE
@@ -267,7 +268,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     bodyLayout.visibility = View.GONE
                     progressBar4.visibility = View.GONE
                     summaryLayout2.visibility = View.GONE
-                    summaryLayout.visibility = View.GONE
+                    targetLayout.visibility = View.GONE
                     bodyLayoutScroll.visibility = View.GONE
                     collectionLayout.visibility = View.GONE
                     tryAgain2.visibility = View.VISIBLE
@@ -287,7 +288,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 ViewUtils.getErrorResponse(error, applicationContext)
                 progressBar4.visibility = View.GONE
                 summaryLayout2.visibility = View.GONE
-                summaryLayout.visibility = View.GONE
+                targetLayout.visibility = View.GONE
                 collectionLayout.visibility = View.GONE
                 bodyLayout.visibility = View.GONE
                 bodyLayoutScroll.visibility = View.GONE
@@ -346,42 +347,47 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
                 tr.addView(c1)
                 tr.addView(c2)
-                //tr.setOnClickListener(this@OrderSummaryTOActivity)
+
                 tr.setOnClickListener {
-                    pd!!.show()
                     Log.d("OrderSummary", "pd.isShowing: " + pd!!.isShowing)
-                    bodyLayoutScroll.visibility = View.VISIBLE
-                    collectionLayout.visibility = View.VISIBLE
-                    orderList.removeAllViews()
-                    try {
-                        //Log.d("OrderSummary", "clicked: "+i)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            //progressBar5.visibility = View.VISIBLE
+                    bodyLayoutScroll.visibility = View.GONE
+                    collectionLayout.visibility = View.GONE
+                    targetLayout.visibility = View.GONE
+                    orderList.visibility = View.GONE
+                    pd!!.show()
+                    Thread {
+                        this@OrderSummaryTOActivity.runOnUiThread(object : Runnable{
+                            override fun run() {
+                                try {
+                                    orderArray = sowithOrderList!!.get(i).ordersArray
+                                    bodyLayoutScroll.visibility = View.VISIBLE
+                                    collectionLayout.visibility = View.VISIBLE
+                                    order_collection_count.setText(sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(i).total_outlets)
+                                    total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
+                                    getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
+                                        for (t in 0 until tab_Layout.childCount) {
+                                            if (tab_Layout.getChildAt(t).tag == it.tag) {
+                                                tab_Layout.getChildAt(t)
+                                                    .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                            } else {
+                                                tab_Layout.getChildAt(t)
+                                                    .setBackgroundColor(resources.getColor(R.color.white))
+                                            }
+                                        }
+                                    }
 
-                            Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
-                            for (t in 0 until tab_Layout.childCount) {
-                                if (tab_Layout.getChildAt(t).tag == it.tag) {
-                                    tab_Layout.getChildAt(t)
-                                        .setBackgroundColor(resources.getColor(R.color.light_yellow))
-                                    orderArray = sowithOrderList!!.get(t).ordersArray
-                                    order_collection_count.setText(sowithOrderList!!.get(t).order_collected + "/" + sowithOrderList!!.get(t).total_outlets)
-                                    total_bounce_count.setText(sowithOrderList!!.get(t).total_bounce.toString())
-                                    getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[t].first.second/*+"&route_id="+routeId*/)
-
-
-                                } else {
-                                    tab_Layout.getChildAt(t)
-                                        .setBackgroundColor(resources.getColor(R.color.white))
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    Sentry.captureException(e)
                                 }
                             }
 
-                        }
+                        })
+                    }.start()
 
 
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Sentry.captureException(e)
-                    }
                 }
                 tab_Layout.addView(tr)
             }
@@ -440,6 +446,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     )
                 }
             }
+            orderList.visibility = View.VISIBLE
             adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
             orderList.adapter = adapter
             adapter!!.notifyDataSetChanged()
@@ -452,10 +459,10 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                             // At this point the layout is complete and the
                             // dimensions of recyclerView and any child views
                             // are known.
-                            /*orderList
-                                .getViewTreeObserver()
-                                .removeOnGlobalLayoutListener(this)*/
                             pd!!.dismiss()
+                            orderList
+                                .getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this)
                         }
                     })
 
@@ -466,7 +473,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     }
 
     private fun getSummaryTargets(url: String) {
-        pd!!.show()
+        //pd!!.show()
         //progressBarHome.visibility = View.VISIBLE
         var total_target = "--:--"
         var total_target_completed = "--:--"
@@ -493,8 +500,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
                         progressBarHome.visibility = View.GONE
-                        summaryLayout.visibility = View.VISIBLE
-
+                        targetLayout.visibility = View.VISIBLE
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
@@ -561,6 +567,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 } catch (e: Exception) {
                     e.printStackTrace()
                     progressBarHome.visibility = View.GONE
+                    getAllOrders(orderArray!!)
                 }
 
             }
@@ -576,10 +583,12 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
                 progressBarHome.visibility = View.GONE
+                getAllOrders(orderArray!!)
             }
 
             override fun onException(e: Exception) {
                 progressBarHome.visibility = View.GONE
+                getAllOrders(orderArray!!)
             }
 
         })

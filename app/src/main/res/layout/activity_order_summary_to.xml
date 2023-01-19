@@ -489,14 +489,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_corner_lightgray"
-                        android:backgroundTint="@color/white">
+                        android:backgroundTint="@color/white"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:id="@+id/summaryLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="gone">
+                            >
 
                             <TableLayout
                                 android:id="@+id/tabLayoutTarget"
