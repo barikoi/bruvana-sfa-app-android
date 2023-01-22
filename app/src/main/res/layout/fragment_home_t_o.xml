@@ -270,7 +270,7 @@
                         android:layout_alignParentTop="true"
                         app:tabBackground="@drawable/tab_indicator_bg_gray"
                         app:tabMinWidth="120dp"
-                        app:tabMode="scrollable"
+                        app:tabMode="fixed"
                         app:tabSelectedTextColor="@color/white"
                         app:tabTextColor="@color/text_title" />
 

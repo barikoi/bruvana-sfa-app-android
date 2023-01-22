@@ -212,6 +212,7 @@ class CreateAttendanceFragment : Fragment() {
                 if(fileExist) {
                     try {
                         var bitmap = imagepicker.getRotateImage(dbPhotoPath)
+                        isImageAdded = true
                         imagepicker.setLocalImage(bitmap, dbPhotoPath, imageList[p]!!.position, "", "Attendance")
                     } catch (e:Exception ) {
                         e.printStackTrace()
