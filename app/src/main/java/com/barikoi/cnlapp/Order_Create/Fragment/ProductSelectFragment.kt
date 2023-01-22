@@ -518,7 +518,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("employee_id", sr_id)
             /*orderObj.put("ordered_at", today)
             orderObj.put("delivered_at", nextDay)*/
-            orderObj.put("total_ordered_quantity", grandTotalPrice.toString())
+            orderObj.put("total_ordered_amount", grandTotalPrice.toString())
             orderObj.put("total_ordered_quantity", totalCount.toString())
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
