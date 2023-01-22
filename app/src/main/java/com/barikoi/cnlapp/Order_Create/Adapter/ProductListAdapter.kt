@@ -90,9 +90,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                 /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = subtotal.toString()*/
                 productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-                productList[position].ordered_total_price = dformat.format(
-                    productList[position].unit_price * holder.productCount.text.toString().toInt()
-                ).toDouble()
+                productList[position].ordered_total_price = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 productList[position].stock_available = productList[position].stock_available - 1
                 holder.stockAvailable.text =
                     productList[position].stock_available.toString() + " in stock"
@@ -145,12 +143,9 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                 /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = subtotal.toString()*/
                 productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-                productList[position].ordered_total_price = dformat.format(
-                    productList[position].unit_price * holder.productCount.text.toString().toInt()
-                ).toDouble()
+                productList[position].ordered_total_price = productList[position].unit_price * holder.productCount.text.toString().toInt()
                 productList[position].stock_available = productList[position].stock_available + 1
-                holder.stockAvailable.text =
-                    productList[position].stock_available.toString() + " in stock"
+                holder.stockAvailable.text = productList[position].stock_available.toString() + " in stock"
                 val prodList = appDatabase!!.saveOrderDao()
                     .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
                 if (prodList!!.size > 0) {
@@ -191,7 +186,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                             .toInt()
                     holder.tvSubtoal.text = dformat.format(subtotal).toString()
 
-                    productList[position].ordered_total_price = dformat.format(subtotal).toDouble()
+                    productList[position].ordered_total_price = subtotal
                     productList[position].ordered_quantity =
                         holder.productCount.text.toString().toInt()
 
