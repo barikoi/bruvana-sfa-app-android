@@ -22,7 +22,7 @@ class TargetAdapter (val targets: List<TargetValue>, val from: String) : Recycle
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
+        holder.setIsRecyclable(false)
         holder.tvTitle.setText(targets[position].title)
         holder.targetedAmount.setText(targets[position].target)
         holder.completedAmount.setText(targets[position].completed)

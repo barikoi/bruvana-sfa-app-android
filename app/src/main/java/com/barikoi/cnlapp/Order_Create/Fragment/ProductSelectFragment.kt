@@ -141,7 +141,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     } else {
                         totalItemCount!!.setText(itemCountt.toString() + "Items")
                     }
-                    tvgrandTotal!!.setText("Total " + dformat.format(selectedOrder!!.grandTotal))
+                    tvgrandTotal!!.setText("Total " + dformat.format(selectedOrder!!.grandTotal.toDouble()))
                     appDatabase!!.saveOrderDao().insertAll(
                         SaveOrder(
                             null,

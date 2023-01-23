@@ -491,6 +491,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         var visited = "--:--"
         var bounce_completed = "--:--"
         var bounced = "--:--"
+        var delivery_value = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
@@ -524,6 +525,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                     dformat.format(
                                         targetObj.getString("bounce_quantity_percentage").toDouble()
                                     )
+                                if(!targetObj.isNull("delivered_value")) delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
                             }
                         }
 
@@ -561,6 +563,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                 bounce_completed
                             )
                         )
+                        itemList.add(Pair(resources.getString(R.string.delivery_value), delivery_value))
 
                         createTable(itemList, tabLayoutTarget)
                     }
