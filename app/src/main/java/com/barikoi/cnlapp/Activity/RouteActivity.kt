@@ -41,12 +41,15 @@ class RouteActivity : AppCompatActivity() {
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     private var token: String? = ""
-    private var userId: String? = ""
+
     private var srCode: String? = ""
     var selected_so : Int? = null
     private var tvTitle: TextView? = null
     val soList: ArrayList<SOList> = ArrayList()
     private var back_img: ImageButton? = null
+    companion object{
+        var userId: String? = ""
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

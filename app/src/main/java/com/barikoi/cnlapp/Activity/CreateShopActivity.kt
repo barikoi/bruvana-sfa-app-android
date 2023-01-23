@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -12,6 +13,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
@@ -25,9 +27,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
-import com.android.volley.NetworkResponse
-import com.android.volley.RequestQueue
-import com.android.volley.VolleyError
+import com.android.volley.*
+import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
@@ -57,6 +58,10 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
+import kotlinx.android.synthetic.main.activity_create_shop.imagepicker
+import kotlinx.android.synthetic.main.activity_create_shop.spinnerRoutes
+import kotlinx.android.synthetic.main.fragment_create_attendance.*
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.net.URLEncoder
@@ -65,6 +70,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
     private var mapView: MapView? = null
@@ -91,6 +97,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var selectedCategory: String? = ""
     private var selectedMarketOpportunity: String? = ""
     private var selectedBuyer: Int? = -1
+
+    var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
+    var routesList : java.util.ArrayList<String>? = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,7 +131,18 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         imagepicker.setMainactivity(this@CreateShopActivity)
         imagepicker.setCameraLauncher(startCamera)
 
-        getRoutes()
+        routesList = intent.getStringArrayListExtra("routes")
+        routeNameList = intent.getParcelableArrayListExtra<Parcelable>("routeList") as java.util.ArrayList<Pair<String, String>>
+
+        if (routesList!!.size > 0){
+            routesList!!.add(0, resources.getString(R.string.select_route))
+            routeNameList!!.add(0, Pair(
+                "",
+                resources.getString(R.string.select_route)
+            ))
+            setRoutes(routesList!!, routeNameList!!)
+        }
+        //getRoutes()
         getShopType()
         getShopCategory()
         getMarketOpportunity()
@@ -132,9 +152,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
 
         btnBack.setOnClickListener {
-            onBackPressed()
             setResult(55)
             finish()
+            onBackPressed()
         }
 
         locationMap.setOnClickListener {
@@ -163,6 +183,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     if (latitude!! > 0.0 && longitude!! > 0.0) {
                         etLatitude.setText(dformat.format(latitude).toString())
                         etLongitude.setText(dformat.format(longitude).toString())
+                        reverseGeoAddress(applicationContext, latitude!!, longitude!!)
                     }
                     dialog.dismiss()
                     mapView!!.onStop()
@@ -407,6 +428,76 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 }
 
             })
+    }
+
+    fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>){
+        if (spinnerRoutes != null) {
+            if (spinnerRoutes.adapter == null) {
+                val adapter = object : ArrayAdapter<String>(
+                    applicationContext,
+                    android.R.layout.simple_spinner_item, routesList
+                ) {
+                    override fun isEnabled(position: Int): Boolean {
+                        return position != 0
+                    }
+
+                    override fun getDropDownView(
+                        position: Int,
+                        convertView: View?,
+                        parent: ViewGroup
+                    ): View {
+                        val view: TextView = super.getDropDownView(
+                            position,
+                            convertView,
+                            parent
+                        ) as TextView
+                        //set the color of first item in the drop down list to gray
+                        if (position == 0) {
+                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                            view.visibility = View.GONE
+                        } else {
+                            //here it is possible to define color for other items by
+                            //view.setTextColor(Color.RED)
+                            view.setTextColor(resources.getColor(R.color.black))
+                        }
+                        return view
+                    }
+                }
+                spinnerRoutes.adapter = adapter
+            }
+
+            spinnerRoutes.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        p0: AdapterView<*>?,
+                        p1: View?,
+                        p2: Int,
+                        p3: Long
+                    ) {
+                        if (p2 > 0) {
+                            val view1: TextView =
+                                p0!!.getChildAt(0) as TextView
+                            view1.setTextColor(resources.getColor(R.color.black))
+                            if (routeNameList[p2].first.length > 0) {
+                                selectedRoute = routeNameList[p2].first
+                            } else {
+                                selectedRoute = ""
+                            }
+                        } else {
+                            val view1: TextView =
+                                p0!!.getChildAt(0) as TextView
+                            view1.setTextColor(resources.getColor(R.color.text_title_2))
+                            selectedRoute = ""
+                        }
+                    }
+
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                    }
+
+                }
+
+        }
     }
 
     fun getShopType() {
@@ -912,12 +1003,47 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }else{
             btnSubmitShop.isEnabled = true
         }
-        /*else {
-            if (!isImageAdded) {
-                Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
-                    .show()
+    }
+
+    fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
+        try {
+            val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
+            val request: StringRequest = object : StringRequest(
+                Method.GET,
+                Api.reverseGeo + "?key=" +Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+                Response.Listener { response: String? ->
+                    try {
+                        val data = JSONObject(response)
+                        val place = JSONObject(data.getString("place"))
+                        var address = ""
+                        if (!place.getString("address").equals("null")) {
+                            address = place.getString("address")
+                        }
+                        val city = place.getString("city")
+                        val area = place.getString("area")
+                        //address[0] = jsonArray.getJSONObject(0).getString("Address");
+                        etAddress.setText(address+", "+area+", "+city)
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        Sentry.captureException(e)
+                    }
+                },
+                Response.ErrorListener { error: VolleyError ->
+                    Sentry.captureException(error)
+                    Log.d("MainActivity", "Error: " + error.message)
+                }) {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params: MutableMap<String, String> = HashMap()
+                    params["Accept"] = "application/json"
+                    return params
+                }
             }
-        }*/
+            queue.add(request)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Sentry.captureException(e)
+        }
     }
 
     @SuppressLint("MissingPermission")

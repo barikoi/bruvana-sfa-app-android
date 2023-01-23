@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
@@ -25,6 +26,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
+import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
@@ -61,6 +63,7 @@ class ShopListFragment : Fragment() {
         spinner = view.findViewById(R.id.spinnerRoutes)
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
+        btncreateShop = view.findViewById(R.id.createShop)
         adapter = ShopListAdapter(ArrayList<Shops>())
         recylerView!!.adapter = adapter
 
@@ -132,23 +135,30 @@ class ShopListFragment : Fragment() {
         createShop.setBackgroundDrawable(gd)
 
         createShop.setOnClickListener {
-            startActivityResult.launch(
-                Intent(
-                    requireActivity(),
-                    CreateShopActivity::class.java
-                ).putExtra("requestCode", 55)
-            )
+            if (routesList!!.size> 0) {
+                startActivityResult.launch(
+                    Intent(requireActivity(), CreateShopActivity::class.java)
+                        .putExtra("requestCode", 55)
+                        .putStringArrayListExtra("routes", routesList)
+                        .putExtra("routeList", routeNameList)
+                )
+            }else{
+                Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            if (result.getResultCode() == Activity.RESULT_OK) {
+            /*if (result.getResultCode() == Activity.RESULT_OK) {
                 val intent = result.data
                 if (intent!!.getIntExtra("requestCode", 0) == 55) {
                     getShopList(userId!!)
                 }
+            }*/
+            if (result.getResultCode() == 55) {
+                getShopList(RouteActivity.userId!!)
             }
         }
     )
@@ -156,12 +166,14 @@ class ShopListFragment : Fragment() {
     companion object {
         var routesList: ArrayList<String>? = ArrayList()
         var allRouteList: ArrayList<Routes>? = ArrayList()
+        var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
         var shopList: ArrayList<Shops>? = ArrayList()
         var recylerView: RecyclerView? = null
         var progressBar2: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
         var spinner: MoreSpinner? = null
+        var btncreateShop: AppCompatButton? = null
         var et_search: AutoCompleteTextView? = null
 
         fun getShopList(userId: String) {
@@ -181,6 +193,7 @@ class ShopListFragment : Fragment() {
                         val routesArray = data.getJSONArray("routes")
                         shopList!!.clear()
                         routesList!!.clear()
+                        routeNameList!!.clear()
                         for (i in 0 until routesArray.length()) {
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")
@@ -251,20 +264,15 @@ class ShopListFragment : Fragment() {
                                     shopList!!
                                 )
                             )
-                            for (i in 0 until allRouteList!!.size) {
-                                Log.d(
-                                    "RouteList",
-                                    "all 2 " + allRouteList!![i].route_name + " " + allRouteList!![i].shopList.size.toString()
+                            routeNameList!!.add(
+                                Pair(
+                                    route_id,
+                                    route_name
                                 )
-                            }
+                            )
+                            btncreateShop!!.visibility = View.VISIBLE
                         }
                         if (spinner != null) {
-                            for (i in 0 until allRouteList!!.size) {
-                                Log.d(
-                                    "RouteList",
-                                    "all 3 " + allRouteList!![i].route_name + " " + allRouteList!![i].shopList.size.toString()
-                                )
-                            }
                             val adapter = ArrayAdapter(
                                 mContext!!,
                                 android.R.layout.simple_spinner_item, routesList!!

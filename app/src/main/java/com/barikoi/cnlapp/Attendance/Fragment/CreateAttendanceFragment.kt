@@ -485,7 +485,10 @@ class CreateAttendanceFragment : Fragment() {
                     try {
                         val data = JSONObject(response)
                         val place = JSONObject(data.getString("place"))
-                        val address = place.getString("address")
+                        var address = ""
+                        if (!place.getString("address").equals("null")) {
+                            address = place.getString("address")
+                        }
                         val city = place.getString("city")
                         val area = place.getString("area")
                         //address[0] = jsonArray.getJSONObject(0).getString("Address");
