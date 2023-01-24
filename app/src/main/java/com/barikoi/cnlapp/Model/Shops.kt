@@ -11,6 +11,9 @@ class Shops(
     val shop_type: String,
     val category: String,
     val shop_owner: String,
+    val market_opportunity: String,
+    val contact_number: String,
+    val is_buyer: Int,
     /*val distributor_office: String,
     val distributor_office_code: String,*/
     val imageUrl: String,
@@ -20,6 +23,7 @@ class Shops(
     val route_code: String,
     val route_name: String,
     val lastOrderDate: String,
+    val isVerified: Int,
     val isOrdered: Int,
     val isNoOrdered: Int
 ): Serializable

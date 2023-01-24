@@ -29,6 +29,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
@@ -149,7 +150,15 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         getBuyer()
         getImageFromDB()
 
-
+        if (intent.hasExtra("fromEdit")){
+            tvTitle.text = resources.getString(R.string.update_shop_information)
+            isVerified.visibility = View.VISIBLE
+            val shops = intent.getSerializableExtra("fromEdit") as Shops
+            getShopDetails(shops)
+        }else{
+            tvTitle.text = resources.getString(R.string.new_shop_creation)
+            isVerified.visibility = View.GONE
+        }
 
         btnBack.setOnClickListener {
             setResult(55)
@@ -209,6 +218,54 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         btnSubmitShop.setOnClickListener {
             btnSubmitShop.isEnabled = false
             createShop()
+        }
+    }
+
+    private fun getShopDetails(shops: Shops) {
+        if(shops.route_name.length>0){
+            val pos= (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops.route_name)
+            if(pos>-1) {
+                spinnerRoutes.setSelection(pos)
+            }
+        }
+        etShopName.setText(shops.shop_name)
+        if(shops.shop_type.length>0){
+            val pos= (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(shops.shop_type)
+            if(pos>-1) {
+                spinnerShopType.setSelection(pos)
+            }
+        }
+        if(shops.category.length>0){
+            val pos= (spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(shops.category)
+            if(pos>-1) {
+                spinnerCatOutlets.setSelection(pos)
+            }
+        }
+        if(shops.market_opportunity.length>0){
+            val pos= (spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(shops.market_opportunity)
+            if(pos>-1) {
+                spinnerMarketOpportunity.setSelection(pos)
+            }
+        }
+        if(shops.is_buyer >-1){
+            //val pos= (spinBuyer.adapter as ArrayAdapter<String>).getPosition(p.getRetailData()[0].is_buyer)
+            if (shops.is_buyer == 0 ){
+                spinnerBuyer.setSelection(2)
+            }else{
+                spinnerBuyer.setSelection(1)
+            }
+        }
+
+        etAddress.setText(shops.address)
+        etOwnerName.setText(shops.shop_owner)
+        etContactNumber.setText(shops.contact_number)
+        etLatitude.setText(shops.latitude.toString())
+        etLongitude.setText(shops.longitude.toString())
+
+        if (shops.isVerified == 1){
+            isVerified.isChecked = true
+        }else{
+            isVerified.isChecked = false
         }
     }
 

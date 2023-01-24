@@ -30,22 +30,26 @@ import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
+import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.callback.OnEditShopListener
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_shop_list.*
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
-class ShopListFragment : Fragment() {
+class ShopListFragment : Fragment(), OnEditShopListener {
     //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var adapter: ShopListAdapter? = null
     private var userId: String? = ""
+    private var listener: OnEditShopListener? = null
     //private var mContext: Context? = null
     //private var recylerView: RecyclerView? = null
 
@@ -64,7 +68,7 @@ class ShopListFragment : Fragment() {
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
         btncreateShop = view.findViewById(R.id.createShop)
-        adapter = ShopListAdapter(ArrayList<Shops>())
+        adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
         spinner!!.onItemSelectedListener = object :
@@ -110,7 +114,7 @@ class ShopListFragment : Fragment() {
 
                         }
                     }
-                    adapter = ShopListAdapter(shops)
+                    adapter = ShopListAdapter(shops, listener!!)
                     recylerView!!.adapter = adapter
                     adapter!!.notifyDataSetChanged()
                 }
@@ -227,6 +231,7 @@ class ShopListFragment : Fragment() {
                                 val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
+                                val is_Verified = outlet.getInt("is_verified")
                                 /*val last_order_date = outlet.getString("order_delivery_date")*/
 
                                 shopList!!.add(
@@ -248,7 +253,7 @@ class ShopListFragment : Fragment() {
                                         route_id,
                                         route_name,
                                         "",
-                                        0, 0
+                                        is_Verified,0, 0
                                     )
                                 )
                             }
@@ -332,6 +337,12 @@ class ShopListFragment : Fragment() {
         }
     }
 
+    fun generateImages(imageArray: JSONArray){
+        for(i in 0 until imageArray.length()){
+
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         getShopList(userId!!)
@@ -346,5 +357,20 @@ class ShopListFragment : Fragment() {
         //token = prefs.getString("token", "")
         userId = prefs!!.getString(Api.USER_ID, "")
         mContext = context
+        listener = this
+    }
+
+    override fun onEdit(shops: Shops) {
+        if (routesList!!.size> 0) {
+            startActivityResult.launch(
+                Intent(requireActivity(), CreateShopActivity::class.java)
+                    .putExtra("requestCode", 55)
+                    .putExtra("fromEdit", shops)
+                    .putStringArrayListExtra("routes", routesList)
+                    .putExtra("routeList", routeNameList)
+            )
+        }else{
+            Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
+        }
     }
 }
