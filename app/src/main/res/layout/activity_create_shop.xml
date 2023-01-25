@@ -95,16 +95,18 @@
             </com.barikoi.cnlapp.Utils.MoreSpinner>
         </RelativeLayout>
                 <HorizontalScrollView
+                    android:id="@+id/imageViewScroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:visibility="gone"
                     android:background="@drawable/cardview_bg">
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/imageViewLayout"
                     android:layout_width="match_parent"
                     android:layout_height="80dp">
 
-                </RelativeLayout>
+                </LinearLayout>
                 </HorizontalScrollView>
         <RelativeLayout
             android:id="@+id/imagepickerLayout"
@@ -418,6 +420,24 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:text="@string/submit" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnUpdateShop"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/cardview_bg"
+            android:backgroundTint="@color/cnl_color_2"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:text="@string/update" />
     </RelativeLayout>
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBarShop"

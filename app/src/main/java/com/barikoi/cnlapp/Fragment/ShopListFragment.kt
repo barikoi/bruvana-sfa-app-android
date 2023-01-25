@@ -210,12 +210,21 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             for (j in 0 until route_outlet_list.length()) {
                                 val outlet = route_outlet_list.getJSONObject(j)
                                 var imageUrl = "null"
+                                var imageList: ArrayList<String> = ArrayList()
                                 if (outlet.has("images") && !outlet.isNull("images")) {
                                     val imageArray = outlet.getJSONArray("images")
                                     if (imageArray.length() > 0) {
                                         val imageobj = imageArray.getJSONObject(0)
                                         if (imageobj.has("image_url")) {
                                             imageUrl = imageobj.getString("image_url")
+                                        }
+
+                                        for (p in 0 until imageArray.length()){
+                                            val imageobj = imageArray.getJSONObject(p)
+                                            if (imageobj.has("image_url")) {
+                                                imageList.add(imageobj.getString("image_url"))
+                                            }
+
                                         }
                                     }
                                 }
@@ -225,8 +234,11 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
                                 val outlet_type = outlet.getString("outlet_type")
-                                /*val outlet_category = outlet.getString("outlet_category")*/
+                                val outlet_category = outlet.getString("outlet_category")
                                 val owner_name = outlet.getString("owner_name")
+                                val market_opportunity = outlet.getString("market_opportunity")
+                                val contact_number = outlet.getString("phone_number")
+                                val is_buyer = outlet.getInt("is_buyer")
                                 /*val distributor_office = outlet.getString("distributor_office")
                                 val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
@@ -242,9 +254,13 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         outlet_address,
                                         outlet_code,
                                         outlet_type,
-                                        "",
+                                        outlet_category,
                                         owner_name,
+                                        market_opportunity,
+                                        contact_number,
+                                        is_buyer,
                                         imageUrl,
+                                        imageList,
                                         /*distributor_office,
                                         distributor_office_code,*/
                                         territory_name,

@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.Activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.IntentSender.SendIntentException
@@ -32,12 +33,15 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
+import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment
 import com.barikoi.cnlapp.Utils.*
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -61,6 +65,8 @@ import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
 import kotlinx.android.synthetic.main.activity_create_shop.imagepicker
 import kotlinx.android.synthetic.main.activity_create_shop.spinnerRoutes
+import kotlinx.android.synthetic.main.activity_create_shop.tvTitle
+import kotlinx.android.synthetic.main.appcontent_main.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -71,7 +77,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
     private var mapView: MapView? = null
@@ -89,18 +94,20 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     var token: String? = null
     var userId: String? = ""
     var srId: String? = ""
+    var userType: String? = ""
     var appDatabase: ImageDatabase? = null
     private var isImageAdded = false
     private val CAMERA = 4
-
     private var selectedRoute: String? = ""
     private var selectedShopType: String? = ""
     private var selectedCategory: String? = ""
     private var selectedMarketOpportunity: String? = ""
     private var selectedBuyer: Int? = -1
+    private var inputVerified: Int? = 0
 
     var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
     var routesList : java.util.ArrayList<String>? = ArrayList()
+    var shops: Shops? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +119,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         token = prefs!!.getString(Api.TOKEN, "")
         srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
         userId = prefs!!.getString(Api.USER_ID, "")
+        userType = prefs!!.getString(Api.USER_TYPE, "")
         appDatabase = ImageDatabase.getInstance(applicationContext)
 
         val gd = GradientDrawable()
@@ -126,7 +134,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         spinnerLayoutCategory.setBackgroundDrawable(gd)
         etAddress.setBackgroundDrawable(gd)
         etOwnerName.setBackgroundDrawable(gd)
-
+        if (userType.equals("TO", true)){
+            isVerified.visibility = View.VISIBLE
+        }else{
+            isVerified.visibility = View.GONE
+        }
+        if (intent.hasExtra("fromEdit")){
+            btnUpdateShop.visibility = View.VISIBLE
+            btnSubmitShop.visibility = View.GONE
+            tvTitle.text = resources.getString(R.string.update_shop_information)
+            shops = intent.getSerializableExtra("fromEdit") as Shops
+            getShopDetails(shops!!)
+        }else{
+            btnUpdateShop.visibility = View.GONE
+            btnSubmitShop.visibility = View.VISIBLE
+            tvTitle.text = resources.getString(R.string.new_shop_creation)
+        }
         imagepicker.taskId = "taskId"
         imagepicker.CAMERA = 4
         imagepicker.setMainactivity(this@CreateShopActivity)
@@ -150,16 +173,23 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         getBuyer()
         getImageFromDB()
 
-        if (intent.hasExtra("fromEdit")){
-            tvTitle.text = resources.getString(R.string.update_shop_information)
-            isVerified.visibility = View.VISIBLE
-            val shops = intent.getSerializableExtra("fromEdit") as Shops
-            getShopDetails(shops)
-        }else{
-            tvTitle.text = resources.getString(R.string.new_shop_creation)
-            isVerified.visibility = View.GONE
+        isVerified.setOnCheckedChangeListener { compoundButton, isChecked ->
+            if (isChecked){
+                inputVerified = 1
+            }else{
+                inputVerified = 0
+            }
+
         }
 
+        /*Thread{
+            this@CreateShopActivity.runOnUiThread(object : Runnable{
+                override fun run() {
+
+                }
+
+            })
+        }.start()*/
         btnBack.setOnClickListener {
             setResult(55)
             finish()
@@ -219,53 +249,101 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             btnSubmitShop.isEnabled = false
             createShop()
         }
+        btnUpdateShop.setOnClickListener {
+            btnUpdateShop.isEnabled = false
+            updateShop()
+        }
     }
 
     private fun getShopDetails(shops: Shops) {
-        if(shops.route_name.length>0){
-            val pos= (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops.route_name)
-            if(pos>-1) {
-                spinnerRoutes.setSelection(pos)
-            }
-        }
-        etShopName.setText(shops.shop_name)
-        if(shops.shop_type.length>0){
-            val pos= (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(shops.shop_type)
-            if(pos>-1) {
-                spinnerShopType.setSelection(pos)
-            }
-        }
-        if(shops.category.length>0){
-            val pos= (spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(shops.category)
-            if(pos>-1) {
-                spinnerCatOutlets.setSelection(pos)
-            }
-        }
-        if(shops.market_opportunity.length>0){
-            val pos= (spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(shops.market_opportunity)
-            if(pos>-1) {
-                spinnerMarketOpportunity.setSelection(pos)
-            }
-        }
-        if(shops.is_buyer >-1){
-            //val pos= (spinBuyer.adapter as ArrayAdapter<String>).getPosition(p.getRetailData()[0].is_buyer)
-            if (shops.is_buyer == 0 ){
-                spinnerBuyer.setSelection(2)
-            }else{
-                spinnerBuyer.setSelection(1)
-            }
-        }
 
+        etShopName.setText(shops.shop_name)
         etAddress.setText(shops.address)
         etOwnerName.setText(shops.shop_owner)
         etContactNumber.setText(shops.contact_number)
         etLatitude.setText(shops.latitude.toString())
         etLongitude.setText(shops.longitude.toString())
+        latitude = shops.latitude
+        longitude = shops.longitude
+        inputVerified = shops.isVerified
 
         if (shops.isVerified == 1){
             isVerified.isChecked = true
         }else{
             isVerified.isChecked = false
+        }
+        
+        if (shops.imageArray.size > 0){
+            generateImages(shops.imageArray)
+        }
+    }
+
+    private fun generateImages(imageArray: ArrayList<String>) {
+
+        if (!imageArray.isEmpty()) {
+            imageViewScroll.visibility = View.VISIBLE
+            val layout = findViewById<View>(R.id.imageViewLayout) as LinearLayout
+            for (i in 0 until imageArray.size) {
+                val image = ImageView(this)
+                image.layoutParams = ViewGroup.LayoutParams(100, 80)
+                image.maxHeight = 50
+                image.maxWidth = 50
+                Log.d("PlaceEditActivity", imageArray.get(i))
+                Glide.with(applicationContext)
+                    .load(imageArray.get(i))
+                    .override(100, 80)
+                    .into(image)
+
+                // Adds the view to the layout
+                layout.addView(image)
+                /*image.setOnClickListener { view: View? ->
+                    val nagDialog = Dialog(
+                        this@CreateShopActivity,
+                        android.R.style.Theme_NoTitleBar_Fullscreen
+                    )
+                    nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                    nagDialog.setCancelable(false)
+                    nagDialog.setContentView(R.layout.preview_image)
+                    val btnClose =
+                        nagDialog.findViewById<Button>(R.id.btnIvClose)
+                    val btnDelete =
+                        nagDialog.findViewById<Button>(R.id.btnIvDelete)
+                    val ivPreview =
+                        nagDialog.findViewById<ImageView>(R.id.iv_preview_image)
+                    Glide.with(applicationContext)
+                        .load(Api.url_base + place.getImgArray().get(i).getImageLink())
+                        .thumbnail(.2.toFloat())
+                        .into(ivPreview)
+                    btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
+                    btnDelete.setOnClickListener { view1: View? ->
+                        try {
+                            val builder =
+                                AlertDialog.Builder(applicationContext)
+                            builder.setTitle("Delete Image")
+                            builder.setMessage("Are you sure you want to delete this image?")
+                            builder.setPositiveButton(
+                                "Yes"
+                            ) { dialog, which ->
+                                deleteImage(applicationContext, place.getImgArray().get(i).getId())
+                                nagDialog.dismiss()
+                                layout.removeAllViews()
+                                generatelist(editTag, place.getCode())
+                            }
+                            builder.setNegativeButton(
+                                "No"
+                            ) { dialog, which -> dialog.dismiss() }
+                            builder.show()
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                            Log.d("ImagePicker", "onClick: " + e.message)
+                        }
+                    }
+                    *//*val pAttacher: PhotoViewAttacher
+                    pAttacher = PhotoViewAttacher(ivPreview)
+                    pAttacher.update()*//*
+                    nagDialog.show()
+                }*/
+            }
         }
     }
 
@@ -554,6 +632,15 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                 }
 
+            if (shops != null){
+                if(shops!!.route_name.length>0){
+                    val pos= (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
+                    if(pos>-1) {
+                        spinnerRoutes.setSelection(pos)
+                    }
+                }
+            }
+
         }
     }
 
@@ -628,6 +715,15 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         }
 
                                     }
+
+                                if (shops != null){
+                                    if(shops!!.shop_type.length>0){
+                                        val pos= (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(shops!!.shop_type)
+                                        if(pos>-1) {
+                                            spinnerShopType.setSelection(pos)
+                                        }
+                                    }
+                                }
                             }
                         }
                     } catch (e: Exception) {
@@ -728,6 +824,14 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         }
 
                                     }
+                                if (shops != null){
+                                    if(shops!!.category.length>0){
+                                        val pos= (spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(shops!!.category)
+                                        if(pos>-1) {
+                                            spinnerCatOutlets.setSelection(pos)
+                                        }
+                                    }
+                                }
                             }
                         }
                     } catch (e: Exception) {
@@ -829,6 +933,15 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         }
 
                                     }
+
+                                if (shops != null){
+                                    if(shops!!.market_opportunity.length>0){
+                                        val pos= (spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(shops!!.market_opportunity)
+                                        if(pos>-1) {
+                                            spinnerMarketOpportunity.setSelection(pos)
+                                        }
+                                    }
+                                }
                             }
                         }
                     } catch (e: Exception) {
@@ -916,6 +1029,17 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
 
         }
+
+        if (shops != null){
+            if(shops!!.is_buyer >-1){
+                //val pos= (spinBuyer.adapter as ArrayAdapter<String>).getPosition(p.getRetailData()[0].is_buyer)
+                if (shops!!.is_buyer == 0 ){
+                    spinnerBuyer.setSelection(2)
+                }else{
+                    spinnerBuyer.setSelection(1)
+                }
+            }
+        }
     }
 
     fun createShop() {
@@ -993,6 +1117,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["route_id"] = selectedRoute!!
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
+            params["is_verified"] = inputVerified.toString()
 
             if (isImageAdded) {
                 ApiServices.apiPOSTMultipart(
@@ -1059,6 +1184,146 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
         }else{
             btnSubmitShop.isEnabled = true
+        }
+    }
+
+    fun updateShop() {
+        showProgress(progressBarShop)
+        var inputOk = true
+        if (etShopName.text.trim().length == 0) {
+            inputOk = false
+            etShopName.setError(getString(R.string.this_field_is_required))
+            hideProgress(progressBarShop)
+        }
+        if (etAddress.text.trim().length == 0) {
+            inputOk = false
+            etAddress.setError(getString(R.string.this_field_is_required))
+            hideProgress(progressBarShop)
+        }
+        if (etOwnerName.text.trim().length == 0) {
+            inputOk = false
+            etOwnerName.setError(getString(R.string.this_field_is_required))
+            hideProgress(progressBarShop)
+        }
+        if (selectedRoute!!.length == 0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
+            hideProgress(progressBarShop)
+        }
+        if (selectedShopType!!.length == 0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
+            hideProgress(progressBarShop)
+        }
+        if (selectedCategory!!.length == 0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
+                .show()
+            hideProgress(progressBarShop)
+        }
+        if (latitude == 0.0 || longitude == 0.0) {
+            inputOk = false
+            Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
+                .show()
+            hideProgress(progressBarShop)
+        }
+
+        if (inputOk) {
+            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+            val today = df.format(Calendar.getInstance().time)
+            val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
+            var imagesList = ArrayList<Images>()
+            imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
+            if (imagesList.size > 0) {
+                for (i in 0 until imagesList.size) {
+                    val fileExist = File(imagesList[i].filePath).canRead()
+                    if (fileExist) {
+                        val imagename = imagesList[i].filePath.substring(
+                            imagesList[i].filePath.lastIndexOf("/"))
+                        byteparams["images[" + i + "]"] = VolleyMultipartRequest.DataPart(
+                            imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
+                        )
+                    }
+                }
+            }
+            val params: MutableMap<String, String> = java.util.HashMap()
+            params["outlet_name"] = URLEncoder.encode(etShopName.text.toString(), "utf-8")
+            params["outlet_id"] = shops!!.shop_id
+            params["outlet_type"] = selectedShopType!!
+            params["outlet_category"] = selectedCategory!!
+            params["address"] = URLEncoder.encode(etAddress.text.toString(), "utf-8")
+            params["owner_name"] = URLEncoder.encode(etOwnerName.text.toString(), "utf-8")
+            if (etContactNumber.text.trim().length > 0) params["phone_number"] =
+                URLEncoder.encode(etContactNumber.text.toString(), "utf-8")
+            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] = selectedMarketOpportunity!!
+            if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
+            params["outlet_updated_at"] = today
+            params["updated_by_user_id"] = userId!!
+            params["updated_by_employee_id"] = srId!!
+            params["route_id"] = selectedRoute!!
+            params["latitude"] = latitude.toString()
+            params["longitude"] = longitude.toString()
+            params["is_verified"] = inputVerified.toString()
+
+            ApiServices.apiPOSTMultipart(
+                Api.update_shop,
+                queue!!,
+                "",
+                params,
+                byteparams,
+                object : ApiServiceListener {
+                    override fun onResponseSuccess(response: String) {
+
+                    }
+
+                    override fun onJSONResponseSuccess(response: JSONObject) {
+
+                    }
+
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                        hideProgress(progressBarShop)
+                        val data = JSONObject(String(response.data))
+                        val message = data.getString("message")
+                        appDatabase!!.imagesDao()!!.deleteAllImages()
+                        ViewUtils.viewDialogResponse(
+                            this@CreateShopActivity,
+                            message,
+                            object : DialogListener {
+                                override fun onConfirmed() {
+                                    btnUpdateShop.isEnabled = true
+                                    finish()
+                                    startActivity(getIntent())
+                                }
+
+                                override fun onCanceled() {
+                                    TODO("Not yet implemented")
+                                }
+
+                            })
+                    }
+
+                    @RequiresApi(Build.VERSION_CODES.KITKAT)
+                    override fun onResponseFailure(error: VolleyError) {
+                        btnUpdateShop.isEnabled = true
+                        hideProgress(progressBarShop)
+                        val s = String(
+                            error.networkResponse.data,
+                            StandardCharsets.UTF_8
+                        )
+                        val data = JSONObject(s)
+                        val message = data.getString("message")
+                        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onException(e: Exception) {
+                        btnUpdateShop.isEnabled = true
+                        hideProgress(progressBarShop)
+                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                    }
+
+                })
+        }else{
+            btnUpdateShop.isEnabled = true
         }
     }
 

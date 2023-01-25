@@ -481,9 +481,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("outlet_type"),
                                         outletObj.getString("outlet_category"),
                                         outletObj.getString("owner_name"),
+                                        outletObj.getString("market_opportunity"),
+                                        outletObj.getString("phone_number") ,
+                                        outletObj.getInt("is_buyer"),
                                         /*outletObj.getString("distributor_office"),
                                         outletObj.getString("distributor_office_code"),*/
-                                        imageUrl,"",
+                                        imageUrl,ArrayList(),"",
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
                                         outletObj.getString("route_id"),
