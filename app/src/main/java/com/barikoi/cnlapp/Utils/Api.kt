@@ -77,4 +77,5 @@ object Api {
     val get_category_outlet = base_url+"api/v1/outlet-category"
     val get_market_opportunity = base_url+"api/v1/outlet-market-opportunity"
     val create_shop = base_url+"api/v1/create-outlet"
+    val update_shop = base_url+"api/v1/update-outlet"
 }

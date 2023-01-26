@@ -12,10 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.callback.OnEditShopListener
 import com.bumptech.glide.Glide
 import java.util.*
 
-class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),
+class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener): RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),
     Filterable {
 
     var shopList: List<Shops> = mValues
@@ -50,12 +51,22 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
             //holder.imageProduct.visibility = View.INVISIBLE
         }
 
+        if (shopList[position].isVerified == 0){
+            holder.imageNewTag.visibility = View.VISIBLE
+        }else{
+            holder.imageNewTag.visibility = View.GONE
+        }
+
+        holder.btnEdit.setOnClickListener {
+            mListener.onEdit(shopList[position])
+        }
+
     }
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    /*override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         Log.d("Product", "view holder: " + recyclerView.childCount)
         this.mRecyclerView = recyclerView
-    }
+    }*/
 
     override fun getItemCount(): Int {
         return shopList.size
@@ -70,6 +81,9 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
         internal val shopType: TextView
         internal val territoryName: TextView
         internal val imageShop:ImageView
+        internal val imageNewTag:ImageView
+        internal val btnEdit:ImageView
+
         init {
             shopName = itemView.findViewById(R.id.shop_name)
             shopState = itemView.findViewById(R.id.shop_state)
@@ -79,6 +93,8 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
             shopType = itemView.findViewById(R.id.shop_type)
             distributorName = itemView.findViewById(R.id.distributor_name)
             imageShop = itemView.findViewById(R.id.imageShop)
+            imageNewTag = itemView.findViewById(R.id.imgNewTag)
+            btnEdit = itemView.findViewById(R.id.btn_edit)
 
         }
     }
@@ -96,10 +112,7 @@ class ShopListAdapter(var mValues: List<Shops>): RecyclerView.Adapter<ShopListAd
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.shop_name.toLowerCase()
-                                .contains(charString.lowercase(Locale.getDefault())) || row.shop_code
-                                .contains(charString)
-                        ) {
+                        if (row.shop_name.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
                             filteredList.add(row)
                         }
                     }

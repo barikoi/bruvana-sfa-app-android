@@ -327,10 +327,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 val outlet_type = outlet.getString("outlet_type")
                                 /*val outlet_category = outlet.getString("outlet_category")*/
                                 val owner_name = outlet.getString("owner_name")
+                                val market_opportunity = outlet.getString("market_opportunity")
+                                val contact_number = outlet.getString("phone_number")
+                                val is_buyer = outlet.getInt("is_buyer")
                                 /*val distributor_office = outlet.getString("distributor_office")
                                 val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
+                                val is_Verified = outlet.getInt("is_verified")
 
                                 shopList!!.add(
                                     Shops(
@@ -342,7 +346,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         outlet_type,
                                         "",
                                         owner_name,
+                                        market_opportunity,
+                                        contact_number,
+                                        is_buyer,
                                         "",
+                                        ArrayList(),
                                         /*distributor_office,
                                         distributor_office_code,*/
                                         territory_name,
@@ -351,7 +359,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         route_id,
                                         route_name,
                                         "",
-                                        0,0
+                                        is_Verified,0,0
                                     )
                                 )
                             }
@@ -368,6 +376,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             val outlet_code = outlet.getString("outlet_code")
                             val outlet_type = outlet.getString("outlet_type")
                             val owner_name = outlet.getString("owner_name")
+                            val market_opportunity = outlet.getString("market_opportunity")
+                            val contact_number = outlet.getString("phone_number")
+                            val is_buyer = outlet.getInt("is_buyer")
                             /*val distributor_office = outlet.getString("distributor_office")
                             val distributor_office_code = outlet.getString("distributor_office_code")*/
                             val latitude = outlet.getDouble("latitude")
@@ -375,7 +386,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             val route_id = outlet.getString("route_id")
                             val route_name = outlet.getString("route_name")
                             val territory_name = outlet.getString("territory_name")
-
+                            val is_Verified = outlet.getInt("is_verified")
                             val shops = Shops(
                                 outlet_id,
                                 outlet_name,
@@ -385,7 +396,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 outlet_type,
                                 "",
                                 owner_name,
+                                market_opportunity,
+                                contact_number,
+                                is_buyer,
                                 "",
+                                ArrayList(),
                                 /*distributor_office,
                                 distributor_office_code,*/
                                 territory_name,
@@ -394,7 +409,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 route_id,
                                 route_name,
                                 "",
-                                0, 0
+                                is_Verified,0, 0
                             )
                             verifiedShopList!!.add(shops)
                             icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_green)

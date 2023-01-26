@@ -223,7 +223,8 @@ class HomeFragment : Fragment() {
                         if (targetsArray.length() > 0){
                             for (i in 0 until targetsArray.length()){
                                 val targetObj =targetsArray.getJSONObject(i)
-                                if(!targetObj.isNull("target_amount")) total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
+                                //if(!targetObj.isNull("target_amount")) total_target = Math.round(targetObj.getString("target_amount").toDouble()).toString()
+                                if(!targetObj.isNull("target_amount")) total_target = dformat.format(targetObj.getString("target_amount").toDouble())
                                 if(!targetObj.isNull("target_ads")) ads = dformat.format(targetObj.getString("target_ads").toDouble())
                                 if(!targetObj.isNull("target_rds")) rds = dformat.format(targetObj.getString("target_rds").toDouble())
                                 if(!targetObj.isNull("target_sku_per_memo")) bpc = dformat.format(targetObj.getString("target_sku_per_memo").toDouble())
@@ -236,7 +237,8 @@ class HomeFragment : Fragment() {
                         if (completedArray.length() > 0){
                             for (i in 0 until completedArray.length()){
                                 val targetObj =completedArray.getJSONObject(i)
-                                if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                //if(!targetObj.isNull("revenue")) total_target_completed = Math.round(targetObj.getString("revenue").toDouble()).toString()
+                                if(!targetObj.isNull("revenue")) total_target_completed = dformat.format(targetObj.getString("revenue").toDouble())
                                 if(!targetObj.isNull("ads")) ads_completed = dformat.format(targetObj.getString("ads").toDouble())
                                 if(!targetObj.isNull("rds")) rds_completed = dformat.format(targetObj.getString("rds").toDouble())
                                 if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())

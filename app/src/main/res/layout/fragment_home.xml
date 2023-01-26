@@ -59,7 +59,7 @@
                 android:drawableLeft="@drawable/ic_date_range"
                 android:drawablePadding="4dp"
                 android:gravity="start"
-                android:text="Oct 23-Nov 21"
+                android:text=""
                 android:textColor="@color/text_title_2"
                 android:textSize="14sp">
 

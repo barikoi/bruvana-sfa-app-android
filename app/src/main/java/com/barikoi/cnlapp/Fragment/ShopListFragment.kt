@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
@@ -25,25 +26,30 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
+import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
+import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.callback.OnEditShopListener
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_shop_list.*
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
-class ShopListFragment : Fragment() {
+class ShopListFragment : Fragment(), OnEditShopListener {
     //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var adapter: ShopListAdapter? = null
     private var userId: String? = ""
+    private var listener: OnEditShopListener? = null
     //private var mContext: Context? = null
     //private var recylerView: RecyclerView? = null
 
@@ -61,7 +67,8 @@ class ShopListFragment : Fragment() {
         spinner = view.findViewById(R.id.spinnerRoutes)
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
-        adapter = ShopListAdapter(ArrayList<Shops>())
+        btncreateShop = view.findViewById(R.id.createShop)
+        adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
         spinner!!.onItemSelectedListener = object :
@@ -78,7 +85,8 @@ class ShopListFragment : Fragment() {
                     }
 
                 }
-                adapter!!.shopList = shops
+                adapter = ShopListAdapter(shops, listener!!)
+                recylerView!!.adapter = adapter
                 adapter!!.notifyDataSetChanged()
 
             }
@@ -107,7 +115,7 @@ class ShopListFragment : Fragment() {
 
                         }
                     }
-                    adapter = ShopListAdapter(shops)
+                    adapter = ShopListAdapter(shops, listener!!)
                     recylerView!!.adapter = adapter
                     adapter!!.notifyDataSetChanged()
                 }
@@ -132,23 +140,30 @@ class ShopListFragment : Fragment() {
         createShop.setBackgroundDrawable(gd)
 
         createShop.setOnClickListener {
-            startActivityResult.launch(
-                Intent(
-                    requireActivity(),
-                    CreateShopActivity::class.java
-                ).putExtra("requestCode", 55)
-            )
+            if (routesList!!.size> 0) {
+                startActivityResult.launch(
+                    Intent(requireActivity(), CreateShopActivity::class.java)
+                        .putExtra("requestCode", 55)
+                        .putStringArrayListExtra("routes", routesList)
+                        .putExtra("routeList", routeNameList)
+                )
+            }else{
+                Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            if (result.getResultCode() == Activity.RESULT_OK) {
+            /*if (result.getResultCode() == Activity.RESULT_OK) {
                 val intent = result.data
                 if (intent!!.getIntExtra("requestCode", 0) == 55) {
                     getShopList(userId!!)
                 }
+            }*/
+            if (result.getResultCode() == 55) {
+                getShopList(RouteActivity.userId!!)
             }
         }
     )
@@ -156,12 +171,14 @@ class ShopListFragment : Fragment() {
     companion object {
         var routesList: ArrayList<String>? = ArrayList()
         var allRouteList: ArrayList<Routes>? = ArrayList()
+        var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
         var shopList: ArrayList<Shops>? = ArrayList()
         var recylerView: RecyclerView? = null
         var progressBar2: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
         var spinner: MoreSpinner? = null
+        var btncreateShop: AppCompatButton? = null
         var et_search: AutoCompleteTextView? = null
 
         fun getShopList(userId: String) {
@@ -181,6 +198,7 @@ class ShopListFragment : Fragment() {
                         val routesArray = data.getJSONArray("routes")
                         shopList!!.clear()
                         routesList!!.clear()
+                        routeNameList!!.clear()
                         for (i in 0 until routesArray.length()) {
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")
@@ -193,12 +211,21 @@ class ShopListFragment : Fragment() {
                             for (j in 0 until route_outlet_list.length()) {
                                 val outlet = route_outlet_list.getJSONObject(j)
                                 var imageUrl = "null"
+                                var imageList: ArrayList<String> = ArrayList()
                                 if (outlet.has("images") && !outlet.isNull("images")) {
                                     val imageArray = outlet.getJSONArray("images")
                                     if (imageArray.length() > 0) {
                                         val imageobj = imageArray.getJSONObject(0)
                                         if (imageobj.has("image_url")) {
                                             imageUrl = imageobj.getString("image_url")
+                                        }
+
+                                        for (p in 0 until imageArray.length()){
+                                            val imageobj = imageArray.getJSONObject(p)
+                                            if (imageobj.has("image_url")) {
+                                                imageList.add(imageobj.getString("image_url"))
+                                            }
+
                                         }
                                     }
                                 }
@@ -208,12 +235,16 @@ class ShopListFragment : Fragment() {
                                 val outlet_address = outlet.getString("address")
                                 val outlet_code = outlet.getString("outlet_code")
                                 val outlet_type = outlet.getString("outlet_type")
-                                /*val outlet_category = outlet.getString("outlet_category")*/
+                                val outlet_category = outlet.getString("outlet_category")
                                 val owner_name = outlet.getString("owner_name")
+                                val market_opportunity = outlet.getString("market_opportunity")
+                                val contact_number = outlet.getString("phone_number")
+                                val is_buyer = outlet.getInt("is_buyer")
                                 /*val distributor_office = outlet.getString("distributor_office")
                                 val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
+                                val is_Verified = outlet.getInt("is_verified")
                                 /*val last_order_date = outlet.getString("order_delivery_date")*/
 
                                 shopList!!.add(
@@ -224,9 +255,13 @@ class ShopListFragment : Fragment() {
                                         outlet_address,
                                         outlet_code,
                                         outlet_type,
-                                        "",
+                                        outlet_category,
                                         owner_name,
+                                        market_opportunity,
+                                        contact_number,
+                                        is_buyer,
                                         imageUrl,
+                                        imageList,
                                         /*distributor_office,
                                         distributor_office_code,*/
                                         territory_name,
@@ -235,7 +270,7 @@ class ShopListFragment : Fragment() {
                                         route_id,
                                         route_name,
                                         "",
-                                        0, 0
+                                        is_Verified,0, 0
                                     )
                                 )
                             }
@@ -251,20 +286,15 @@ class ShopListFragment : Fragment() {
                                     shopList!!
                                 )
                             )
-                            for (i in 0 until allRouteList!!.size) {
-                                Log.d(
-                                    "RouteList",
-                                    "all 2 " + allRouteList!![i].route_name + " " + allRouteList!![i].shopList.size.toString()
+                            routeNameList!!.add(
+                                Pair(
+                                    route_id,
+                                    route_name
                                 )
-                            }
+                            )
+                            btncreateShop!!.visibility = View.VISIBLE
                         }
                         if (spinner != null) {
-                            for (i in 0 until allRouteList!!.size) {
-                                Log.d(
-                                    "RouteList",
-                                    "all 3 " + allRouteList!![i].route_name + " " + allRouteList!![i].shopList.size.toString()
-                                )
-                            }
                             val adapter = ArrayAdapter(
                                 mContext!!,
                                 android.R.layout.simple_spinner_item, routesList!!
@@ -324,6 +354,12 @@ class ShopListFragment : Fragment() {
         }
     }
 
+    fun generateImages(imageArray: JSONArray){
+        for(i in 0 until imageArray.length()){
+
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         getShopList(userId!!)
@@ -338,5 +374,20 @@ class ShopListFragment : Fragment() {
         //token = prefs.getString("token", "")
         userId = prefs!!.getString(Api.USER_ID, "")
         mContext = context
+        listener = this
+    }
+
+    override fun onEdit(shops: Shops) {
+        if (routesList!!.size> 0) {
+            startActivityResult.launch(
+                Intent(requireActivity(), CreateShopActivity::class.java)
+                    .putExtra("requestCode", 55)
+                    .putExtra("fromEdit", shops)
+                    .putStringArrayListExtra("routes", routesList)
+                    .putExtra("routeList", routeNameList)
+            )
+        }else{
+            Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
+        }
     }
 }

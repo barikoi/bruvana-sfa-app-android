@@ -97,6 +97,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     lateinit var ACTIVITY: MainActivity
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
+    var dformat = DecimalFormat("#.##")
 
     /*var itemCount = 0
     var grandTotal = 0.0*/
@@ -140,7 +141,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     } else {
                         totalItemCount!!.setText(itemCountt.toString() + "Items")
                     }
-                    tvgrandTotal!!.setText("Total " + selectedOrder!!.grandTotal)
+                    tvgrandTotal!!.setText("Total " + dformat.format(selectedOrder!!.grandTotal.toDouble()))
                     appDatabase!!.saveOrderDao().insertAll(
                         SaveOrder(
                             null,
@@ -1219,7 +1220,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     override fun onValueChanged(products: Any, position: Int) {
-        val dformat = DecimalFormat("#.##")
         products as Products
         var itemCount = 0
         var grandTotal = 0.0
@@ -1283,7 +1283,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
         tvgrandTotal!!.setText("Total " + dformat.format(grandTotal).toString())
         totalAmount = dformat.format(grandTotal).toString()
-        grandTotalPrice = dformat.format(grandTotal).toDouble()
+        grandTotalPrice = grandTotal
         totalCount = itemCount
 
     }

@@ -56,6 +56,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
+    <string name="update">Update</string>
     <string name="check">Check</string>
     <string name="try_again">Try Again</string>
 
@@ -174,6 +175,8 @@
 
     <!--create shop-->
     <string name="new_shop_creation">New Shop Creation</string>
+    <string name="update_shop_information">Update Shop Information</string>
+    <string name="verify_shop">Are you want to verify the Shop?</string>
     <string name="adjust_shop_location">Adjust Shop Location</string>
     <string name="adjust_shop_location_link"><a href="http://www.bla.com">Adjust Shop Location</a></string>
     <string name="select_location">Select Location</string>
