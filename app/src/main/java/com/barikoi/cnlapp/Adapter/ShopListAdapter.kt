@@ -62,11 +62,11 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         }
 
     }
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    /*override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         Log.d("Product", "view holder: " + recyclerView.childCount)
         this.mRecyclerView = recyclerView
-    }
+    }*/
 
     override fun getItemCount(): Int {
         return shopList.size
@@ -112,10 +112,7 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.shop_name.toLowerCase()
-                                .contains(charString.lowercase(Locale.getDefault())) || row.shop_code
-                                .contains(charString)
-                        ) {
+                        if (row.shop_name.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
                             filteredList.add(row)
                         }
                     }

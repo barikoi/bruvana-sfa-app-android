@@ -85,7 +85,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                     }
 
                 }
-                adapter!!.shopList = shops
+                adapter = ShopListAdapter(shops, listener!!)
+                recylerView!!.adapter = adapter
                 adapter!!.notifyDataSetChanged()
 
             }

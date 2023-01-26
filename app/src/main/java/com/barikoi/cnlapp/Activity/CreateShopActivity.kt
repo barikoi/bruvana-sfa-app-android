@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.Activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.IntentSender.SendIntentException
@@ -33,8 +32,6 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
-import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment
 import com.barikoi.cnlapp.Utils.*
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
@@ -42,6 +39,9 @@ import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -63,13 +63,9 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
-import kotlinx.android.synthetic.main.activity_create_shop.imagepicker
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerRoutes
-import kotlinx.android.synthetic.main.activity_create_shop.tvTitle
-import kotlinx.android.synthetic.main.appcontent_main.*
-import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import org.json.JSONException
 import org.json.JSONObject
+import uk.co.senab.photoview.PhotoViewAttacher
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -285,18 +281,23 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val layout = findViewById<View>(R.id.imageViewLayout) as LinearLayout
             for (i in 0 until imageArray.size) {
                 val image = ImageView(this)
-                image.layoutParams = ViewGroup.LayoutParams(100, 80)
-                image.maxHeight = 50
-                image.maxWidth = 50
-                Log.d("PlaceEditActivity", imageArray.get(i))
+                image.layoutParams = ViewGroup.LayoutParams(200, 200)
+                image.maxHeight = 200
+                image.maxWidth = 200
+                val p = layout.layoutParams as ViewGroup.MarginLayoutParams
+                p.setMargins(8, 8, 4, 8)
+                Log.d("CreateShopActivity", imageArray.get(i))
+                image.layoutParams = p
                 Glide.with(applicationContext)
                     .load(imageArray.get(i))
-                    .override(100, 80)
+                    .override(200, 200)
+                    /*.apply(RequestOptions.bitmapTransform(RoundedCorners(10)))*/
+                    .transform(CenterCrop(), RoundedCorners(10))
                     .into(image)
 
                 // Adds the view to the layout
                 layout.addView(image)
-                /*image.setOnClickListener { view: View? ->
+                image.setOnClickListener { view: View? ->
                     val nagDialog = Dialog(
                         this@CreateShopActivity,
                         android.R.style.Theme_NoTitleBar_Fullscreen
@@ -306,43 +307,20 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     nagDialog.setContentView(R.layout.preview_image)
                     val btnClose =
                         nagDialog.findViewById<Button>(R.id.btnIvClose)
-                    val btnDelete =
-                        nagDialog.findViewById<Button>(R.id.btnIvDelete)
+                    /*val btnDelete =
+                        nagDialog.findViewById<Button>(R.id.btnIvDelete)*/
                     val ivPreview =
                         nagDialog.findViewById<ImageView>(R.id.iv_preview_image)
                     Glide.with(applicationContext)
-                        .load(Api.url_base + place.getImgArray().get(i).getImageLink())
+                        .load(imageArray.get(i))
                         .thumbnail(.2.toFloat())
                         .into(ivPreview)
                     btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
-                    btnDelete.setOnClickListener { view1: View? ->
-                        try {
-                            val builder =
-                                AlertDialog.Builder(applicationContext)
-                            builder.setTitle("Delete Image")
-                            builder.setMessage("Are you sure you want to delete this image?")
-                            builder.setPositiveButton(
-                                "Yes"
-                            ) { dialog, which ->
-                                deleteImage(applicationContext, place.getImgArray().get(i).getId())
-                                nagDialog.dismiss()
-                                layout.removeAllViews()
-                                generatelist(editTag, place.getCode())
-                            }
-                            builder.setNegativeButton(
-                                "No"
-                            ) { dialog, which -> dialog.dismiss() }
-                            builder.show()
-                        } catch (e: java.lang.Exception) {
-                            e.printStackTrace()
-                            Log.d("ImagePicker", "onClick: " + e.message)
-                        }
-                    }
-                    *//*val pAttacher: PhotoViewAttacher
+                    val pAttacher: PhotoViewAttacher
                     pAttacher = PhotoViewAttacher(ivPreview)
-                    pAttacher.update()*//*
+                    pAttacher.update()
                     nagDialog.show()
-                }*/
+                }
             }
         }
     }
@@ -1096,7 +1074,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         val imagename = imagesList[i].filePath.substring(
                             imagesList[i].filePath.lastIndexOf("/"))
                         byteparams["images[" + i + "]"] = VolleyMultipartRequest.DataPart(
-                            imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
+                            imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
                         )
                     }
                 }
@@ -1240,8 +1218,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     if (fileExist) {
                         val imagename = imagesList[i].filePath.substring(
                             imagesList[i].filePath.lastIndexOf("/"))
-                        byteparams["images[" + i + "]"] = VolleyMultipartRequest.DataPart(
-                            imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
+                        byteparams["images[" + (shops!!.imageArray.size+i) + "]"] = VolleyMultipartRequest.DataPart(
+                            imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
                         )
                     }
                 }
@@ -1291,8 +1269,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                             object : DialogListener {
                                 override fun onConfirmed() {
                                     btnUpdateShop.isEnabled = true
+                                    setResult(55)
                                     finish()
-                                    startActivity(getIntent())
                                 }
 
                                 override fun onCanceled() {
