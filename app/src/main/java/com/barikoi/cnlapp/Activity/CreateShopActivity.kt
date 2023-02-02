@@ -326,6 +326,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     }
 
     private fun getImageFromDB() {
+        appDatabase!!.imagesDao()!!.deleteAllImages()
         var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
         imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
         if (imageList!!.size > 0){

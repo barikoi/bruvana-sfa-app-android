@@ -29,7 +29,7 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
     override fun onBindViewHolder(holder: OutletProductAdapter.ViewHolder, position: Int) {
         val item = products[position]
         holder.productName.setText(item.product_name)
-        holder.productType.setText(item.product_type)
+        holder.productType.setText(item.unit_name)
         holder.perUnitPrice.setText(item.unit_price.toString())
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false

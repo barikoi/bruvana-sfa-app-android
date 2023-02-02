@@ -32,14 +32,14 @@ import java.util.*
 
 class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 
-    var token : String? = null
-    var user_id : String? = null
-    var sr_id : String? = null
+    var token: String? = null
+    var user_id: String? = null
+    var sr_id: String? = null
     var route_id: String? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
-    var listener : OnEditOrderListener? =null
+    var listener: OnEditOrderListener? = null
     private var adapter: ConfirmOrderListAdapter? = null
     var StartDate: String? = null
     var EndDate: String? = null
@@ -59,9 +59,9 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         listener = this
         if (route_id!!.length > 0) {
             setDateFilter()
-            no_route_check.visibility =View.GONE
+            no_route_check.visibility = View.GONE
             bodyLayout.visibility = View.VISIBLE
-        }else{
+        } else {
             //setDateFilter()
             /*ViewUtils.viewDialogResponse(applicationContext, resources.getString(R.string.no_route_selected_today), object : DialogListener{
                 override fun onConfirmed() {
@@ -74,7 +74,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 
             })*/
 
-            no_route_check.visibility =View.VISIBLE
+            no_route_check.visibility = View.VISIBLE
             bodyLayout.visibility = View.GONE
             btn_tryAgain.setOnClickListener {
                 setDateFilter()
@@ -90,12 +90,14 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
+
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 adapter!!.filter.filter(s)
-                if (s!!.length == 0){
-                    getAllOrders(Api.get_saved_order+"?sr_id="+sr_id+/*"&route_id="+route_id+*/"&start_date="+StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=PENDING, DELIVERED")
+                if (s!!.length == 0) {
+                    getAllOrders(Api.get_saved_order + "?sr_id=" + sr_id +/*"&route_id="+route_id+*/"&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING, DELIVERED")
                 }
             }
+
             override fun afterTextChanged(p0: Editable?) {
 
             }
@@ -142,75 +144,138 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&order_status=PENDING, DELIVERED")
+            getAllOrders(
+                Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + df.format(
+                    s_date
+                ) + " 00:00:00" + "&end_date=" + df.format(e_date) + " 23:59:59" + "&order_status=PENDING, DELIVERED"
+            )
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=PENDING, DELIVERED")
+        getAllOrders(Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING, DELIVERED")
     }
 
     private fun getAllOrders(url: String) {
         progressBarOrder.visibility = View.VISIBLE
-        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
+        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    if (response != null){
+                    if (response != null) {
                         progressBarOrder.visibility = View.GONE
                         val itemList: ArrayList<OrderList> = ArrayList()
 
                         val obj = JSONObject(response)
                         val orderArray = obj.getJSONArray("orders")
-                        if (orderArray.length() > 0){
-                            for (i in 0 until orderArray.length()){
+                        if (orderArray.length() > 0) {
+                            for (i in 0 until orderArray.length()) {
                                 //productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
                                 val brandArray = orderObj.getJSONArray("products")
                                 tvRouteName.setText(orderObj.getString("route_name"))
                                 val productItems: ArrayList<Products> = ArrayList()
-                                if (brandArray.length() > 0){
-                                    for (j in 0 until brandArray.length()){
-                                        val brandObj = brandArray.getJSONObject(j)
-                                        if(brandObj.getInt("ordered_quantity") > 0) {
-                                            productItems.add(
-                                                Products(
-                                                    brandObj.getString("product_id"),
-                                                    brandObj.getString("product_name"),
-                                                    "",
-                                                    /*brandObj.getString("brand_id"),
-                                                    "",*/
-                                                    brandObj.getDouble("unit_price"),
-                                                    /*0.0,*/ "",
-                                                    brandObj.getString("unit_name"),
-                                                    "", 0, 0,
-                                                    brandObj.getInt("bounced_quantity"),
-                                                    brandObj.getInt("ordered_quantity"),
-                                                    brandObj.getDouble("ordered_amount")
+                                if (orderObj.getString("order_status").equals("DELIVERED", true)) {
+                                    if (brandArray.length() > 0) {
+                                        for (j in 0 until brandArray.length()) {
+                                            val brandObj = brandArray.getJSONObject(j)
+                                            if (brandObj.getInt("delivered_quantity") > 0) {
+                                                productItems.add(
+                                                    Products(
+                                                        brandObj.getString("product_id"),
+                                                        brandObj.getString("product_name"),
+                                                        brandObj.getString("product_code"),
+                                                        /*brandObj.getString("brand_id"),
+                                                        "",*/
+                                                        brandObj.getDouble("unit_price"),
+                                                        brandObj.getDouble("discounted_unit_price"),
+                                                        brandObj.getString("sku_code"),
+                                                        /*0.0,*/ "",
+                                                        brandObj.getString("unit_id"),
+                                                        brandObj.getString("unit_name"),
+                                                        brandObj.getString("unit_code"),
+                                                        brandObj.getString("category_id"),
+                                                        brandObj.getString("category_name"),
+                                                        brandObj.getString("category_code"),
+                                                        0, 0,
+                                                        brandObj.getInt("bounced_quantity"),
+                                                        brandObj.getInt("delivered_quantity"),
+                                                        brandObj.getDouble("delivered_amount")
+                                                    )
                                                 )
-                                            )
+                                            }
                                         }
-                                    }
 
-                                }
-                                itemList.add(
-                                    OrderList(
-                                        null,
-                                        orderObj.getString("order_no"),
-                                        orderObj.getString("ordered_at"),
-                                        orderObj.getString("order_status"),
-                                        orderObj.getString("outlet_id"),
-                                        orderObj.getString("outlet_name"),
-                                        orderObj.getString("route_id"),
-                                        orderObj.getString("route_name"),
-                                        /*orderObj.getString("distributor_office_code"),*/
-                                        orderObj.getString("total_ordered_amount"),
-                                        orderObj.getString("total_ordered_quantity"),
-                                        orderObj.getString("latitude"),
-                                        orderObj.getString("longitude"),
-                                        productItems
+                                    }
+                                    itemList.add(
+                                        OrderList(
+                                            null,
+                                            orderObj.getString("order_no"),
+                                            orderObj.getString("ordered_at"),
+                                            orderObj.getString("order_status"),
+                                            orderObj.getString("outlet_id"),
+                                            orderObj.getString("outlet_name"),
+                                            orderObj.getString("route_id"),
+                                            orderObj.getString("route_name"),
+                                            /*orderObj.getString("distributor_office_code"),*/
+                                            orderObj.getString("total_delivered_amount"),
+                                            orderObj.getString("total_delivered_quantity"),
+                                            orderObj.getString("latitude"),
+                                            orderObj.getString("longitude"),
+                                            productItems
+                                        )
                                     )
-                                )
+                                } else {
+                                    if (brandArray.length() > 0) {
+                                        for (j in 0 until brandArray.length()) {
+                                            val brandObj = brandArray.getJSONObject(j)
+                                            if (brandObj.getInt("ordered_quantity") > 0) {
+                                                productItems.add(
+                                                    Products(
+                                                        brandObj.getString("product_id"),
+                                                        brandObj.getString("product_name"),
+                                                        brandObj.getString("product_code"),
+                                                        /*brandObj.getString("brand_id"),
+                                                        "",*/
+                                                        brandObj.getDouble("unit_price"),
+                                                        brandObj.getDouble("discounted_unit_price"),
+                                                        brandObj.getString("sku_code"),
+                                                        /*0.0,*/ "",
+                                                        brandObj.getString("unit_id"),
+                                                        brandObj.getString("unit_name"),
+                                                        brandObj.getString("unit_code"),
+                                                        brandObj.getString("category_id"),
+                                                        brandObj.getString("category_name"),
+                                                        brandObj.getString("category_code"),
+                                                        0, 0,
+                                                        brandObj.getInt("bounced_quantity"),
+                                                        brandObj.getInt("ordered_quantity"),
+                                                        brandObj.getDouble("ordered_amount")
+                                                    )
+                                                )
+                                            }
+                                        }
+
+                                    }
+                                    itemList.add(
+                                        OrderList(
+                                            null,
+                                            orderObj.getString("order_no"),
+                                            orderObj.getString("ordered_at"),
+                                            orderObj.getString("order_status"),
+                                            orderObj.getString("outlet_id"),
+                                            orderObj.getString("outlet_name"),
+                                            orderObj.getString("route_id"),
+                                            orderObj.getString("route_name"),
+                                            /*orderObj.getString("distributor_office_code"),*/
+                                            orderObj.getString("total_ordered_amount"),
+                                            orderObj.getString("total_ordered_quantity"),
+                                            orderObj.getString("latitude"),
+                                            orderObj.getString("longitude"),
+                                            productItems
+                                        )
+                                    )
+                                }
                             }
                         }
                         itemList.sortByDescending {
@@ -223,7 +288,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 
 
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     progressBarOrder.visibility = View.GONE
                     e.printStackTrace()
                 }

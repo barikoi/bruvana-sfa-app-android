@@ -144,7 +144,7 @@ class TradeOffersActivity : AppCompatActivity() {
                                         productObj.getString("product_name"),
                                         productObj.getString("unit_name"),
                                         productObj.getString("current_available_stock"),
-                                        productObj.getString("unit_price"),
+                                        productObj.getString("discounted_unit_price"),
                                         imageUrl,
                                         tradeProducts)
                                 )

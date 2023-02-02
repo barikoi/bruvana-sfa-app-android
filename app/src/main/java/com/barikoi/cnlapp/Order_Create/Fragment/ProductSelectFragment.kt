@@ -265,7 +265,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 brandObj.getString("product_name"),
                                 brandObj.getString("unit_name"),
                                 *//*brandObj.getString("brand_id"),*//*
-                                brandObj.getDouble("unit_price"),
+                                brandObj.getDouble("discounted_unit_price"),
                                 brandObj.getDouble("ordered_amount"),
                                 brandObj.getInt("ordered_quantity"),
                                 brandObj.getInt("delivered_quantity"),
@@ -529,10 +529,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 val brandObj = JSONObject()
                 if (addedProducts!![j].ordered_quantity > 0) {
                     brandObj.put("product_id", addedProducts!![j].product_id)
-                    brandObj.put("brand_id", null)
+                    brandObj.put("product_code", addedProducts!![j].product_code)
                     brandObj.put("product_name", addedProducts!![j].product_name)
+                    brandObj.put("brand_id", null)
+                    brandObj.put("sku_code", addedProducts!![j].sku_code)
+                    brandObj.put("unit_id", addedProducts!![j].unit_id)
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    brandObj.put("unit_code", addedProducts!![j].unit_code)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                    brandObj.put("discounted_unit_price", addedProducts!![j].discounted_unit_price.toString())
+                    brandObj.put("category_id", addedProducts!![j].category_id)
+                    brandObj.put("category_name", addedProducts!![j].category_name)
+                    brandObj.put("category_code", addedProducts!![j].category_code)
                     brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
@@ -645,10 +653,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 val brandObj = JSONObject()
                 if (addedProducts!![j].ordered_quantity > 0) {
                     brandObj.put("product_id", addedProducts!![j].product_id)
-                    brandObj.put("brand_id", null)
+                    brandObj.put("product_code", addedProducts!![j].product_code)
                     brandObj.put("product_name", addedProducts!![j].product_name)
+                    brandObj.put("brand_id", null)
+                    brandObj.put("sku_code", addedProducts!![j].sku_code)
+                    brandObj.put("unit_id", addedProducts!![j].unit_id)
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
+                    brandObj.put("unit_code", addedProducts!![j].unit_code)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                    brandObj.put("discounted_unit_price", addedProducts!![j].discounted_unit_price.toString())
+                    brandObj.put("category_id", addedProducts!![j].category_id)
+                    brandObj.put("category_name", addedProducts!![j].category_name)
+                    brandObj.put("category_code", addedProducts!![j].category_code)
                     brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
@@ -830,10 +846,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 var imageUrl = "null"
                                 val productObj = productArray.getJSONObject(i)
                                 val productId = productObj.getString("id")
-                                val productName =
-                                    if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
-                                val productCode =
-                                    if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
+                                val productName = if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
+                                val productCode = if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
                                 /*val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
                                 val brandName = if (!productObj.isNull("brand__name")) productObj.getString("brand__name") else ""*/
                                 /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
@@ -846,12 +860,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                val unitName =
-                                    if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
-                                val categoryName =
-                                    if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
-                                val qtyLastMonth =
-                                    if (!productObj.isNull("quantity_last_month")) productObj.getInt(
+                                val skuCode = if (!productObj.isNull("sku_code")) productObj.getString("sku_code") else ""
+                                val unitId = if (!productObj.isNull("unit_id")) productObj.getString("unit_id") else ""
+                                val unitName = if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
+                                val unitCode = if (!productObj.isNull("unit_code")) productObj.getString("unit_code") else ""
+                                val categoryId = if (!productObj.isNull("category_id")) productObj.getString("category_id") else ""
+                                val categoryName = if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
+                                val categoryCode = if (!productObj.isNull("category_code")) productObj.getString("category_code") else ""
+                                val qtyLastMonth = if (!productObj.isNull("quantity_last_month")) productObj.getInt(
                                         "quantity_last_month"
                                     ) else 0
                                 val availableStock =
@@ -859,10 +875,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         "current_available_stock"
                                     ) else 0
                                 var price = 0.0
+                                var discount_price = 0.0
                                 if (!productObj.isNull("unit_price")) {
                                     price = productObj.getDouble("unit_price")
                                 } else {
                                     price = 0.0
+                                }
+                                if (!productObj.isNull("discounted_unit_price")) {
+                                    discount_price = productObj.getDouble("discounted_unit_price")
+                                } else {
+                                    discount_price = 0.0
                                 }
                                 if (selectedOrder != null) {
                                     //var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
@@ -889,9 +911,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                     productName,
                                     productCode,
                                     price,
+                                    discount_price,
+                                    skuCode,
                                     imageUrl,
+                                    unitId,
                                     unitName,
+                                    unitCode,
+                                    categoryId,
                                     categoryName,
+                                    categoryCode,
                                     qtyLastMonth,
                                     availableStock,
                                     0,
@@ -1030,9 +1058,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                                 ProductStatistics(
                                                     brandObj.getString("product_id"),
                                                     brandObj.getString("product_name"),
+                                                    brandObj.getString("product_code"),
+                                                    brandObj.getString("sku_code"),
+                                                    brandObj.getString("category_code"),
+                                                    brandObj.getString("category_name"),
+                                                    brandObj.getString("category_id"),
                                                     brandObj.getString("unit_name"),
+                                                    brandObj.getString("unit_id"),
+                                                    brandObj.getString("unit_code"),
                                                     /*brandObj.getString("brand_id"),*/
                                                     brandObj.getDouble("unit_price"),
+                                                    brandObj.getDouble("discounted_unit_price"),
                                                     brandObj.getDouble("ordered_amount"),
                                                     brandObj.getInt("ordered_quantity"),
                                                     brandObj.getInt("delivered_quantity"),
@@ -1069,9 +1105,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                                 ProductStatistics(
                                                     brandObj.getString("product_id"),
                                                     brandObj.getString("product_name"),
+                                                    brandObj.getString("product_code"),
+                                                    brandObj.getString("sku_code"),
+                                                    brandObj.getString("category_code"),
+                                                    brandObj.getString("category_name"),
+                                                    brandObj.getString("category_id"),
                                                     brandObj.getString("unit_name"),
+                                                    brandObj.getString("unit_id"),
+                                                    brandObj.getString("unit_code"),
                                                     /*brandObj.getString("brand_id"),*/
                                                     brandObj.getDouble("unit_price"),
+                                                    brandObj.getDouble("discounted_unit_price"),
                                                     brandObj.getDouble("ordered_amount"),
                                                     brandObj.getInt("ordered_quantity"),
                                                     brandObj.getInt("bounced_quantity"),
@@ -1114,9 +1158,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             ProductStatistics(
                                 brandObj.getString("product_id"),
                                 brandObj.getString("product_name"),
+                                brandObj.getString("product_code"),
+                                brandObj.getString("sku_code"),
+                                brandObj.getString("category_code"),
+                                brandObj.getString("category_name"),
+                                brandObj.getString("category_id"),
                                 brandObj.getString("unit_name"),
+                                brandObj.getString("unit_id"),
+                                brandObj.getString("unit_code"),
                                 /*brandObj.getString("brand_id"),*/
                                 brandObj.getDouble("unit_price"),
+                                brandObj.getDouble("discounted_unit_price"),
                                 brandObj.getDouble("ordered_amount"),
                                 brandObj.getInt("ordered_quantity"),
                                 brandObj.getInt("delivered_quantity"),
@@ -1247,9 +1299,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         products.product_name,
                         products.product_code,
                         products.unit_price,
+                        products.discounted_unit_price,
+                        products.sku_code,
                         products.imageUrl,
+                        products.unit_id,
                         products.unit_name,
+                        products.unit_code,
+                        products.category_id,
                         products.category_name,
+                        products.category_code,
                         products.quantity_last_month,
                         products.stock_available,
                         products.bounced_quantity,
@@ -1265,9 +1323,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         products.product_name,
                         products.product_code,
                         products.unit_price,
+                        products.discounted_unit_price,
+                        products.sku_code,
                         products.imageUrl,
+                        products.unit_id,
                         products.unit_name,
+                        products.unit_code,
+                        products.category_id,
                         products.category_name,
+                        products.category_code,
                         products.quantity_last_month,
                         products.stock_available,
                         products.bounced_quantity,

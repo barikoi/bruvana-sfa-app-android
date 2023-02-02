@@ -47,7 +47,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
         holder.stockAvailable.visibility = View.VISIBLE
         holder.productName.text = productList[position].product_name
         holder.productUnit.text = productList[position].unit_name
-        holder.perUnitPrice.text = productList[position].unit_price.toString()
+        holder.perUnitPrice.text = productList[position].discounted_unit_price.toString()
 
         if (productList[position].ordered_quantity > 0) {
             /*holder.layoutQty.visibility = View.VISIBLE
@@ -77,7 +77,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             holder.stockAvailable.text = holder.itemView.resources.getString(R.string.stock_out)
         }
 
-        holder.perUnitPrice.text = productList[position].unit_price.toString()
+        holder.perUnitPrice.text = productList[position].discounted_unit_price.toString()
 
         holder.productUnit.text = productList[position].unit_name
 
@@ -87,10 +87,10 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             if (productList[position].stock_available > 0) {
                 val qtyValue = holder.productCount.text.toString().toInt() + 1
                 holder.productCount.setText(qtyValue.toString())
-                /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                /*val subtotal = productList[position].discounted_unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = subtotal.toString()*/
                 productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-                productList[position].ordered_total_price = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                productList[position].ordered_total_price = productList[position].discounted_unit_price * holder.productCount.text.toString().toInt()
                 productList[position].stock_available = productList[position].stock_available - 1
                 holder.stockAvailable.text =
                     productList[position].stock_available.toString() + " in stock"
@@ -105,7 +105,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                         appDatabase.saveOrderDao().update(
                             prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
                             prodList[0].itemsCount + 1,
-                            prodList[0].totalPrice + productList[position].unit_price
+                            prodList[0].totalPrice + productList[position].discounted_unit_price
                         )
                     } else {
                         appDatabase.saveOrderDao().insertAll(
@@ -140,10 +140,10 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             ) {
                 val qtyValue = holder.productCount.text.toString().toInt() - 1
                 holder.productCount.setText(qtyValue.toString())
-                /*val subtotal = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                /*val subtotal = productList[position].discounted_unit_price * holder.productCount.text.toString().toInt()
                 holder.tvSubtoal.text = subtotal.toString()*/
                 productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-                productList[position].ordered_total_price = productList[position].unit_price * holder.productCount.text.toString().toInt()
+                productList[position].ordered_total_price = productList[position].discounted_unit_price * holder.productCount.text.toString().toInt()
                 productList[position].stock_available = productList[position].stock_available + 1
                 holder.stockAvailable.text = productList[position].stock_available.toString() + " in stock"
                 val prodList = appDatabase!!.saveOrderDao()
@@ -156,7 +156,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                     appDatabase.saveOrderDao().update(
                         prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
                         prodList[0].itemsCount - 1,
-                        prodList[0].totalPrice - productList[position].unit_price
+                        prodList[0].totalPrice - productList[position].discounted_unit_price
                     )
                 } else {
                     appDatabase.saveOrderDao().insertAll(
@@ -182,7 +182,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if (holder.productCount.text.toString().trim().length > 0) {
                     val subtotal =
-                        productList[position].unit_price * holder.productCount.text.toString()
+                        productList[position].discounted_unit_price * holder.productCount.text.toString()
                             .toInt()
                     holder.tvSubtoal.text = dformat.format(subtotal).toString()
 

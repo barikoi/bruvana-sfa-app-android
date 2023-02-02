@@ -9,10 +9,16 @@ class Products(
     /*val brand_id: String,
     val brand_name: String,*/
     val unit_price: Double,
+    val discounted_unit_price: Double,
+    val sku_code: String,
     /*val discount: Double,*/
     val imageUrl: String,
+    val unit_id: String,
     val unit_name: String,
+    val unit_code: String,
+    val category_id: String,
     val category_name: String,
+    val category_code: String,
     val quantity_last_month: Int,
     var stock_available: Int,
     var bounced_quantity: Int,

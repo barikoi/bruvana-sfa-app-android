@@ -228,9 +228,18 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                     if (brandList[j].ordered_quantity > 0) {
                         brandObj.put("product_id", brandList[j].product_id)
                         /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
+                        brandObj.put("product_code", brandList[j].product_code)
                         brandObj.put("product_name", brandList[j].product_name)
+                        brandObj.put("brand_id", null)
+                        brandObj.put("sku_code", brandList[j].sku_code)
+                        brandObj.put("unit_id", brandList[j].unit_id)
                         brandObj.put("unit_name", brandList[j].unit_name)
+                        brandObj.put("unit_code", brandList[j].unit_code)
                         brandObj.put("unit_price", brandList[j].unit_price.toString())
+                        brandObj.put("discounted_unit_price", brandList[j].discounted_unit_price.toString())
+                        brandObj.put("category_id", brandList[j].category_id)
+                        brandObj.put("category_name", brandList[j].category_name)
+                        brandObj.put("category_code", brandList[j].category_code)
                         brandObj.put("ordered_quantity", brandList[j].ordered_quantity.toString())
                         brandObj.put("delivered_quantity", "0")
                         brandObj.put("bounced_quantity", "0")
@@ -356,13 +365,20 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                                     Products(
                                         brandObj.getString("product_id"),
                                         brandObj.getString("product_name"),
-                                        "",
+                                        brandObj.getString("product_code"),
                                         /*brandObj.getString("brand_id"),
                                         "",*/
                                         brandObj.getDouble("unit_price"),
+                                        brandObj.getDouble("discounted_unit_price"),
+                                        brandObj.getString("sku_code"),
                                         /*0.0,*/ "",
+                                        brandObj.getString("unit_id"),
                                         brandObj.getString("unit_name"),
-                                        "", 0, 0,
+                                        brandObj.getString("unit_code"),
+                                        brandObj.getString("category_id"),
+                                        brandObj.getString("category_name"),
+                                        brandObj.getString("category_code"),
+                                        0, 0,
                                         brandObj.getInt("bounced_quantity"),
                                         brandObj.getInt("ordered_quantity"),
                                         brandObj.getDouble("ordered_amount")

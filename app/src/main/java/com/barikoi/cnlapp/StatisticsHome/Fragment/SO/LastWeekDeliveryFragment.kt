@@ -97,9 +97,17 @@ class LastWeekDeliveryFragment : Fragment() {
                                                             ProductStatistics(
                                                                 brandObj.getString("product_id"),
                                                                 brandObj.getString("product_name"),
+                                                                brandObj.getString("product_code"),
+                                                                brandObj.getString("sku_code"),
+                                                                brandObj.getString("category_code"),
+                                                                brandObj.getString("category_name"),
+                                                                brandObj.getString("category_id"),
                                                                 brandObj.getString("unit_name"),
+                                                                brandObj.getString("unit_id"),
+                                                                brandObj.getString("unit_code"),
                                                                 /*brandObj.getString("brand_id"),*/
                                                                 brandObj.getDouble("unit_price"),
+                                                                brandObj.getDouble("discounted_unit_price"),
                                                                 brandObj.getDouble("ordered_amount"),
                                                                 brandObj.getInt("ordered_quantity"),
                                                                 brandObj.getInt("delivered_quantity"),

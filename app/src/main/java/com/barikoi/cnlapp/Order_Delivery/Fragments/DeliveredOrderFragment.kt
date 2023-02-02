@@ -187,13 +187,20 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                         Products(
                                             brandObj.getString("product_id"),
                                             brandObj.getString("product_name"),
-                                            "",
+                                            brandObj.getString("product_code"),
                                             /*brandObj.getString("brand_id"),
                                             "",*/
                                             brandObj.getDouble("unit_price"),
+                                            brandObj.getDouble("discounted_unit_price"),
+                                            brandObj.getString("sku_code"),
                                             /*0.0,*/ "",
+                                            brandObj.getString("unit_id"),
                                             brandObj.getString("unit_name"),
-                                            "", 0, 0,
+                                            brandObj.getString("unit_code"),
+                                            brandObj.getString("category_id"),
+                                            brandObj.getString("category_name"),
+                                            brandObj.getString("category_code"),
+                                            0, 0,
                                             bounce,
                                             brandObj.getInt("delivered_quantity"),
                                             brandObj.getDouble("delivered_amount")
@@ -290,7 +297,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onEdit(order: OrderList) {
 
-        viewDialog(mContext!!, order)
+        //viewDialog(mContext!!, order)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -346,9 +353,17 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                     ProductStatistics(
                         order.brands_array[i].product_id,
                         order.brands_array[i].product_name,
+                        order.brands_array[i].product_code,
+                        order.brands_array[i].sku_code,
+                        order.brands_array[i].category_code,
+                        order.brands_array[i].category_name,
+                        order.brands_array[i].category_id,
                         order.brands_array[i].unit_name,
+                        order.brands_array[i].unit_id,
+                        order.brands_array[i].unit_code,
                         /*order.brands_array[i].brand_id,*/
                         order.brands_array[i].unit_price,
+                        order.brands_array[i].discounted_unit_price,
                         order.brands_array[i].ordered_total_price,
                         order.brands_array[i].ordered_quantity,
                         order.brands_array[i].ordered_quantity,
@@ -416,9 +431,9 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                     /*brandObj.put("brand_id", updatedProducts[i].brand_id)*/
                     brandObj.put("quantity", updatedProducts[i].quantity.toString())
                     brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
-                    brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
+                    brandObj.put("discounted_unit_price", updatedProducts[i].discounted_unit_price.toString())
                     brandObj.put("total_price", updatedProducts[i].total_price.toString())
-                    brandObj.put("unit_name", updatedProducts[i].product_type)
+                    brandObj.put("unit_name", updatedProducts[i].unit_name)
                 }
                 brandsArray.put(brandObj)
             }

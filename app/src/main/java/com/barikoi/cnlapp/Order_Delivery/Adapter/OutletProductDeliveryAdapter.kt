@@ -35,7 +35,7 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
         val item = products[position]
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
         holder.productName.setText(item.product_name)
-        holder.productType.setText(item.product_type)
+        holder.productType.setText(item.unit_name)
         holder.perUnitPrice.setText(item.unit_price.toString())
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false
