@@ -24,6 +24,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_last_week_product.*
 import org.json.JSONObject
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -69,7 +70,7 @@ class LastWeekProductFragment : Fragment() {
 
 
     private fun getSummaryProducts(url: String) {
-
+        var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
@@ -83,7 +84,7 @@ class LastWeekProductFragment : Fragment() {
                                 if (!productObj.isNull("delivered_amount")) {
                                     if (productObj.getDouble("delivered_amount") > 0.0) {
                                         val productName = productObj.getString("product_name")
-                                        val totalPrice = productObj.getString("delivered_amount")
+                                        val totalPrice = dformat.format(productObj.getString("delivered_amount").toDouble())
                                         itemList.add(Pair(productName, totalPrice))
                                     }
                                 }

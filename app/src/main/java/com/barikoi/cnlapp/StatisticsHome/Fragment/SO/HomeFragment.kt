@@ -302,6 +302,7 @@ class HomeFragment : Fragment() {
         fragments.add(LastWeekCategoryFragment())
         fragments.add(LastWeekDeliveryFragment())
         fragments.add(LastWeekBounceFragment())
+        dotsLayout.removeAllViews()
         addDots(fragments.size)
         viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator
@@ -381,7 +382,7 @@ class HomeFragment : Fragment() {
     }
 
     fun addDots(dotCount: Int) {
-
+        dots.clear()
         for (i in 0 until dotCount) {
             val dot = ImageView(mContext)
             dot.setImageDrawable(resources.getDrawable(R.drawable.ic_dot_unselected))

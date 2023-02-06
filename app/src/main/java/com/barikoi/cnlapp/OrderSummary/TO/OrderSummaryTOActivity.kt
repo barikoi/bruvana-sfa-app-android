@@ -314,13 +314,13 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
         var size: Int = 0
-        if (data.size < 5) {
+        /*if (data.size < 5) {
             size = data.size
         } else {
             size = 5
-        }
+        }*/
         if (data.size > 0) {
-            for (i in 0 until size) {
+            for (i in 0 until data.size) {
                 val tr = TableRow(applicationContext)
                 val tableRowParams = TableLayout.LayoutParams(
                     TableLayout.LayoutParams.FILL_PARENT,

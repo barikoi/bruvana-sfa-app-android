@@ -150,12 +150,12 @@ class LastWeekSummaryTOFragment : Fragment() {
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
         var size : Int = 0
-        if (data.size<5){
+        /*if (data.size<5){
             size = data.size
         }else{
             size = 5
-        }
-        for (i in 0 until size) {
+        }*/
+        for (i in 0 until data.size) {
             val tr = TableRow(mContext)
             val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
             val leftMargin = 0

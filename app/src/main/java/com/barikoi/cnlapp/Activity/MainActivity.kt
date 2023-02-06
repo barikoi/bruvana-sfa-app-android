@@ -384,6 +384,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
                 val home = Intent(context, SplashActivity::class.java)
                 home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(home)
                 finish()
             }) {
