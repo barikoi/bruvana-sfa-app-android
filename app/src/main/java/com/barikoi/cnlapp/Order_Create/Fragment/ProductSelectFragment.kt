@@ -655,7 +655,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("product_id", addedProducts!![j].product_id)
                     brandObj.put("product_code", addedProducts!![j].product_code)
                     brandObj.put("product_name", addedProducts!![j].product_name)
-                    brandObj.put("brand_id", null)
+                    brandObj.put("brand_id", "")
                     brandObj.put("sku_code", addedProducts!![j].sku_code)
                     brandObj.put("unit_id", addedProducts!![j].unit_id)
                     brandObj.put("unit_name", addedProducts!![j].unit_name)

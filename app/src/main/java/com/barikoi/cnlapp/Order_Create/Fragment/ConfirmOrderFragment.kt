@@ -230,7 +230,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                         /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
                         brandObj.put("product_code", brandList[j].product_code)
                         brandObj.put("product_name", brandList[j].product_name)
-                        brandObj.put("brand_id", null)
+                        brandObj.put("brand_id", "")
                         brandObj.put("sku_code", brandList[j].sku_code)
                         brandObj.put("unit_id", brandList[j].unit_id)
                         brandObj.put("unit_name", brandList[j].unit_name)
