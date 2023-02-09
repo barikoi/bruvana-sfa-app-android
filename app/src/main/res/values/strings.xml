@@ -104,6 +104,7 @@
     <string name="bounce">Bounce</string>
     <string name="delivery_value">Delivery Value</string>
     <string name="total_target">Total Target</string>
+    <string name="total_target_achieved">Total Target Achieved</string>
     <string name="details">Details</string>
     <string name="total">Total-</string>
     <string name="last_order_date">Last order date- </string>

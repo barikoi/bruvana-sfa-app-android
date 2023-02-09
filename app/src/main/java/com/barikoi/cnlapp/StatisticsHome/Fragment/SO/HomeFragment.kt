@@ -245,7 +245,7 @@ class HomeFragment : Fragment() {
                                 if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                                 if(!targetObj.isNull("number_of_visits")) visit_completed = dformat.format(targetObj.getString("number_of_visits").toDouble())
                                 if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
-                                if(!targetObj.isNull("bounce_quantity_percentage")) bounce_completed = dformat.format(targetObj.getString("bounce_quantity_percentage").toDouble())
+                                if(!targetObj.isNull("bounce_amount_percentage")) bounce_completed = dformat.format(targetObj.getString("bounce_amount_percentage").toDouble())
                             }
                         }
 
