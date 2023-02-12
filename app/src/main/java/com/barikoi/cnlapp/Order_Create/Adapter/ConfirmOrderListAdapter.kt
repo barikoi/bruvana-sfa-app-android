@@ -36,6 +36,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val queue = RequestQueueSingleton.getInstance(holder.itemView.context).getRequestQueue()
         var dformat = DecimalFormat("#.##")
+        holder.routeName.text = orderList[position].routeName
         holder.shopName.text = orderList[position].outletName
         holder.subTotal.text = dformat.format(orderList[position].grandTotal.toDouble()).toString()
 
@@ -152,6 +153,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val shopName: TextView
+        internal val routeName: TextView
         internal val orderAt: TextView
         internal val subTotal: TextView
         internal val addMore: TextView
@@ -163,6 +165,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
 
         init {
             shopName = itemView.findViewById(R.id.tvShopName)
+            routeName = itemView.findViewById(R.id.tvRouteName)
             orderAt = itemView.findViewById(R.id.tvOrderDate)
             subTotal = itemView.findViewById(R.id.tvSubTotal)
             productList = itemView.findViewById(R.id.productlist)

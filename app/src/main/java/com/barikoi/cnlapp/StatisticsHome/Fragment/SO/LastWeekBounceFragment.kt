@@ -99,7 +99,6 @@ class LastWeekBounceFragment : Fragment() {
                                                                 brandObj.getString("unit_name"),
                                                                 brandObj.getString("unit_id"),
                                                                 brandObj.getString("unit_code"),
-                                                                /*brandObj.getString("brand_id"),*/
                                                                 brandObj.getDouble("unit_price"),
                                                                 brandObj.getDouble("discounted_unit_price"),
                                                                 brandObj.getDouble("ordered_amount"),
@@ -133,7 +132,6 @@ class LastWeekBounceFragment : Fragment() {
                                                                 brandObj.getString("unit_name"),
                                                                 brandObj.getString("unit_id"),
                                                                 brandObj.getString("unit_code"),
-                                                                /*brandObj.getString("brand_id"),*/
                                                                 brandObj.getDouble("unit_price"),
                                                                 brandObj.getDouble("discounted_unit_price"),
                                                                 brandObj.getDouble("ordered_amount"),

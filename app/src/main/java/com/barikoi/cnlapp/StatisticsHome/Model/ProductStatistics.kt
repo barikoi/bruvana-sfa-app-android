@@ -13,7 +13,6 @@ class ProductStatistics(
     val unit_name: String,
     val unit_id: String,
     val unit_code: String,
-    /*val brand_id: String,*/
     val unit_price: Double,
     val discounted_unit_price: Double,
     var ordered_price: Double,

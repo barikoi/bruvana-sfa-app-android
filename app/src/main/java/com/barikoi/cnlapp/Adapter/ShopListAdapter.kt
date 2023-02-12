@@ -37,7 +37,9 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         }else{
             holder.shopState.visibility = View.GONE
         }
-        holder.shopCode.text = shopList[position].shop_code
+        if (!shopList[position].shop_code.equals("null")) holder.shopCode.text = shopList[position].shop_code
+        if (!shopList[position].category.equals("null"))holder.shopCategory.text = "Category: "+shopList[position].category
+        else holder.shopCategory.text = "Category: "
         holder.shopType.text = shopList[position].shop_type
         //holder.distributorName.text = shopList[position].distributor_office
         holder.territoryName.text = shopList[position].territory_name
@@ -79,6 +81,7 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         internal val shopCode: TextView
         internal val distributorName: TextView
         internal val shopType: TextView
+        internal val shopCategory: TextView
         internal val territoryName: TextView
         internal val imageShop:ImageView
         internal val imageNewTag:ImageView
@@ -91,6 +94,7 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
             address = itemView.findViewById(R.id.address)
             shopCode = itemView.findViewById(R.id.shop_code)
             shopType = itemView.findViewById(R.id.shop_type)
+            shopCategory = itemView.findViewById(R.id.shop_category)
             distributorName = itemView.findViewById(R.id.distributor_name)
             imageShop = itemView.findViewById(R.id.imageShop)
             imageNewTag = itemView.findViewById(R.id.imgNewTag)

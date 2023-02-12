@@ -187,7 +187,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             })
         }.start()*/
         btnBack.setOnClickListener {
-            setResult(55)
+            //setResult(55)
             finish()
             onBackPressed()
         }

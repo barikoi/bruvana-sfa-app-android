@@ -6,8 +6,6 @@ class Products(
     var product_id: String,
     val product_name: String,
     val product_code: String,
-    /*val brand_id: String,
-    val brand_name: String,*/
     val unit_price: Double,
     val discounted_unit_price: Double,
     val sku_code: String,

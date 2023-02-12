@@ -227,10 +227,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                     val brandObj = JSONObject()
                     if (brandList[j].ordered_quantity > 0) {
                         brandObj.put("product_id", brandList[j].product_id)
-                        /*brandObj.put("brand_id", addedProducts!![j].brand_id)*/
                         brandObj.put("product_code", brandList[j].product_code)
                         brandObj.put("product_name", brandList[j].product_name)
-                        brandObj.put("brand_id", "")
                         brandObj.put("sku_code", brandList[j].sku_code)
                         brandObj.put("unit_id", brandList[j].unit_id)
                         brandObj.put("unit_name", brandList[j].unit_name)
@@ -366,8 +364,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                                         brandObj.getString("product_id"),
                                         brandObj.getString("product_name"),
                                         brandObj.getString("product_code"),
-                                        /*brandObj.getString("brand_id"),
-                                        "",*/
                                         brandObj.getDouble("unit_price"),
                                         brandObj.getDouble("discounted_unit_price"),
                                         brandObj.getString("sku_code"),

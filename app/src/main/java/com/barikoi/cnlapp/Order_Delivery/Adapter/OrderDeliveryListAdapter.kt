@@ -29,6 +29,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = orderList[position]
         var dformat = DecimalFormat("#.##")
+        holder.routeName.text = mItem.routeName
         holder.shopName.text = mItem.outletName
         holder.subTotal.text = dformat.format(mItem.grandTotal.toDouble()).toString()
 
@@ -129,6 +130,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val shopName: TextView
+        internal val routeName: TextView
         internal val orderAt: TextView
         internal val subTotal: TextView
         internal val editItem: ImageView
@@ -138,6 +140,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
 
         init {
             shopName = itemView.findViewById(R.id.tvShopName)
+            routeName = itemView.findViewById(R.id.tvRouteName)
             orderAt = itemView.findViewById(R.id.tvOrderDate)
             subTotal = itemView.findViewById(R.id.tvSubTotal)
             productList = itemView.findViewById(R.id.productlist)

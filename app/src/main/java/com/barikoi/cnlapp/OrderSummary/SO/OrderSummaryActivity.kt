@@ -185,8 +185,6 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                                         brandObj.getString("product_id"),
                                                         brandObj.getString("product_name"),
                                                         brandObj.getString("product_code"),
-                                                        /*brandObj.getString("brand_id"),
-                                                        "",*/
                                                         brandObj.getDouble("unit_price"),
                                                         brandObj.getDouble("discounted_unit_price"),
                                                         brandObj.getString("sku_code"),
@@ -235,8 +233,6 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                                         brandObj.getString("product_id"),
                                                         brandObj.getString("product_name"),
                                                         brandObj.getString("product_code"),
-                                                        /*brandObj.getString("brand_id"),
-                                                        "",*/
                                                         brandObj.getDouble("unit_price"),
                                                         brandObj.getDouble("discounted_unit_price"),
                                                         brandObj.getString("sku_code"),

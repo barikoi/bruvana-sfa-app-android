@@ -47,7 +47,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         holder.shopName.setText(item.shop_name)
         if (!item.lastOrderDate.equals("null")){
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(item.lastOrderDate))
             holder.lastOrderDate.setText(holder.itemView.context.resources.getString(R.string.last_order_date)+orderDate)
         }
@@ -90,7 +90,7 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         var dformat = DecimalFormat("#.##")
         outletName.setText(outlet_name)
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-        val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+        val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(lastOrder))
         tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
 

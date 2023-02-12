@@ -92,7 +92,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                // write code to perform some action
+                //parent.lastVisiblePosition
             }
         }
 

@@ -106,8 +106,9 @@
                     android:background="@drawable/cardview_bg">
                 <LinearLayout
                     android:id="@+id/imageViewLayout"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:orientation="horizontal">
                 </LinearLayout>
                 </HorizontalScrollView>
@@ -252,8 +253,6 @@
             android:id="@+id/etAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:layout_weight="4"
             android:layout_gravity="center_vertical"
             android:gravity="top"
             android:enabled="false"

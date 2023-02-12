@@ -256,25 +256,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 //val outletName = outletObj.getString("outlet_name")
                 lastDeliveryDate = outletObj.getString("ordered_at")
                 orderStatus = outletObj.getString("order_status")
-                /*if (brandArray.length() > 0) {
-                    for (j in 0 until brandArray.length()) {
-                        val brandObj = brandArray.getJSONObject(j)
-                        productItems.add(
-                            ProductStatistics(
-                                brandObj.getString("product_id"),
-                                brandObj.getString("product_name"),
-                                brandObj.getString("unit_name"),
-                                *//*brandObj.getString("brand_id"),*//*
-                                brandObj.getDouble("discounted_unit_price"),
-                                brandObj.getDouble("ordered_amount"),
-                                brandObj.getInt("ordered_quantity"),
-                                brandObj.getInt("delivered_quantity"),
-                                brandObj.getInt("bounced_quantity"),
-                                brandObj.getDouble("delivered_amount")
-                            )
-                        )
-                    }
-                }*/
 
             }
 
@@ -531,7 +512,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("product_id", addedProducts!![j].product_id)
                     brandObj.put("product_code", addedProducts!![j].product_code)
                     brandObj.put("product_name", addedProducts!![j].product_name)
-                    brandObj.put("brand_id", null)
                     brandObj.put("sku_code", addedProducts!![j].sku_code)
                     brandObj.put("unit_id", addedProducts!![j].unit_id)
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
@@ -655,7 +635,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("product_id", addedProducts!![j].product_id)
                     brandObj.put("product_code", addedProducts!![j].product_code)
                     brandObj.put("product_name", addedProducts!![j].product_name)
-                    brandObj.put("brand_id", "")
                     brandObj.put("sku_code", addedProducts!![j].sku_code)
                     brandObj.put("unit_id", addedProducts!![j].unit_id)
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
@@ -848,8 +827,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val productId = productObj.getString("id")
                                 val productName = if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
                                 val productCode = if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
-                                /*val brandId = if (!productObj.isNull("brand_id")) productObj.getString("brand_id") else ""
-                                val brandName = if (!productObj.isNull("brand__name")) productObj.getString("brand__name") else ""*/
                                 /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
                                 if (productObj.has("images") && !productObj.isNull("images")){
                                     val imageArray = productObj.getJSONArray("images")
@@ -1031,7 +1008,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         var dformat = DecimalFormat("#.##")
         outletName.setText(outlet_name)
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-        val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+        val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         if (lastOrder.length > 0) {
             val orderDate = df.format(oldDate.parse(lastOrder))
             tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
@@ -1066,7 +1043,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                                     brandObj.getString("unit_name"),
                                                     brandObj.getString("unit_id"),
                                                     brandObj.getString("unit_code"),
-                                                    /*brandObj.getString("brand_id"),*/
                                                     brandObj.getDouble("unit_price"),
                                                     brandObj.getDouble("discounted_unit_price"),
                                                     brandObj.getDouble("ordered_amount"),
@@ -1113,7 +1089,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                                     brandObj.getString("unit_name"),
                                                     brandObj.getString("unit_id"),
                                                     brandObj.getString("unit_code"),
-                                                    /*brandObj.getString("brand_id"),*/
                                                     brandObj.getDouble("unit_price"),
                                                     brandObj.getDouble("discounted_unit_price"),
                                                     brandObj.getDouble("ordered_amount"),
@@ -1166,7 +1141,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 brandObj.getString("unit_name"),
                                 brandObj.getString("unit_id"),
                                 brandObj.getString("unit_code"),
-                                /*brandObj.getString("brand_id"),*/
                                 brandObj.getDouble("unit_price"),
                                 brandObj.getDouble("discounted_unit_price"),
                                 brandObj.getDouble("ordered_amount"),

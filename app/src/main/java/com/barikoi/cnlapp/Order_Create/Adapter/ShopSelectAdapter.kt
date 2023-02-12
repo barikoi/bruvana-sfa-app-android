@@ -39,7 +39,7 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         holder.ownerName.text = shopList[position].shop_owner
         if (!shopList[position].lastOrderDate.equals("null")){
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(shopList[position].lastOrderDate))
             holder.lastOrderDate.text = holder.itemView.context.resources.getString(com.barikoi.cnlapp.R.string.last_order_date)+orderDate
         }

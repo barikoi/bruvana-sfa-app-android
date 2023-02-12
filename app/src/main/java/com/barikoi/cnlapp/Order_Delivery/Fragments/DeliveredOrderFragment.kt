@@ -188,8 +188,6 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                             brandObj.getString("product_id"),
                                             brandObj.getString("product_name"),
                                             brandObj.getString("product_code"),
-                                            /*brandObj.getString("brand_id"),
-                                            "",*/
                                             brandObj.getDouble("unit_price"),
                                             brandObj.getDouble("discounted_unit_price"),
                                             brandObj.getString("sku_code"),
@@ -340,7 +338,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         var dformat = DecimalFormat("#.##")
         outletName.setText(order.outletName)
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-        val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+        val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(order.orderedAt))
         tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
         var grandTotal = 0.0
@@ -361,7 +359,6 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                         order.brands_array[i].unit_name,
                         order.brands_array[i].unit_id,
                         order.brands_array[i].unit_code,
-                        /*order.brands_array[i].brand_id,*/
                         order.brands_array[i].unit_price,
                         order.brands_array[i].discounted_unit_price,
                         order.brands_array[i].ordered_total_price,
@@ -428,7 +425,6 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                 if (updatedProducts!![i].quantity > 0) {
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product", updatedProducts[i].product_name)
-                    /*brandObj.put("brand_id", updatedProducts[i].brand_id)*/
                     brandObj.put("quantity", updatedProducts[i].quantity.toString())
                     brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("discounted_unit_price", updatedProducts[i].discounted_unit_price.toString())
