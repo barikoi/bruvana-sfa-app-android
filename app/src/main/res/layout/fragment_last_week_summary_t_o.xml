@@ -171,7 +171,7 @@
             android:layout_centerInParent="true"
             android:visibility="gone"
             android:background="@drawable/rounded_stroke_bg"
-            android:text="@string/try_again"
+            android:text="@string/refresh"
             android:textStyle="bold"
             android:textAllCaps="true"
             android:textColor="@color/text_title"

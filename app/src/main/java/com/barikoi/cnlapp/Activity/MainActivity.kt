@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         userLayout.visibility = View.VISIBLE
         tvUserName.setText(userName)
-        getAuthUser(token, Api.authUserCheck+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59")
+        getAuthUser(token, Api.authUserCheck+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59&app_version="+BuildConfig.VERSION_NAME)
         if (userType.equals("TO", true)){
             routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)

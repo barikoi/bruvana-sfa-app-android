@@ -362,7 +362,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
     override fun onResume() {
         super.onResume()
-        getShopList(userId!!)
+        //getShopList(userId!!)
     }
 
     override fun onAttach(context: Context) {

@@ -59,6 +59,7 @@
     <string name="update">Update</string>
     <string name="check">Check</string>
     <string name="try_again">Try Again</string>
+    <string name="refresh">Refresh</string>
 
     <string name="route_plan">Route Plan</string>
     <string name="verified">Verified</string>
