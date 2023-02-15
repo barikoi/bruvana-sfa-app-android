@@ -67,7 +67,7 @@ class LastWeekCategoryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryCategory(Api.get_last_week_category+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+"&user_id="+userId+"&route_id="+routeId)
+        getSummaryCategory(Api.get_last_week_category+"?user_id="+userId+"&route_id="+routeId+"&last_week_category=1")
     }
 
     private fun getSummaryCategory(url: String) {

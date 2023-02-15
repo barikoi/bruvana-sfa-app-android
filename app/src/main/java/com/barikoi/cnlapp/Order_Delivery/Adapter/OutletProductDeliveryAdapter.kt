@@ -36,7 +36,7 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
         holder.productName.setText(item.product_name)
         holder.productType.setText(item.unit_name)
-        holder.perUnitPrice.setText(item.unit_price.toString())
+        holder.perUnitPrice.setText(item.discounted_unit_price.toString())
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false
         var dformat = DecimalFormat("#.##")
@@ -73,7 +73,7 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
         holder.btnMinus.setOnClickListener {
             val qtyValue = holder.productCount.text.toString().toInt() - 1
             holder.productCount.setText(qtyValue.toString())
-            val subtotal = item.unit_price * holder.productCount.text.toString().toInt()
+            val subtotal = item.discounted_unit_price * holder.productCount.text.toString().toInt()
             holder.subTotal.setText(dformat.format(subtotal).toString())
             item.bounced_quantity = item.bounced_quantity+1
             item.quantity = holder.productCount.text.toString().toInt()
@@ -85,7 +85,7 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
                     outletId,
                     prodList[0].itemsCount-1,
                     item.bounced_quantity,
-                    prodList[0].totalPrice-item.unit_price
+                    prodList[0].totalPrice-item.discounted_unit_price
                 )
             }else{
                 appDatabase.updateOrderDao().insertAll(

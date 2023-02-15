@@ -1249,8 +1249,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         products as Products
         var itemCount = 0
         var grandTotal = 0.0
-        val prodList =
-            appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+        val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
         itemCount = prodList!![0].itemsCount
         grandTotal = prodList[0].totalPrice
         if (itemCount == 1 || itemCount == 0) {

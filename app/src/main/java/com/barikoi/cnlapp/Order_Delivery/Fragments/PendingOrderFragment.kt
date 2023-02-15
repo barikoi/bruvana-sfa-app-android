@@ -502,6 +502,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 val brandObj = JSONObject()
                 if (updatedProducts[i].quantity > 0 ) {
                     val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
+                    val delivereAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product_code", updatedProducts[i].product_code)
                     brandObj.put("product_name", updatedProducts[i].product_name)
@@ -518,16 +519,17 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
                     brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("ordered_amount", updatedProducts[i].ordered_price.toString())
-                    brandObj.put("delivered_amount", updatedProducts[i].total_price.toString())
+                    brandObj.put("delivered_amount", delivereAmount.toString())
                     brandObj.put("bounced_amount", bounceAmount.toString())
                     brandsArray.put(brandObj)
                     deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
-                    deliveredAmount = deliveredAmount + updatedProducts[i].total_price
+                    deliveredAmount = deliveredAmount + delivereAmount
                     bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
-                    bouncedAmount = bounceAmount + bounceAmount
+                    bouncedAmount = bouncedAmount + bounceAmount
                 }
                 else if(updatedProducts[i].quantity == 0 && updatedProducts[i].bounced_quantity > 0){
-                    val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].unit_price
+                    val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
+                    val delivereAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product_code", updatedProducts[i].product_code)
                     brandObj.put("product_name", updatedProducts[i].product_name)
@@ -544,12 +546,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
                     brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("ordered_amount", updatedProducts[i].ordered_price.toString())
-                    brandObj.put("delivered_amount", updatedProducts[i].total_price.toString())
+                    brandObj.put("delivered_amount", delivereAmount.toString())
                     brandObj.put("bounced_amount", bounceAmount.toString())
                     brandsArray.put(brandObj)
                     deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
-                    deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
-                    deliveredAmount = deliveredAmount + updatedProducts[i].total_price
+                    deliveredAmount = deliveredAmount + delivereAmount
                     bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
                     bouncedAmount = bounceAmount + bounceAmount
                 }
@@ -660,8 +661,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         products.category_id, products.unit_name,
                         products.unit_id, products.unit_code,
                         products.unit_price, products.discounted_unit_price,
-                        products.total_price,
-                        products.quantity, products.quantity,
+                        products.ordered_price,
+                        products.ordered_quantity, products.quantity,
                         products.bounced_quantity, products.total_price)
                 )
 
@@ -674,8 +675,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         products.category_id, products.unit_name,
                         products.unit_id, products.unit_code,
                         products.unit_price, products.discounted_unit_price,
-                        products.total_price,
-                        products.quantity, products.quantity,
+                        products.ordered_price,
+                        products.ordered_quantity, products.quantity,
                         products.bounced_quantity, products.total_price
                     )
                 )
