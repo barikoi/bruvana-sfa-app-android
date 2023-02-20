@@ -426,7 +426,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         status = "CANCELLED"
                         //updatedProducts!!.addAll(brandsStatistics)
                         for (i in 0 until updatedProducts!!.size){
-                            updatedProducts!![i].bounced_quantity = updatedProducts!![i].quantity
+                            updatedProducts!![i].bounced_quantity = updatedProducts!![i].ordered_quantity
                             updatedProducts!![i].quantity = 0
                         }
                     }else{
@@ -502,7 +502,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 val brandObj = JSONObject()
                 if (updatedProducts[i].quantity > 0 ) {
                     val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
-                    val delivereAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
+                    val deliverAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product_code", updatedProducts[i].product_code)
                     brandObj.put("product_name", updatedProducts[i].product_name)
@@ -516,20 +516,20 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("category_name", updatedProducts[i].category_name)
                     brandObj.put("category_code", updatedProducts[i].category_code)
                     brandObj.put("ordered_quantity", updatedProducts[i].ordered_quantity.toString())
-                    brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
-                    brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("ordered_amount", updatedProducts[i].ordered_price.toString())
-                    brandObj.put("delivered_amount", delivereAmount.toString())
+                    brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
+                    brandObj.put("delivered_amount", deliverAmount.toString())
+                    brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("bounced_amount", bounceAmount.toString())
                     brandsArray.put(brandObj)
                     deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
-                    deliveredAmount = deliveredAmount + delivereAmount
+                    deliveredAmount = deliveredAmount + deliverAmount
                     bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
                     bouncedAmount = bouncedAmount + bounceAmount
                 }
                 else if(updatedProducts[i].quantity == 0 && updatedProducts[i].bounced_quantity > 0){
                     val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
-                    val delivereAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
+                    val deliverAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product_code", updatedProducts[i].product_code)
                     brandObj.put("product_name", updatedProducts[i].product_name)
@@ -543,23 +543,23 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("category_name", updatedProducts[i].category_name)
                     brandObj.put("category_code", updatedProducts[i].category_code)
                     brandObj.put("ordered_quantity", updatedProducts[i].ordered_quantity.toString())
-                    brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
-                    brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("ordered_amount", updatedProducts[i].ordered_price.toString())
-                    brandObj.put("delivered_amount", delivereAmount.toString())
+                    brandObj.put("delivered_quantity", updatedProducts[i].quantity.toString())
+                    brandObj.put("delivered_amount", deliverAmount.toString())
+                    brandObj.put("bounced_quantity", updatedProducts[i].bounced_quantity.toString())
                     brandObj.put("bounced_amount", bounceAmount.toString())
                     brandsArray.put(brandObj)
                     deliveredQuantity = deliveredQuantity + updatedProducts[i].quantity
-                    deliveredAmount = deliveredAmount + delivereAmount
+                    deliveredAmount = deliveredAmount + deliverAmount
                     bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
-                    bouncedAmount = bounceAmount + bounceAmount
+                    bouncedAmount = bouncedAmount + bounceAmount
                 }
 
             }
-            orderObj.put("total_delivered_amount", deliveredAmount)
-            orderObj.put("total_delivered_quantity", deliveredQuantity)
-            orderObj.put("total_bounced_amount", bouncedAmount)
-            orderObj.put("total_bounced_quantity", bouncedQuantity)
+            orderObj.put("total_delivered_amount", deliveredAmount.toString())
+            orderObj.put("total_delivered_quantity", deliveredQuantity.toString())
+            orderObj.put("total_bounced_amount", bouncedAmount.toString())
+            orderObj.put("total_bounced_quantity", bouncedQuantity.toString())
             orderObj.put("products", brandsArray)
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
