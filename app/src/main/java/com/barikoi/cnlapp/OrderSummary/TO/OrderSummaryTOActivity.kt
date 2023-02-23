@@ -1,10 +1,10 @@
 package com.barikoi.cnlapp.OrderSummary.TO
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +15,8 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -56,7 +58,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     var sowithOrderList: ArrayList<OrdersSO>? = ArrayList()
     var orderArray: JSONArray? = null
     val itemList: ArrayList<OrderList> = ArrayList()
+    val loadList: ArrayList<OrderList> = ArrayList()
     var pd: ProgressDialog? = null
+    var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -449,11 +453,18 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         )
                     )
                 }
+
+                if (itemList.size> 10) {
+                    loadList.addAll(itemList.subList(0, 10))
+                }else{
+                    loadList.addAll(itemList)
+                }
             }
             orderList.visibility = View.VISIBLE
-            adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
+            adapter = ConfirmOrderListAdapter(loadList, listener!!, "summary")
             orderList.adapter = adapter
             adapter!!.notifyDataSetChanged()
+            initScrollListener()
 
             orderList
                 .getViewTreeObserver()
@@ -474,6 +485,53 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun initScrollListener() {
+        orderList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!recyclerView.canScrollVertically(1)) {
+                    loadMore()
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
+                if (!isLoading) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == loadList.size) {
+                        //bottom of list!
+                        loadMore()
+                        isLoading = true
+                    }
+                }
+            }
+        })
+    }
+
+    private fun loadMore() {
+        //loadList.add(null)
+        adapter!!.notifyItemInserted(loadList.size - 1)
+        val handler = Handler()
+        handler.postDelayed(Runnable {
+            loadList.removeAt(loadList.size - 1)
+            val scrollPosition: Int = loadList.size
+            adapter!!.notifyItemRemoved(scrollPosition)
+            var currentSize = scrollPosition
+            var nextLimit = 0
+            if (itemList.size-currentSize > 10) {
+                nextLimit = currentSize + 10
+            }else{
+                nextLimit = itemList.size-currentSize
+            }
+            while (currentSize - 1 < nextLimit) {
+                loadList.add(itemList.get(currentSize))
+                currentSize++
+            }
+            adapter!!.notifyDataSetChanged()
+            isLoading = false
+        }, 2000)
     }
 
     private fun getSummaryTargets(url: String) {
