@@ -807,7 +807,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
         val url =
-            Api.all_product_list + "?with_stock=1&user_id=" + user_id /*+ "&route_id=" + routeId*/
+            Api.all_product_list + "?with_stock=1&user_id=" + user_id +"&is_active=1"/*+ "&route_id=" + routeId*/
         val request = StringRequest(
             Request.Method.GET, url,
             { response ->
