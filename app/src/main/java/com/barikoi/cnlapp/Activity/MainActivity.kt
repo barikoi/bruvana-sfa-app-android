@@ -409,7 +409,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Log.i("MainActivity", "nothing on backstack, calling super")
             super.onBackPressed()
         }*/
-        super.onBackPressed()
     }
 
 }

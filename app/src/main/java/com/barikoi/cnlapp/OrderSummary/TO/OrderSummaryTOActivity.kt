@@ -1,12 +1,10 @@
 package com.barikoi.cnlapp.OrderSummary.TO
 
-import android.R.attr
 import android.app.ProgressDialog
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Parcelable
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,8 +15,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -60,10 +56,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
     var sowithOrderList: ArrayList<OrdersSO>? = ArrayList()
     var orderArray: JSONArray? = null
     val itemList: ArrayList<OrderList> = ArrayList()
-    val loadList: ArrayList<OrderList> = ArrayList()
     var pd: ProgressDialog? = null
-    var isLoading = false
-    private val recyclerViewState: Parcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -224,7 +217,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         summaryLayout2.visibility = View.VISIBLE
                         collectionLayout.visibility = View.GONE
                         targetLayout.visibility = View.GONE
-                        //bodyLayoutScroll.visibility = View.GONE
+                        bodyLayoutScroll.visibility = View.GONE
                         tryAgain2.visibility = View.GONE
                         bodyLayout.visibility = View.VISIBLE
                         val obj = JSONObject(response)
@@ -276,7 +269,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     progressBar4.visibility = View.GONE
                     summaryLayout2.visibility = View.GONE
                     targetLayout.visibility = View.GONE
-                    //bodyLayoutScroll.visibility = View.GONE
+                    bodyLayoutScroll.visibility = View.GONE
                     collectionLayout.visibility = View.GONE
                     tryAgain2.visibility = View.VISIBLE
                 }
@@ -298,7 +291,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 targetLayout.visibility = View.GONE
                 collectionLayout.visibility = View.GONE
                 bodyLayout.visibility = View.GONE
-                //bodyLayoutScroll.visibility = View.GONE
+                bodyLayoutScroll.visibility = View.GONE
                 tryAgain2.visibility = View.VISIBLE
             }
 
@@ -306,7 +299,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 progressBar4.visibility = View.GONE
                 summaryLayout2.visibility = View.GONE
                 collectionLayout.visibility = View.GONE
-                //bodyLayoutScroll.visibility = View.GONE
+                bodyLayoutScroll.visibility = View.GONE
                 tryAgain2.visibility = View.VISIBLE
             }
 
@@ -357,7 +350,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
                 tr.setOnClickListener {
                     Log.d("OrderSummary", "pd.isShowing: " + pd!!.isShowing)
-                    //bodyLayoutScroll.visibility = View.GONE
+                    bodyLayoutScroll.visibility = View.GONE
                     collectionLayout.visibility = View.GONE
                     targetLayout.visibility = View.GONE
                     orderList.visibility = View.GONE
@@ -367,12 +360,11 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                             override fun run() {
                                 try {
                                     orderArray = sowithOrderList!!.get(i).ordersArray
-                                    //bodyLayoutScroll.visibility = View.VISIBLE
+                                    bodyLayoutScroll.visibility = View.VISIBLE
                                     collectionLayout.visibility = View.VISIBLE
                                     order_collection_count.setText(sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(i).total_outlets)
                                     total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
-                                    //getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
-                                    getAllOrders(orderArray!!)
+                                    getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                         Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
                                         for (t in 0 until tab_Layout.childCount) {
@@ -457,18 +449,11 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         )
                     )
                 }
-
-                if (itemList.size> 10) {
-                    loadList.addAll(itemList.subList(0, 10))
-                }else{
-                    loadList.addAll(itemList)
-                }
             }
             orderList.visibility = View.VISIBLE
-            adapter = ConfirmOrderListAdapter(loadList, listener!!, "summary")
+            adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
             orderList.adapter = adapter
             adapter!!.notifyDataSetChanged()
-            initScrollListener()
 
             orderList
                 .getViewTreeObserver()
@@ -489,74 +474,6 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun initScrollListener() {
-
-        orderList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                Log.d("ScrollView","scroll item count: "+linearLayoutManager!!.itemCount)
-                Log.d("ScrollView","scroll First Visible: "+linearLayoutManager.findFirstVisibleItemPosition())
-                Log.d("ScrollView","scroll Last Visible: "+linearLayoutManager.findLastVisibleItemPosition())
-                Log.d("ScrollView","scroll canScrollVertically 1: "+recyclerView.canScrollVertically(1))
-                Log.d("ScrollView","scroll canScrollVertically -1: "+recyclerView.canScrollVertically(-1))
-                if (!recyclerView.canScrollVertically(1) && newState==RecyclerView.SCROLL_STATE_IDLE) {
-                    if(recyclerView.canScrollVertically(RecyclerView.FOCUS_DOWN) == false){
-                        onScrolled(recyclerView, 0, 1)
-                    }
-                }
-                //Log.d("ScrollView","pastVisibleItems: "+orderList.getLayoutManager()!!.onSaveInstanceState())
-
-
-
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
-                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                /*val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                if (!isLoading) {
-                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == loadList.size) {
-                        //bottom of list!
-                        loadMore()
-                        isLoading = true
-                    }
-                }*/
-                //Log.d("ScrollView","scroll: "+dy)
-                if (dy > 0) {
-                    loadMore()
-                    Log.d("ScrollView","canScrollVertically Last")
-                    //Toast.makeText(getApplicationContext(), "Reached the end of recycler view", Toast.LENGTH_SHORT).show();
-                }
-                super.onScrolled(recyclerView, dx, dy)
-            }
-        })
-    }
-
-    private fun loadMore() {
-        //loadList.add(null)
-        //adapter!!.notifyItemInserted(loadList.size - 1)
-        val handler = Handler()
-        handler.postDelayed(Runnable {
-            //loadList.removeAt(loadList.size - 1)
-            val scrollPosition: Int = loadList.size
-            //adapter!!.notifyItemRemoved(scrollPosition)
-            var currentSize = scrollPosition
-            var nextLimit = 0
-            if (itemList.size - currentSize > 10) {
-                nextLimit = currentSize + 10
-            }else{
-                nextLimit = itemList.size-currentSize
-            }
-            while (currentSize - 1 < nextLimit) {
-                loadList.add(itemList.get(currentSize))
-                currentSize++
-            }
-            adapter!!.notifyDataSetChanged()
-            isLoading = false
-        }, 2000)
     }
 
     private fun getSummaryTargets(url: String) {
@@ -657,7 +574,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 } catch (e: Exception) {
                     e.printStackTrace()
                     progressBarHome.visibility = View.GONE
-                    getAllOrders(orderArray!!)
+                    //getAllOrders(orderArray!!)
+                    pd!!.dismiss()
                 }
 
             }
@@ -673,12 +591,14 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
                 progressBarHome.visibility = View.GONE
-                getAllOrders(orderArray!!)
+                //getAllOrders(orderArray!!)
+                pd!!.dismiss()
             }
 
             override fun onException(e: Exception) {
                 progressBarHome.visibility = View.GONE
-                getAllOrders(orderArray!!)
+                //getAllOrders(orderArray!!)
+                pd!!.dismiss()
             }
 
         })
@@ -690,7 +610,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         tabLayout.bringToFront()
         tabLayout.removeAllViews()
         if (data.size > 0) {
-            //bodyLayoutScroll.smoothScrollTo(0, 0)
+            //bodyLayoutScroll.scrollTo(0, 0)
+            bodyLayoutScroll.smoothScrollTo(0, 0)
             for (i in 0 until data.size) {
                 val tr = TableRow(applicationContext)
                 val c1 = TextView(applicationContext)
@@ -706,7 +627,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                 tabLayout.addView(tr)
             }
         }
-        getAllOrders(orderArray!!)
+        //getAllOrders(orderArray!!)
+        pd!!.dismiss()
     }
 
     override fun onEdit(order: OrderList) {
