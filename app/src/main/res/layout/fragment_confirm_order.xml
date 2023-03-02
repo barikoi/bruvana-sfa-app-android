@@ -65,6 +65,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="12sp"
+                android:visibility="gone"
                 android:textStyle="bold">
 
             </androidx.appcompat.widget.AppCompatButton>

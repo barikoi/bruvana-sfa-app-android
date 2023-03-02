@@ -85,7 +85,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             if (mCallback!= null) {
-                getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=SAVED", queue, token, mCallback!!)
+                getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+today+" 00:00:00"+"&end_date="+today+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
             }
 
         }
@@ -351,7 +351,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             bodyLayout.visibility = View.VISIBLE
             for (i in 0 until orderArray.length()){
                 val orderObj = orderArray.getJSONObject(i)
-                if (orderObj.getString("order_status").equals("SAVED", true)){
+                if (orderObj.getString("order_status").equals("PENDING", true)){
                     val brandArray = orderObj.getJSONArray("products")
                     tvRouteName.setText(orderObj.getString("route_name"))
                     val productItems: ArrayList<Products> = ArrayList()

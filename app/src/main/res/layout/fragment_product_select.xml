@@ -204,7 +204,7 @@
             android:layout_height="40dp"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:text="@string/save_order"
+            android:text="@string/confirm_order"
             android:textSize="12sp"
             android:textColor="@color/white"
             android:textStyle="bold"

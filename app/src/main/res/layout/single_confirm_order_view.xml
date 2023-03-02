@@ -71,12 +71,13 @@
             android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
             android:layout_toRightOf="@+id/shopNameLayout"
             android:background="@drawable/cardview_bg_stroke_2dp"
             android:backgroundTint="@color/white"
             android:padding="2dp"
             android:src="@drawable/ic_edit"
-            android:layout_marginLeft="4dp">
+            android:visibility="gone">
 
         </ImageView>
 
@@ -135,24 +136,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
+
         <TextView
             android:id="@+id/tvAddMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/cardview_bg"
             android:backgroundTint="@color/cnl_color_2"
-            android:layout_centerVertical="true"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:paddingRight="16dp"
             android:paddingLeft="16dp"
-            android:textColor="@color/white"
+            android:paddingTop="4dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="4dp"
+            android:visibility="gone"
             android:text="@string/add_more_item"
-            android:textStyle="bold"
+            android:textColor="@color/white"
             android:textSize="10sp"
-            android:layout_alignParentStart="true"
-            android:layout_marginRight="8dp" />
+            android:textStyle="bold" />
         <LinearLayout
             android:id="@+id/layoutSubTotal"
             android:layout_width="120dp"
