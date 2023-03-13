@@ -165,7 +165,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         previous_order.setOnClickListener {
             try {
                 ApiServices.apiGET(
-                    Api.get_saved_order + "?user_id=" + user_id + "&outlet_id=" + shopId+"&last_week_orders=1",
+                    Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId+"&with_last_week_order=1",
                     queue!!,
                     token!!,
                     object : ApiServiceListener {
@@ -247,15 +247,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         var brandArray = JSONArray()
         //val productItems: ArrayList<ProductStatistics> = ArrayList()
         val obj = JSONObject(response)
-        val ordersArray = obj.getJSONArray("orders")
+        val outletArray = obj.getJSONArray("outlets")
+        val ordersArray = outletArray.getJSONObject(0).getJSONArray("orders")
         if (ordersArray.length() > 0) {
             for (i in 0 until ordersArray.length()) {
                 //productItems.clear()
-                val outletObj = ordersArray.getJSONObject(i)
-                brandArray = outletObj.getJSONArray("products")
+                val orderObj = ordersArray.getJSONObject(i)
+                brandArray = orderObj.getJSONArray("products")
                 //val outletName = outletObj.getString("outlet_name")
-                lastDeliveryDate = outletObj.getString("ordered_at")
-                orderStatus = outletObj.getString("order_status")
+                lastDeliveryDate = orderObj.getString("ordered_at")
+                orderStatus = orderObj.getString("order_status")
 
             }
 
@@ -1169,6 +1170,76 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             tvGrandTotal.setText(dformat.format(grandTotal).toString())
         }else{
             filterLayout.visibility = View.GONE
+
+            productItems.clear()
+            if (brands_array.length() > 0) {
+                for (j in 0 until brands_array.length()) {
+                    val brandObj = brands_array.getJSONObject(j)
+                    if (statusOrder.equals("PENDING")){
+                    if (brandObj.getInt("ordered_quantity") > 0) {
+                        productItems.add(
+                            ProductStatistics(
+                                brandObj.getString("product_id"),
+                                brandObj.getString("product_name"),
+                                brandObj.getString("product_code"),
+                                brandObj.getString("sku_code"),
+                                brandObj.getString("category_code"),
+                                brandObj.getString("category_name"),
+                                brandObj.getString("category_id"),
+                                brandObj.getString("unit_name"),
+                                brandObj.getString("unit_id"),
+                                brandObj.getString("unit_code"),
+                                brandObj.getDouble("unit_price"),
+                                brandObj.getDouble("discounted_unit_price"),
+                                brandObj.getDouble("ordered_amount"),
+                                brandObj.getInt("ordered_quantity"),
+                                brandObj.getInt("ordered_quantity"),
+                                brandObj.getInt("bounced_quantity"),
+                                brandObj.getDouble("ordered_amount")
+                            )
+                        )
+                    }
+                    }else if (statusOrder.equals("CANCELLED")){
+                        if (brandObj.getInt("bounced_quantity") > 0) {
+                            productItems.add(
+                                ProductStatistics(
+                                    brandObj.getString("product_id"),
+                                    brandObj.getString("product_name"),
+                                    brandObj.getString("product_code"),
+                                    brandObj.getString("sku_code"),
+                                    brandObj.getString("category_code"),
+                                    brandObj.getString("category_name"),
+                                    brandObj.getString("category_id"),
+                                    brandObj.getString("unit_name"),
+                                    brandObj.getString("unit_id"),
+                                    brandObj.getString("unit_code"),
+                                    brandObj.getDouble("unit_price"),
+                                    brandObj.getDouble("discounted_unit_price"),
+                                    brandObj.getDouble("ordered_amount"),
+                                    brandObj.getInt("ordered_quantity"),
+                                    brandObj.getInt("bounced_quantity"),
+                                    brandObj.getInt("bounced_quantity"),
+                                    brandObj.getDouble("bounced_amount")
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+
+            var grandTotal = 0.0
+            if (productItems.size > 0) {
+                for (i in 0 until productItems.size) {
+                    grandTotal = grandTotal + productItems[i].total_price
+                }
+
+            }
+            val adapter = OutletProductAdapter(productItems)
+            listView.adapter = adapter
+            adapter.notifyDataSetChanged()
+
+            tvGrandTotal.setText(dformat.format(grandTotal).toString())
         }
 
         /*tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
