@@ -390,7 +390,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 } else {
                     imagePosition + 1
                 }
-                imagepicker.AddNewImage(result.data, CAMERA, imagePosition, "Shop")
+                imagepicker.AddNewImage(result.data, CAMERA, imagePosition, "Shop", prefs!!.getString(ApiCall.IMAGE_PATH, "")!!)
                 try {
                     val placeImage = Images(
                         null, imagePosition,

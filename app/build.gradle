@@ -36,7 +36,8 @@ android {
         production{
             applicationId "com.barikoi.cnlapp"
             dimension "default"
-            versionName "0.1.10"
+            versionName "0.1.11"
+            //versionName "1.0.0"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
             manifestPlaceholders = [

@@ -539,7 +539,7 @@ class CreateAttendanceFragment : Fragment() {
                 } else {
                     imagePosition + 1
                 }
-                imagepicker.AddNewImage(result.data, CAMERA, imagePosition, "Attendance")
+                imagepicker.AddNewImage(result.data, CAMERA, imagePosition, "Attendance", prefs!!.getString(ApiCall.IMAGE_PATH, "")!!)
                 try {
                     val placeImage = Images(
                         null, imagePosition,

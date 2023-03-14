@@ -179,17 +179,20 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         }
     }
 
-    fun AddNewImage(imageReturnedIntent: Intent?, source: Int, position: Int, type: String) {
+    fun AddNewImage(imageReturnedIntent: Intent?, source: Int, position: Int, type: String, image_path: String) {
         var bitmap: Bitmap? = null
         try {
-            bitmap = getRotateImage(mCurrentPhotoPath)
+            bitmap = getRotateImage(image_path)
             //Sentry.captureMessage("Add Image Clicked pos: "+position+" "+bitmap)
             val lt = ImageList(bitmap, prefs.getString(ApiCall.IMAGE_PATH, "")!!, position,
                 type, prefs.getString(ApiCall.IMAGE_PATH, "")!!)
             imageItems.add(lt)
             imageRecyclerAdapter = ImageRecyclerAdapter(imageItems, taskId!!)
             mRecyclerView.adapter = imageRecyclerAdapter
-            fmap[position] = mCurrentPhotoPath
+            fmap[position] = image_path
+            layoutImagePick.visibility = GONE
+            layoutImageAdd.visibility = VISIBLE
+            layoutImageScroller.visibility = VISIBLE
         } catch (e: IOException) {
             e.printStackTrace()
             Sentry.captureException(e)
