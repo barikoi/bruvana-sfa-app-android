@@ -2,6 +2,7 @@ package com.barikoi.cnlapp.Activity
 
 import android.Manifest
 import android.content.Intent
+import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -16,6 +17,11 @@ import androidx.core.app.ActivityCompat
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.github.ybq.android.spinkit.style.ThreeBounce
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import io.sentry.Sentry
 import java.util.*
 
 class SplashActivity : AppCompatActivity() {
@@ -27,14 +33,15 @@ class SplashActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
+    private val RC_APP_UPDATE = 11
+    var mAppUpdateManager: AppUpdateManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        //SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
+        mAppUpdateManager = AppUpdateManagerFactory.create(this)
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
 
@@ -51,11 +58,33 @@ class SplashActivity : AppCompatActivity() {
         progressBar!!.setIndeterminateDrawable(ThreeBounce())
         showProgress()
 
-        checkPermissions()
-        /*val handler: Handler = Handler()
-        handler.postDelayed(Runnable {
-            init()
-            handler.removeCallbacksAndMessages(null) }, 2000)*/
+        mAppUpdateManager!!.appUpdateInfo.addOnSuccessListener { result ->
+            println("AppUpdateService:1 " + result.updateAvailability())
+            println("AppUpdateService:2 " + UpdateAvailability.UPDATE_AVAILABLE)
+            println("AppUpdateService:3 " + result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
+            if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                && result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                try {
+                    mAppUpdateManager!!.startUpdateFlowForResult(
+                        result,
+                        AppUpdateType.IMMEDIATE,
+                        this@SplashActivity,
+                        RC_APP_UPDATE
+                    )
+                    println("checkForAppUpdateAvailability")
+                } catch (e: SendIntentException) {
+                    e.printStackTrace()
+                }
+            } else {
+                checkPermissions()
+            }
+        }
+
+        mAppUpdateManager!!.appUpdateInfo.addOnFailureListener {
+            println("checkForAppUpdate onFailure")
+            checkPermissions()
+        }
     }
 
     private fun checkPermissions(): Boolean {
@@ -82,37 +111,8 @@ class SplashActivity : AppCompatActivity() {
                 listPermissionsNeeded.toTypedArray(),
                 MULTIPLE_PERMISSIONS
             )
-            //sendLocation();
-            //init()
             return false
         }
-       /* else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                *//*ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 1);
-                return false;*//*
-                val alertBuilder = AlertDialog.Builder(this)
-                alertBuilder.setCancelable(false)
-                alertBuilder.setIcon(R.drawable.mapmarkersplash)
-                alertBuilder.setTitle("Background permission is necessary")
-                alertBuilder.setMessage(resources.getString(R.string.app_name) + " needs background location permission to get location data. Kindly select ALLOW ALL THE TIME option to stay connected.")
-                alertBuilder.setPositiveButton(
-                    android.R.string.yes
-                ) { dialog, which ->
-                    ActivityCompat.requestPermissions(
-                        this@SplashActivity,
-                        arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                        1
-                    )
-                    //proceedusercheck();
-                }
-                val alert = alertBuilder.create()
-                alert.show()
-                Log.d("Splash", "background permission not granted: " + ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-            } else {
-                Log.d("Splash", "background permission granted")
-                Handler().postDelayed(Runnable { init() }, 2000)
-            }
-        } */
         else {
             Log.d("Splash", "request permission if list not empty")
             val handler: Handler = Handler()
@@ -253,8 +253,33 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        //checkPermissions()
-        //init()
+        mAppUpdateManager!!.appUpdateInfo.addOnSuccessListener { result ->
+            println("AppUpdateService:1 " + result.updateAvailability())
+            println("AppUpdateService:2 " + UpdateAvailability.UPDATE_AVAILABLE)
+            println("AppUpdateService:3 " + result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
+            if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                && result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                try {
+                    mAppUpdateManager!!.startUpdateFlowForResult(
+                        result,
+                        AppUpdateType.IMMEDIATE,
+                        this@SplashActivity,
+                        RC_APP_UPDATE
+                    )
+                    println("checkForAppUpdateAvailability")
+                } catch (e: SendIntentException) {
+                    e.printStackTrace()
+                }
+            } else {
+                checkPermissions()
+            }
+        }
+        mAppUpdateManager!!.appUpdateInfo.addOnFailureListener {
+            Sentry.captureMessage("checkForAppUpdate onFailure onResume")
+            println("checkForAppUpdate onFailure")
+            checkPermissions()
+        }
 
     }
 }

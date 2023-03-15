@@ -36,8 +36,8 @@ android {
         production{
             applicationId "com.barikoi.cnlapp"
             dimension "default"
-            versionName "0.1.11"
-            //versionName "1.0.0"
+            //versionName "0.1.11"
+            versionName "1.0.0"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
             manifestPlaceholders = [
@@ -84,8 +84,6 @@ dependencies {
     kapt "androidx.room:room-runtime:2.2.4"
 
     /*map*/
-    /*implementation 'com.graphhopper:graphhopper-navigation-android-ui:0.1.0-SNAPSHOT'
-    implementation 'com.graphhopper:directions-api-client:0.10.1-4'*/
     implementation 'org.maplibre.gl:android-sdk:9.2.1'
     //implementation 'com.github.maplibre:maplibre-navigation-android:1.1.1'
 
@@ -98,8 +96,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
-    //implementation files('libs/android-viewbadger.jar')
-
     /*image zoom*/
     implementation 'com.commit451:PhotoView:1.2.4'
+
+    //play store update
+    implementation 'com.google.android.play:core:1.10.3'
 }
