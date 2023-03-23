@@ -57,14 +57,14 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         } else{
             holder.isOrdered.visibility = View.GONE
         }
-        if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
+        /*if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
             Glide.with(holder.itemView.context)
                 .load(shopList[position].imageUrl)
                 .error(R.drawable.shop)
                 .into(holder.imageShop)
         }else{
             //holder.imageProduct.visibility = View.INVISIBLE
-        }
+        }*/
 
 
         holder.btnDetails.setOnClickListener {

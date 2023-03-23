@@ -193,42 +193,6 @@ class SplashActivity : AppCompatActivity() {
                             """.trimIndent()
                             //init()
                         }
-                        /*else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                    val alertBuilder = AlertDialog.Builder(this)
-                                    alertBuilder.setCancelable(false)
-                                    alertBuilder.setIcon(R.drawable.descologo)
-                                    alertBuilder.setTitle("Background permission is necessary")
-                                    alertBuilder.setMessage(resources.getString(R.string.app_name) + " needs background location permission to get location data. Kindly select ALLOW ALL THE TIME option to stay connected.")
-                                    alertBuilder.setPositiveButton(
-                                        android.R.string.yes
-                                    ) { dialog, which ->
-                                        ActivityCompat.requestPermissions(
-                                            this@SplashActivity,
-                                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1)
-                                        //proceedusercheck();
-                                    }
-                                    val alert = alertBuilder.create()
-
-                                    //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 1);
-                                    Log.d("Dialog", "check Location permission: 3 count: " + count + " " +permissionsList.size)
-                                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                        //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 1);
-                                        if (count == permissionsList.size) {
-                                            Log.d("Dialog", "check Location permission: 3")
-                                            alert.show()
-                                        }
-                                    } else {
-                                        Log.d("Dialog", "check Location permission: 4")
-                                        alert.dismiss()
-                                    }
-                                }
-                            } else {
-                                init()
-                            }
-                        }*/
-                        //init()
                     }
                     // Show permissionsDenied
                     //sendLocation();

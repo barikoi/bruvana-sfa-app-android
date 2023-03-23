@@ -44,14 +44,14 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         //holder.distributorName.text = shopList[position].distributor_office
         holder.territoryName.text = shopList[position].territory_name
 
-        if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
+        /*if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
             Glide.with(holder.itemView.context)
                 .load(shopList[position].imageUrl)
                 .error(R.drawable.shop)
                 .into(holder.imageShop)
         }else{
             //holder.imageProduct.visibility = View.INVISIBLE
-        }
+        }*/
 
         if (shopList[position].isVerified == 0){
             holder.imageNewTag.visibility = View.VISIBLE

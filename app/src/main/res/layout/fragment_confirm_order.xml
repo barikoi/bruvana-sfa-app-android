@@ -76,10 +76,10 @@
                 android:layout_height="40dp"
                 android:layout_margin="8dp"
                 android:background="@drawable/button_whitebg_stroke"
-                android:backgroundTint="@color/background_card"
+                android:backgroundTint="@color/cnl_color_1"
                 android:text="@string/download_chalan"
                 android:textAllCaps="false"
-                android:textColor="@color/text_title"
+                android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold">
 
