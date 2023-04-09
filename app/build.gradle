@@ -55,6 +55,29 @@ android {
                     appIcon: "@mipmap/ic_launcher_2"
             ]
         }
+        retaildemo{
+            applicationId "com.barikoi.retaildemo"
+            dimension "default"
+            versionName "0.0.1"
+            resValue "string", "app_name", "Retail Demo SFA"
+            //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
+            resValue "string", "url_base", "http://20.24.15.52:7040/"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher_demo"
+            ]
+        }
+    }
+    sourceSets {
+        retaildemo {
+            java {
+                srcDirs 'src\\retaildemo\\java'
+            }
+        }
+        staging {
+            java {
+                srcDirs 'src\\staging\\java'
+            }
+        }
     }
 }
 

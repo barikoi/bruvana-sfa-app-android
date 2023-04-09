@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefresh"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@color/background_app"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:id="@+id/spinnerLayout1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_vertical"
+                android:visibility="visible"
+                android:background="@drawable/cardview_bg">
+
+                <com.barikoi.cnlapp.Utils.MoreSpinner
+                    android:id="@+id/spinnerTerritory"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+
+                    android:theme="@style/spinnerItemStyle"
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                </com.barikoi.cnlapp.Utils.MoreSpinner>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/spinnerLayout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_vertical"
+                android:visibility="visible"
+                android:background="@drawable/cardview_bg">
+
+                <com.barikoi.cnlapp.Utils.MoreSpinner
+                    android:id="@+id/spinnerRoutes"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+
+                    android:theme="@style/spinnerItemStyle"
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                </com.barikoi.cnlapp.Utils.MoreSpinner>
+            </RelativeLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/routelist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:scrollbarThumbVertical="@color/black"
+                android:background="@color/background_app"
+                app:layoutManager="LinearLayoutManager"
+                tools:listitem="@layout/single_route_list" />
+        </LinearLayout>
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/progress_bar3"
+            style="@style/SpinKitView.Large.ThreeBounce"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            app:SpinKit_Color="@color/cnl_color_1" />
+        <TextView
+            android:id="@+id/tvNoContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_centerInParent="true"
+            android:textSize="20sp"
+            android:textColor="@color/cnl_color_1"
+            android:textAlignment="center"
+            android:visibility="gone"
+            android:gravity="center_horizontal">
+        </TextView>
+    </RelativeLayout>
+</LinearLayout>
