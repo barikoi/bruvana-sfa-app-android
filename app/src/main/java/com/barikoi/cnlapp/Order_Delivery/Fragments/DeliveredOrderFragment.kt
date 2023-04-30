@@ -20,7 +20,6 @@ import android.view.Window
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -31,7 +30,6 @@ import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Delivery.Adapter.OrderDeliveryListAdapter
-import com.barikoi.cnlapp.Order_Delivery.Adapter.OutletProductDeliveryAdapter
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.EndDate
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.StartDate

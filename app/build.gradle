@@ -78,6 +78,11 @@ android {
                 srcDirs 'src\\staging\\java'
             }
         }
+        production {
+            java {
+                srcDirs 'src\\production\\java'
+            }
+        }
     }
 }
 

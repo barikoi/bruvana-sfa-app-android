@@ -1,6 +1,5 @@
 package com.barikoi.cnlapp.Adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.callback.OnEditShopListener
-import com.bumptech.glide.Glide
 import java.util.*
 
 class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener): RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),

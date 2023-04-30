@@ -195,6 +195,8 @@
     <string name="need_more_zoom">Need to zoom more to get better view at your shop location!</string>
     <string name="this_field_is_required">This field is required</string>
 
+    <string name="list_tab_1">Route List</string>
+    <string name="list_tab_2">Shop List</string>
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>

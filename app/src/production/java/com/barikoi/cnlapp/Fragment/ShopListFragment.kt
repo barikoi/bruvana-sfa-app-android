@@ -1,6 +1,5 @@
 package com.barikoi.cnlapp.Fragment
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -30,7 +29,6 @@ import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner

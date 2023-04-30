@@ -20,7 +20,6 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.TO.HistoryListTOAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.Attendance.Model.SOList
-import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener

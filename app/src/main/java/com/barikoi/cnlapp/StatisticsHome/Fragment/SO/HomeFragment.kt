@@ -71,7 +71,8 @@ class HomeFragment : Fragment() {
     private fun checkforAttendanceToday() {
         val today = Calendar.getInstance().time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        ApiServices.apiGET(Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
+        ApiServices.apiGET(
+            Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today),
             mQueue!!, token!!, object : ApiServiceListener{
                 override fun onResponseSuccess(response: String) {
                     try {

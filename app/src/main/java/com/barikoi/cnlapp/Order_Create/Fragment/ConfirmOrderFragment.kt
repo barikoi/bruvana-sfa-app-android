@@ -12,7 +12,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.barikoi.cnlapp.Activity.MainActivity
@@ -30,14 +29,12 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.gms.location.*
-import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_confirm_order.*
 import kotlinx.android.synthetic.main.fragment_confirm_order.bodyLayout
 import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
 import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*

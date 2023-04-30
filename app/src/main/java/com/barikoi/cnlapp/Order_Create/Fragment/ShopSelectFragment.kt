@@ -2,7 +2,6 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager

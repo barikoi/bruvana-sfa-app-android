@@ -13,12 +13,10 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
-import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
 import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
-import com.barikoi.cnlapp.Utils.Api
 import java.text.DecimalFormat
 
 class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mListener: OnValueChangeListener, var outletId: String, var from: String) : RecyclerView.Adapter<OutletProductDeliveryAdapter.ViewHolder>() {

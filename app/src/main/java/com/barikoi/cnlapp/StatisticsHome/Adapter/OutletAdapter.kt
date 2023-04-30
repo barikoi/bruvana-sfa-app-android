@@ -14,14 +14,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
-import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*

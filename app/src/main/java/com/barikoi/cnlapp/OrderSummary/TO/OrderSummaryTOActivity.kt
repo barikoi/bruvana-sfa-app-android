@@ -1,7 +1,6 @@
 package com.barikoi.cnlapp.OrderSummary.TO
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle

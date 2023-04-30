@@ -27,7 +27,6 @@ import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
-import com.barikoi.cnlapp.BuildConfig.VERSION_NAME
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
 import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
@@ -45,7 +44,6 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry

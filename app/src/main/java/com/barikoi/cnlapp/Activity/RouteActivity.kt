@@ -81,7 +81,7 @@ class RouteActivity : AppCompatActivity() {
         viewPager2 = findViewById<ViewPager2>(R.id.viewPager)
         tabLayout2 = findViewById<TabLayout>(R.id.viewpagertab)
 
-        val titles = arrayOf(resources.getString(R.string.route_list), resources.getString(R.string.shop_list))
+        val titles = arrayOf(resources.getString(R.string.list_tab_1), resources.getString(R.string.list_tab_2))
         val fragments = ArrayList<Fragment>()
         fragments.add(RouteFragment())
         fragments.add(ShopListFragment())

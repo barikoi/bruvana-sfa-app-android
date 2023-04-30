@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.*
