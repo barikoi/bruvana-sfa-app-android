@@ -309,6 +309,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             val route_id = route.getString("id")
                             val route_name = route.getString("route_name")
                             val route_code = route.getString("route_code")
+                            val market_name = route.getString("market_name")
+                            val market_id = route.getString("market_id")
                             val territory_name = route.getString("territory_name")
                             routesList!!.add(Pair(route_id, route_name))
                             routeNameList!!.add(route_name)
@@ -355,6 +357,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         longitude,
                                         route_id,
                                         route_name,
+                                        market_id,
+                                        market_name,
                                         "",
                                         is_Verified,0,0
                                     )
@@ -382,6 +386,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             val longitude = outlet.getDouble("longitude")
                             val route_id = outlet.getString("route_id")
                             val route_name = outlet.getString("route_name")
+                            val market_name = outlet.getString("market_name")
+                            val market_id = outlet.getString("market_id")
                             val territory_name = outlet.getString("territory_name")
                             val is_Verified = outlet.getInt("is_verified")
                             val shops = Shops(
@@ -405,6 +411,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 longitude,
                                 route_id,
                                 route_name,
+                                market_id,
+                                market_name,
                                 "",
                                 is_Verified,0, 0
                             )

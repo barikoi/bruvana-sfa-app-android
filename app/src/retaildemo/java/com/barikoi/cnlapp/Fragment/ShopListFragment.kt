@@ -62,14 +62,48 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
         recylerView = view.findViewById(R.id.shoplist)
-        spinner = view.findViewById(R.id.spinnerRoutes)
+        spinnerRoute = view.findViewById(R.id.spinnerRoutes)
+        spinnerMarket = view.findViewById(R.id.spinnerMarkets)
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
         btncreateShop = view.findViewById(R.id.createShop)
         adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
-        spinner!!.onItemSelectedListener = object :
+
+        spinnerRoute!!.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
+
+                markets.clear()
+                for (i in 0 until marketList!!.size) {
+                    if (marketList!![i].first == routesList!![position]) {
+                        markets.add(marketList!![i].second)
+                    }
+
+                }
+                if (markets.size > 0) {
+                    if (spinnerMarket != null) {
+                        val adapter = ArrayAdapter(
+                            mContext!!,
+                            android.R.layout.simple_spinner_item, markets
+                        )
+                        spinnerMarket!!.adapter = adapter
+
+                    }
+                }
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                //parent.lastVisiblePosition
+            }
+        }
+
+        spinnerMarket!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -78,7 +112,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
-                    if (shopList!![i].route_name == routesList!![position]) {
+                    if (shopList!![i].market_name.equals(markets[position])) {
                         shops.add(shopList!![i])
                     }
 
@@ -106,7 +140,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                     if (shopList!!.size > 0) {
                         for (i in 0 until shopList!!.size) {
                             if (routesList!!.size > 0) {
-                                if (shopList!![i].route_name == routesList!![spinner!!.selectedItemPosition]) {
+                                if (shopList!![i].route_name == markets[spinnerMarket!!.selectedItemPosition]) {
                                     shops.add(shopList!![i])
                                 }
                             }
@@ -168,6 +202,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
     companion object {
         var routesList: ArrayList<String>? = ArrayList()
+        var marketList: ArrayList<Pair<String,String>>? = ArrayList()
+        val markets: ArrayList<String> = ArrayList()
         var allRouteList: ArrayList<Routes>? = ArrayList()
         var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
         var shopList: ArrayList<Shops>? = ArrayList()
@@ -175,7 +211,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         var progressBar2: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
-        var spinner: MoreSpinner? = null
+        var spinnerMarket: MoreSpinner? = null
+        var spinnerRoute: MoreSpinner? = null
         var btncreateShop: AppCompatButton? = null
         var et_search: AutoCompleteTextView? = null
 
@@ -197,13 +234,25 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                         shopList!!.clear()
                         routesList!!.clear()
                         routeNameList!!.clear()
+                        marketList!!.clear()
                         for (i in 0 until routesArray.length()) {
                             val route = routesArray.getJSONObject(i)
                             val route_id = route.getString("id")
                             val route_name = route.getString("route_name")
                             val route_code = route.getString("route_code")
                             val territory_name = route.getString("territory_name")
-                            routesList!!.add(route_name)
+                            val market_name = route.getString("market_name")
+                            //val market_code = route.getString("route_code")
+                            val market_id = route.getString("market_id")
+                            val exists = routesList!!.find {
+                                it == route_name
+                            }
+                            Log.d("Route", "routes exist: " + exists)
+                            if (exists == null) {
+                                routesList!!.add(route_name)
+                            }
+
+                            marketList!!.add(Pair(route_name, market_name))
 
                             val route_outlet_list = route.getJSONArray("outlets")
                             for (j in 0 until route_outlet_list.length()) {
@@ -267,6 +316,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         longitude,
                                         route_id,
                                         route_name,
+                                        market_id,
+                                        market_name,
                                         "",
                                         is_Verified,0, 0
                                     )
@@ -292,12 +343,12 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             )
                             btncreateShop!!.visibility = View.VISIBLE
                         }
-                        if (spinner != null) {
+                        if (spinnerRoute != null) {
                             val adapter = ArrayAdapter(
                                 mContext!!,
                                 android.R.layout.simple_spinner_item, routesList!!
                             )
-                            spinner!!.adapter = adapter
+                            spinnerRoute!!.adapter = adapter
 
                         }
 

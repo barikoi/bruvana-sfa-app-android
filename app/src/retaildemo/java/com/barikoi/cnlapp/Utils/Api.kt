@@ -51,6 +51,7 @@ object Api {
     val get_saved_order = base_url+"api/v1/orders"
     val confirm_order = base_url+"api/v1/create-order"
     val update_saved_order = base_url+"api/v1/update-orders"
+    val market_list = base_url+"api/v1/markets"
 
     /*notice*/
     val get_notice = base_url+"api/v1/notices"

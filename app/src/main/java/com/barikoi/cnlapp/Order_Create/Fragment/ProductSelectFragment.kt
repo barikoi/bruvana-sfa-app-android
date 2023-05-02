@@ -50,7 +50,6 @@ import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_product_select.*
 import kotlinx.android.synthetic.main.fragment_product_select.progressBar
-import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

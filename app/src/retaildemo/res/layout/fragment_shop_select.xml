@@ -64,7 +64,6 @@
 
             </com.barikoi.cnlapp.Utils.MoreSpinner>
         </RelativeLayout>
-
         <AutoCompleteTextView
             android:id="@+id/editTextSearchShop"
             android:layout_width="match_parent"

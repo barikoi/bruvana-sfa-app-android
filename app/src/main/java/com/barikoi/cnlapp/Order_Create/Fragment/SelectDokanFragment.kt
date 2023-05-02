@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 
 class SelectDokanFragment : Fragment() {
