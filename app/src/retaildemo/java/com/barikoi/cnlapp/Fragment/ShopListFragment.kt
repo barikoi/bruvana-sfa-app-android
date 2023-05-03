@@ -81,7 +81,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                 markets.clear()
                 for (i in 0 until marketList!!.size) {
                     if (marketList!![i].first == routesList!![position]) {
-                        markets.add(marketList!![i].second)
+                        markets.add(marketList!![i].second.second)
                     }
 
                 }
@@ -178,6 +178,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                         .putExtra("requestCode", 55)
                         .putStringArrayListExtra("routes", routesList)
                         .putExtra("routeList", routeNameList)
+                        /*.putStringArrayListExtra("markets", markets)
+                        .putExtra("marketList", marketList)*/
                 )
             }else{
                 Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
@@ -202,7 +204,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
     companion object {
         var routesList: ArrayList<String>? = ArrayList()
-        var marketList: ArrayList<Pair<String,String>>? = ArrayList()
+        var marketList: ArrayList<Pair<String,Pair<String,String>>>? = ArrayList()
         val markets: ArrayList<String> = ArrayList()
         var allRouteList: ArrayList<Routes>? = ArrayList()
         var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
@@ -250,9 +252,26 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             Log.d("Route", "routes exist: " + exists)
                             if (exists == null) {
                                 routesList!!.add(route_name)
+                                routeNameList!!.add(
+                                    Pair(
+                                        route_id,
+                                        route_name
+                                    )
+                                )
+                                /*allRouteList!!.add(
+                                    Routes(
+                                        route_id,
+                                        route_code,
+                                        route_name,
+                                        "",
+                                        "",
+                                        "",
+                                        shopList!!
+                                    )
+                                )*/
                             }
 
-                            marketList!!.add(Pair(route_name, market_name))
+                            marketList!!.add(Pair(route_name, Pair(market_id, market_name)))
 
                             val route_outlet_list = route.getJSONArray("outlets")
                             for (j in 0 until route_outlet_list.length()) {
@@ -285,7 +304,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                 val outlet_category = outlet.getString("outlet_category")
                                 val owner_name = outlet.getString("owner_name")
                                 val market_opportunity = outlet.getString("market_opportunity")
-                                val contact_number = outlet.getString("phone_number")
+                                val contact_number = if (!outlet.getString("phone_number").equals("null")) outlet.getString("phone_number") else ""
                                 val is_buyer = outlet.getInt("is_buyer")
                                 /*val distributor_office = outlet.getString("distributor_office")
                                 val distributor_office_code = outlet.getString("distributor_office_code")*/
@@ -324,23 +343,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                 )
                             }
                             Log.d("RouteList", "all 1 " + shopList!!.size.toString())
-                            allRouteList!!.add(
-                                Routes(
-                                    route_id,
-                                    route_code,
-                                    route_name,
-                                    "",
-                                    "",
-                                    "",
-                                    shopList!!
-                                )
-                            )
-                            routeNameList!!.add(
-                                Pair(
-                                    route_id,
-                                    route_name
-                                )
-                            )
+
+
                             btncreateShop!!.visibility = View.VISIBLE
                         }
                         if (spinnerRoute != null) {

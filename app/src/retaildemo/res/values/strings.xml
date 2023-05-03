@@ -135,6 +135,7 @@
     <string name="filter">Filter</string>
     <string name="search_shop">Search shop</string>
     <string name="select_route">Select Route</string>
+    <string name="select_market">Select Market</string>
     <string name="create_shop">Create New Shop</string>
     <string name="previous_order">Previous Order</string>
     <string name="search_product">Search by product name</string>

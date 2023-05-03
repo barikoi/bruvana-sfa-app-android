@@ -52,6 +52,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     var filterList: ArrayList<Shops>? = ArrayList()
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
     var marketNameList: ArrayList<Pair<String, Pair<String, String>>>? = ArrayList()
+    var marketPairList: ArrayList<Pair<String, Pair<String, String>>>? = ArrayList()
     val routesList = ArrayList<String>()
     val marketList = ArrayList<String>()
     private var prefs: SharedPreferences? = null
@@ -326,9 +327,11 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 /*val route_id = routeNameList!![p2].first*/
                 if (spinnerMarket != null) {
                     val marketItems = ArrayList<String>()
+                    marketPairList!!.clear()
                     for (i in 0 until marketNameList!!.size) {
                         if (marketNameList!![i].first == routeNameList!![p2].first){
                             marketItems.add(marketNameList!!.get(i).second.second)
+                            marketPairList!!.add(Pair(marketNameList!!.get(i).first, Pair(marketNameList!!.get(i).second.first, marketNameList!!.get(i).second.second)))
                         }
                     }
 
@@ -358,7 +361,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     }
                 }*/
 
-                val market_id = marketNameList!![p2].second.first
+                val market_id = marketPairList!![p2].second.first
                 getShopListbyRoute(Api.verified_shop_list+"?market_id="+market_id+"&user_id="+user_id)
             }
 
@@ -382,13 +385,15 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
                     val shops: ArrayList<Shops> = ArrayList()
-                    if (shopList!!.size >0) {
+                    if (spinnerMarket!!.selectedItemPosition > -1){
+                    if (shopList!!.size >0 && routeNameList!!.size>0) {
                         for (i in 0 until shopList!!.size) {
                             if (shopList!![i].route_name == routeNameList!![spinnerMarket!!.selectedItemPosition].second) {
                                 shops.add(shopList!![i])
                             }
 
                         }
+                    }
                     }
                     //adapter!!.shopList=shops
                     adapter = ShopSelectAdapter(shops, listener!!)
@@ -508,12 +513,11 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     response ->
                 try {
                     loading!!.visibility = View.GONE
-
+                    shopList!!.clear()
                     val data = JSONObject(response)
                     if (data.has("outlets") && !data.isNull("outlets")){
                         val outletsArray = data.getJSONArray("outlets")
                         if (outletsArray.length() > 0){
-                            shopList!!.clear()
                             if (outletsArray.length()>0){
 
                                 for (i in 0 until outletsArray.length()){
@@ -558,11 +562,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                     shopList!!.add(shops)
                                 }
 
-                                if (shopList!!.size > 0){
-                                    adapter = ShopSelectAdapter(shopList!!, listener!!)
-                                    recylerView!!.adapter = adapter
-                                    adapter!!.notifyDataSetChanged()
-                                }
+
                             }
                             if (spinnerRoute != null) {
                                 if (spinnerRoute!!.adapter == null){
@@ -575,7 +575,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
                             }
                         }
+                        /*if (shopList!!.size > 0){
 
+                        }*/
+                        adapter = ShopSelectAdapter(shopList!!, listener!!)
+                        recylerView!!.adapter = adapter
+                        adapter!!.notifyDataSetChanged()
                     }
                 }catch (e:Exception){
                     Sentry.captureException(e)

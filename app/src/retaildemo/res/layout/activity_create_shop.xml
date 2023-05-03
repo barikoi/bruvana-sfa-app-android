@@ -103,6 +103,28 @@
 
                     </com.barikoi.cnlapp.Utils.MoreSpinner>
                 </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/spinnerLayoutMarkets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg_required"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerMarkets"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
 
                 <HorizontalScrollView
                     android:id="@+id/imageViewScroll"

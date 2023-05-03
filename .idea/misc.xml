@@ -84,7 +84,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/drawable/tab_unselected_gray.xml" value="0.1245" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/font/ceraprofontfamily.xml" value="0.778125" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_active_inactive.xml" value="0.17" />
-        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_create_shop.xml" value="0.11569799022270505" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_create_shop.xml" value="0.25" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_login.xml" value="0.7041666666666667" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_main.xml" value="0.15625" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/layout/activity_notice.xml" value="0.8175182481751825" />
@@ -162,6 +162,7 @@
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/filter_menu_outlets.xml" value="0.17149122807017544" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/mainactivity_drawer_menu.xml" value="0.5" />
         <entry key="..\:/devPushpo/cnl_app/app/src/main/res/menu/sort_menu.xml" value="0.8145833333333333" />
+        <entry key="..\:/devPushpo/cnl_app/app/src/retaildemo/res/layout/activity_create_shop.xml" value="0.14945652173913043" />
         <entry key="..\:/devPushpo/cnl_app/app/src/retaildemo/res/layout/activity_login.xml" value="0.12681159420289856" />
         <entry key="..\:/devPushpo/cnl_app/app/src/retaildemo/res/layout/activity_splash.xml" value="0.12681159420289856" />
         <entry key="..\:/devPushpo/cnl_app/app/src/retaildemo/res/layout/fragment_route.xml" value="0.25" />
