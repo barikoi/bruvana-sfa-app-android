@@ -22,7 +22,7 @@ class MarketListAdapter(val routes: List<Markets>) : RecyclerView.Adapter<Market
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemCount.text = (position+1).toString()
-        holder.routeName.text = routes[position].route_name
+        holder.marketName.text = routes[position].market_name
         holder.territoryName.text = routes[position].territory_name
         holder.areaName.text = routes[position].area_name
         holder.routeCode.text = routes[position].route_code
@@ -41,14 +41,14 @@ class MarketListAdapter(val routes: List<Markets>) : RecyclerView.Adapter<Market
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val itemCount: TextView
-        internal val routeName: TextView
+        internal val marketName: TextView
         internal val territoryName: TextView
         internal val areaName: TextView
         internal val routeCode: TextView
         internal val shopCount: TextView
         init {
             itemCount = itemView.findViewById(R.id.item_count_id)
-            routeName = itemView.findViewById(R.id.route_name)
+            marketName = itemView.findViewById(R.id.route_name)
             territoryName = itemView.findViewById(R.id.territory_name)
             areaName = itemView.findViewById(R.id.area_name)
             routeCode = itemView.findViewById(R.id.route_code)

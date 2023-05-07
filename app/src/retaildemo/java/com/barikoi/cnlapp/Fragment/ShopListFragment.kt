@@ -19,10 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.NoConnectionError
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.TimeoutError
+import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
 import com.barikoi.cnlapp.Activity.RouteActivity
@@ -243,9 +240,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             val route_name = route.getString("route_name")
                             val route_code = route.getString("route_code")
                             val territory_name = route.getString("territory_name")
-                            val market_name = route.getString("market_name")
-                            //val market_code = route.getString("route_code")
-                            val market_id = route.getString("market_id")
+                            var market_name = ""
+                            var market_id = ""
                             val exists = routesList!!.find {
                                 it == route_name
                             }
@@ -258,89 +254,86 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         route_name
                                     )
                                 )
-                                /*allRouteList!!.add(
-                                    Routes(
-                                        route_id,
-                                        route_code,
-                                        route_name,
-                                        "",
-                                        "",
-                                        "",
-                                        shopList!!
-                                    )
-                                )*/
                             }
 
-                            marketList!!.add(Pair(route_name, Pair(market_id, market_name)))
+                            val marketsArray = route.getJSONArray("market")
+                            for (k in 0 until marketsArray.length()) {
+                                val market = marketsArray.getJSONObject(k)
+                                market_name = market.getString("name")
+                                market_id = market.getString("id")
+                                marketList!!.add(Pair(route_name, Pair(market_id, market_name)))
 
-                            val route_outlet_list = route.getJSONArray("outlets")
-                            for (j in 0 until route_outlet_list.length()) {
-                                val outlet = route_outlet_list.getJSONObject(j)
-                                var imageUrl = "null"
-                                var imageList: ArrayList<String> = ArrayList()
-                                if (outlet.has("images") && !outlet.isNull("images")) {
-                                    val imageArray = outlet.getJSONArray("images")
-                                    if (imageArray.length() > 0) {
-                                        val imageobj = imageArray.getJSONObject(0)
-                                        if (imageobj.has("image_url")) {
-                                            imageUrl = imageobj.getString("image_url")
-                                        }
-
-                                        for (p in 0 until imageArray.length()){
-                                            val imageobj = imageArray.getJSONObject(p)
+                                val route_outlet_list = market.getJSONArray("outlets")
+                                for (j in 0 until route_outlet_list.length()) {
+                                    val outlet = route_outlet_list.getJSONObject(j)
+                                    var imageUrl = "null"
+                                    var imageList: ArrayList<String> = ArrayList()
+                                    if (outlet.has("images") && !outlet.isNull("images")) {
+                                        val imageArray = outlet.getJSONArray("images")
+                                        if (imageArray.length() > 0) {
+                                            val imageobj = imageArray.getJSONObject(0)
                                             if (imageobj.has("image_url")) {
-                                                imageList.add(imageobj.getString("image_url"))
+                                                imageUrl = imageobj.getString("image_url")
                                             }
 
+                                            for (p in 0 until imageArray.length()){
+                                                val imageobj = imageArray.getJSONObject(p)
+                                                if (imageobj.has("image_url")) {
+                                                    imageList.add(imageobj.getString("image_url"))
+                                                }
+
+                                            }
                                         }
                                     }
-                                }
-                                val outlet_id = outlet.getString("id")
-                                val outlet_name = outlet.getString("outlet_name")
-                                val outlet_status = outlet.getString("outlet_status")
-                                val outlet_address = outlet.getString("address")
-                                val outlet_code = outlet.getString("outlet_code")
-                                val outlet_type = outlet.getString("outlet_type")
-                                val outlet_category = outlet.getString("outlet_category")
-                                val owner_name = outlet.getString("owner_name")
-                                val market_opportunity = outlet.getString("market_opportunity")
-                                val contact_number = if (!outlet.getString("phone_number").equals("null")) outlet.getString("phone_number") else ""
-                                val is_buyer = outlet.getInt("is_buyer")
-                                /*val distributor_office = outlet.getString("distributor_office")
-                                val distributor_office_code = outlet.getString("distributor_office_code")*/
-                                val latitude = outlet.getDouble("latitude")
-                                val longitude = outlet.getDouble("longitude")
-                                val is_Verified = outlet.getInt("is_verified")
-                                /*val last_order_date = outlet.getString("order_delivery_date")*/
+                                    val outlet_id = outlet.getString("id")
+                                    val outlet_name = outlet.getString("outlet_name")
+                                    val outlet_status = outlet.getString("outlet_status")
+                                    val outlet_address = outlet.getString("address")
+                                    val outlet_code = outlet.getString("outlet_code")
+                                    val outlet_type = outlet.getString("outlet_type")
+                                    val outlet_category = outlet.getString("outlet_category")
+                                    val owner_name = outlet.getString("owner_name")
+                                    val market_opportunity = outlet.getString("market_opportunity")
+                                    val contact_number = if (!outlet.getString("phone_number").equals("null")) outlet.getString("phone_number") else ""
+                                    val is_buyer = outlet.getInt("is_buyer")
+                                    /*val distributor_office = outlet.getString("distributor_office")
+                                    val distributor_office_code = outlet.getString("distributor_office_code")*/
+                                    val latitude = outlet.getDouble("latitude")
+                                    val longitude = outlet.getDouble("longitude")
+                                    val is_Verified = outlet.getInt("is_verified")
+                                    /*val last_order_date = outlet.getString("order_delivery_date")*/
 
-                                shopList!!.add(
-                                    Shops(
-                                        outlet_id,
-                                        outlet_name,
-                                        outlet_status,
-                                        outlet_address,
-                                        outlet_code,
-                                        outlet_type,
-                                        outlet_category,
-                                        owner_name,
-                                        market_opportunity,
-                                        contact_number,
-                                        is_buyer,
-                                        imageUrl,
-                                        imageList,
-                                        /*distributor_office,
-                                        distributor_office_code,*/
-                                        territory_name,
-                                        latitude,
-                                        longitude,
-                                        route_id,
-                                        route_name,
-                                        market_id,
-                                        market_name,
-                                        "",
-                                        is_Verified,0, 0
+                                    shopList!!.add(
+                                        Shops(
+                                            outlet_id,
+                                            outlet_name,
+                                            outlet_status,
+                                            outlet_address,
+                                            outlet_code,
+                                            outlet_type,
+                                            outlet_category,
+                                            owner_name,
+                                            market_opportunity,
+                                            contact_number,
+                                            is_buyer,
+                                            imageUrl,
+                                            imageList,
+                                            /*distributor_office,
+                                            distributor_office_code,*/
+                                            territory_name,
+                                            latitude,
+                                            longitude,
+                                            route_id,
+                                            route_name,
+                                            market_id,
+                                            market_name,
+                                            "",
+                                            is_Verified,0, 0
+                                        )
                                     )
-                                )
+                            }
+
+
                             }
                             Log.d("RouteList", "all 1 " + shopList!!.size.toString())
 
@@ -402,6 +395,10 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                         }
                     }
                 }
+            )
+            request.retryPolicy = DefaultRetryPolicy(
+                60 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
             )
             queue!!.add(request)
         }

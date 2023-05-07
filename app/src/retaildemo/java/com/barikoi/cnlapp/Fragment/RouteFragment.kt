@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NoConnectionError
 import com.android.volley.Request.Method.GET
 import com.android.volley.RequestQueue
@@ -89,10 +90,8 @@ class RouteFragment : Fragment() {
                             val route_code = route.getString("route_code")
                             val area_name = route.getString("area_name")
                             val territory_name = route.getString("territory_name")
-                            val outlet_count = route.getString("outlet_count")
-                            val market_name = route.getString("market_name")
-                            //val market_code = route.getString("route_code")
-                            val market_id = route.getString("market_id")
+                            //val outlet_count = route.getString("outlet_count")
+
                             val exists = arrayList!!.find {
                                 it.route_code == route_code
                             }
@@ -106,13 +105,31 @@ class RouteFragment : Fragment() {
                                         route_name,
                                         territory_name,
                                         area_name,
+                                        "",
+                                        ArrayList()
+                                    )
+                                )
+                            }
+                            val marketsArray = route.getJSONArray("market")
+                            for (j in 0 until marketsArray.length()) {
+                                val market = marketsArray.getJSONObject(j)
+                                val market_name = market.getString("name")
+                                val market_id = market.getString("id")
+                                val outlet_count = market.getString("outlet_count")
+                                marketList!!.add(
+                                    Markets(
+                                        route_id,
+                                        route_code,
+                                        route_name,
+                                        market_id,
+                                        market_name,
+                                        territory_name,
+                                        area_name,
                                         outlet_count,
                                         ArrayList()
                                     )
                                 )
                             }
-                            marketList!!.add(Markets(route_id, route_code, market_name, territory_name, area_name, outlet_count, ArrayList()))
-
                         }
 
                         if (spinner != null) {
@@ -134,7 +151,7 @@ class RouteFragment : Fragment() {
                                 //getAllMarketList(selectedRouteId!!)
                                 val marketItems = ArrayList<Markets>()
                                 for (i in 0 until marketList!!.size){
-                                    if (selectedRouteId == marketList!![i].id){
+                                    if (selectedRouteId == marketList!![i].route_id){
                                         marketItems.add(marketList!![i])
                                     }
                                 }
@@ -190,6 +207,10 @@ class RouteFragment : Fragment() {
                         }
                     }
                 }
+            )
+            request.retryPolicy = DefaultRetryPolicy(
+                60 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
             )
             queue!!.add(request)
         }
