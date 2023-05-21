@@ -43,7 +43,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_history_t_o.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_map.spinnerSO
 import org.json.JSONException
@@ -61,6 +60,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var spinner : MoreSpinner? = null
+    var spinnerCategory : MoreSpinner? = null
     var cbVerified: AppCompatCheckBox? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -79,6 +79,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var selected_so : Int? = null
     var selected_so_id : String? = null
     val soList: ArrayList<SOList> = ArrayList()
+    var categoryList: ArrayList<String> = ArrayList()
     val filteredsoList: ArrayList<HistoryList> = ArrayList()
     internal lateinit var icon: Icon
     private var loading: ProgressBar? = null
@@ -107,6 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         loading = view.findViewById(R.id.progressBar1)
 
         spinner = view.findViewById(R.id.spinnerRoutes)
+        spinnerCategory = view.findViewById(R.id.spinnerCategory)
 
         return view
     }
@@ -184,6 +186,54 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 // write code to perform some action
             }
         }
+
+        categoryList = arrayListOf<String>("A","B", "C", "D", "E", "F", "P", "MP", "WS")
+        val adapter = ArrayAdapter(
+            mContext!!,
+            android.R.layout.simple_spinner_item, categoryList!!
+        )
+        spinnerCategory!!.adapter = adapter
+        spinnerCategory!!.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View, position: Int, id: Long) {
+                /*placemarkermap!!.clear()
+                //loading!!.visibility = View.VISIBLE
+                routeId = routesList!!.get(position).first
+                //val shops: ArrayList<Shops> = ArrayList()
+                if (cbVerified!!.isChecked){
+                    mMap!!.clear()
+                    if (srCode!!.length > 0) {
+                        getShopList(Api.verified_shop_list +"?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId, "")
+                    }
+                }else{
+                    nonVerifiedShopList!!.clear()
+                    if (shopList!!.size > 0){
+                        mMap!!.clear()
+                        Log.d("RouteList", "all routelist "+ routesList!!.size.toString()+" position"+position)
+                        Log.d("RouteList", "all shops "+ shopList!!.size.toString())
+                        for (j in 0 until shopList!!.size) {
+                            Log.d("RouteList", "all shops for "+ shopList!![j].route_code)
+                            if (shopList!![j].route_name.equals(routesList!![position].second)) {
+                                //shops.add(shopList!![i])
+                                nonVerifiedShopList!!.add(shopList!![j])
+                                icon = IconFactory.getInstance(mContext!!).fromResource(R.drawable.map_marker_red)
+                                plotMarker(shopList!![j], icon)
+                            }
+
+                        }
+                        shopCount.setText("${nonVerifiedShopList!!.size} outlet(s)")
+                    }
+                }*/
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // write code to perform some action
+            }
+        }
+
+
 
         cbVerified!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
@@ -357,8 +407,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         longitude,
                                         route_id,
                                         route_name,
-                                        market_id,
-                                        market_name,
                                         "",
                                         is_Verified,0,0
                                     )
@@ -411,8 +459,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 longitude,
                                 route_id,
                                 route_name,
-                                market_id,
-                                market_name,
                                 "",
                                 is_Verified,0, 0
                             )
