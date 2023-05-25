@@ -4,6 +4,9 @@
     <item
         android:id="@+id/menu_mostfrequent"
         android:title="@string/most_frequent" />
+    <item
+        android:id="@+id/menu_highstock"
+        android:title="@string/high_stock" />
 
     <item
         android:id="@+id/menu_lowstock"

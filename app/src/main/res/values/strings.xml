@@ -36,6 +36,7 @@
     <string name="type_your_reason_here">Type your reason here...</string>
 
     <string name="most_frequent">Most Frequent</string>
+    <string name="high_stock">High Stock</string>
     <string name="low_stock">Low Stock</string>
     <string name="atoz">A to Z</string>
     <string name="ztoa">Z to A</string>

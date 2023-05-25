@@ -335,6 +335,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             sortTitle!!.setText(resources.getString(R.string.low_stock))
                         }
+                        R.id.menu_highstock -> {
+                            productsList!!.sortByDescending {
+                                it.stock_available
+                            }
+                            if (productsList!!.size > 0) {
+                                adapter = ProductListAdapter(productsList!!, listener!!)
+                                recylerView!!.adapter = adapter
+                                adapter!!.notifyDataSetChanged()
+                            }
+                            sortTitle!!.setText(resources.getString(R.string.high_stock))
+                        }
                     }
                     return true
                 }
@@ -917,8 +928,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                             if (productsList!!.size > 0) {
-                                productsList!!.sortBy { it.product_name }
-                                sortTitle!!.setText(resources.getString(R.string.atoz))
+                                productsList!!.sortByDescending { it.stock_available }
+                                sortTitle!!.setText(resources.getString(R.string.high_stock))
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 recylerView!!.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
