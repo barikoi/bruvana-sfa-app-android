@@ -144,14 +144,57 @@
                     </TextView>
                 </LinearLayout>
             </LinearLayout>
-            <TableLayout
-                android:id="@+id/tabLayout2"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white"
-                android:layout_margin="4dp">
-            </TableLayout>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
 
+                <TableLayout
+                    android:id="@+id/tabLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:layout_margin="4dp">
+                </TableLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/targetLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/summaryLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@color/color_gray">
+                    </View>
+
+                    <TableLayout
+                        android:id="@+id/tabLayoutTarget"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="4dp"
+                        android:background="@color/white">
+
+                    </TableLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
         </LinearLayout>
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/progressBarHome"
