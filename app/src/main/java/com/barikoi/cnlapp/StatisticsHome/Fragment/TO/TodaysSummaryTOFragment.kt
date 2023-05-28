@@ -260,42 +260,25 @@ class TodaysSummaryTOFragment : Fragment() {
         pd!!.dismiss()
     }
     private fun getSummaryTargets(url: String) {
-        var total_target = "--:--"
         var total_target_completed = "--:--"
-        var lpc = "--:--"
         var lpc_completed = "--:--"
-        var bpc = "--:--"
         var bpc_completed = "--:--"
-        var aiv = "--:--"
         var aiv_completed = "--:--"
-        var ads = "--:--"
-        var ads_completed = "--:--"
-        var rds = "--:--"
-        var rds_completed = "--:--"
         var visit_completed = "--:--"
-        var visited = "--:--"
-        var bounce_completed = "--:--"
-        var bounced = "--:--"
-        var delivery_value = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null) {
                         val obj = JSONObject(response)
-                        val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
                         progressBarHome.visibility = View.GONE
                         targetLayout.visibility = View.VISIBLE
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
-                                if (!targetObj.isNull("revenue")) total_target_completed =
-                                    dformat.format(targetObj.getString("revenue").toDouble())
-                                if (!targetObj.isNull("ads")) ads_completed =
-                                    dformat.format(targetObj.getString("ads").toDouble())
-                                if (!targetObj.isNull("rds")) rds_completed =
-                                    dformat.format(targetObj.getString("rds").toDouble())
+                                if (!targetObj.isNull("today_order_value")) total_target_completed =
+                                    dformat.format(targetObj.getString("today_order_value").toDouble())
                                 if (!targetObj.isNull("sku_per_memo")) bpc_completed =
                                     dformat.format(targetObj.getString("sku_per_memo").toDouble())
                                 if (!targetObj.isNull("number_of_memo")) lpc_completed =
@@ -306,23 +289,16 @@ class TodaysSummaryTOFragment : Fragment() {
                                     )
                                 if (!targetObj.isNull("aiv")) aiv_completed =
                                     dformat.format(targetObj.getString("aiv").toDouble())
-                                if (!targetObj.isNull("bounce_amount_percentage")) bounce_completed =
-                                    dformat.format(
-                                        targetObj.getString("bounce_amount_percentage").toDouble()
-                                    )
-                                if(!targetObj.isNull("delivered_value")) delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
                             }
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         itemList.add(
                             Pair(
-                                resources.getString(R.string.total_target_achieved),
+                                resources.getString(R.string.total_order_value),
                                 total_target_completed
                             )
                         )
-                        itemList.add(Pair(resources.getString(R.string.ads), ads_completed))
-                        itemList.add(Pair(resources.getString(R.string.rds), rds_completed))
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.sku_per_memo),
@@ -342,13 +318,6 @@ class TodaysSummaryTOFragment : Fragment() {
                             )
                         )
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
-                        itemList.add(
-                            Pair(
-                                resources.getString(R.string.bounce) + " (%)",
-                                bounce_completed
-                            )
-                        )
-                        //itemList.add(Pair(resources.getString(R.string.delivery_value), delivery_value))
 
                         createTable(itemList, tabLayoutTarget)
                     }
