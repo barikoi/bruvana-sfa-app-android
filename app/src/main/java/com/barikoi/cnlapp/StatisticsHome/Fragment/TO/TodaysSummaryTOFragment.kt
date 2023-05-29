@@ -48,6 +48,7 @@ class TodaysSummaryTOFragment : Fragment() {
     var userId: String? = ""
     var pd: ProgressDialog? = null
     var EndDate: String? = null
+    var soId: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,6 +165,17 @@ class TodaysSummaryTOFragment : Fragment() {
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
         if (data.size > 0) {
+            /*val trefresh = TableRow(mContext)
+            val refresh = TextView(mContext)
+            refresh.gravity = Gravity.CENTER
+            refresh.setTextColor(resources.getColor(R.color.text_title))
+            refresh.setText("Refresh")
+            refresh.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
+            refresh.setOnClickListener {
+                getSummaryTargets(Api.get_summary + "?start_date=" + EndDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + soId)
+            }
+            trefresh.addView(refresh)
+            tab_Layout.addView(trefresh)*/
             //bodyLayoutScroll.smoothScrollTo(0, 0)
             for (i in 0 until data.size) {
                 val tr = TableRow(mContext)
@@ -233,6 +245,7 @@ class TodaysSummaryTOFragment : Fragment() {
                     }.start()*/
 
                     try {
+                        soId = data[i].first.second
                         getSummaryTargets(Api.get_summary + "?start_date=" + EndDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
@@ -405,5 +418,10 @@ class TodaysSummaryTOFragment : Fragment() {
         pd = ProgressDialog(mContext)
         pd!!.setMessage("Processing...")
         pd!!.setCancelable(false)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        setTodaysSummary()
     }
 }

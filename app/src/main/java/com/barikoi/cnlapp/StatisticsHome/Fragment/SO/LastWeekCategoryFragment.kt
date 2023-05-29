@@ -73,7 +73,6 @@ class LastWeekCategoryFragment : Fragment() {
     }
 
     private fun getSummaryCategory(url: String) {
-
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onResponseSuccess(response: String) {

@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -73,7 +74,7 @@ class HomeTOFragment : Fragment() {
         }
 
         lastweeksummary.setOnClickListener {
-            startActivity(Intent(requireActivity(), OrderSummaryTOActivity::class.java).putExtra("from", "lastweek"))
+            //startActivity(Intent(requireActivity(), OrderSummaryTOActivity::class.java).putExtra("from", "lastweek"))
         }
 
 
@@ -430,6 +431,7 @@ class HomeTOFragment : Fragment() {
             tab.requestLayout()
         }
         Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
+        val fragmentManager = (activity as FragmentActivity).supportFragmentManager
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -437,9 +439,14 @@ class HomeTOFragment : Fragment() {
                 if (position == 0) {
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()*/
+
+                    fragmentManager.beginTransaction().detach(TodaysSummaryTOFragment()).commitAllowingStateLoss()
+                    Log.d("Fragment", "viewpager tab action: ${TodaysSummaryTOFragment().isDetached}")
+                    fragmentManager.beginTransaction().attach(TodaysSummaryTOFragment()).commitNow()
                 } else if (position == 1) {
                     /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
                     editor!!.commit()*/
+                    fragmentManager.beginTransaction().detach(LastWeekSummaryTOFragment()).attach(LastWeekSummaryTOFragment()).commitNowAllowingStateLoss()
                 }
             }
         })

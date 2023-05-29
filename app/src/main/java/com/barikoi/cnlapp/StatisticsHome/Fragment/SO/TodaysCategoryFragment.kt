@@ -14,11 +14,13 @@ import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.view.marginLeft
 import androidx.fragment.app.Fragment
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Model.Categories
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
@@ -26,6 +28,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_last_week_category.*
 import org.json.JSONObject
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -71,22 +74,62 @@ class TodaysCategoryFragment : Fragment() {
     }
 
     private fun getSummaryCategory(url: String) {
-
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
-                        val itemList: ArrayList<Pair<String, String>> = ArrayList()
+                        var dformat = DecimalFormat("#.##")
+                        val itemList: ArrayList<Categories> = ArrayList()
                         val obj = JSONObject(response)
                         val categoryArray = obj.getJSONArray("outlet_categories")
                         if (categoryArray.length() > 0){
+                            itemList.add(
+                                Categories(
+                                "Category",
+                                "Total Outlet",
+                                "Order Done",
+                                "Order Value"
+                            )
+                            )
                             for (i in 0 until categoryArray.length()){
                                 val productObj = categoryArray.getJSONObject(i)
                                 if (!productObj.getString("outlet_category").equals("") && !productObj.getString("outlet_category").equals("null")) {
                                     val outletCatName = productObj.getString("outlet_category")
-                                    val outletCount = productObj.getString("outlet_count")
-                                    itemList.add(Pair(outletCatName, outletCount))
+                                    val outletCount = productObj.getString("total_outlet")
+                                    val orderDone = productObj.getString("outlet_count_ordered")
+                                    val orderValue =  dformat.format(productObj.getString("order_value").toDouble())
+                                    val sumOutletCount = productObj.getString("sum_total_outlet")
+                                    val sumOrderDone = productObj.getString("sum_outlet_count_ordered")
+                                    val sumOrderValue =  dformat.format(productObj.getString("sum_order_value").toDouble())
+
+                                    if (i == categoryArray.length() -1) {
+                                        itemList.add(
+                                            Categories(
+                                                outletCatName,
+                                                outletCount,
+                                                orderDone,
+                                                orderValue
+                                            )
+                                        )
+                                        itemList.add(
+                                            Categories(
+                                                "Total",
+                                                sumOutletCount,
+                                                sumOrderDone,
+                                                sumOrderValue
+                                            )
+                                        )
+                                    }else{
+                                        itemList.add(
+                                            Categories(
+                                                outletCatName,
+                                                outletCount,
+                                                orderDone,
+                                                orderValue
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -121,27 +164,47 @@ class TodaysCategoryFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun createTable(data: ArrayList<Pair<String, String>>) {
+    private fun createTable(data: ArrayList<Categories>) {
         tabLayout.isStretchAllColumns = true
         tabLayout.bringToFront()
         val colorsTxt: Array<String> = mContext!!.getResources().getStringArray(R.array.colors)
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
+            val trborder = TableRow(mContext)
+            trborder.setBackgroundColor(resources.getColor(R.color.colorAccent))
             val image = ImageView(mContext)
             image.setImageDrawable(resources.getDrawable(R.drawable.ic_dot))
             image.drawable.setTint(Color.parseColor(colorsTxt[i]))
             val c1 = TextView(mContext)
             c1.gravity = Gravity.START
             c1.setTextColor(resources.getColor(R.color.text_title))
-            c1.setText(data.get(i).first)
+            c1.setText(data.get(i).outlet_category)
             val c2 = TextView(mContext)
-            c2.gravity = Gravity.END
+            c2.gravity = Gravity.CENTER
             c2.setTextColor(resources.getColor(R.color.text_title))
-            c2.setText(data.get(i).second)
+            c2.setText(data.get(i).total_outlet)
+            val c3 = TextView(mContext)
+            c3.gravity = Gravity.CENTER
+            c3.setTextColor(resources.getColor(R.color.text_title))
+            c3.setText(data.get(i).order_done)
+            val c4 = TextView(mContext)
+            c4.gravity = Gravity.CENTER
+            c4.setTextColor(resources.getColor(R.color.text_title))
+            c4.setText(data.get(i).order_value)
+            /*if (i==0 || i == data.size-1) {
+                image.visibility = View.INVISIBLE
+            }*/
             tr.addView(image)
             tr.addView(c1)
             tr.addView(c2)
+            tr.addView(c3)
+            tr.addView(c4)
             tabLayout.addView(tr)
+            if (i==0 || i == data.size-1) {
+                image.visibility = View.INVISIBLE
+                //tabLayout.addView(trborder)
+            }
+
         }
     }
 

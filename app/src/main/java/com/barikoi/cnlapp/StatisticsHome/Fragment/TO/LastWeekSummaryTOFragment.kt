@@ -383,6 +383,11 @@ class LastWeekSummaryTOFragment : Fragment() {
 
     }
 
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        requireFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
