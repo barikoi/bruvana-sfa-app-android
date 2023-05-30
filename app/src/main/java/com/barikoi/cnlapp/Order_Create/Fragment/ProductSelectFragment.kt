@@ -615,7 +615,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     private fun submitOrder(location: Location) {
         if (addedProducts!!.size > 0) {
-            var deliveredQuantity = 0
+            var orderedQuantity = 0
+            var orderedAmount = 0.0
             val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
@@ -632,8 +633,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("ordered_at", today)
             /*orderObj.put("delivered_at", nextDay)*/
             /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
-            orderObj.put("total_ordered_amount", grandTotalPrice.toString())
-            orderObj.put("total_ordered_quantity", totalCount.toString())
+
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
             //orderObj.put("order_status", "SAVED")
@@ -657,16 +657,22 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
-                    brandObj.put(
-                        "ordered_amount",
-                        addedProducts!![j].ordered_total_price.toString()
-                    )
+                    brandObj.put("ordered_amount", addedProducts!![j].ordered_total_price.toString())
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
-                    deliveredQuantity = deliveredQuantity + addedProducts!![j].ordered_quantity
+                    orderedQuantity = orderedQuantity + addedProducts!![j].ordered_quantity
+                    orderedAmount = orderedAmount + addedProducts!![j].ordered_total_price
                 }
 
+            }
+
+            if (orderedQuantity == totalCount){
+                orderObj.put("total_ordered_amount", grandTotalPrice.toString())
+                orderObj.put("total_ordered_quantity", totalCount.toString())
+            }else{
+                orderObj.put("total_ordered_amount", orderedAmount.toString())
+                orderObj.put("total_ordered_quantity", orderedQuantity.toString())
             }
 
             orderObj.put("products", brandsArray)
@@ -675,7 +681,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             if (obj1.length() > 0) {
                 Log.d("ConfirmOrder", "response: " + obj1)
-                if (deliveredQuantity > 0) {
+                if (orderedQuantity > 0) {
                     ApiServices.apiJSONObjectPOST(
                         Api.confirm_order,
                         queue!!,
