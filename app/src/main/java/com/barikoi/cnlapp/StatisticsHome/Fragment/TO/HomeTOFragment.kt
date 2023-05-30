@@ -19,7 +19,6 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
-import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
@@ -437,16 +436,11 @@ class HomeTOFragment : Fragment() {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
-                    editor!!.commit()*/
-
-                    fragmentManager.beginTransaction().detach(TodaysSummaryTOFragment()).commitAllowingStateLoss()
-                    Log.d("Fragment", "viewpager tab action: ${TodaysSummaryTOFragment().isDetached}")
-                    fragmentManager.beginTransaction().attach(TodaysSummaryTOFragment()).commitNow()
+                    val intent = Intent("TodaySummary")
+                    mContext!!.sendBroadcast(intent)
                 } else if (position == 1) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
-                    editor!!.commit()*/
-                    fragmentManager.beginTransaction().detach(LastWeekSummaryTOFragment()).attach(LastWeekSummaryTOFragment()).commitNowAllowingStateLoss()
+                    val intent = Intent("LastWeekSummary")
+                    mContext!!.sendBroadcast(intent)
                 }
             }
         })

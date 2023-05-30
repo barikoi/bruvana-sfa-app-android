@@ -1,8 +1,7 @@
 package com.barikoi.cnlapp.StatisticsHome.Fragment.TO
 
 import android.app.ProgressDialog
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -26,6 +25,16 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.*
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.bpcCount
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.lpcCount
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.ovCount
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.progressBarHome
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.summaryLayout
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.tabLayout2
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.tabLayoutTarget
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.targetLayout
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.tryAgain
+import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -61,6 +70,7 @@ class LastWeekSummaryTOFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setLastWeekSummary()
+        mContext!!.registerReceiver(broadcastReceiver, IntentFilter("LastWeekSummary"))
 
         tryAgain.setOnClickListener {
             setLastWeekSummary()
@@ -70,6 +80,7 @@ class LastWeekSummaryTOFragment : Fragment() {
     private fun setLastWeekSummary() {
         try{
             progressBarHome.visibility = View.VISIBLE
+            summaryLayout.visibility = View.GONE
             val dformat = DecimalFormat("#.##")
             val c = Calendar.getInstance()
             c.add(Calendar.DAY_OF_WEEK, -7)
@@ -188,6 +199,8 @@ class LastWeekSummaryTOFragment : Fragment() {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
+        tabLayoutTarget.removeAllViews()
+        targetLayout.visibility = View.GONE
         if (data.size > 0) {
             for (i in 0 until data.size) {
                 val tr = TableRow(mContext)
@@ -383,9 +396,10 @@ class LastWeekSummaryTOFragment : Fragment() {
 
     }
 
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        requireFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            setLastWeekSummary()
+        }
     }
 
 

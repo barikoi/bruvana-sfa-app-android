@@ -1,20 +1,19 @@
 package com.barikoi.cnlapp.StatisticsHome.Fragment.TO
 
 import android.app.ProgressDialog
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -25,12 +24,17 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import io.sentry.Sentry
+import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.*
 import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.*
 import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.bpcCount
 import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.lpcCount
 import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.ovCount
 import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.progressBarHome
 import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.summaryLayout
+import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.tabLayout2
+import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.tabLayoutTarget
+import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.targetLayout
+import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.tryAgain
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -65,6 +69,7 @@ class TodaysSummaryTOFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTodaysSummary()
+        mContext!!.registerReceiver(broadcastReceiver, IntentFilter("TodaySummary"))
 
         tryAgain.setOnClickListener {
             setTodaysSummary()
@@ -74,6 +79,7 @@ class TodaysSummaryTOFragment : Fragment() {
     private fun setTodaysSummary() {
         try{
             progressBarHome.visibility = View.VISIBLE
+            summaryLayout.visibility = View.GONE
             val dformat = DecimalFormat("#.##")
             val c = Calendar.getInstance()
             c.add(Calendar.DAY_OF_WEEK, -7)
@@ -202,6 +208,8 @@ class TodaysSummaryTOFragment : Fragment() {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
+        tabLayoutTarget.removeAllViews()
+        targetLayout.visibility = View.GONE
         if (data.size > 0) {
             for (i in 0 until data.size) {
                 val tr = TableRow(mContext)
@@ -367,42 +375,11 @@ class TodaysSummaryTOFragment : Fragment() {
         })
 
     }
-    /*private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {
-        tab_Layout.isStretchAllColumns = true
-        tab_Layout.bringToFront()
-        tab_Layout.removeAllViews()
-        var size : Int = 0
-        *//*if (data.size<5){
-            size = data.size
-        }else{
-            size = 5
-        }*//*
-        for (i in 0 until data.size) {
-            val tr = TableRow(mContext)
-            val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
-            val leftMargin = 0
-            val topMargin = 0
-            val rightMargin = 0
-            val bottomMargin = 8
-
-            tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
-            tr.setLayoutParams(tableRowParams)
-            tr.gravity = Gravity.CENTER_VERTICAL
-            val c1 = TextView(mContext)
-            c1.gravity = Gravity.START
-            c1.setTextColor(resources.getColor(R.color.text_title))
-            c1.setText(data.get(i).first)
-            val c2 = TextView(mContext)
-            c2.gravity = Gravity.END
-            c2.setTextColor(resources.getColor(R.color.text_title))
-            c2.setText(data.get(i).second)
-            c2.gravity = Gravity.CENTER
-            c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
-            tr.addView(c1)
-            tr.addView(c2)
-            tab_Layout.addView(tr)
+    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            setTodaysSummary()
         }
-    }*/
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

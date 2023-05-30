@@ -86,8 +86,8 @@ class LastWeekCategoryFragment : Fragment() {
                             itemList.add(Categories(
                                 "Category",
                                 "Total Outlet",
-                                "Order Done",
-                                "Order Value"
+                                "Deli Done",
+                                "Deli Value"
                             ))
                             for (i in 0 until categoryArray.length()){
                                 val productObj = categoryArray.getJSONObject(i)
