@@ -304,10 +304,10 @@ class TodaysSummaryTOFragment : Fragment() {
                                     dformat.format(targetObj.getString("sku_per_memo").toDouble())
                                 if (!targetObj.isNull("number_of_memo")) lpc_completed =
                                     dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                /*if (!targetObj.isNull("number_of_visits")) visit_completed =
+                                if (!targetObj.isNull("number_of_visits")) visit_completed =
                                     dformat.format(
                                         targetObj.getString("number_of_visits").toDouble()
-                                    )*/
+                                    )
                                 if (!targetObj.isNull("aiv")) aiv_completed =
                                     dformat.format(targetObj.getString("aiv").toDouble())
                             }
