@@ -95,7 +95,7 @@ class LastWeekSummaryFragment : Fragment() {
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
+                        itemList.add(Pair(resources.getString(R.string.total_delivery_value), total_target_completed))
                         itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
                         itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))

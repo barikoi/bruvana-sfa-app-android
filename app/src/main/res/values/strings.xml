@@ -106,6 +106,7 @@
     <string name="rds">RDS</string>
     <string name="bounce">Bounce</string>
     <string name="delivery_value">Delivery Value</string>
+    <string name="total_delivery_value">Total Delivery Value</string>
     <string name="total_target">Total Target</string>
     <string name="total_target_achieved">Total Target Achieved</string>
     <string name="details">Details</string>

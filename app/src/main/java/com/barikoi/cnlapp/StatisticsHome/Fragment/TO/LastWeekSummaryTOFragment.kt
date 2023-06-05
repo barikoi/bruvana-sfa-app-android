@@ -328,7 +328,7 @@ class LastWeekSummaryTOFragment : Fragment() {
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         itemList.add(
                             Pair(
-                                resources.getString(R.string.total_target_achieved),
+                                resources.getString(R.string.total_delivery_value),
                                 total_target_completed
                             )
                         )

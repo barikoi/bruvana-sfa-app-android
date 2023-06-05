@@ -101,10 +101,12 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
         })
         tryAgain2.setOnClickListener {
-            setDateFilter(spinnerMenu.selectedItemPosition)
+            setDateFilter(/*spinnerMenu.selectedItemPosition*/)
         }
 
-        val menuList = arrayOf(
+        setDateFilter(/*spinnerMenu.selectedItemPosition*/)
+
+        /*val menuList = arrayOf(
             resources.getString(R.string.today_summary),
             resources.getString(R.string.last_week_summary),
             resources.getString(R.string.custom)
@@ -131,17 +133,17 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
             }
 
-        }
+        }*/
     }
 
-    private fun setDateFilter(position: Int) {
+    private fun setDateFilter(/*position: Int*/) {
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
-        if (position == 0) {
+        /*if (position == 0) {
             StartDate = df.format(end)
             EndDate = df.format(end)
             tvDateRange.setText(simpleFormat.format(end))
@@ -154,14 +156,12 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         } else {
             tvDateRange.setText("Select date range")
             tvDateRange.setText(customDate)
-        }
-        /*if (intent.hasExtra("from")) {
-            EndDate = df.format(start)
-            tvDateRange.setText(simpleFormat.format(start) *//*+ " - " + simpleFormat.format(end)*//*)
-        }else{
-            EndDate = df.format(end)
-            tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         }*/
+        StartDate = df.format(start)
+        EndDate = df.format(end)
+        customDate = simpleFormat.format(start) + " - " + simpleFormat.format(end)
+        tvDateRange.setText(customDate)
+        getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -535,7 +535,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         itemList.add(
                             Pair(
-                                resources.getString(R.string.total_target_achieved),
+                                resources.getString(R.string.total_delivery_value),
                                 total_target_completed
                             )
                         )

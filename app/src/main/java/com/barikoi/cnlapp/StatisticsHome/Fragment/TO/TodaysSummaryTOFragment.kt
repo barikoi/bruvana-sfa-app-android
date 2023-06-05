@@ -254,7 +254,7 @@ class TodaysSummaryTOFragment : Fragment() {
 
                     try {
                         soId = data[i].first.second
-                        getSummaryTargets(Api.get_summary + "?start_date=" + EndDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second)
+                        getSummaryTargets(Api.get_summary + "?today_summary=1&today_for_so=1&user_id=" + data[i].first.second)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
                             for (t in 0 until tab_Layout.childCount) {
@@ -292,22 +292,22 @@ class TodaysSummaryTOFragment : Fragment() {
                 try {
                     if (response != null) {
                         val obj = JSONObject(response)
-                        val completedArray = obj.getJSONArray("target_completed")
+                        val completedArray = obj.getJSONArray("today_summary")
                         progressBarHome.visibility = View.GONE
                         targetLayout.visibility = View.VISIBLE
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
-                                if (!targetObj.isNull("today_order_value")) total_target_completed =
-                                    dformat.format(targetObj.getString("today_order_value").toDouble())
+                                if (!targetObj.isNull("today_ordered_amount")) total_target_completed =
+                                    dformat.format(targetObj.getString("today_ordered_amount").toDouble())
                                 if (!targetObj.isNull("sku_per_memo")) bpc_completed =
                                     dformat.format(targetObj.getString("sku_per_memo").toDouble())
                                 if (!targetObj.isNull("number_of_memo")) lpc_completed =
                                     dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                if (!targetObj.isNull("number_of_visits")) visit_completed =
+                                /*if (!targetObj.isNull("number_of_visits")) visit_completed =
                                     dformat.format(
                                         targetObj.getString("number_of_visits").toDouble()
-                                    )
+                                    )*/
                                 if (!targetObj.isNull("aiv")) aiv_completed =
                                     dformat.format(targetObj.getString("aiv").toDouble())
                             }
