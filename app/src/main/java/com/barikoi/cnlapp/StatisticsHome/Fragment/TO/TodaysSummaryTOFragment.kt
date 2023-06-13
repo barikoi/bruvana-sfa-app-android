@@ -90,7 +90,7 @@ class TodaysSummaryTOFragment : Fragment() {
             //tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
             val StartDate = df.format(start)
             EndDate = df.format(end)
-            ApiServices.apiGET(Api.get_all_so_list+"?last_week_summary=1&start_date="+EndDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+userId, mQueue!!, token!!, object :
+            ApiServices.apiGET(Api.get_all_so_list+"?today_summary=1&start_date="+EndDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&to_id="+userId, mQueue!!, token!!, object :
                 ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {

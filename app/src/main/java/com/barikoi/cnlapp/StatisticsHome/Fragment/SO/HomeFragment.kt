@@ -295,10 +295,11 @@ class HomeFragment : Fragment() {
 
     private fun setSecondPartSummary() {
         layoutSecond.visibility = View.VISIBLE
-        val titles = arrayOf(resources.getString(R.string.today_summary),resources.getString(R.string.last_week_summary), resources.getString(R.string.last_week_product),resources.getString(R.string.today_category), resources.getString(R.string.last_week_category), resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
+        val titles = arrayOf(resources.getString(R.string.today_summary),resources.getString(R.string.last_week_summary), resources.getString(R.string.low_stock_product), resources.getString(R.string.last_week_product), resources.getString(R.string.today_category), resources.getString(R.string.last_week_category), resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
         val fragments = ArrayList<Fragment>()
         fragments.add(TodaysSummaryFragment())
         fragments.add(LastWeekSummaryFragment())
+        fragments.add(LowStockProductFragment())
         fragments.add(LastWeekProductFragment())
         fragments.add(TodaysCategoryFragment())
         fragments.add(LastWeekCategoryFragment())

@@ -90,6 +90,7 @@
     <string name="today_summary">Today Summary</string>
     <string name="last_week_summary">Last Week Summary</string>
     <string name="last_week_product">Last Week Product</string>
+    <string name="low_stock_product">Low Stock Product</string>
     <string name="today_category">Today Category</string>
     <string name="last_week_category">Last Week Category</string>
     <string name="last_week_delivery">Last Week Delivery</string>
