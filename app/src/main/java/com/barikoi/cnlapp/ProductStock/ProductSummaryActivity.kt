@@ -178,6 +178,9 @@ class ProductSummaryActivity : AppCompatActivity() {
                             }
                         }
 
+                        itemList.sortByDescending {
+                            it.per_unit_quantity
+                        }
 
                         val adapter = ProductStockAdapter(itemList)
                         productList.adapter = adapter
