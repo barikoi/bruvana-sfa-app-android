@@ -194,7 +194,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             }
 
             getOrderSummary(
-                Api.get_all_so_list + "?last_week_summary=1&start_date=" + df.format(
+                Api.get_all_so_list + "?start_date=" + df.format(
                     s_date
                 ) + " 00:00:00" + "&end_date=" + df.format(e_date) + " 23:59:59" + "&to_id=" + user_id
             )
