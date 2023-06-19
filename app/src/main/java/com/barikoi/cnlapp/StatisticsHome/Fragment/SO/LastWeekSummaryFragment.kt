@@ -78,6 +78,7 @@ class LastWeekSummaryFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
+                    progressBar.visibility = View.GONE
                     if (response != null){
                         val obj = JSONObject(response)
                         val completedArray = obj.getJSONArray("last_week_summary")
@@ -95,7 +96,7 @@ class LastWeekSummaryFragment : Fragment() {
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        itemList.add(Pair(resources.getString(R.string.total_delivery_value), total_target_completed))
+                        itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
                         itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
                         itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
@@ -109,6 +110,7 @@ class LastWeekSummaryFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar.visibility = View.GONE
                 }
 
             }
@@ -123,10 +125,11 @@ class LastWeekSummaryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 getErrorResponse(error, mContext!!)
+                progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar.visibility = View.GONE
             }
 
         })

@@ -121,6 +121,7 @@ class RouteActivity : AppCompatActivity() {
             getSOList()
         }else{
             spinnerLayoutSO2.visibility = View.GONE
+            progressBar.visibility = View.GONE
         }
         spinnerSO2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             @RequiresApi(Build.VERSION_CODES.N)
@@ -150,6 +151,7 @@ class RouteActivity : AppCompatActivity() {
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
+                    progressBar.visibility = View.GONE
                     //setDateFilter()
                 }
 
@@ -163,10 +165,12 @@ class RouteActivity : AppCompatActivity() {
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
+                    progressBar.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
                     Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
                 }
 
             })

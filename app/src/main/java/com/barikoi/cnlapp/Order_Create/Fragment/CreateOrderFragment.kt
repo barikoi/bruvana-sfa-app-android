@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -44,6 +45,7 @@ class CreateOrderFragment : Fragment(){
     var userId: String ? = ""
     var srId: String ? = ""
     var routeId: String ? = ""
+    var progressBar: ProgressBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +67,7 @@ class CreateOrderFragment : Fragment(){
         val view = inflater.inflate(R.layout.fragment_create_order, container, false)
         viewpagertab = view.findViewById(R.id.viewpagertabOrder)
         viewPager = view.findViewById(R.id.viewPager3)
+        progressBar = view.findViewById(R.id.progressBarOrder)
         return view
     }
 
@@ -197,6 +200,7 @@ class CreateOrderFragment : Fragment(){
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
+                        progressBar!!.visibility = View.GONE
                         if (response != null) {
                             val obj = JSONObject(response)
                             val attedanceArray = obj.getJSONArray("attendances")
@@ -217,6 +221,7 @@ class CreateOrderFragment : Fragment(){
                                             attendanceObj.getString("route_name")
                                         ).commit()
                                 }else{
+                                    progressBar!!.visibility = View.GONE
                                     no_route_check.visibility = View.VISIBLE
                                     bodyLayout.visibility = View.GONE
 
@@ -226,6 +231,7 @@ class CreateOrderFragment : Fragment(){
                                 }
 
                             }else{
+                                progressBar!!.visibility = View.GONE
                                 no_route_check.visibility = View.VISIBLE
                                 bodyLayout.visibility = View.GONE
 
@@ -236,6 +242,7 @@ class CreateOrderFragment : Fragment(){
                         }
                     }catch (e: Exception){
                         e.printStackTrace()
+                        progressBar!!.visibility = View.GONE
                     }
                 }
 
@@ -249,10 +256,12 @@ class CreateOrderFragment : Fragment(){
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, mContext!!)
+                    progressBar!!.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
                     Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                    progressBar!!.visibility = View.GONE
                 }
 
             })

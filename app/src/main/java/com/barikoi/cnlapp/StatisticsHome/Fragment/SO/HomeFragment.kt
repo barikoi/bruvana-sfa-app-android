@@ -28,6 +28,7 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.tvDateRange
 import org.json.JSONObject
@@ -48,6 +49,7 @@ class HomeFragment : Fragment() {
     var srId: String ? = ""
     var userId: String ? = ""
     var routeId: String ? = ""
+    var progressBar: ProgressBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +61,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        progressBar = view.findViewById(R.id.progressBarHomeTO)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -103,6 +107,7 @@ class HomeFragment : Fragment() {
                                     routeId =  attendanceObj.getInt("route_id").toString()
                                     init()
                                 }else{
+                                    progressBar!!.visibility = View.GONE
                                     no_route_check.visibility = View.VISIBLE
                                     bodyLayout.visibility = View.GONE
 
@@ -112,6 +117,7 @@ class HomeFragment : Fragment() {
                                 }
 
                             }else{
+                                progressBar!!.visibility = View.GONE
                                 no_route_check.visibility = View.VISIBLE
                                 bodyLayout.visibility = View.GONE
 
@@ -122,6 +128,8 @@ class HomeFragment : Fragment() {
                         }
                     }catch (e: Exception){
                         e.printStackTrace()
+                        Sentry.captureException(e)
+                        progressBar!!.visibility = View.GONE
                     }
                 }
 
@@ -135,10 +143,12 @@ class HomeFragment : Fragment() {
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, mContext!!)
+                    progressBar!!.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
                     Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                    progressBar!!.visibility = View.GONE
                 }
 
             })
@@ -218,6 +228,7 @@ class HomeFragment : Fragment() {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
+                        progressBar!!.visibility = View.GONE
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
@@ -269,6 +280,7 @@ class HomeFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar!!.visibility = View.GONE
                 }
 
             }
@@ -283,10 +295,11 @@ class HomeFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar!!.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar!!.visibility = View.GONE
             }
 
         })

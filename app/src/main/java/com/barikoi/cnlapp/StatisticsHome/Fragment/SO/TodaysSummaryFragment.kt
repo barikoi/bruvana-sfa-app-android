@@ -20,7 +20,6 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_last_week_summary.*
 import kotlinx.android.synthetic.main.fragment_todays_summary.*
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -78,6 +77,7 @@ class TodaysSummaryFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
+                    progressBar.visibility = View.GONE
                     if (response != null){
                         val obj = JSONObject(response)
                         val completedArray = obj.getJSONArray("today_summary")
@@ -105,6 +105,7 @@ class TodaysSummaryFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar.visibility = View.GONE
                 }
 
             }
@@ -119,10 +120,11 @@ class TodaysSummaryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar.visibility = View.GONE
             }
 
         })

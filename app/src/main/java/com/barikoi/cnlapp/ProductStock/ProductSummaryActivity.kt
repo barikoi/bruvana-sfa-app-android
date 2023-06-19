@@ -149,6 +149,7 @@ class ProductSummaryActivity : AppCompatActivity() {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
+                        progressBar.visibility= View.GONE
                         val itemList: ArrayList<ProductStock> = ArrayList()
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
@@ -190,6 +191,7 @@ class ProductSummaryActivity : AppCompatActivity() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar.visibility= View.GONE
                 }
             }
 
@@ -203,10 +205,12 @@ class ProductSummaryActivity : AppCompatActivity() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
+                progressBar.visibility= View.GONE
             }
 
             override fun onException(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                progressBar.visibility= View.GONE
             }
 
         })

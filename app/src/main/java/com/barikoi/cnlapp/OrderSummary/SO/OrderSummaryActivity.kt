@@ -71,7 +71,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                 }
 
             })*/
-
+            progressBar.visibility = View.GONE
             no_route_check.visibility = View.VISIBLE
             bodyLayout.visibility = View.GONE
             btn_tryAgain.setOnClickListener {
@@ -156,10 +156,12 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
     }
 
     private fun getAllOrders(url: String) {
+        progressBar.visibility = View.GONE
         progressBarOrder.visibility = View.VISIBLE
         ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
+                    progressBar.visibility = View.GONE
                     if (response != null) {
                         progressBarOrder.visibility = View.GONE
                         val itemList: ArrayList<OrderList> = ArrayList()

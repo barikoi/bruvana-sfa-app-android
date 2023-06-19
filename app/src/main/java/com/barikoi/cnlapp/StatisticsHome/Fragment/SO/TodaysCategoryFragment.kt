@@ -78,6 +78,7 @@ class TodaysCategoryFragment : Fragment() {
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onResponseSuccess(response: String) {
                 try {
+                    progressBar.visibility = View.GONE
                     if (response != null){
                         var dformat = DecimalFormat("#.##")
                         val itemList: ArrayList<Categories> = ArrayList()
@@ -139,6 +140,7 @@ class TodaysCategoryFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar.visibility = View.GONE
                 }
 
             }
@@ -153,10 +155,11 @@ class TodaysCategoryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar.visibility = View.GONE
             }
 
         })

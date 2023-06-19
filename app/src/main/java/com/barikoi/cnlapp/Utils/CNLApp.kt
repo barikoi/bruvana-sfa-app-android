@@ -4,12 +4,19 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import io.sentry.android.core.SentryAndroid
+import io.sentry.android.core.SentryAndroidOptions
 import java.util.*
 
 class CNLApp: Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = applicationContext
+        SentryAndroid.init(
+            this
+        ) { options: SentryAndroidOptions ->
+            options.isEnableAutoSessionTracking = true
+        }
     }
 
     companion object {

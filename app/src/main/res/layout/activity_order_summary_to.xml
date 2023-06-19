@@ -362,7 +362,7 @@
 
             <com.github.ybq.android.spinkit.SpinKitView
                 android:id="@+id/progressBar4"
-                style="@style/SpinKitView.Small.Circle"
+                style="@style/SpinKitView.Circle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -543,7 +543,7 @@
     </LinearLayout>
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar5"
-        style="@style/SpinKitView.Small.Circle"
+        style="@style/SpinKitView.Circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

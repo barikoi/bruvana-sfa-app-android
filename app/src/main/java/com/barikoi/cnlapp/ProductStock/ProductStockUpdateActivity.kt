@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.View
 import android.widget.Toast
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -15,9 +16,6 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import kotlinx.android.synthetic.main.activity_product_stock_update.*
-import kotlinx.android.synthetic.main.activity_product_stock_update.btnBack
-import kotlinx.android.synthetic.main.activity_product_stock_update.productList
-import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,7 +49,6 @@ class ProductStockUpdateActivity : AppCompatActivity() {
 
     private fun setDateFilter() {
         val c = Calendar.getInstance()
-        //c.add(Calendar.DAY_OF_WEEK, -7)
         c.set(Calendar.DAY_OF_MONTH, 1);
         val end = Calendar.getInstance().time
         val start = c.time
@@ -72,6 +69,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
+                        progressBar.visibility = View.GONE
                         val itemList: ArrayList<ProductStock> = ArrayList()
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
@@ -110,6 +108,7 @@ class ProductStockUpdateActivity : AppCompatActivity() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar.visibility = View.GONE
                 }
             }
 
@@ -123,10 +122,12 @@ class ProductStockUpdateActivity : AppCompatActivity() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
+                progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
 
         })

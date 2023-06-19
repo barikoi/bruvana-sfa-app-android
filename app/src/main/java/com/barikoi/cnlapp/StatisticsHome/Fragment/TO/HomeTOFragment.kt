@@ -50,6 +50,7 @@ class HomeTOFragment : Fragment() {
     var territoryId: String ? = ""
     var employeeId: String? = ""
     var userId: String? = ""
+    var progressBar: ProgressBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +61,9 @@ class HomeTOFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_t_o, container, false)
+        val view = inflater.inflate(R.layout.fragment_home_t_o, container, false)
+        progressBar = view.findViewById(R.id.progressBarHomeTO)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -272,6 +275,7 @@ class HomeTOFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar!!.visibility = View.GONE
                 }
 
             }
@@ -286,10 +290,11 @@ class HomeTOFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar!!.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar!!.visibility = View.GONE
             }
 
         })
@@ -348,10 +353,11 @@ class HomeTOFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar!!.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar!!.visibility = View.GONE
             }
 
         })
@@ -411,6 +417,7 @@ class HomeTOFragment : Fragment() {
     }
     private fun setSummary() {
         layoutFourth.visibility = View.VISIBLE
+        progressBar!!.visibility = View.GONE
         val titles = arrayOf(resources.getString(R.string.today_summary),resources.getString(R.string.last_week_summary))
         val fragments = ArrayList<Fragment>()
         fragments.add(TodaysSummaryTOFragment())

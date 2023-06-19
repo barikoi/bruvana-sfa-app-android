@@ -61,6 +61,7 @@ class LastWeekBounceFragment : Fragment() {
                 try {
                     if (response != null) {
                         itemList.clear()
+                        progressBar.visibility = View.GONE
                         val obj = JSONObject(response)
                         val outletssArray = obj.getJSONArray("outlets")
                         if (outletssArray.length() > 0) {
@@ -184,6 +185,7 @@ class LastWeekBounceFragment : Fragment() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    progressBar.visibility = View.GONE
                 }
 
             }
@@ -198,10 +200,11 @@ class LastWeekBounceFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
+                progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                TODO("Not yet implemented")
+                progressBar.visibility = View.GONE
             }
 
         })

@@ -47,7 +47,7 @@ android {
         staging{
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
-            versionName "1.2.0_4"
+            versionName "1.2.0_5"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "http://20.24.15.52:7040/"
@@ -118,7 +118,7 @@ dependencies {
     /*progressbar*/
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
-    implementation 'io.sentry:sentry-android:6.4.1'
+    implementation 'io.sentry:sentry-android:6.23.0'
 
     /*glide*/
     implementation 'com.github.bumptech.glide:glide:4.11.0'

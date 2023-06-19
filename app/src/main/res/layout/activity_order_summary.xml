@@ -195,4 +195,13 @@
         android:textSize="12sp"
         android:text="@string/refresh" />
     </LinearLayout>
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar"
+        style="@style/SpinKitView.Large.Circle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:visibility="visible"
+        android:layout_centerInParent="true"
+        app:SpinKit_Color="@color/cnl_color_1" />
 </RelativeLayout>

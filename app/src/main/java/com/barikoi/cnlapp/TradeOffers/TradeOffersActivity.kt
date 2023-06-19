@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.MenuItem
+import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -110,6 +111,7 @@ class TradeOffersActivity : AppCompatActivity() {
                 try {
                     if (response != null){
                         itemList.clear()
+                        progressBar.visibility = View.GONE
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
                         if (productsArray.length() > 0){
@@ -159,6 +161,7 @@ class TradeOffersActivity : AppCompatActivity() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
+                    progressBar.visibility = View.GONE
                 }
             }
 
@@ -172,10 +175,12 @@ class TradeOffersActivity : AppCompatActivity() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
+                progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
 
         })
