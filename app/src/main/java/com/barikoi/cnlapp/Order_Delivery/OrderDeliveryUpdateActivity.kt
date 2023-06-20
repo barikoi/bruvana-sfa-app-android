@@ -1,6 +1,7 @@
 package com.barikoi.cnlapp.Order_Delivery
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -28,6 +29,7 @@ import kotlinx.android.synthetic.main.activity_order_delivery_update.tvDateRange
 import kotlinx.android.synthetic.main.activity_order_delivery_update.viewPager
 import kotlinx.android.synthetic.main.activity_order_delivery_update.viewpagertab
 import java.text.SimpleDateFormat
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -120,9 +122,11 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
 
     private fun setDateFilter() {
         val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -7)
-        val end = Calendar.getInstance().time
-        val start = c.time
+        //c.add(Calendar.DAY_OF_WEEK, -7)
+        c.add(Calendar.DATE, -1)
+        //val end = Calendar.getInstance().time
+        val end = c.time
+        //val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
         StartDate = df.format(end)

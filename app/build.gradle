@@ -11,7 +11,7 @@ android {
     defaultConfig {
         minSdk 16
         targetSdk 32
-        versionCode 5
+        versionCode 6
         multiDexEnabled true
         flavorDimensions "default"
         resConfigs "en"
@@ -37,7 +37,7 @@ android {
             applicationId "com.barikoi.cnlapp"
             dimension "default"
             //versionName "0.1.11"
-            versionName "1.2.1"
+            versionName "1.2.2"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
             manifestPlaceholders = [
@@ -47,7 +47,7 @@ android {
         staging{
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
-            versionName "1.2.0_5"
+            versionName "1.2.2_1"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "http://20.24.15.52:7040/"

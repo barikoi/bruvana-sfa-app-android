@@ -45,6 +45,7 @@ object Api {
     /*order create*/
     val routes_withfilter = base_url+"api/v1/routes"
     val all_product_list = base_url+"api/v1/products"
+    val lowstock_product_list = base_url+"api/v1/low-stocks"
     val verified_shop_list = base_url+"api/v1/outlets"
     val no_order = base_url+"api/v1/no-orders"
     val previous_order = base_url+"api/v1/previous-orders"
