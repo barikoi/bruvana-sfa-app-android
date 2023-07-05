@@ -111,8 +111,10 @@
     <string name="total_target">Total Target</string>
     <string name="total_target_achieved">Total Target Achieved</string>
     <string name="details">Details</string>
+    <string name="start_ordering">Start Ordering</string>
     <string name="total">Total-</string>
     <string name="last_order_date">Last order date- </string>
+    <string name="last_delivery_date">Last delivery date- </string>
     <string name="items">Items</string>
     <string name="ordered_at">Ordered at- </string>
 

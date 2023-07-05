@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import io.heap.autocapture.ViewAutocaptureSDK
+import io.heap.core.Heap
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import java.util.*
@@ -17,6 +19,11 @@ class CNLApp: Application() {
         ) { options: SentryAndroidOptions ->
             options.isEnableAutoSessionTracking = true
         }
+
+        /*// Replace YOUR_ENVIRONMENT_ID with the ID of the Heap environment you wish to send data to.
+        Heap.startRecording(this, "2261727323")
+        // Call ViewAutocaptureSDK.register() to enable autocapture for supported UI elements.
+        ViewAutocaptureSDK.register()*/
     }
 
     companion object {

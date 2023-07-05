@@ -154,48 +154,46 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         shopTitle!!.text = shopName
-        val gd = GradientDrawable()
+        /*val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 5f
         gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
-        previous_order.setBackgroundDrawable(gd)
+        previous_order.setBackgroundDrawable(gd)*/
 
-        previous_order.setOnClickListener {
-            try {
-                ApiServices.apiGET(
-                    Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId+"&with_last_week_order=1",
-                    queue!!,
-                    token!!,
-                    object : ApiServiceListener {
-                        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-                        override fun onResponseSuccess(response: String) {
-                            getPreviousOrders(response)
-                        }
+        try {
+            ApiServices.apiGET(
+                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId+"&with_last_week_order=1",
+                queue!!,
+                token!!,
+                object : ApiServiceListener {
+                    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+                    override fun onResponseSuccess(response: String) {
+                        getPreviousOrders(response)
+                    }
 
-                        override fun onJSONResponseSuccess(response: JSONObject) {
-                            TODO("Not yet implemented")
-                        }
+                    override fun onJSONResponseSuccess(response: JSONObject) {
+                        TODO("Not yet implemented")
+                    }
 
-                        override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                            TODO("Not yet implemented")
-                        }
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                        TODO("Not yet implemented")
+                    }
 
-                        override fun onResponseFailure(error: VolleyError) {
-                            ViewUtils.getErrorResponse(error, mContext!!)
-                        }
+                    override fun onResponseFailure(error: VolleyError) {
+                        ViewUtils.getErrorResponse(error, mContext!!)
+                    }
 
-                        override fun onException(e: Exception) {
-                            Toast.makeText(
-                                mContext!!.applicationContext,
-                                e.message, Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                    override fun onException(e: Exception) {
+                        Toast.makeText(
+                            mContext!!.applicationContext,
+                            e.message, Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
-                    })
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Sentry.captureException(e)
-            }
+                })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Sentry.captureException(e)
         }
 
         if (selectedOrder != null) {
@@ -240,12 +238,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun getPreviousOrders(response: String) {
+        var lastOrderDate = ""
         var lastDeliveryDate = ""
         var orderStatus = ""
+        var outletCategory = ""
         var brandArray = JSONArray()
         //val productItems: ArrayList<ProductStatistics> = ArrayList()
         val obj = JSONObject(response)
         val outletArray = obj.getJSONArray("outlets")
+        outletCategory = outletArray.getJSONObject(0).getString("outlet_category")
         val ordersArray = outletArray.getJSONObject(0).getJSONArray("orders")
         if (ordersArray.length() > 0) {
             for (i in 0 until ordersArray.length()) {
@@ -253,13 +254,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 val orderObj = ordersArray.getJSONObject(i)
                 brandArray = orderObj.getJSONArray("products")
                 //val outletName = outletObj.getString("outlet_name")
-                lastDeliveryDate = orderObj.getString("ordered_at")
+                lastOrderDate = orderObj.getString("ordered_at")
+                lastDeliveryDate = orderObj.getString("delivered_at")
                 orderStatus = orderObj.getString("order_status")
 
             }
 
         }
-        viewDialog(mContext!!, shopName!!, lastDeliveryDate, orderStatus, brandArray)
+        viewDialog(mContext!!, shopName!!, lastDeliveryDate, orderStatus, brandArray, outletCategory, lastOrderDate)
 
 
     }
@@ -997,9 +999,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     fun viewDialog(
         mContext: Context,
         outlet_name: String,
-        lastOrder: String,
+        lastDelivery: String,
         statusOrder: String,
-        brands_array: JSONArray
+        brands_array: JSONArray,
+        outletCategory: String,
+        lastOrderDate: String
         /*listItem: ArrayList<ProductStatistics>*/
     ) {
         val dialog = Dialog(mContext)
@@ -1011,23 +1015,38 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         dialog.setContentView(R.layout.popup_previous_order_list)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
+        val tvoutletCategory = dialog.findViewById<TextView>(R.id.tvcategory)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
+        val tvLastDeliveryDate = dialog.findViewById<TextView>(R.id.lastDeliveryDate)
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
         val tvOrderStatus = dialog.findViewById<TextView>(R.id.tvOrderStatus)
         val statusLayout = dialog.findViewById<LinearLayout>(R.id.layoutStatus)
         val filterLayout = dialog.findViewById<LinearLayout>(R.id.filterLayout)
         val filterTitle = dialog.findViewById<TextView>(R.id.filterTitle)
+        val tvminOrderValue = dialog.findViewById<TextView>(R.id.minOV)
+        val startOrder = dialog.findViewById<AppCompatButton>(R.id.btnStartOrder)
 
         val productItems: ArrayList<ProductStatistics> = ArrayList()
         var dformat = DecimalFormat("#.##")
         outletName.setText(outlet_name)
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
-        if (lastOrder.length > 0) {
-            val orderDate = df.format(oldDate.parse(lastOrder))
+        if (lastOrderDate.length > 0 && !lastOrderDate.equals("null")) {
+            val orderDate = df.format(oldDate.parse(lastOrderDate))
             tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
+        }
+        if (lastDelivery.length > 0 && !lastDelivery.equals("null")) {
+            val deliveryDate = df.format(oldDate.parse(lastDelivery))
+            tvLastDeliveryDate.setText(mContext.resources.getString(R.string.last_delivery_date) + deliveryDate)
+        }
+        if (!outletCategory.equals("null")){
+            tvoutletCategory.setText(outletCategory)
+        }
+
+        startOrder.setOnClickListener {
+            dialog.dismiss()
         }
 
         if (statusOrder.equals("DELIVERED")){
@@ -1274,6 +1293,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         btnClose.setOnClickListener {
             dialog.dismiss()
+            requireActivity().onBackPressed()
         }
 
         if (!statusOrder.equals("null")) {

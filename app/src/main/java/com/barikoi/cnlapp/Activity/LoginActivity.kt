@@ -18,6 +18,8 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import io.heap.core.Heap
+import io.heap.core.Heap.addUserProperties
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
@@ -119,6 +121,15 @@ class LoginActivity : AppCompatActivity() {
                                     event
                                 }
                         }
+
+                        // Example
+                        /*Heap.identify("unique_identifier");
+                        val props: MutableMap<String, String> = HashMap()
+                        props["Name"] = userObj.getString("user_name")
+                        props["EmployeeId"] = userObj.getString("employee_id")
+                        props["Designation"] = userObj.getString("designation")
+                        addUserProperties(props)*/
+
                         routeToAppropriatePage(2)
                         //OneSignal.setEmail(email);
                         pd!!.dismiss()
@@ -202,7 +213,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun onLoginFailed() {
-        showDialog("Login failed,check if SR Code and password is correct",)
+        showDialog("Login failed,check if SR Code and password is correct")
 
     }
 
