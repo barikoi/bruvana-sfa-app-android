@@ -436,6 +436,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 val outlet_type = outlet.getString("outlet_type")
                                 /*val outlet_category = outlet.getString("outlet_category")*/
                                 val owner_name = outlet.getString("owner_name")
+                                val min_order = ""
                                 val market_opportunity = outlet.getString("market_opportunity")
                                 val contact_number = outlet.getString("phone_number")
                                 val is_buyer = outlet.getInt("is_buyer")
@@ -455,6 +456,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         outlet_type,
                                         outlet_category,
                                         owner_name,
+                                        min_order,
                                         market_opportunity,
                                         contact_number,
                                         is_buyer,
@@ -509,6 +511,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         outlet_type,
                                         outlet_category,
                                         owner_name,
+                                        "",
                                         market_opportunity,
                                         contact_number,
                                         is_buyer,
@@ -538,6 +541,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                         outlet_type,
                                         outlet_category,
                                         owner_name,
+                                        "",
                                         market_opportunity,
                                         contact_number,
                                         is_buyer,

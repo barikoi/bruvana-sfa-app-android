@@ -18,8 +18,6 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import io.heap.core.Heap
-import io.heap.core.Heap.addUserProperties
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions

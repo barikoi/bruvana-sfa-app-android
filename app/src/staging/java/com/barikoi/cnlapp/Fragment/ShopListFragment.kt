@@ -255,6 +255,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         outlet_type,
                                         outlet_category,
                                         owner_name,
+                                        "",
                                         market_opportunity,
                                         contact_number,
                                         is_buyer,

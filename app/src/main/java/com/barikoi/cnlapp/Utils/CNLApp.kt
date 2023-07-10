@@ -4,8 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
-import io.heap.autocapture.ViewAutocaptureSDK
-import io.heap.core.Heap
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import java.util.*

@@ -83,6 +83,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var grandTotalPrice: Double? = 0.0
     var totalCount: Int? = 0
     var shopName: String? = null
+    var outletMinOrder: String? = ""
     var shopId: String? = null
     var routeId: String? = null
     var listener: OnValueChangeListener? = null
@@ -117,12 +118,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 if (bundle.getString("from").equals("Shop")) {
                     selectedShop = bundle.getSerializable("Shop") as Shops?
                     shopName = selectedShop!!.shop_name
+                    outletMinOrder = selectedShop!!.min_order
                     shopId = selectedShop!!.shop_id
                     routeId = selectedShop!!.route_code
                     addedProducts!!.clear()
                 } else if (bundle.getString("from").equals("Order")) {
                     selectedOrder = bundle.getSerializable("Order") as OrderList?
                     shopName = selectedOrder!!.outletName
+                    //outletMinOrder = selectedOrder!!.min_order
                     shopId = selectedOrder!!.outletId
                     routeId = selectedOrder!!.routeId
                     addedProducts!!.clear()
@@ -154,6 +157,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         shopTitle!!.text = shopName
+        minOV.text = "Min Order Value: "+outletMinOrder
         /*val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 5f
@@ -242,10 +246,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         var lastDeliveryDate = ""
         var orderStatus = ""
         var outletCategory = ""
+        var minimum_order = ""
         var brandArray = JSONArray()
         //val productItems: ArrayList<ProductStatistics> = ArrayList()
         val obj = JSONObject(response)
         val outletArray = obj.getJSONArray("outlets")
+        minimum_order = outletArray.getJSONObject(0).getString("minimum_order")
         outletCategory = outletArray.getJSONObject(0).getString("outlet_category")
         val ordersArray = outletArray.getJSONObject(0).getJSONArray("orders")
         if (ordersArray.length() > 0) {
@@ -261,7 +267,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             }
 
         }
-        viewDialog(mContext!!, shopName!!, lastDeliveryDate, orderStatus, brandArray, outletCategory, lastOrderDate)
+        viewDialog(mContext!!, shopName!!, lastDeliveryDate, orderStatus, brandArray, outletCategory, lastOrderDate, minimum_order)
 
 
     }
@@ -1003,7 +1009,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         statusOrder: String,
         brands_array: JSONArray,
         outletCategory: String,
-        lastOrderDate: String
+        lastOrderDate: String,
+        minimum_order: String
         /*listItem: ArrayList<ProductStatistics>*/
     ) {
         val dialog = Dialog(mContext)
@@ -1043,6 +1050,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
         if (!outletCategory.equals("null")){
             tvoutletCategory.setText(outletCategory)
+        }
+        if (!minimum_order.equals("null")){
+            tvminOrderValue.text = "Min Order Value: "+ minimum_order
+        }else{
+            tvminOrderValue.text = "Min Order Value: N/A"
         }
 
         startOrder.setOnClickListener {

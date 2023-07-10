@@ -11,6 +11,7 @@ class Shops(
     val shop_type: String,
     val category: String,
     val shop_owner: String,
+    val min_order: String,
     val market_opportunity: String,
     val contact_number: String,
     val is_buyer: Int,
