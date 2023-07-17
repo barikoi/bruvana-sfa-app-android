@@ -23,7 +23,11 @@ class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adap
 
         holder.productName.text = mItem.product_name
         holder.soldQuantity.text = mItem.sold_quantity
-        holder.perUnitSold.text = mItem.per_unit_quantity+" "+mItem.unit_name
+        if (!mItem.unit_name.equals("null")) {
+            holder.perUnitSold.text = mItem.per_unit_quantity + " " + mItem.unit_name
+        }else{
+            holder.perUnitSold.text = mItem.per_unit_quantity + " "
+        }
 
         if (!mItem.imageUrl.isNullOrEmpty() && !mItem.imageUrl.equals("null")){
             Glide.with(holder.itemView.context)

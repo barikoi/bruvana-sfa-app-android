@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_app"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/bodyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            app:elevation="0dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/background_app"
+                app:contentInsetEnd="0dp"
+                app:contentInsetLeft="0dp"
+                app:contentInsetRight="0dp"
+                app:contentInsetStart="0dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <ImageButton
+                        android:id="@+id/btnBack"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="8dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_back">
+
+                    </ImageButton>
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/text_title"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:visibility="visible">
+
+                    </TextView>
+
+                </RelativeLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/locationMap"
+            android:layout_below="@+id/appbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+
+                <RelativeLayout
+                    android:id="@+id/spinnerLayoutRoutes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg_required"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerRoutes"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/spinnerLayoutMarkets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg_required"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerMarkets"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
+
+                <HorizontalScrollView
+                    android:id="@+id/imageViewScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg"
+                    android:fillViewport="true"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/imageViewLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <RelativeLayout
+                    android:id="@+id/imagepickerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg_required">
+
+                    <com.barikoi.cnlapp.imagecapture.ImageCapture
+                        android:id="@+id/imagepicker"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:visibility="visible">
+
+                    </com.barikoi.cnlapp.imagecapture.ImageCapture>
+
+                    <TextView
+                        android:id="@+id/imageCounter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:paddingBottom="8dp"
+                        android:text=""
+                        android:textSize="12sp"
+                        android:visibility="gone">
+
+                    </TextView>
+                </RelativeLayout>
+
+                <EditText
+                    android:id="@+id/etShopName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/cardview_bg_required"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:hint="@string/shop_name"
+                    android:inputType="text"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="16dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/text_title"
+                    android:textColorHint="@color/text_title_2"
+                    android:textSize="15sp" />
+
+                <RelativeLayout
+                    android:id="@+id/spinnerLayoutType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg_required"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerShopType"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/spinnerLayoutCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg_required"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerCatOutlets"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/spinnerLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg"
+                    android:backgroundTint="@color/white"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerMarketOpportunity"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/spinnerLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg"
+                    android:backgroundTint="@color/white"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="visible">
+
+                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                        android:id="@+id/spinnerBuyer"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:theme="@style/spinnerItemStyle"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </RelativeLayout>
+
+                <EditText
+                    android:id="@+id/etAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/cardview_bg_required"
+                    android:gravity="top"
+                    android:hint="@string/address"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="16dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/text_title"
+                    android:textColorHint="@color/text_title_2"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/etOwnerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/cardview_bg_required"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:hint="@string/owner_name"
+                    android:inputType="text"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="16dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/text_title"
+                    android:textColorHint="@color/text_title_2"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/etContactNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/cardview_bg"
+                    android:backgroundTint="@color/white"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:hint="@string/contact_number"
+                    android:inputType="phone"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="16dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/text_title"
+                    android:textColorHint="@color/text_title_2"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/etLatitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/cardview_bg"
+                    android:backgroundTint="@color/white"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:gravity="top"
+                    android:hint="@string/latitude"
+                    android:inputType="text"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="16dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/text_title"
+                    android:textColorHint="@color/text_title_2"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/etLongitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/cardview_bg"
+                    android:backgroundTint="@color/white"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:gravity="top"
+                    android:hint="@string/longitude"
+                    android:inputType="text"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="16dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/text_title"
+                    android:textColorHint="@color/text_title_2"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/locationMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/isVerified"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="start"
+            android:text="@string/adjust_shop_location_link"
+            android:textAllCaps="false"
+            android:textColor="@color/text_title_blue"
+            android:textColorLink="@color/text_title_blue"
+            android:textSize="15sp"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/isVerified"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_above="@+id/buttonLayout"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:button="@null"
+            android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
+            android:drawableTint="@color/cnl_color_2"
+            android:text="@string/verify_shop"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <RelativeLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSubmitShop"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/cardview_bg"
+                android:backgroundTint="@color/cnl_color_2"
+                android:padding="4dp"
+                android:text="@string/submit"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnUpdateShop"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/cardview_bg"
+                android:backgroundTint="@color/cnl_color_2"
+                android:padding="4dp"
+                android:text="@string/update"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBarShop"
+        style="@style/SpinKitView.Large.ThreeBounce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
+        android:translationZ="90dp"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/cnl_color_1" />
+
+    <LinearLayout
+        android:id="@+id/no_route_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center_horizontal"
+            android:text="@string/no_route_selected_today"
+            android:textColor="@color/text_title"
+            android:textSize="17sp">
+
+        </TextView>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_tryAgain"
+            android:layout_width="100dp"
+            android:layout_height="36dp"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="4dp"
+            android:background="@drawable/cardview_bg"
+            android:backgroundTint="@color/color_gray"
+            android:padding="2dp"
+            android:text="@string/refresh"
+            android:textAllCaps="false"
+            android:textColor="@color/text_title"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</RelativeLayout>
