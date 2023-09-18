@@ -19,6 +19,7 @@ class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.setIsRecyclable(false)
         val mItem = products[position]
 
         holder.productName.text = mItem.product_name
