@@ -46,6 +46,7 @@ import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.callback.LocationFetch
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_product_select.*
@@ -448,55 +449,21 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     fun getLocation(choice: String) {
-        val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
-            val mLocationRequest = LocationRequest()
-            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            mLocationCallback = object : LocationCallback() {
-                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val location = locationResult.lastLocation
-                    if (!location.latitude.isNaN()) {
-                        if (!location.isFromMockProvider) {
-                            if (choice.equals("no_order")) {
-                                submitNoOrder(location)
-                            } else if (choice.equals("update_order")) {
-                                updateOrder(location)
-                            } else {
-                                submitOrder(location)
-                            }
-
-                        } else {
-                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    } else {
-                        Toast.makeText(
-                            mContext!!.applicationContext,
-                            "Location not available $location", Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    mFusedLocationClient!!.removeLocationUpdates(mLocationCallback!!)
+        ViewUtils.getLocation(mContext!!, ACTIVITY, object : LocationFetch {
+            override fun onFetchSuccess(location: Location) {
+                if (choice.equals("no_order")) {
+                    submitNoOrder(location)
+                } else if (choice.equals("update_order")) {
+                    updateOrder(location)
+                } else {
+                    submitOrder(location)
                 }
             }
-
-            if (ActivityCompat.checkSelfPermission(
-                    mContext!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    mContext!!, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            override fun onFailure() {
 
             }
-            mFusedLocationClient!!.requestLocationUpdates(
-                mLocationRequest, mLocationCallback!!,
-                Looper.myLooper()!!
-            )
-        } else {
-            ViewUtils.showGPSDisabledAlertToUser(mContext!!)
-        }
+
+        })
     }
 
     private fun updateOrder(location: Location) {

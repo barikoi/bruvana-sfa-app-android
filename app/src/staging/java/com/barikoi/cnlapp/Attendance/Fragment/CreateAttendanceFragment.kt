@@ -43,6 +43,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
@@ -324,53 +325,19 @@ class CreateAttendanceFragment : Fragment() {
     }
 
     fun getLocation(choice: String){
-        val lm = mContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext!!)
-            val mLocationRequest = LocationRequest()
-            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            mLocationCallback = object : LocationCallback() {
-                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val location = locationResult.lastLocation
-                    if (!location.latitude.isNaN()) {
-                        if (!location.isFromMockProvider) {
-                            if (choice.equals("submit")){
-                                submitAttendance(location)
-                            }else if(choice.equals("reversegeo")){
-                                reverseGeoAddress(mContext!!, location.latitude, location.longitude)
-                            }
-
-                        } else {
-                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    } else {
-                        Toast.makeText(
-                            mContext!!.applicationContext,
-                            "Location not available $location", Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    mFusedLocationClient!!.removeLocationUpdates(mLocationCallback!!)
+        ViewUtils.getLocation(mContext!!, ACTIVITY, object : LocationFetch{
+            override fun onFetchSuccess(location: Location) {
+                if (choice.equals("submit")){
+                    submitAttendance(location)
+                }else if(choice.equals("reversegeo")){
+                    reverseGeoAddress(mContext!!, location.latitude, location.longitude)
                 }
             }
-
-            if (ActivityCompat.checkSelfPermission(
-                    mContext!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    mContext!!, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            override fun onFailure() {
 
             }
-            mFusedLocationClient!!.requestLocationUpdates(
-                mLocationRequest, mLocationCallback!!,
-                Looper.myLooper()!!
-            )
-        } else {
-            ViewUtils.showGPSDisabledAlertToUser(mContext!!)
-        }
+
+        })
     }
 
     private fun getAllRoutes(url: String) {
