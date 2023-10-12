@@ -21,6 +21,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_order_collection">
+
+        </ImageView>
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="match_parent"
@@ -71,7 +78,7 @@
             android:textColor="@color/white"
             android:textStyle="bold"
             android:textSize="12sp"
-            android:text="@string/confirm" />
+            android:text="@string/order_confirm" />
     </LinearLayout>
     </LinearLayout>
 

@@ -91,6 +91,35 @@ object ViewUtils {
         )
 
     }
+    fun viewDialogCustom(mContext: Context, message: String, listener: DialogListener){
+        val dialog = Dialog(mContext)
+        dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.popup_dialog)
+        val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
+        val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
+        val btnNo = dialog.findViewById<AppCompatButton>(R.id.btn_no)
+
+        tvMessage.setText(message)
+
+        btnConfirm.setOnClickListener {
+            listener.onConfirmed()
+            dialog.dismiss()
+        }
+        btnNo.setOnClickListener {
+            listener.onCanceled()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        val window = dialog.window
+        window!!.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+    }
     fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener){
         val dialog = Dialog(mContext)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

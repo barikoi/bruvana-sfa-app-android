@@ -1,18 +1,14 @@
 package com.barikoi.cnlapp.Order_Create.Fragment
 
-import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.SpannableString
@@ -21,10 +17,12 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
@@ -47,10 +45,11 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.callback.LocationFetch
-import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_product_select.*
+import kotlinx.android.synthetic.main.fragment_product_select.imgRefresh
 import kotlinx.android.synthetic.main.fragment_product_select.progressBar
+import kotlinx.android.synthetic.main.fragment_product_select.tvLocation
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -87,6 +86,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var outletMinOrder: String? = ""
     var shopId: String? = null
     var routeId: String? = null
+    var distanceValue: Double? = null
     var listener: OnValueChangeListener? = null
     var et_search: AutoCompleteTextView? = null
     private var adapter: ProductListAdapter? = null
@@ -98,11 +98,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
     var dformat = DecimalFormat("#.##")
-
-    /*var itemCount = 0
-    var grandTotal = 0.0*/
-    private var mFusedLocationClient: FusedLocationProviderClient? = null
-    private var mLocationCallback: LocationCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,11 +154,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         shopTitle!!.text = shopName
         minOV.text = "Min Order Value: "+outletMinOrder
-        /*val gd = GradientDrawable()
-        gd.setColor(mContext!!.resources.getColor(R.color.white))
-        gd.cornerRadius = 5f
-        gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
-        previous_order.setBackgroundDrawable(gd)*/
+        getLocation("reversegeo")
+
+        imgRefresh.setOnClickListener {
+            rotateAnimation(imgRefresh, 0f, 380f)
+            getLocation("reversegeo")
+        }
 
         try {
             ApiServices.apiGET(
@@ -239,6 +235,19 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         }
         getAllProducts()
+    }
+
+    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
+        // Create an animation instance
+        val an: Animation = RotateAnimation(
+            fromDegrees, toDegrees, (v.width / 2).toFloat(),
+            (v.height / 2).toFloat()
+        )
+        an.setDuration(500)
+        an.setFillAfter(true)
+        an.repeatMode = Animation.RESTART
+        //v.clearAnimation();
+        v.startAnimation(an)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -385,20 +394,22 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
+            val builder = SpannableStringBuilder()
+            val str1 = SpannableString(shopName)
+            str1.setSpan(
+                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
+                0,
+                str1.length,
+                0
+            )
+            builder.append(str1)
             if (addedProducts!!.size > 0) {
                 appDatabase!!.saveOrderDao().deleteALL()
-                val builder = SpannableStringBuilder()
-                val str1 = SpannableString(shopName)
-                str1.setSpan(
-                    ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
-                    0,
-                    str1.length,
-                    0
-                )
-                builder.append(str1)
+
                 ViewUtils.viewDialog(
                     mContext!!,
-                    "Are you sure want to save " + str1 + "'s order?",
+                    "You are "+tvdistance.text+" away from "+str1,
+                    /*"Are you sure want to save " + str1 + "'s order?"*/
                     object :
                         DialogListener {
                         override fun onConfirmed() {
@@ -407,14 +418,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                         override fun onCanceled() {
-
+                            getLocation("reversegeo")
                         }
 
                     })
             } else {
                 ViewUtils.viewDialogResponse(
                     mContext!!,
-                    "No products selected to order",
+                    "You are "+tvdistance.text+" away from "+str1+"and No products selected to order",
                     object :
                         DialogListener {
                         override fun onConfirmed() {
@@ -422,7 +433,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                         override fun onCanceled() {
-
+                            getLocation("reversegeo")
                         }
 
                     })
@@ -455,6 +466,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     submitNoOrder(location)
                 } else if (choice.equals("update_order")) {
                     updateOrder(location)
+                }else if (choice.equals("reversegeo")) {
+                    reverseGeoAddress(mContext!!, location.latitude, location.longitude)
+                    getDistance(location.latitude, location.longitude, selectedShop!!.latitude, selectedShop!!.longitude)
                 } else {
                     submitOrder(location)
                 }
@@ -464,6 +478,94 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             }
 
         })
+    }
+
+    private fun getDistance(currentlatitude: Double, currentlongitude: Double, shoplatitude: Double, shoplongitude: Double) {
+        ApiServices.apiGET(Api.distance + Api.APIKEY + "/"+shoplongitude+","+shoplatitude+"/"+currentlongitude+","+currentlatitude,
+            queue!!, token!!, object : ApiServiceListener{
+                override fun onResponseSuccess(response: String) {
+                    try {
+                        val data = JSONObject(response)
+                        val dist = data.getString("Distance")
+                        var dformat = DecimalFormat("#.##")
+                        val distance = dformat.format(dist.substring(0, dist.indexOf(' ')).toDouble())
+
+                        distanceValue = distance.toDouble()*1000
+
+                        if (distance.toDouble() <1){
+                            val distMeter = distance.toDouble()/1000
+                            if (distMeter>500) {
+                                tvdistance.text = distMeter.toString() + "m"
+                            }else{
+                                tvdistance.setTextColor(ContextCompat.getColor(mContext!!,R.color.cnl_color_2))
+                                tvdistance.text = distMeter.toString() + "m"
+                            }
+                        }else{
+                            tvdistance.text = distance+"km"
+                        }
+
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        Sentry.captureException(e)
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    Sentry.captureException(error)
+                }
+
+                override fun onException(e: Exception) {
+                    Sentry.captureException(e)
+                }
+
+            })
+    }
+
+    fun reverseGeoAddress(context: Context, lat: Double, lng: Double){
+        ApiServices.apiGET(Api.reverseGeo + "?key=" +Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+        queue!!, token!!, object : ApiServiceListener{
+                override fun onResponseSuccess(response: String) {
+                    try {
+                        val data = JSONObject(response)
+                        val place = JSONObject(data.getString("place"))
+                        var address = ""
+                        if (!place.getString("address").equals("null")) {
+                            address = place.getString("address")
+                        }
+                        val city = place.getString("city")
+                        val area = place.getString("area")
+                        tvLocation.text = address+", "+area+", "+city
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        Sentry.captureException(e)
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    Sentry.captureException(error)
+                }
+
+                override fun onException(e: Exception) {
+                    Sentry.captureException(e)
+                }
+
+            })
     }
 
     private fun updateOrder(location: Location) {
@@ -606,6 +708,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("user_id", user_id)
             orderObj.put("employee_id", sr_id)
             orderObj.put("ordered_at", today)
+            if (tvdistance.text.toString().length>0) orderObj.put("distance_from_outlets", distanceValue.toString())
             /*orderObj.put("delivered_at", nextDay)*/
             /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
 
@@ -739,6 +842,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         orderObj.put("outlet_id", shopId)
         orderObj.put("user_id", user_id)
         orderObj.put("employee_id", sr_id)
+        if (distanceValue.toString().length>0) orderObj.put("distance_from_outlets", distanceValue.toString())
         orderObj.put("longitude", location.longitude.toString())
         orderObj.put("latitude", location.latitude.toString())
         ordersArray.put(orderObj)
@@ -1254,21 +1358,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             tvGrandTotal.setText(dformat.format(grandTotal).toString())
         }
-
-        /*tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
-
-        var grandTotal = 0.0
-        if (productItems.size > 0) {
-            for (i in 0 until productItems.size) {
-                grandTotal = grandTotal + productItems[i].total_price
-            }
-
-            val adapter = OutletProductAdapter(productItems)
-            listView.adapter = adapter
-            adapter.notifyDataSetChanged()
-        }
-
-        tvGrandTotal.setText(dformat.format(grandTotal).toString())*/
 
         btnClose.setOnClickListener {
             dialog.dismiss()

@@ -52,6 +52,7 @@
     <string name="sure_log_out">Are you sure you want to log out?</string>
 
     <string name="confirm">Confirm</string>
+    <string name="order_confirm">Order Confirm</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string>
