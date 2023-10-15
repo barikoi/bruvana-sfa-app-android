@@ -286,6 +286,7 @@ class TodaysSummaryTOFragment : Fragment() {
         var bpc_completed = "--:--"
         var aiv_completed = "--:--"
         var visit_completed = "--:--"
+        var visit_covered = "--:--"
         var dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
@@ -308,6 +309,7 @@ class TodaysSummaryTOFragment : Fragment() {
                                     dformat.format(
                                         targetObj.getString("number_of_visits").toDouble()
                                     )
+                                if(!targetObj.isNull("distance_from_outlets")) visit_covered = dformat.format(targetObj.getString("distance_from_outlets").toDouble())
                                 if (!targetObj.isNull("aiv")) aiv_completed =
                                     dformat.format(targetObj.getString("aiv").toDouble())
                             }
@@ -338,6 +340,7 @@ class TodaysSummaryTOFragment : Fragment() {
                                 visit_completed
                             )
                         )
+                        itemList.add(Pair(resources.getString(R.string.visit_500m), visit_covered))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
 
                         createTable(itemList, tabLayoutTarget)

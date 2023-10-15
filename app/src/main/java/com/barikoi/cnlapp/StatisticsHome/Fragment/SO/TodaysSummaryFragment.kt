@@ -71,6 +71,7 @@ class TodaysSummaryFragment : Fragment() {
         var bpc_completed = "--:--"
         var aiv_completed = "--:--"
         var visit_ratio = "--:--"
+        var visit_covered = "--:--"
 
         var dformat = DecimalFormat("#.##")
 
@@ -89,6 +90,7 @@ class TodaysSummaryFragment : Fragment() {
                                 if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
                                 if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
                                 if(!targetObj.isNull("number_of_visits")) visit_ratio = dformat.format(targetObj.getString("number_of_visits").toDouble())
+                                if(!targetObj.isNull("distance_from_outlets")) visit_covered = dformat.format(targetObj.getString("distance_from_outlets").toDouble())
                             }
                         }
 
@@ -96,6 +98,7 @@ class TodaysSummaryFragment : Fragment() {
                         itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
                         itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
                         itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
+                        itemList.add(Pair(resources.getString(R.string.visit_500m), visit_covered))
                         itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
 
