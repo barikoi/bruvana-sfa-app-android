@@ -26,7 +26,7 @@ import kotlin.collections.ArrayList
 
 class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String) : RecyclerView.Adapter<OutletAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OutletAdapter.ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_satistics, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_statistics, parent, false)
         return ViewHolder(v)
     }
 

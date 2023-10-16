@@ -221,6 +221,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                                 orderObj.getString("total_delivered_quantity"),
                                 orderObj.getString("latitude"),
                                 orderObj.getString("longitude"),
+                                orderObj.getString("distance_from_outlets"),
                                 productItems
                             )
                         )

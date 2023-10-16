@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/single_outlet_satistics">
+        tools:listitem="@layout/single_outlet_statistics">
 
     </androidx.recyclerview.widget.RecyclerView>
     <com.github.ybq.android.spinkit.SpinKitView

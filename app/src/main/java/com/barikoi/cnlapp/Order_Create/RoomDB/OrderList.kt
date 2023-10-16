@@ -8,7 +8,7 @@ import com.barikoi.cnlapp.Model.Products
 import java.io.Serializable
 
 @Entity
-data class OrderList (
+data class OrderList(
         @PrimaryKey(autoGenerate = true) var id: Int?,
         @ColumnInfo(name = "OrderId") var orderId: String,
         @ColumnInfo(name = "Ordered_At") var orderedAt: String,
@@ -22,5 +22,6 @@ data class OrderList (
         @ColumnInfo(name = "TotalQuantity") var totalQuantity: String,
         @ColumnInfo(name = "Latitude") var latitude: String,
         @ColumnInfo(name = "Longitude") var longitude: String,
+        @ColumnInfo(name = "Distance") var distance: String,
         @TypeConverters(DataConvertor::class) var brands_array: ArrayList<Products>
         ):Serializable

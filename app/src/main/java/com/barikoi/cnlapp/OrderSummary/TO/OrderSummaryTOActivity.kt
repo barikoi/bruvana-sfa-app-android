@@ -444,6 +444,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                             orderObj.getString("total_ordered_quantity"),
                             orderObj.getString("latitude"),
                             orderObj.getString("longitude"),
+                            orderObj.getString("distance_from_outlets"),
                             productItems
                         )
                     )

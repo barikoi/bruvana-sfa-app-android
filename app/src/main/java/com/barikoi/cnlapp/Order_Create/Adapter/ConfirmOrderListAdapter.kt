@@ -1,12 +1,18 @@
 package com.barikoi.cnlapp.Order_Create.Adapter
 
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.VolleyError
@@ -50,7 +56,46 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(orderList[position].orderedAt))
-            holder.orderAt.setText(holder.itemView.context.resources.getString(R.string.ordered_at)+orderDate)
+            val builder = SpannableStringBuilder()
+            val str1 = SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
+            builder.append(str1)
+            val str2 = SpannableString(orderDate)
+            builder.append(str2)
+            if (!orderList[position].distance.equals("null")) {
+                val str3 = SpannableString(" away from ")
+                val boldSpan3 = StyleSpan(Typeface.BOLD)
+                str3.setSpan(
+                    boldSpan3, 0, str3.length, 0
+                )
+                builder.append(str3)
+                val suffix = if(orderList[position].distance.toDouble()/1000 <1){
+                    "m"
+                }else{
+                    "km"
+                }
+                val strDistance = SpannableString(dformat.format(orderList[position].distance.toDouble())+suffix)
+                if (orderList[position].distance.toDouble() > 500) {
+                    strDistance.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),
+                        0,
+                        strDistance.length,
+                        0
+                    )
+                } else {
+                    strDistance.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.cnl_color_2)),
+                        0,
+                        strDistance.length,
+                        0
+                    )
+                }
+                val boldSpan4 = StyleSpan(Typeface.BOLD)
+                strDistance.setSpan(
+                    boldSpan4, 0, strDistance.length, 0
+                )
+                builder.append(strDistance)
+            }
+            holder.orderAt.setText(builder)
         }else{
             holder.orderAt.visibility = View.GONE
         }

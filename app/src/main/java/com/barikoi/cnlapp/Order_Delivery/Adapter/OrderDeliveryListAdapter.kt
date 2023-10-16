@@ -1,17 +1,24 @@
 package com.barikoi.cnlapp.Order_Delivery.Adapter
 
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
+import kotlinx.android.synthetic.main.fragment_product_select.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -72,7 +79,47 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(mItem.orderedAt))
-            holder.orderAt.setText(holder.itemView.context.resources.getString(R.string.ordered_at)+orderDate)
+            var dformat = DecimalFormat("#.##")
+            val builder = SpannableStringBuilder()
+            val str1 = SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
+            builder.append(str1)
+            val str2 = SpannableString(orderDate)
+            builder.append(str2)
+            if (!mItem.distance.equals("null")) {
+                val str3 = SpannableString(" away from ")
+                val boldSpan3 = StyleSpan(Typeface.BOLD)
+                str3.setSpan(
+                    boldSpan3, 0, str3.length, 0
+                )
+                builder.append(str3)
+                val suffix = if(mItem.distance.toDouble()/1000 <1){
+                    "m"
+                }else{
+                    "km"
+                }
+                val strDistance = SpannableString(dformat.format(mItem.distance.toDouble())+suffix)
+                if (mItem.distance.toDouble() > 500) {
+                    strDistance.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),
+                        0,
+                        strDistance.length,
+                        0
+                    )
+                } else {
+                    strDistance.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.cnl_color_2)),
+                        0,
+                        strDistance.length,
+                        0
+                    )
+                }
+                val boldSpan4 = StyleSpan(Typeface.BOLD)
+                strDistance.setSpan(
+                    boldSpan4, 0, strDistance.length, 0
+                )
+                builder.append(strDistance)
+            }
+            holder.orderAt.setText(builder)
         }else{
             holder.orderAt.visibility = View.GONE
         }

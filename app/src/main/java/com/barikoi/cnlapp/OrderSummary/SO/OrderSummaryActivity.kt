@@ -220,6 +220,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                             orderObj.getString("total_delivered_quantity"),
                                             orderObj.getString("latitude"),
                                             orderObj.getString("longitude"),
+                                            orderObj.getString("distance_from_outlets"),
                                             productItems
                                         )
                                     )
@@ -268,6 +269,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                             orderObj.getString("total_ordered_quantity"),
                                             orderObj.getString("latitude"),
                                             orderObj.getString("longitude"),
+                                            orderObj.getString("distance_from_outlets"),
                                             productItems
                                         )
                                     )

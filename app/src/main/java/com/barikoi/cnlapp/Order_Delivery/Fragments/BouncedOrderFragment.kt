@@ -254,6 +254,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                     orderObj.getString("total_bounced_quantity"),
                                     orderObj.getString("latitude"),
                                     orderObj.getString("longitude"),
+                                    orderObj.getString("distance_from_outlets"),
                                     productItems
                                 )
                             )

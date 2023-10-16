@@ -155,7 +155,7 @@
             android:scrollbars="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:spanCount="2"
-            tools:listitem="@layout/single_outlet_satistics" />
+            tools:listitem="@layout/single_outlet_statistics" />
     </LinearLayout>
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar"

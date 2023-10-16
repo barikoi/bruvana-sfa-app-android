@@ -22,7 +22,7 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_satistics, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_statistics, parent, false)
         return ViewHolder(v)
     }
 
