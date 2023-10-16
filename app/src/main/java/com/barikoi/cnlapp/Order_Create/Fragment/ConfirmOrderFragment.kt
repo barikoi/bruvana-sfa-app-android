@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -135,7 +136,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         recylerView = view.findViewById(R.id.orderListView)
         progressBar = view.findViewById(R.id.progressBar2)
         confirmOrder!!.setOnClickListener {
-            ViewUtils.viewDialog(mContext!!, mContext!!.resources.getString(R.string.confirm_order_dialog), object :
+            ViewUtils.viewDialog(mContext!!, mContext!!.resources.getString(R.string.confirm_order_dialog),
+                SpannableStringBuilder(), object :
                 DialogListener {
                 override fun onConfirmed() {
                     createOrder()

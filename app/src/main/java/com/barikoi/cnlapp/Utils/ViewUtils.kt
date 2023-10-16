@@ -13,6 +13,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.Window
 import android.widget.*
@@ -62,7 +63,7 @@ object ViewUtils {
         alert.show()
     }
 
-    fun viewDialog(mContext: Context, message: String, listener: DialogListener){
+    fun viewDialog(mContext: Context, message: String, styleString: SpannableStringBuilder,listener: DialogListener){
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -72,7 +73,11 @@ object ViewUtils {
         val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
         val btnNo = dialog.findViewById<AppCompatButton>(R.id.btn_no)
 
-        tvMessage.setText(message)
+        if (message.length>0) {
+            tvMessage.setText(message)
+        }else{
+            tvMessage.setText(styleString, TextView.BufferType.SPANNABLE)
+        }
 
         btnConfirm.setOnClickListener {
             listener.onConfirmed()

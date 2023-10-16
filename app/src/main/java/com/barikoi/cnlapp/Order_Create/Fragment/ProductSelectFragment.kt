@@ -210,17 +210,21 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         update_order.setOnClickListener {
             appDatabase!!.saveOrderDao().deleteALL()
             val builder = SpannableStringBuilder()
-            val str1 = SpannableString(shopName)
-            str1.setSpan(
+            val str1 = SpannableString("Are you sure want to update ")
+            builder.append(str1)
+            val str2 = SpannableString(shopName)
+            str2.setSpan(
                 ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
                 0,
-                str1.length,
+                str2.length,
                 0
             )
-            builder.append(str1)
+            builder.append(str2)
+            val str3 = SpannableString("'s order?")
+            builder.append(str3)
             ViewUtils.viewDialog(
                 mContext!!,
-                "Are you sure want to update " + str1 + "'s order?",
+                "",builder,
                 object :
                     DialogListener {
                     override fun onConfirmed() {
@@ -394,22 +398,45 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
-            val builder = SpannableStringBuilder()
-            val str1 = SpannableString(shopName)
-            str1.setSpan(
-                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
-                0,
-                str1.length,
-                0
-            )
-            builder.append(str1)
             if (addedProducts!!.size > 0) {
+                val builder = SpannableStringBuilder()
+                val str1 =SpannableString( "You are ")
+                builder.append(str1)
+                val strDistance = SpannableString(tvdistance.text)
+                if (distanceValue != null) {
+                    if (distanceValue!! > 500) {
+                        strDistance.setSpan(
+                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.red)),
+                            0,
+                            strDistance.length,
+                            0
+                        )
+                    } else {
+                        strDistance.setSpan(
+                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_2)),
+                            0,
+                            strDistance.length,
+                            0
+                        )
+                    }
+                }
+                builder.append(strDistance)
+                val str2 =SpannableString( " away from ")
+                builder.append(str2)
+                val strShop = SpannableString(shopName)
+                strShop.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(mContext!!,R.color.cnl_color_1)),
+                    0,
+                    strShop.length,
+                    0
+                )
+                builder.append(strShop)
                 appDatabase!!.saveOrderDao().deleteALL()
-
                 ViewUtils.viewDialog(
                     mContext!!,
-                    "You are "+tvdistance.text+" away from "+str1,
+                    "",
                     /*"Are you sure want to save " + str1 + "'s order?"*/
+                    builder,
                     object :
                         DialogListener {
                         override fun onConfirmed() {
@@ -423,9 +450,44 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                     })
             } else {
-                ViewUtils.viewDialogResponse(
+                val builder = SpannableStringBuilder()
+                val str1 =SpannableString( "You are ")
+                builder.append(str1)
+                val strDistance = SpannableString(tvdistance.text)
+                if (distanceValue != null) {
+                    if (distanceValue!! > 500) {
+                        strDistance.setSpan(
+                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.red)),
+                            0,
+                            strDistance.length,
+                            0
+                        )
+                    } else {
+                        strDistance.setSpan(
+                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_2)),
+                            0,
+                            strDistance.length,
+                            0
+                        )
+                    }
+                }
+                builder.append(strDistance)
+                val str2 =SpannableString( " away from ")
+                builder.append(str2)
+                val strShop = SpannableString(shopName)
+                strShop.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(mContext!!,R.color.cnl_color_1)),
+                    0,
+                    strShop.length,
+                    0
+                )
+                builder.append(strShop)
+                val str3 =SpannableString( " and No products selected to order")
+                builder.append(str3)
+                ViewUtils.viewDialog(
                     mContext!!,
-                    "You are "+tvdistance.text+" away from "+str1+"and No products selected to order",
+                    "",
+                    builder,
                     object :
                         DialogListener {
                         override fun onConfirmed() {
@@ -441,8 +503,43 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         noOrder!!.setOnClickListener {
+            val builder = SpannableStringBuilder()
+            val str1 =SpannableString( "You are ")
+            builder.append(str1)
+            val strDistance = SpannableString(tvdistance.text)
+            if (distanceValue != null) {
+                if (distanceValue!! > 500) {
+                    strDistance.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.red)),
+                        0,
+                        strDistance.length,
+                        0
+                    )
+                } else {
+                    strDistance.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_2)),
+                        0,
+                        strDistance.length,
+                        0
+                    )
+                }
+            }
+            builder.append(strDistance)
+            val str2 =SpannableString( " away from ")
+            builder.append(str2)
+            val strShop = SpannableString(shopName)
+            strShop.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(mContext!!,R.color.cnl_color_1)),
+                0,
+                strShop.length,
+                0
+            )
+            builder.append(strShop)
+            val str3 =SpannableString( " and selecting No Order")
+            builder.append(str3)
             appDatabase!!.saveOrderDao().deleteALL()
-            ViewUtils.viewDialog(mContext!!, "Are you sure want to select no order?", object :
+
+            ViewUtils.viewDialog(mContext!!,"", builder, object :
                 DialogListener {
                 override fun onConfirmed() {
                     progressBar.visibility = View.VISIBLE

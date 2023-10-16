@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -380,7 +381,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             dialog.dismiss()
         }
         btnSubmit.setOnClickListener {
-            ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), object :
+            ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), SpannableStringBuilder(), object :
                 DialogListener {
                 override fun onConfirmed() {
                     val status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
