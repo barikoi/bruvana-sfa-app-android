@@ -40,6 +40,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".VisitReport.VisitReportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
             android:name=".Activity.CreateShopActivity"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -140,22 +146,25 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider>
-
-        <!-- Required: set your sentry.io project identifier (DSN) -->
-        <meta-data android:name="io.sentry.dsn" android:value="http://fb4e314efdb94551ad957ff683e0c16e@20.244.112.255:9000/4" />
-
-        <!-- enable automatic breadcrumbs for user interactions (clicks, swipes, scrolls) -->
-        <meta-data android:name="io.sentry.traces.user-interaction.enable" android:value="true" />
-        <!-- enable screenshot for crashes -->
-        <meta-data android:name="io.sentry.attach-screenshot" android:value="true" />
-        <!-- enable view hierarchy for crashes -->
-        <meta-data android:name="io.sentry.attach-view-hierarchy" android:value="true" />
-
-        <!-- enable the performance API by setting a sample-rate, adjust in production env -->
-        <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
-        <!-- enable profiling when starting transactions, adjust in production env -->
-        <meta-data android:name="io.sentry.traces.profiling.sample-rate" android:value="1.0" />
+        </provider> <!-- Required: set your sentry.io project identifier (DSN) -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="http://fb4e314efdb94551ad957ff683e0c16e@20.244.112.255:9000/4" /> <!-- enable automatic breadcrumbs for user interactions (clicks, swipes, scrolls) -->
+        <meta-data
+            android:name="io.sentry.traces.user-interaction.enable"
+            android:value="true" /> <!-- enable screenshot for crashes -->
+        <meta-data
+            android:name="io.sentry.attach-screenshot"
+            android:value="true" /> <!-- enable view hierarchy for crashes -->
+        <meta-data
+            android:name="io.sentry.attach-view-hierarchy"
+            android:value="true" /> <!-- enable the performance API by setting a sample-rate, adjust in production env -->
+        <meta-data
+            android:name="io.sentry.traces.sample-rate"
+            android:value="1.0" /> <!-- enable profiling when starting transactions, adjust in production env -->
+        <meta-data
+            android:name="io.sentry.traces.profiling.sample-rate"
+            android:value="1.0" />
     </application>
 
 </manifest>

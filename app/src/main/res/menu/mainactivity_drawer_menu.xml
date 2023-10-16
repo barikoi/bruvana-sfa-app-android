@@ -27,6 +27,12 @@
       android:iconTint="@color/black"
       android:title="@string/title_notice" />
   </group>
+  <group android:id="@+id/nav_visit_report">
+    <item
+        android:id="@+id/menu_visit_report"
+        android:iconTint="@color/black"
+        android:title="@string/title_visit_report" />
+  </group>
   <group android:id="@+id/nav_trade_offers">
   <item
       android:id="@+id/menu_trade_offers"

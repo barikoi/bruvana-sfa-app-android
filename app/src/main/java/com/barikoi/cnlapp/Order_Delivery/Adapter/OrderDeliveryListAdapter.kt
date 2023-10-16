@@ -92,12 +92,12 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
                     boldSpan3, 0, str3.length, 0
                 )
                 builder.append(str3)
-                val suffix = if(mItem.distance.toDouble()/1000 <1){
-                    "m"
+                val suffix = if(orderList[position].distance.toDouble()/1000 <1){
+                    dformat.format(orderList[position].distance.toDouble())+"m"
                 }else{
-                    "km"
+                    dformat.format(orderList[position].distance.toDouble()/1000)+"km"
                 }
-                val strDistance = SpannableString(dformat.format(mItem.distance.toDouble())+suffix)
+                val strDistance = SpannableString(suffix)
                 if (mItem.distance.toDouble() > 500) {
                     strDistance.setSpan(
                         ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),

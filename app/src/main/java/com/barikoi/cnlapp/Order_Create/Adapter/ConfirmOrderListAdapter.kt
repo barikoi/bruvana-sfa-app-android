@@ -69,11 +69,11 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
                 )
                 builder.append(str3)
                 val suffix = if(orderList[position].distance.toDouble()/1000 <1){
-                    "m"
+                    dformat.format(orderList[position].distance.toDouble())+"m"
                 }else{
-                    "km"
+                    dformat.format(orderList[position].distance.toDouble()/1000)+"km"
                 }
-                val strDistance = SpannableString(dformat.format(orderList[position].distance.toDouble())+suffix)
+                val strDistance = SpannableString(suffix)
                 if (orderList[position].distance.toDouble() > 500) {
                     strDistance.setSpan(
                         ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),

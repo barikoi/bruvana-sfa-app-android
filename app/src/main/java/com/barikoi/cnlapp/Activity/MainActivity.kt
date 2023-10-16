@@ -44,6 +44,7 @@ import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.VisitReport.VisitReportActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
@@ -315,6 +316,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(Intent(this@MainActivity, OrderDeliveryUpdateActivity::class.java))
         }else if (id == R.id.menu_notice){
             startActivity(Intent(this@MainActivity, NoticeActivity::class.java))
+        }else if (id == R.id.menu_visit_report){
+            startActivity(Intent(this@MainActivity, VisitReportActivity::class.java))
         }else if (id == R.id.menu_trade_offers){
            startActivity(Intent(this@MainActivity, TradeOffersActivity::class.java))
         }else if (id == R.id.menu_product_summary){

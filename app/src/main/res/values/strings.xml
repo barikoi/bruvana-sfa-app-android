@@ -12,6 +12,7 @@
     <string name="title_shop_route">Shop &amp; Route List</string>
     <string name="title_order_summary">Order Summary</string>
     <string name="title_notice">Notice</string>
+    <string name="title_visit_report">Visit Report</string>
     <string name="title_trade_offers">Trade Offers</string>
     <string name="title_product_summary">Product Wise Summary</string>
     <string name="title_product_stock_update">Product Wise Stock Update</string>
@@ -90,6 +91,8 @@
     <!--Home View-->
     <string name="today_summary">Today Summary</string>
     <string name="last_week_summary">Last Week Summary</string>
+    <string name="today_report">Today Report</string>
+    <string name="last_week_report">Last Week Report</string>
     <string name="last_week_product">Last Week Product</string>
     <string name="low_stock_product">Low Stock Product</string>
     <string name="today_category">Today Category</string>
@@ -174,6 +177,7 @@
     <string name="no_order_to_download_chalan">No order to download Chalan</string>
 
     <string name="order_selection">Order Selection</string>
+    <string name="report_selection">Report Selection</string>
     <string name="today">Today</string>
     <string name="lwsd">LWSD</string>
 
