@@ -1,15 +1,11 @@
 package com.barikoi.cnlapp.Attendance.Fragment
 
-import android.Manifest
 import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
@@ -43,6 +39,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.*
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
@@ -50,7 +47,6 @@ import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.activity_create_shop.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.imagepicker
 import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerLayout

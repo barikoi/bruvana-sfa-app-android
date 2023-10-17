@@ -47,7 +47,7 @@ android {
         staging{
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
-            versionName "1.2.3_2"
+            versionName "1.2.3_3"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "https://api.cnl.barikoimaps.dev/"
@@ -58,7 +58,7 @@ android {
         retaildemo{
             applicationId "com.barikoi.retaildemo"
             dimension "default"
-            versionName "0.0.2"
+            versionName "0.0.3"
             resValue "string", "app_name", "Retail Demo SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "http://20.24.15.52:2010/"
@@ -69,7 +69,7 @@ android {
         lalmairetaildemo{
             applicationId "com.barikoi.lalmairetaildemo"
             dimension "default"
-            versionName "0.0.2"
+            versionName "0.0.3"
             resValue "string", "app_name", "Lalmai Demo SFA"
             resValue "string", "url_base", "http://20.24.15.52:3051/"
             manifestPlaceholders = [

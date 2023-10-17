@@ -35,6 +35,7 @@ object Api {
     val base_url = CNLApp.appContext.resources.getString(R.string.url_base)
 
     val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
+    val distance = "https://barikoi.xyz/v1/api/distance/"
     val APIKEY = "NDI5MzpIQzBBRjZFQ1ZF"
 
     val loginurl = base_url + "api/v1/login"
@@ -79,4 +80,7 @@ object Api {
     val get_market_opportunity = base_url+"api/v1/outlet-market-opportunity"
     val create_shop = base_url+"api/v1/create-outlet"
     val update_shop = base_url+"api/v1/update-outlet"
+
+    /*visit-report*/
+    val get_visit_report = base_url+"api/v1/visited-report"
 }

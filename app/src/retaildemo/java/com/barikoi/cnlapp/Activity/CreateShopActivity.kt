@@ -572,20 +572,20 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         p2: Int,
                         p3: Long
                     ) {
-                        if (p2 > 0) {
-                            val view1: TextView =
-                                p0!!.getChildAt(0) as TextView
-                            view1.setTextColor(resources.getColor(R.color.black))
-                            if (routeNameList[p2].first.length > 0) {
-                                selectedRoute = routeNameList[p2].first
+                        if (p0 != null) {
+                            if (p2 > 0) {
+                                val view1: TextView = p0.getChildAt(0) as TextView
+                                view1.setTextColor(resources.getColor(R.color.black))
+                                if (routeNameList[p2].first.length > 0) {
+                                    selectedRoute = routeNameList[p2].first
+                                } else {
+                                    selectedRoute = ""
+                                }
                             } else {
+                                val view1: TextView = p0.getChildAt(0) as TextView
+                                view1.setTextColor(resources.getColor(R.color.text_title_2))
                                 selectedRoute = ""
                             }
-                        } else {
-                            val view1: TextView =
-                                p0!!.getChildAt(0) as TextView
-                            view1.setTextColor(resources.getColor(R.color.text_title_2))
-                            selectedRoute = ""
                         }
 
                         val marketPairList: ArrayList<Pair<String, Pair<String, String>>> = ArrayList()
@@ -1200,44 +1200,61 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         }
 
                         override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                            hideProgress(progressBarShop)
-                            val data = JSONObject(String(response.data))
-                            val message = data.getString("message")
-                            appDatabase!!.imagesDao()!!.deleteAllImages()
-                            ViewUtils.viewDialogResponse(
-                                this@CreateShopActivity,
-                                message,
-                                object : DialogListener {
-                                    override fun onConfirmed() {
-                                        btnSubmitShop.isEnabled = true
-                                        finish()
-                                        startActivity(getIntent())
-                                    }
+                            try {
+                                hideProgress(progressBarShop)
+                                val data = JSONObject(String(response.data))
+                                val message = data.getString("message")
+                                appDatabase!!.imagesDao()!!.deleteAllImages()
+                                ViewUtils.viewDialogResponse(
+                                    this@CreateShopActivity,
+                                    message,
+                                    object : DialogListener {
+                                        override fun onConfirmed() {
+                                            btnSubmitShop.isEnabled = true
+                                            finish()
+                                            startActivity(getIntent())
+                                        }
 
-                                    override fun onCanceled() {
-                                        TODO("Not yet implemented")
-                                    }
+                                        override fun onCanceled() {
+                                            TODO("Not yet implemented")
+                                        }
 
-                                })
+                                    })
+                            }catch (e: Exception){
+                                Sentry.captureException(e)
+                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            }
                         }
 
                         @RequiresApi(Build.VERSION_CODES.KITKAT)
                         override fun onResponseFailure(error: VolleyError) {
-                            btnSubmitShop.isEnabled = true
-                            hideProgress(progressBarShop)
-                            val s = String(
-                                error.networkResponse.data,
-                                StandardCharsets.UTF_8
-                            )
-                            val data = JSONObject(s)
-                            val message = data.getString("message")
-                            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                            try {
+                                btnSubmitShop.isEnabled = true
+                                hideProgress(progressBarShop)
+                                val s = String(
+                                    error.networkResponse.data,
+                                    StandardCharsets.UTF_8
+                                )
+                                val data = JSONObject(s)
+                                val message = data.getString("message")
+                                Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }catch (e: Exception){
+                                Sentry.captureException(e)
+                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            }
                         }
 
                         override fun onException(e: Exception) {
-                            btnSubmitShop.isEnabled = true
-                            hideProgress(progressBarShop)
-                            Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                            try {
+                                btnSubmitShop.isEnabled = true
+                                hideProgress(progressBarShop)
+                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT)
+                                    .show()
+                            }catch (e: Exception){
+                                Sentry.captureException(e)
+                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            }
                         }
 
                     })
@@ -1351,44 +1368,59 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     }
 
                     override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                        hideProgress(progressBarShop)
-                        val data = JSONObject(String(response.data))
-                        val message = data.getString("message")
-                        appDatabase!!.imagesDao()!!.deleteAllImages()
-                        ViewUtils.viewDialogResponse(
-                            this@CreateShopActivity,
-                            message,
-                            object : DialogListener {
-                                override fun onConfirmed() {
-                                    btnUpdateShop.isEnabled = true
-                                    setResult(55)
-                                    finish()
-                                }
+                        try {
+                            hideProgress(progressBarShop)
+                            val data = JSONObject(String(response.data))
+                            val message = data.getString("message")
+                            appDatabase!!.imagesDao()!!.deleteAllImages()
+                            ViewUtils.viewDialogResponse(
+                                this@CreateShopActivity,
+                                message,
+                                object : DialogListener {
+                                    override fun onConfirmed() {
+                                        btnUpdateShop.isEnabled = true
+                                        setResult(55)
+                                        finish()
+                                    }
 
-                                override fun onCanceled() {
-                                    TODO("Not yet implemented")
-                                }
+                                    override fun onCanceled() {
+                                        TODO("Not yet implemented")
+                                    }
 
-                            })
+                                })
+                        }catch (e: Exception){
+                            Sentry.captureException(e)
+                            Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                     @RequiresApi(Build.VERSION_CODES.KITKAT)
                     override fun onResponseFailure(error: VolleyError) {
-                        btnUpdateShop.isEnabled = true
-                        hideProgress(progressBarShop)
-                        val s = String(
-                            error.networkResponse.data,
-                            StandardCharsets.UTF_8
-                        )
-                        val data = JSONObject(s)
-                        val message = data.getString("message")
-                        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                        try {
+                            btnUpdateShop.isEnabled = true
+                            hideProgress(progressBarShop)
+                            val s = String(
+                                error.networkResponse.data,
+                                StandardCharsets.UTF_8
+                            )
+                            val data = JSONObject(s)
+                            val message = data.getString("message")
+                            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                        }catch (e: Exception){
+                            Sentry.captureException(e)
+                            Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                     override fun onException(e: Exception) {
-                        btnUpdateShop.isEnabled = true
-                        hideProgress(progressBarShop)
-                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                        try {
+                            btnUpdateShop.isEnabled = true
+                            hideProgress(progressBarShop)
+                            Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                        }catch (e: Exception){
+                            Sentry.captureException(e)
+                            Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                 })
