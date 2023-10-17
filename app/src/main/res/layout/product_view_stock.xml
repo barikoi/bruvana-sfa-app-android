@@ -29,6 +29,15 @@
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
                 android:src="@drawable/product" />
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/SpinKitView.Small.Circle"
+                android:visibility="gone"
+                android:padding="8dp">
+
+            </com.github.ybq.android.spinkit.SpinKitView>
 
         </androidx.cardview.widget.CardView>
 

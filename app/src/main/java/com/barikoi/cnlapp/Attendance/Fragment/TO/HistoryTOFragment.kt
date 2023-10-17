@@ -209,10 +209,11 @@ class HistoryTOFragment : Fragment() {
                 val soArray = obj.getJSONArray("so")
                 val soNameList: ArrayList<String> = ArrayList()
                 soNameList.add(prefs!!.getString(Api.NAME, "")+" (You)")
-                var imageUrl = "null"
+
                 if (soArray.length() >0){
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
+                        var imageUrl = "null"
                         if (soObj.has("images") && !soObj.isNull("images")){
                             val imageArray = soObj.getJSONArray("images")
                             if (imageArray.length() > 0){
@@ -253,13 +254,13 @@ class HistoryTOFragment : Fragment() {
             if (response != null){
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
-                var latitude = 0.0
-                var longitude = 0.0
-                var imageUrl = "null"
                 historyList.clear()
                 if (attedanceArray.length() >0){
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
+                        var latitude = 0.0
+                        var longitude = 0.0
+                        var imageUrl = "null"
                         if (!attendanceObj.getString("checkin_time").equals("null")) {
                             if (!attendanceObj.getString("latitude").equals("null")) latitude =
                                 attendanceObj.getDouble("latitude")

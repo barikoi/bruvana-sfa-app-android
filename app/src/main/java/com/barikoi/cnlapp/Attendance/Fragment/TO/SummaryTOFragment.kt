@@ -142,10 +142,11 @@ class SummaryTOFragment : Fragment() {
                 val soArray = obj.getJSONArray("so")
                 val soNameList: ArrayList<String> = ArrayList()
                 soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
-                var imageUrl = "null"
+
                 if (soArray.length() > 0) {
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
+                        var imageUrl = "null"
                         if (soObj.has("images")  && !soObj.isNull("images")){
                             val imageArray = soObj.getJSONArray("images")
                             if (imageArray.length() > 0){

@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.barikoi.cnlapp.R
 import com.bumptech.glide.Glide
+
 
 class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adapter<ProductStockAdapter.ViewHolder>(){
     override fun onCreateViewHolder(
@@ -30,9 +32,20 @@ class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adap
             holder.perUnitSold.text = mItem.per_unit_quantity + " "
         }
 
+        // create a ProgressDrawable object which we will show as placeholder
+        val drawable = CircularProgressDrawable(holder.itemView.context)
+        drawable.setColorSchemeColors(
+            holder.itemView.context.resources.getColor(R.color.cnl_color_1),
+            holder.itemView.context.resources.getColor(R.color.cnl_color_2)
+        )
+        drawable.centerRadius = 20f
+        drawable.strokeWidth = 6f
+        drawable.start()
+
         if (!mItem.imageUrl.isNullOrEmpty() && !mItem.imageUrl.equals("null")){
             Glide.with(holder.itemView.context)
                 .load(mItem.imageUrl)
+                .placeholder(drawable)
                 .into(holder.imageProduct)
         }else{
             holder.imageProduct.visibility = View.GONE

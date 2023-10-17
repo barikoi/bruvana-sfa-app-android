@@ -144,13 +144,13 @@ class HistoryFragment : Fragment() {
             if (response != null){
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
-                var latitude = 0.0
-                var longitude = 0.0
-                var imageUrl = "null"
                 historyList.clear()
                 if (attedanceArray.length() >0){
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
+                        var latitude = 0.0
+                        var longitude = 0.0
+                        var imageUrl = "null"
                         if (!attendanceObj.getString("checkin_time").equals("null")) {
                             if (!attendanceObj.getString("latitude").equals("null")) latitude =
                                 attendanceObj.getDouble("latitude")

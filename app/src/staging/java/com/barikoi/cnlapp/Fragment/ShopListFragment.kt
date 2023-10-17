@@ -209,7 +209,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             for (j in 0 until route_outlet_list.length()) {
                                 val outlet = route_outlet_list.getJSONObject(j)
                                 var imageUrl = "null"
-                                var imageList: ArrayList<String> = ArrayList()
+                                val imageList: ArrayList<String> = ArrayList()
                                 if (outlet.has("images") && !outlet.isNull("images")) {
                                     val imageArray = outlet.getJSONArray("images")
                                     if (imageArray.length() > 0) {

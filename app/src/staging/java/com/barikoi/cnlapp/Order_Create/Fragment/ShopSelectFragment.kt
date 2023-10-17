@@ -458,7 +458,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         if (outletsArray.length() > 0){
                             shopList!!.clear()
                             if (outletsArray.length()>0){
-
                                 for (i in 0 until outletsArray.length()){
                                     var imageUrl = "null"
                                     val outletObj = outletsArray.getJSONObject(i)

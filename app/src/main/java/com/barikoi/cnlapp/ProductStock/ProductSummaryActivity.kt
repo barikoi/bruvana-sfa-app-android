@@ -153,9 +153,9 @@ class ProductSummaryActivity : AppCompatActivity() {
                         val itemList: ArrayList<ProductStock> = ArrayList()
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
-                        var imageUrl = "null"
                         if (productsArray.length() > 0){
                             for (i in 0 until productsArray.length()){
+                                var imageUrl = "null"
                                 val productObj = productsArray.getJSONObject(i)
                                 if (productObj.has("images") && !productObj.isNull("images")){
                                     val imageArray = productObj.getJSONArray("images")
