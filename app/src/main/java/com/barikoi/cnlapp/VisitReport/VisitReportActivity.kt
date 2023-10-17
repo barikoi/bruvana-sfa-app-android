@@ -82,6 +82,8 @@ class VisitReportActivity : AppCompatActivity() {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (spinnerMenu.adapter.count > 0) {
+                    tabLayout.visibility = View.GONE
+                    tabLayout2.visibility = View.GONE
                     if (p2 == 2) {
                         tvDateRange.setText("Select date range")
                     } else {
@@ -101,6 +103,8 @@ class VisitReportActivity : AppCompatActivity() {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (spinnerSO.adapter.count >0) {
                     sr_id = soList[p2].id
+                    tabLayout.visibility = View.GONE
+                    tabLayout2.visibility = View.GONE
                     getVisitReports(sr_id!!, StartDate!!, EndDate!!)
                 }
             }
@@ -125,20 +129,24 @@ class VisitReportActivity : AppCompatActivity() {
             StartDate = df.format(end)
             EndDate = df.format(end)
             tvDateRange.setText(simpleFormat.format(end))
-            if (sr_id != null) getVisitReports(sr_id!!, StartDate!!, EndDate!!)
+            if (sr_id != null) {
+                tabLayout.visibility = View.GONE
+                tabLayout2.visibility = View.GONE
+                getVisitReports(sr_id!!, StartDate!!, EndDate!!)
+            }
         } else if (position == 1) {
             StartDate = df.format(start)
             EndDate = df.format(start)
             tvDateRange.setText(simpleFormat.format(start))
-            if (sr_id != null) getVisitReports(sr_id!!, StartDate!!, EndDate!!)
+            if (sr_id != null) {
+                tabLayout.visibility = View.GONE
+                tabLayout2.visibility = View.GONE
+                getVisitReports(sr_id!!, StartDate!!, EndDate!!)
+            }
         } else {
             tvDateRange.setText("Select date range")
             tvDateRange.setText(customDate)
         }
-        /*StartDate = df.format(start)
-        EndDate = df.format(end)
-        customDate = simpleFormat.format(start) + " - " + simpleFormat.format(end)
-        tvDateRange.setText(customDate)*/
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -167,7 +175,11 @@ class VisitReportActivity : AppCompatActivity() {
                 customDate = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
             }
 
-            if (sr_id != null) getVisitReports(sr_id!!, StartDate!!, EndDate!!)
+            if (sr_id != null) {
+                tabLayout.visibility = View.GONE
+                tabLayout2.visibility = View.GONE
+                getVisitReports(sr_id!!, StartDate!!, EndDate!!)
+            }
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
@@ -240,12 +252,13 @@ class VisitReportActivity : AppCompatActivity() {
     }
 
     private fun getVisitReports(sr_id: String, startDate: String, endDate: String) {
+        progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(
             Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
-                        progressBar.visibility= View.GONE
+                        progressBar.visibility = View.GONE
                         if (response != null){
                             val obj = JSONObject(response)
                             val productsArray = obj.getJSONArray("visited_report")
@@ -273,14 +286,18 @@ class VisitReportActivity : AppCompatActivity() {
                                 if (visitedArray.length()>0){
                                     for (i in 0 until visitedArray.length()) {
                                         val visitedObj = visitedArray.getJSONObject(i)
-                                        /*visitedList.add(
-                                            Pair(
-                                                visitedObj.getString("range"),
-                                                visitedObj.getString("visited_count")
+                                        val keys = visitedObj.keys()
+                                        while(keys.hasNext()){
+                                            val key = keys.next() as String
+                                            visitedList.add(
+                                                Pair(
+                                                    key,
+                                                    visitedObj.getString(key)
+                                                )
                                             )
-                                        )*/
-                                    }
+                                        }
 
+                                    }
                                     createTableOther(visitedList, tabLayout2)
                                 }
                             }
@@ -317,6 +334,7 @@ class VisitReportActivity : AppCompatActivity() {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
+        tab_Layout.visibility = View.VISIBLE
 
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
@@ -342,6 +360,7 @@ class VisitReportActivity : AppCompatActivity() {
             tr.addView(c1)
             tr.addView(c2)
             tab_Layout.addView(tr)
+            tab_Layout.background = resources.getDrawable(R.drawable.cardview_bg_stroke_2dp)
         }
     }
 
@@ -349,6 +368,7 @@ class VisitReportActivity : AppCompatActivity() {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
+        tab_Layout.visibility = View.VISIBLE
 
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
