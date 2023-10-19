@@ -47,7 +47,7 @@ android {
         staging{
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
-            versionName "1.2.3_3"
+            versionName "1.2.3_4"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "https://api.cnl.barikoimaps.dev/"

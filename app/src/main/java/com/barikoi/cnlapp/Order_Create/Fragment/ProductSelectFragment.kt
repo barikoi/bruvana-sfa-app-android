@@ -154,7 +154,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         shopTitle!!.text = shopName
         minOV.text = "Min Order Value: "+outletMinOrder
-        getLocation("reversegeo")
 
         imgRefresh.setOnClickListener {
             rotateAnimation(imgRefresh, 0f, 380f)
@@ -571,7 +570,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
             }
             override fun onFailure() {
-
+                Toast.makeText(mContext!!, "Location fetch failed", Toast.LENGTH_SHORT).show()
             }
 
         })
@@ -584,13 +583,15 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     try {
                         val data = JSONObject(response)
                         val dist = data.getString("Distance")
-                        var dformat = DecimalFormat("#.##")
-                        val distance = dformat.format(dist.substring(0, dist.indexOf(' ')).toDouble())
+                        /*val dist = "2.94872347923479237492374923 KM"*/
+                        val dformat = DecimalFormat("#.##")
+                        val dis2 = dist.substring(0, dist.indexOf(' ')).toDouble()
+                        val distance = dformat.format(dis2)
 
                         distanceValue = distance.toDouble()*1000
 
                         if (distance.toDouble() <1){
-                            val distMeter = distance.toDouble()/1000
+                            val distMeter = distance.toDouble()*1000
                             if (distMeter>500) {
                                 tvdistance.text = distMeter.toString() + "m"
                             }else{
@@ -1226,6 +1227,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         startOrder.setOnClickListener {
+            getLocation("reversegeo")
             dialog.dismiss()
         }
 

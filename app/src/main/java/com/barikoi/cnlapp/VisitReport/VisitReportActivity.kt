@@ -34,6 +34,7 @@ import kotlin.collections.ArrayList
 class VisitReportActivity : AppCompatActivity() {
     var token: String? = null
     var user_id: String? = null
+    var route_id: String? = null
     var sr_id: String? = null
     var employeeId: String? = ""
     private var prefs: SharedPreferences? = null
@@ -54,6 +55,7 @@ class VisitReportActivity : AppCompatActivity() {
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
         employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         btnBack.setOnClickListener {
             onBackPressed()
@@ -254,7 +256,7 @@ class VisitReportActivity : AppCompatActivity() {
     private fun getVisitReports(sr_id: String, startDate: String, endDate: String) {
         progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(
-            Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate,
+            Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate+"&route_id="+route_id,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
