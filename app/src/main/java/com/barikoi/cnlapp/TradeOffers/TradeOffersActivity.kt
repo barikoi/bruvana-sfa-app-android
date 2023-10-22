@@ -68,8 +68,8 @@ class TradeOffersActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
                 @RequiresApi(Build.VERSION_CODES.N)
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when(item!!.itemId){
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when(item.itemId){
                         R.id.menu_all_product->{
                             if (itemList.size > 0){
                                 if (adapter != null) {

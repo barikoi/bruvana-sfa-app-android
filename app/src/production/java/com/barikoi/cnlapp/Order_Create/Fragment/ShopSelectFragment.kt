@@ -72,8 +72,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             popup.menuInflater.inflate(R.menu.sort_menu_outlet, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when(item!!.itemId){
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when(item.itemId){
                         R.id.menu_ztoa->{
                             shopList!!.sortByDescending {
                                 it.shop_name
@@ -101,6 +101,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     return true
                 }
 
+
             })
             popup.show()
         }
@@ -111,8 +112,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
                 @RequiresApi(Build.VERSION_CODES.N)
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when(item!!.itemId){
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when(item.itemId){
                         R.id.menu_All->{
                             adapter = ShopSelectAdapter(shopList!!, listener!!)
                             shoplist.adapter = adapter
@@ -270,6 +271,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     }
                     return true
                 }
+
 
             })
             popup.show()

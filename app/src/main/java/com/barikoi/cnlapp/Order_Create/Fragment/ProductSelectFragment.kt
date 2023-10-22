@@ -308,8 +308,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             popup.menuInflater.inflate(R.menu.sort_menu_product, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when (item!!.itemId) {
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when (item.itemId) {
                         R.id.menu_ztoa -> {
                             productsList!!.sortByDescending {
                                 it.product_name
@@ -370,7 +370,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
                     return true
                 }
-
             })
             popup.show()
         }
@@ -588,10 +587,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         val dis2 = dist.substring(0, dist.indexOf(' ')).toDouble()
                         val distance = dformat.format(dis2)
 
-                        distanceValue = distance.toDouble()*1000
+                        distanceValue = dformat.format(dis2*1000).toDouble()
 
-                        if (distance.toDouble() <1){
-                            val distMeter = distance.toDouble()*1000
+                        if (dis2 <1){
+                            val distMeter = dformat.format(dis2*1000).toDouble()
                             if (distMeter>500) {
                                 tvdistance.text = distMeter.toString() + "m"
                             }else{
@@ -1238,9 +1237,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 popup.menuInflater.inflate(R.menu.filter_menu_orderstatus, popup.menu)
                 popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                     PopupMenu.OnMenuItemClickListener {
-                    @RequiresApi(Build.VERSION_CODES.N)
-                    override fun onMenuItemClick(item: MenuItem?): Boolean {
-                        when(item!!.itemId){
+                    override fun onMenuItemClick(item: MenuItem): Boolean {
+                        when(item.itemId){
                             R.id.menu_delivered_product->{
                                 productItems.clear()
                                 filterTitle.setText(mContext.resources.getString(R.string.delivered))
@@ -1336,6 +1334,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
                         return true
                     }
+
 
                 })
                 popup.show()
