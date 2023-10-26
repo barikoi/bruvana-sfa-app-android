@@ -76,8 +76,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             popup.menuInflater.inflate(R.menu.sort_menu_outlet, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when(item!!.itemId){
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when(item.itemId){
                         R.id.menu_ztoa->{
                             shopList!!.sortByDescending {
                                 it.shop_name
@@ -105,6 +105,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     return true
                 }
 
+
             })
             popup.show()
         }
@@ -115,8 +116,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
                 @RequiresApi(Build.VERSION_CODES.N)
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    when(item!!.itemId){
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when(item.itemId){
                         R.id.menu_All->{
                             adapter = ShopSelectAdapter(shopList!!, listener!!)
                             shoplist.adapter = adapter
@@ -275,6 +276,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     return true
                 }
 
+
             })
             popup.show()
         }
@@ -295,6 +297,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         recylerView!!.adapter = adapter
 
         var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
+        var selectedMarket = prefs!!.getString(Api.SELECTED_MARKET_NAME, "")
         if (routeNameList!!.size == 0) {
             getAllRoutes(Api.routes_withfilter + "?with_geometry=0&user_id=" + user_id)
         }else{
@@ -341,6 +344,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     )
                     spinnerMarket!!.adapter = adapter
 
+                    if(selectedMarket!!.length>0){
+                        val pos= (spinnerMarket!!.adapter as ArrayAdapter<String>).getPosition(selectedMarket)
+                        if(pos>-1) {
+                            selectedRoute = ""
+                            spinnerMarket!!.setSelection(pos)
+                        }
+                    }
+
                 }
                 //getShopListbyRoute(Api.verified_shop_list+"?market_id="+market_id+"&user_id="+user_id)
             }
@@ -350,18 +361,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             }
 
         }
+
         spinnerMarket!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                /*if(selectedRoute!!.length>0){
-                    val pos= (spinnerMarket!!.adapter as ArrayAdapter<String>).getPosition(selectedRoute)
-                    if(pos>-1) {
-                        selectedRoute = ""
-                        spinnerRoute!!.setSelection(pos)
-                        return
-                    }
-                }*/
 
                 val market_id = marketPairList!![p2].second.first
+                editor!!.putString(Api.SELECTED_MARKET_ID, marketPairList!![p2].second.first)
+                editor!!.putString(Api.SELECTED_MARKET_NAME, marketPairList!![p2].second.second)
+                editor!!.commit()
                 getShopListbyRoute(Api.verified_shop_list+"?market_id="+market_id+"&user_id="+user_id)
             }
 
