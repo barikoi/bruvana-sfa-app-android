@@ -421,26 +421,35 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                     )
                 }
             } else {
-                if (activity!!.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(
-                        activity!!, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        0)
-                }else{
-                    if (activity!!.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(
-                            activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
-                        )
+                Log.d("MyApp", "SDK = "+Build.VERSION.SDK_INT)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                    if (fragment != null){
+                        takePictureFragment()
                     }else{
-                        if (fragment != null){
-                            takePictureFragment()
+                        takePicture();
+                    }
+                }else{
+                    if (activity!!.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(
+                            activity!!, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                            0)
+                    }else{
+                        if (activity!!.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            ActivityCompat.requestPermissions(
+                                activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
+                            )
                         }else{
-                            takePicture();
+                            if (fragment != null){
+                                takePictureFragment()
+                            }else{
+                                takePicture();
+                            }
                         }
                     }
+
                 }
 
-                //takePicture();
 
             }
         } else {
