@@ -323,8 +323,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             val rbn = RadioButton(mContext)
             rbn.setText(itemValue.get(i))
             rbn.id = i
-            rbn.setTextColor(resources.getColor(R.color.text_title))
-            rbn.buttonTintList = ColorStateList.valueOf(resources.getColor(R.color.cnl_color_1))
+            rbn.setTextColor(mContext.resources.getColor(R.color.text_title))
+            rbn.buttonTintList = ColorStateList.valueOf(mContext.resources.getColor(R.color.cnl_color_1))
             radio_group.addView(rbn)
         }
         val checkedid = 1

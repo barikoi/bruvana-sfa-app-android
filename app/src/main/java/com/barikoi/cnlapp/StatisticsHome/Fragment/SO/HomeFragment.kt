@@ -262,14 +262,14 @@ class HomeFragment : Fragment() {
                         }
 
                         val itemList: ArrayList<TargetValue> = ArrayList()
-                        itemList.add(TargetValue(resources.getString(R.string.total_target), total_target, total_target_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.ads), ads, ads_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.rds), rds, rds_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.number_of_memo), lpc, lpc_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.visit_ratio), visited, visit_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.aiv), aiv, aiv_completed))
-                        itemList.add(TargetValue(resources.getString(R.string.bounce)+" (%)", bounced, bounce_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.total_target), total_target, total_target_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.ads), ads, ads_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.rds), rds, rds_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.sku_per_memo), bpc, bpc_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.number_of_memo), lpc, lpc_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.visit_ratio), visited, visit_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.aiv), aiv, aiv_completed))
+                        itemList.add(TargetValue(mContext!!.resources.getString(R.string.bounce)+" (%)", bounced, bounce_completed))
 
                         val adapter = TargetAdapter(itemList, "SO")
                         targetListView.adapter = adapter

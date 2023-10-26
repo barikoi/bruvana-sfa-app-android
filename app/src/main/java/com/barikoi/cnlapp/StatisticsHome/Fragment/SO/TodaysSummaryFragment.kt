@@ -95,12 +95,12 @@ class TodaysSummaryFragment : Fragment() {
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        itemList.add(Pair(resources.getString(R.string.total_order_value), total_target_completed))
-                        itemList.add(Pair(resources.getString(R.string.sku_per_memo), bpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.visit_ratio), visit_ratio))
-                        itemList.add(Pair(resources.getString(R.string.visit_500m), visit_covered))
-                        itemList.add(Pair(resources.getString(R.string.number_of_memo), lpc_completed))
-                        itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
+                        itemList.add(Pair(mContext!!.resources.getString(R.string.total_order_value), total_target_completed))
+                        itemList.add(Pair(mContext!!.resources.getString(R.string.sku_per_memo), bpc_completed))
+                        itemList.add(Pair(mContext!!.resources.getString(R.string.visit_ratio), visit_ratio))
+                        itemList.add(Pair(mContext!!.resources.getString(R.string.visit_500m), visit_covered))
+                        itemList.add(Pair(mContext!!.resources.getString(R.string.number_of_memo), lpc_completed))
+                        itemList.add(Pair(mContext!!.resources.getString(R.string.aiv), aiv_completed))
 
                         createTable(itemList)
 

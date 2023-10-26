@@ -132,7 +132,7 @@ class CreateAttendanceFragment : Fragment() {
                     if (p2 > 0) {
                         val view1: TextView =
                             p0!!.getChildAt(0) as TextView
-                        view1.setTextColor(resources.getColor(R.color.black))
+                        view1.setTextColor(mContext!!.resources.getColor(R.color.black))
                         if (routeNameList!![p2].first.length > 0) {
                             route_id = routeNameList!![p2].first.toInt()
                             selectedRoute = routeNameList!![p2].second
@@ -143,7 +143,7 @@ class CreateAttendanceFragment : Fragment() {
                     } else {
                         val view1: TextView =
                             p0!!.getChildAt(0) as TextView
-                        view1.setTextColor(resources.getColor(R.color.text_title_2))
+                        view1.setTextColor(mContext!!.resources.getColor(R.color.text_title_2))
                         route_id = null
                         selectedRoute = ""
                     }
@@ -275,7 +275,7 @@ class CreateAttendanceFragment : Fragment() {
                         editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
                         editor!!.commit()
 
-                        val titles = arrayOf(resources.getString(R.string.attendance), resources.getString(R.string.history), resources.getString(R.string.summary))
+                        val titles = arrayOf(mContext!!.resources.getString(R.string.attendance), mContext!!.resources.getString(R.string.history), mContext!!.resources.getString(R.string.summary))
                         val fragments = ArrayList<Fragment>()
                         fragments.add(CreateAttendanceFragment())
                         fragments.add(HistoryFragment())
@@ -354,8 +354,8 @@ class CreateAttendanceFragment : Fragment() {
                         val routesList = ArrayList<String>()
                         val routesArray = data.getJSONArray("routes")
                         if (routesArray.length() > 0){
-                            routeNameList!!.add(Pair("", resources.getString(R.string.select_route)))
-                            routesList.add(resources.getString(R.string.select_route))
+                            routeNameList!!.add(Pair("", mContext!!.resources.getString(R.string.select_route)))
+                            routesList.add(mContext!!.resources.getString(R.string.select_route))
                             for(i in 0 until routesArray.length()){
                                 val routeObj = routesArray.getJSONObject(i)
 
@@ -384,7 +384,7 @@ class CreateAttendanceFragment : Fragment() {
                                             ) as TextView
                                             //set the color of first item in the drop down list to gray
                                             if (position == 0) {
-                                                view.setTextColor(resources.getColor(R.color.text_title_2))
+                                                view.setTextColor(mContext!!.resources.getColor(R.color.text_title_2))
                                                 view.visibility = View.GONE
                                             } else {
                                                 //here it is possible to define color for other items by

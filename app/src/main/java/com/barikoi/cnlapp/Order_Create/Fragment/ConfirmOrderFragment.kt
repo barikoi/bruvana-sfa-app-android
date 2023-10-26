@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.fragment_confirm_order.*
 import kotlinx.android.synthetic.main.fragment_confirm_order.bodyLayout
 import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
 import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
+import kotlinx.android.synthetic.main.fragment_confirm_order.view.*
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -57,6 +58,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var appDatabase: AppDatabase? = null
+    var mView: View? = null
     private var listener: OnEditOrderListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
     lateinit var adapter: ConfirmOrderListAdapter
@@ -125,12 +127,12 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_confirm_order, container, false)
+        mView = inflater.inflate(R.layout.fragment_confirm_order, container, false)
 
-        confirmOrder = view.findViewById(R.id.btnConfirm)
-        downloadChalan = view.findViewById(R.id.btndownloadChalan)
-        recylerView = view.findViewById(R.id.orderListView)
-        progressBar = view.findViewById(R.id.progressBar2)
+        confirmOrder = mView!!.findViewById(R.id.btnConfirm)
+        downloadChalan = mView!!.findViewById(R.id.btndownloadChalan)
+        recylerView = mView!!.findViewById(R.id.orderListView)
+        progressBar = mView!!.findViewById(R.id.progressBar2)
         confirmOrder!!.setOnClickListener {
             ViewUtils.viewDialog(mContext!!, mContext!!.resources.getString(R.string.confirm_order_dialog),
                 SpannableStringBuilder(), object :
@@ -188,7 +190,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             }
         }
 
-        return view
+        return mView
     }
 
     private fun createOrder(){
@@ -333,7 +335,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
     override fun onSuccess(orderArray: JSONArray) {
         val badgeDrawable = CreateOrderFragment.tabBadge!!.orCreateBadge
-
+        badgeDrawable.setVisible(false)
         if (orderArray.length() > 0){
             badgeDrawable.number = orderArray.length()
             badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
@@ -404,8 +406,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 it.orderId
             }
         }else{
-            no_route_check.visibility = View.VISIBLE
-            bodyLayout.visibility = View.GONE
+            mView!!.no_route_check.visibility = View.VISIBLE
+            mView!!.bodyLayout.visibility = View.GONE
             badgeDrawable.setVisible(false)
             progressBar!!.visibility = View.GONE
             orderList.clear()

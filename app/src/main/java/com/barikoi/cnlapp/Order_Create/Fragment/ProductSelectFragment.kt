@@ -153,7 +153,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         shopTitle!!.text = shopName
-        minOV.text = "Min Order Value: "+outletMinOrder
+        minOV.text = "Min Order Value: " + outletMinOrder
 
         imgRefresh.setOnClickListener {
             rotateAnimation(imgRefresh, 0f, 380f)
@@ -162,7 +162,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         try {
             ApiServices.apiGET(
-                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId+"&with_last_week_order=1",
+                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
                 queue!!,
                 token!!,
                 object : ApiServiceListener {
@@ -223,7 +223,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             builder.append(str3)
             ViewUtils.viewDialog(
                 mContext!!,
-                "",builder,
+                "", builder,
                 object :
                     DialogListener {
                     override fun onConfirmed() {
@@ -280,7 +280,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             }
 
         }
-        viewDialog(mContext!!, shopName!!, lastDeliveryDate, orderStatus, brandArray, outletCategory, lastOrderDate, minimum_order)
+        viewDialog(
+            mContext!!,
+            shopName!!,
+            lastDeliveryDate,
+            orderStatus,
+            brandArray,
+            outletCategory,
+            lastOrderDate,
+            minimum_order
+        )
 
 
     }
@@ -396,113 +405,151 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
 
         saveOrder!!.setOnClickListener {
-            if (addedProducts!!.size > 0) {
-                val builder = SpannableStringBuilder()
-                val str1 =SpannableString( "You are ")
-                builder.append(str1)
-                val strDistance = SpannableString(tvdistance.text)
-                if (distanceValue != null) {
-                    if (distanceValue!! > 500) {
-                        strDistance.setSpan(
-                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.red)),
-                            0,
-                            strDistance.length,
-                            0
-                        )
-                    } else {
-                        strDistance.setSpan(
-                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_2)),
-                            0,
-                            strDistance.length,
-                            0
-                        )
+            if (distanceValue != null) {
+                if (addedProducts!!.size > 0) {
+                    val builder = SpannableStringBuilder()
+                    val str1 = SpannableString("You are ")
+                    builder.append(str1)
+                    val strDistance = SpannableString(tvdistance.text)
+                    if (distanceValue != null) {
+                        if (distanceValue!! > 500) {
+                            strDistance.setSpan(
+                                ForegroundColorSpan(
+                                    ContextCompat.getColor(
+                                        mContext!!,
+                                        R.color.red
+                                    )
+                                ),
+                                0,
+                                strDistance.length,
+                                0
+                            )
+                        } else {
+                            strDistance.setSpan(
+                                ForegroundColorSpan(
+                                    ContextCompat.getColor(
+                                        mContext!!,
+                                        R.color.cnl_color_2
+                                    )
+                                ),
+                                0,
+                                strDistance.length,
+                                0
+                            )
+                        }
                     }
+                    builder.append(strDistance)
+                    val str2 = SpannableString(" away from ")
+                    builder.append(str2)
+                    val strShop = SpannableString(shopName)
+                    strShop.setSpan(
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                mContext!!,
+                                R.color.cnl_color_1
+                            )
+                        ),
+                        0,
+                        strShop.length,
+                        0
+                    )
+                    builder.append(strShop)
+                    appDatabase!!.saveOrderDao().deleteALL()
+                    ViewUtils.viewDialog(
+                        mContext!!,
+                        "",
+                        /*"Are you sure want to save " + str1 + "'s order?"*/
+                        builder,
+                        object :
+                            DialogListener {
+                            override fun onConfirmed() {
+                                progressBar.visibility = View.VISIBLE
+                                getLocation("save_order")
+                            }
+
+                            override fun onCanceled() {
+                                getLocation("reversegeo")
+                            }
+
+                        })
+                } else {
+                    val builder = SpannableStringBuilder()
+                    val str1 = SpannableString("You are ")
+                    builder.append(str1)
+                    val strDistance = SpannableString(tvdistance.text)
+                    if (distanceValue != null) {
+                        if (distanceValue!! > 500) {
+                            strDistance.setSpan(
+                                ForegroundColorSpan(
+                                    ContextCompat.getColor(
+                                        mContext!!,
+                                        R.color.red
+                                    )
+                                ),
+                                0,
+                                strDistance.length,
+                                0
+                            )
+                        } else {
+                            strDistance.setSpan(
+                                ForegroundColorSpan(
+                                    ContextCompat.getColor(
+                                        mContext!!,
+                                        R.color.cnl_color_2
+                                    )
+                                ),
+                                0,
+                                strDistance.length,
+                                0
+                            )
+                        }
+                    }
+                    builder.append(strDistance)
+                    val str2 = SpannableString(" away from ")
+                    builder.append(str2)
+                    val strShop = SpannableString(shopName)
+                    strShop.setSpan(
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                mContext!!,
+                                R.color.cnl_color_1
+                            )
+                        ),
+                        0,
+                        strShop.length,
+                        0
+                    )
+                    builder.append(strShop)
+                    val str3 = SpannableString(" and No products selected to order")
+                    builder.append(str3)
+                    ViewUtils.viewDialog(
+                        mContext!!,
+                        "",
+                        builder,
+                        object :
+                            DialogListener {
+                            override fun onConfirmed() {
+                                progressBar.visibility = View.GONE
+                            }
+
+                            override fun onCanceled() {
+                                getLocation("reversegeo")
+                            }
+
+                        })
                 }
-                builder.append(strDistance)
-                val str2 =SpannableString( " away from ")
-                builder.append(str2)
-                val strShop = SpannableString(shopName)
-                strShop.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(mContext!!,R.color.cnl_color_1)),
-                    0,
-                    strShop.length,
-                    0
-                )
-                builder.append(strShop)
-                appDatabase!!.saveOrderDao().deleteALL()
-                ViewUtils.viewDialog(
-                    mContext!!,
-                    "",
-                    /*"Are you sure want to save " + str1 + "'s order?"*/
-                    builder,
-                    object :
-                        DialogListener {
-                        override fun onConfirmed() {
-                            progressBar.visibility = View.VISIBLE
-                            getLocation("save_order")
-                        }
-
-                        override fun onCanceled() {
-                            getLocation("reversegeo")
-                        }
-
-                    })
             } else {
-                val builder = SpannableStringBuilder()
-                val str1 =SpannableString( "You are ")
-                builder.append(str1)
-                val strDistance = SpannableString(tvdistance.text)
-                if (distanceValue != null) {
-                    if (distanceValue!! > 500) {
-                        strDistance.setSpan(
-                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.red)),
-                            0,
-                            strDistance.length,
-                            0
-                        )
-                    } else {
-                        strDistance.setSpan(
-                            ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_2)),
-                            0,
-                            strDistance.length,
-                            0
-                        )
-                    }
-                }
-                builder.append(strDistance)
-                val str2 =SpannableString( " away from ")
-                builder.append(str2)
-                val strShop = SpannableString(shopName)
-                strShop.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(mContext!!,R.color.cnl_color_1)),
-                    0,
-                    strShop.length,
-                    0
-                )
-                builder.append(strShop)
-                val str3 =SpannableString( " and No products selected to order")
-                builder.append(str3)
-                ViewUtils.viewDialog(
+                Toast.makeText(
                     mContext!!,
-                    "",
-                    builder,
-                    object :
-                        DialogListener {
-                        override fun onConfirmed() {
-                            progressBar.visibility = View.GONE
-                        }
-
-                        override fun onCanceled() {
-                            getLocation("reversegeo")
-                        }
-
-                    })
+                    "Kindly wait for distance to be updated",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
         noOrder!!.setOnClickListener {
             val builder = SpannableStringBuilder()
-            val str1 =SpannableString( "You are ")
+            val str1 = SpannableString("You are ")
             builder.append(str1)
             val strDistance = SpannableString(tvdistance.text)
             if (distanceValue != null) {
@@ -515,7 +562,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     )
                 } else {
                     strDistance.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_2)),
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                mContext!!,
+                                R.color.cnl_color_2
+                            )
+                        ),
                         0,
                         strDistance.length,
                         0
@@ -523,31 +575,38 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
             }
             builder.append(strDistance)
-            val str2 =SpannableString( " away from ")
+            val str2 = SpannableString(" away from ")
             builder.append(str2)
             val strShop = SpannableString(shopName)
             strShop.setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(mContext!!,R.color.cnl_color_1)),
+                ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.cnl_color_1)),
                 0,
                 strShop.length,
                 0
             )
             builder.append(strShop)
-            val str3 =SpannableString( " and selecting No Order")
+            val str3 = SpannableString(" and selecting No Order")
             builder.append(str3)
             appDatabase!!.saveOrderDao().deleteALL()
+            if (distanceValue != null) {
+                ViewUtils.viewDialog(mContext!!, "", builder, object :
+                    DialogListener {
+                    override fun onConfirmed() {
+                        progressBar.visibility = View.VISIBLE
+                        getLocation("no_order")
+                    }
 
-            ViewUtils.viewDialog(mContext!!,"", builder, object :
-                DialogListener {
-                override fun onConfirmed() {
-                    progressBar.visibility = View.VISIBLE
-                    getLocation("no_order")
-                }
+                    override fun onCanceled() {
 
-                override fun onCanceled() {
-
-                }
-            })
+                    }
+                })
+            } else {
+                Toast.makeText(
+                    mContext!!,
+                    "Kindly wait for distance to be updated",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
         }
 
@@ -561,13 +620,19 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     submitNoOrder(location)
                 } else if (choice.equals("update_order")) {
                     updateOrder(location)
-                }else if (choice.equals("reversegeo")) {
+                } else if (choice.equals("reversegeo")) {
                     reverseGeoAddress(mContext!!, location.latitude, location.longitude)
-                    getDistance(location.latitude, location.longitude, selectedShop!!.latitude, selectedShop!!.longitude)
+                    getDistance(
+                        location.latitude,
+                        location.longitude,
+                        selectedShop!!.latitude,
+                        selectedShop!!.longitude
+                    )
                 } else {
                     submitOrder(location)
                 }
             }
+
             override fun onFailure() {
                 Toast.makeText(mContext!!, "Location fetch failed", Toast.LENGTH_SHORT).show()
             }
@@ -575,9 +640,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         })
     }
 
-    private fun getDistance(currentlatitude: Double, currentlongitude: Double, shoplatitude: Double, shoplongitude: Double) {
-        ApiServices.apiGET(Api.distance + Api.APIKEY + "/"+shoplongitude+","+shoplatitude+"/"+currentlongitude+","+currentlatitude,
-            queue!!, token!!, object : ApiServiceListener{
+    private fun getDistance(
+        currentlatitude: Double,
+        currentlongitude: Double,
+        shoplatitude: Double,
+        shoplongitude: Double
+    ) {
+        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shoplongitude + "," + shoplatitude + "/" + currentlongitude + "," + currentlatitude,
+            queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
                         val data = JSONObject(response)
@@ -587,19 +657,26 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         val dis2 = dist.substring(0, dist.indexOf(' ')).toDouble()
                         val distance = dformat.format(dis2)
 
-                        distanceValue = dformat.format(dis2*1000).toDouble()
+                        distanceValue = dformat.format(dis2 * 1000).toDouble()
 
-                        if (dis2 <1){
-                            val distMeter = dformat.format(dis2*1000).toDouble()
-                            if (distMeter>500) {
+                        if (dis2 < 1) {
+                            val distMeter = dformat.format(dis2 * 1000).toDouble()
+                            if (distMeter > 500) {
                                 tvdistance.text = distMeter.toString() + "m"
-                            }else{
-                                tvdistance.setTextColor(ContextCompat.getColor(mContext!!,R.color.cnl_color_2))
+                            } else {
+                                tvdistance.setTextColor(
+                                    ContextCompat.getColor(
+                                        mContext!!,
+                                        R.color.cnl_color_2
+                                    )
+                                )
                                 tvdistance.text = distMeter.toString() + "m"
                             }
-                        }else{
-                            tvdistance.text = distance+"km"
+                        } else {
+                            tvdistance.text = distance + "km"
                         }
+
+                        buttonLayout.visibility = View.VISIBLE
 
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -626,9 +703,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             })
     }
 
-    fun reverseGeoAddress(context: Context, lat: Double, lng: Double){
-        ApiServices.apiGET(Api.reverseGeo + "?key=" +Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
-        queue!!, token!!, object : ApiServiceListener{
+    fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
+        ApiServices.apiGET(Api.reverseGeo + "?key=" + Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+            queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
                         val data = JSONObject(response)
@@ -639,7 +716,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
                         val city = place.getString("city")
                         val area = place.getString("area")
-                        tvLocation.text = address+", "+area+", "+city
+                        tvLocation.text = address + ", " + area + ", " + city
                     } catch (e: JSONException) {
                         e.printStackTrace()
                         Sentry.captureException(e)
@@ -701,14 +778,20 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_code", addedProducts!![j].unit_code)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                    brandObj.put("discounted_unit_price", addedProducts!![j].discounted_unit_price.toString())
+                    brandObj.put(
+                        "discounted_unit_price",
+                        addedProducts!![j].discounted_unit_price.toString()
+                    )
                     brandObj.put("category_id", addedProducts!![j].category_id)
                     brandObj.put("category_name", addedProducts!![j].category_name)
                     brandObj.put("category_code", addedProducts!![j].category_code)
                     brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
-                    brandObj.put("ordered_amount", addedProducts!![j].ordered_total_price.toString())
+                    brandObj.put(
+                        "ordered_amount",
+                        addedProducts!![j].ordered_total_price.toString()
+                    )
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
@@ -770,17 +853,20 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                         })
-                }else{
-                    ViewUtils.viewDialogResponse(mContext!!, "No products selected to order", object : DialogListener{
-                        override fun onConfirmed() {
-                            progressBar.visibility = View.GONE
-                        }
+                } else {
+                    ViewUtils.viewDialogResponse(
+                        mContext!!,
+                        "No products selected to order",
+                        object : DialogListener {
+                            override fun onConfirmed() {
+                                progressBar.visibility = View.GONE
+                            }
 
-                        override fun onCanceled() {
+                            override fun onCanceled() {
 
-                        }
+                            }
 
-                    })
+                        })
                 }
 
             }
@@ -805,7 +891,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("user_id", user_id)
             orderObj.put("employee_id", sr_id)
             orderObj.put("ordered_at", today)
-            if (tvdistance.text.toString().length>0) orderObj.put("distance_from_outlets", distanceValue.toString())
+            if (tvdistance.text.toString().length > 0) orderObj.put(
+                "distance_from_outlets",
+                distanceValue.toString()
+            )
             /*orderObj.put("delivered_at", nextDay)*/
             /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
 
@@ -825,14 +914,20 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("unit_name", addedProducts!![j].unit_name)
                     brandObj.put("unit_code", addedProducts!![j].unit_code)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
-                    brandObj.put("discounted_unit_price", addedProducts!![j].discounted_unit_price.toString())
+                    brandObj.put(
+                        "discounted_unit_price",
+                        addedProducts!![j].discounted_unit_price.toString()
+                    )
                     brandObj.put("category_id", addedProducts!![j].category_id)
                     brandObj.put("category_name", addedProducts!![j].category_name)
                     brandObj.put("category_code", addedProducts!![j].category_code)
                     brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
-                    brandObj.put("ordered_amount", addedProducts!![j].ordered_total_price.toString())
+                    brandObj.put(
+                        "ordered_amount",
+                        addedProducts!![j].ordered_total_price.toString()
+                    )
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
@@ -842,10 +937,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             }
 
-            if (orderedQuantity == totalCount){
+            if (orderedQuantity == totalCount) {
                 orderObj.put("total_ordered_amount", grandTotalPrice.toString())
                 orderObj.put("total_ordered_quantity", totalCount.toString())
-            }else{
+            } else {
                 orderObj.put("total_ordered_amount", orderedAmount.toString())
                 orderObj.put("total_ordered_quantity", orderedQuantity.toString())
             }
@@ -915,17 +1010,20 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                         })
-                }else{
-                    ViewUtils.viewDialogResponse(mContext!!, "No products selected to order", object : DialogListener{
-                        override fun onConfirmed() {
-                            progressBar.visibility = View.GONE
-                        }
+                } else {
+                    ViewUtils.viewDialogResponse(
+                        mContext!!,
+                        "No products selected to order",
+                        object : DialogListener {
+                            override fun onConfirmed() {
+                                progressBar.visibility = View.GONE
+                            }
 
-                        override fun onCanceled() {
+                            override fun onCanceled() {
 
-                        }
+                            }
 
-                    })
+                        })
                 }
 
             }
@@ -939,7 +1037,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         orderObj.put("outlet_id", shopId)
         orderObj.put("user_id", user_id)
         orderObj.put("employee_id", sr_id)
-        if (distanceValue.toString().length>0) orderObj.put("distance_from_outlets", distanceValue.toString())
+        if (distanceValue.toString().length > 0) orderObj.put(
+            "distance_from_outlets",
+            distanceValue.toString()
+        )
         orderObj.put("longitude", location.longitude.toString())
         orderObj.put("latitude", location.latitude.toString())
         ordersArray.put(orderObj)
@@ -999,7 +1100,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun getAllProducts() {
         loading!!.visibility = View.VISIBLE
         val url =
-            Api.all_product_list + "?with_stock=1&user_id=" + user_id +"&is_active=1"/*+ "&route_id=" + routeId*/
+            Api.all_product_list + "?with_stock=1&user_id=" + user_id + "&is_active=1"/*+ "&route_id=" + routeId*/
         val request = StringRequest(
             Request.Method.GET, url,
             { response ->
@@ -1017,26 +1118,36 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 var imageUrl = "null"
                                 val productObj = productArray.getJSONObject(i)
                                 val productId = productObj.getString("id")
-                                val productName = if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
-                                val productCode = if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
+                                val productName =
+                                    if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
+                                val productCode =
+                                    if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
                                 /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
-                                if (productObj.has("images") && !productObj.isNull("images")){
+                                if (productObj.has("images") && !productObj.isNull("images")) {
                                     val imageArray = productObj.getJSONArray("images")
-                                    if (imageArray.length() > 0){
+                                    if (imageArray.length() > 0) {
                                         val imageobj = imageArray.getJSONObject(0)
-                                        if (imageobj.has("image_url")){
+                                        if (imageobj.has("image_url")) {
                                             imageUrl = imageobj.getString("image_url")
                                         }
                                     }
                                 }
-                                val skuCode = if (!productObj.isNull("sku_code")) productObj.getString("sku_code") else ""
-                                val unitId = if (!productObj.isNull("unit_id")) productObj.getString("unit_id") else ""
-                                val unitName = if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
-                                val unitCode = if (!productObj.isNull("unit_code")) productObj.getString("unit_code") else ""
-                                val categoryId = if (!productObj.isNull("category_id")) productObj.getString("category_id") else ""
-                                val categoryName = if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
-                                val categoryCode = if (!productObj.isNull("category_code")) productObj.getString("category_code") else ""
-                                val qtyLastMonth = if (!productObj.isNull("quantity_last_month")) productObj.getInt(
+                                val skuCode =
+                                    if (!productObj.isNull("sku_code")) productObj.getString("sku_code") else ""
+                                val unitId =
+                                    if (!productObj.isNull("unit_id")) productObj.getString("unit_id") else ""
+                                val unitName =
+                                    if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
+                                val unitCode =
+                                    if (!productObj.isNull("unit_code")) productObj.getString("unit_code") else ""
+                                val categoryId =
+                                    if (!productObj.isNull("category_id")) productObj.getString("category_id") else ""
+                                val categoryName =
+                                    if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
+                                val categoryCode =
+                                    if (!productObj.isNull("category_code")) productObj.getString("category_code") else ""
+                                val qtyLastMonth =
+                                    if (!productObj.isNull("quantity_last_month")) productObj.getInt(
                                         "quantity_last_month"
                                     ) else 0
                                 val availableStock =
@@ -1216,12 +1327,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val deliveryDate = df.format(oldDate.parse(lastDelivery))
             tvLastDeliveryDate.setText(mContext.resources.getString(R.string.last_delivery_date) + deliveryDate)
         }
-        if (!outletCategory.equals("null")){
+        if (!outletCategory.equals("null")) {
             tvoutletCategory.setText(outletCategory)
         }
-        if (!minimum_order.equals("null")){
-            tvminOrderValue.text = "Min Order Value: "+ minimum_order
-        }else{
+        if (!minimum_order.equals("null")) {
+            tvminOrderValue.text = "Min Order Value: " + minimum_order
+        } else {
             tvminOrderValue.text = "Min Order Value: N/A"
         }
 
@@ -1230,7 +1341,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             dialog.dismiss()
         }
 
-        if (statusOrder.equals("DELIVERED")){
+        if (statusOrder.equals("DELIVERED")) {
             filterLayout.visibility = View.VISIBLE
             filterLayout.setOnClickListener {
                 val popup = PopupMenu(mContext, filterTitle)
@@ -1238,8 +1349,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                     PopupMenu.OnMenuItemClickListener {
                     override fun onMenuItemClick(item: MenuItem): Boolean {
-                        when(item.itemId){
-                            R.id.menu_delivered_product->{
+                        when (item.itemId) {
+                            R.id.menu_delivered_product -> {
                                 productItems.clear()
                                 filterTitle.setText(mContext.resources.getString(R.string.delivered))
                                 if (brands_array.length() > 0) {
@@ -1270,7 +1381,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+                                tvItemCount.setText(
+                                    productItems.size.toString() + mContext.resources.getString(
+                                        R.string.items
+                                    )
+                                )
 
                                 var grandTotal = 0.0
                                 if (productItems.size > 0) {
@@ -1285,7 +1400,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                                 tvGrandTotal.setText(dformat.format(grandTotal).toString())
                             }
-                            R.id.menu_bounced_product->{
+                            R.id.menu_bounced_product -> {
                                 productItems.clear()
                                 filterTitle.setText(mContext.resources.getString(R.string.bounced))
                                 if (brands_array.length() > 0) {
@@ -1316,7 +1431,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+                                tvItemCount.setText(
+                                    productItems.size.toString() + mContext.resources.getString(
+                                        R.string.items
+                                    )
+                                )
 
                                 var grandTotal = 0.0
                                 if (productItems.size > 0) {
@@ -1383,38 +1502,38 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             adapter.notifyDataSetChanged()
 
             tvGrandTotal.setText(dformat.format(grandTotal).toString())
-        }else{
+        } else {
             filterLayout.visibility = View.GONE
 
             productItems.clear()
             if (brands_array.length() > 0) {
                 for (j in 0 until brands_array.length()) {
                     val brandObj = brands_array.getJSONObject(j)
-                    if (statusOrder.equals("PENDING")){
-                    if (brandObj.getInt("ordered_quantity") > 0) {
-                        productItems.add(
-                            ProductStatistics(
-                                brandObj.getString("product_id"),
-                                brandObj.getString("product_name"),
-                                brandObj.getString("product_code"),
-                                brandObj.getString("sku_code"),
-                                brandObj.getString("category_code"),
-                                brandObj.getString("category_name"),
-                                brandObj.getString("category_id"),
-                                brandObj.getString("unit_name"),
-                                brandObj.getString("unit_id"),
-                                brandObj.getString("unit_code"),
-                                brandObj.getDouble("unit_price"),
-                                brandObj.getDouble("discounted_unit_price"),
-                                brandObj.getDouble("ordered_amount"),
-                                brandObj.getInt("ordered_quantity"),
-                                brandObj.getInt("ordered_quantity"),
-                                brandObj.getInt("bounced_quantity"),
-                                brandObj.getDouble("ordered_amount")
+                    if (statusOrder.equals("PENDING")) {
+                        if (brandObj.getInt("ordered_quantity") > 0) {
+                            productItems.add(
+                                ProductStatistics(
+                                    brandObj.getString("product_id"),
+                                    brandObj.getString("product_name"),
+                                    brandObj.getString("product_code"),
+                                    brandObj.getString("sku_code"),
+                                    brandObj.getString("category_code"),
+                                    brandObj.getString("category_name"),
+                                    brandObj.getString("category_id"),
+                                    brandObj.getString("unit_name"),
+                                    brandObj.getString("unit_id"),
+                                    brandObj.getString("unit_code"),
+                                    brandObj.getDouble("unit_price"),
+                                    brandObj.getDouble("discounted_unit_price"),
+                                    brandObj.getDouble("ordered_amount"),
+                                    brandObj.getInt("ordered_quantity"),
+                                    brandObj.getInt("ordered_quantity"),
+                                    brandObj.getInt("bounced_quantity"),
+                                    brandObj.getDouble("ordered_amount")
+                                )
                             )
-                        )
-                    }
-                    }else if (statusOrder.equals("CANCELLED")){
+                        }
+                    } else if (statusOrder.equals("CANCELLED")) {
                         if (brandObj.getInt("bounced_quantity") > 0) {
                             productItems.add(
                                 ProductStatistics(
@@ -1479,7 +1598,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 gd.cornerRadius = 5f
                 gd.setStroke(2, mContext.resources.getColor(R.color.white))
                 tvOrderStatus.setBackgroundDrawable(gd)
-            } else if (statusOrder.equals("CANCELLED")){
+            } else if (statusOrder.equals("CANCELLED")) {
                 tvOrderStatus.text = mContext.resources.getString(R.string.bounced)
                 statusLayout.background.setTint(mContext.resources.getColor(R.color.status_bounced_stroke))
                 val gd = GradientDrawable()
@@ -1487,7 +1606,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 gd.cornerRadius = 5f
                 gd.setStroke(2, mContext.resources.getColor(R.color.white))
                 tvOrderStatus.setBackgroundDrawable(gd)
-            }else{
+            } else {
                 statusLayout.visibility = View.GONE
             }
         }
@@ -1521,7 +1640,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         products as Products
         var itemCount = 0
         var grandTotal = 0.0
-        val prodList = appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
+        val prodList =
+            appDatabase!!.saveOrderDao().getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
         itemCount = prodList!![0].itemsCount
         grandTotal = prodList[0].totalPrice
         if (itemCount == 1 || itemCount == 0) {
