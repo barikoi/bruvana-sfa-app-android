@@ -254,9 +254,15 @@ class VisitReportActivity : AppCompatActivity() {
     }
 
     private fun getVisitReports(sr_id: String, startDate: String, endDate: String) {
+        var url = ""
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)){
+            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate+"&route_id="+route_id+"&so_visit=1"
+        }else{
+            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate+"&route_id="+route_id
+        }
         progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(
-            Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate+"&route_id="+route_id,
+            url,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
@@ -275,10 +281,6 @@ class VisitReportActivity : AppCompatActivity() {
                                         )
                                     )
                                 }
-
-                                /*itemList.sortBy {
-                                    it.second
-                                }*/
                                 createTable(itemList, tabLayout)
                             }
 

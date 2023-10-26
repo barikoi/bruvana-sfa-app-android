@@ -69,12 +69,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //checkforOrders()
-        //progressBar!!.visibility =View.VISIBLE
+
         checkforOrders(queue!!, token!!, user_id!!, route_id!!)
-        /*adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
-        recylerView!!.adapter = adapter
-        adapter.notifyDataSetChanged()*/
 
     }
     companion object{
