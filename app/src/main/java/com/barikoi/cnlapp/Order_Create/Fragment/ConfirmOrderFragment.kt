@@ -3,7 +3,7 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater

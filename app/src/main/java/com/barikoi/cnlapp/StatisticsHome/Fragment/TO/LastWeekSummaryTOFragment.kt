@@ -4,7 +4,7 @@ import android.app.ProgressDialog
 import android.content.*
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.Gravity
 import androidx.fragment.app.Fragment

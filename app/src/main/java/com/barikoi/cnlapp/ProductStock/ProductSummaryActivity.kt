@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -65,15 +65,6 @@ class ProductSummaryActivity : AppCompatActivity() {
                 @RequiresApi(Build.VERSION_CODES.N)
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                     if (spinnerDistributorHouse.adapter.count >0) {
-                        /*selected_so = p2
-                        if (p2>0) {
-                            selected_so_id = soList[p2 - 1].id
-                        }
-                        if (p2 == 0) {
-                            setDateFilter("&with_to=1")
-                        } else {
-                            setDateFilter("")
-                        }*/
                         selectedTerritoryId = dhList.get(p2).second
                         territorySuffix = "&db_house_id="+selectedTerritoryId
                         setDateFilter()
@@ -134,22 +125,24 @@ class ProductSummaryActivity : AppCompatActivity() {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()*/
             }
-            getProductStock(Api.all_product_list+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&with_order=1"+territorySuffix)
+            getProductSummary(Api.all_product_list+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&with_order=1"+territorySuffix)
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getProductStock(Api.all_product_list+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&with_order=1"+territorySuffix)
+        getProductSummary(Api.all_product_list+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&with_order=1"+territorySuffix)
     }
 
-    private fun getProductStock(url: String) {
-
+    private fun getProductSummary(url: String) {
+        progressBar.visibility= View.VISIBLE
+        productList.visibility = View.GONE
         ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     if (response != null){
                         progressBar.visibility= View.GONE
+                        productList.visibility = View.VISIBLE
                         val itemList: ArrayList<ProductStock> = ArrayList()
                         val obj = JSONObject(response)
                         val productsArray = obj.getJSONArray("products")
@@ -192,6 +185,7 @@ class ProductSummaryActivity : AppCompatActivity() {
                 }catch (e: Exception){
                     e.printStackTrace()
                     progressBar.visibility= View.GONE
+                    productList.visibility = View.GONE
                 }
             }
 
@@ -206,11 +200,13 @@ class ProductSummaryActivity : AppCompatActivity() {
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
                 progressBar.visibility= View.GONE
+                productList.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                 progressBar.visibility= View.GONE
+                productList.visibility = View.GONE
             }
 
         })

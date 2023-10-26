@@ -3,7 +3,7 @@ package com.barikoi.cnlapp.Order_Create.Adapter
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Build
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log

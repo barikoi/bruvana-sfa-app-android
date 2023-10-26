@@ -3,7 +3,7 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
