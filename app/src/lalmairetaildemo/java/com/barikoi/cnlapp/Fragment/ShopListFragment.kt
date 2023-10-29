@@ -67,6 +67,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
+        var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")
+        var selectedMarket = prefs!!.getString(Api.SELECTED_MARKET_NAME_LIST, "")
 
         spinnerRoute!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
@@ -74,7 +76,16 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-
+                if(selectedRoute!!.length>0){
+                    val pos= (spinnerRoute!!.adapter as ArrayAdapter<String>).getPosition(selectedRoute)
+                    if(pos>-1) {
+                        selectedRoute = ""
+                        spinnerRoute!!.setSelection(pos)
+                    }
+                }
+                editor!!.putString(Api.SELECTED_ROUTE_ID_LIST, routeNameList!![position].first)
+                editor!!.putString(Api.SELECTED_ROUTE_NAME_LIST, routeNameList!![position].second)
+                editor!!.commit()
                 markets.clear()
                 for (i in 0 until marketList!!.size) {
                     if (marketList!![i].first == routesList!![position]) {
@@ -89,7 +100,13 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             android.R.layout.simple_spinner_item, markets
                         )
                         spinnerMarket!!.adapter = adapter
-
+                        /*if(selectedMarket!!.length>0){
+                            val pos= (spinnerMarket!!.adapter as ArrayAdapter<String>).getPosition(selectedMarket)
+                            if(pos>-1) {
+                                selectedMarket = ""
+                                spinnerMarket!!.setSelection(pos)
+                            }
+                        }*/
                     }
                 }
 
@@ -107,6 +124,10 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                 view: View, position: Int, id: Long
             ) {
 
+
+                editor!!.putString(Api.SELECTED_MARKET_ID_LIST, marketList!![position].second.first)
+                editor!!.putString(Api.SELECTED_MARKET_NAME_LIST, marketList!![position].second.second)
+                editor!!.commit()
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
                     if (shopList!![i].market_name.equals(markets[position])) {

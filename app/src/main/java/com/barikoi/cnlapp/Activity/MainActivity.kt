@@ -342,6 +342,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         editor.remove(Api.PHONE)
         editor.remove(Api.SELECTED_ROUTE_NAME)
         editor.remove(Api.SELECTED_ROUTE_ID)
+        editor.remove(Api.SELECTED_MARKET_NAME)
+        editor.remove(Api.SELECTED_MARKET_ID)
         editor.remove(Api.SELECTED_SHOP)
         editor.remove(Api.SELECTED_SHOP_ID)
         editor.commit()

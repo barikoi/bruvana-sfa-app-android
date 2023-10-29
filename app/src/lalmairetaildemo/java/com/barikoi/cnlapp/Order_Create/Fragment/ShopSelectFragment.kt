@@ -347,7 +347,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                     if(selectedMarket!!.length>0){
                         val pos= (spinnerMarket!!.adapter as ArrayAdapter<String>).getPosition(selectedMarket)
                         if(pos>-1) {
-                            selectedRoute = ""
+                            selectedMarket = ""
                             spinnerMarket!!.setSelection(pos)
                         }
                     }
