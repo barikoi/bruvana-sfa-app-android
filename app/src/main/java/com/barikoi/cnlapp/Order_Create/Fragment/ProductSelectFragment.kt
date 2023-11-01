@@ -412,7 +412,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     builder.append(str1)
                     val strDistance = SpannableString(tvdistance.text)
                     if (distanceValue != null) {
-                        if (distanceValue!! > 500) {
+                        if (distanceValue!! > 100) {
                             strDistance.setSpan(
                                 ForegroundColorSpan(
                                     ContextCompat.getColor(
@@ -478,7 +478,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     builder.append(str1)
                     val strDistance = SpannableString(tvdistance.text)
                     if (distanceValue != null) {
-                        if (distanceValue!! > 500) {
+                        if (distanceValue!! > 100) {
                             strDistance.setSpan(
                                 ForegroundColorSpan(
                                     ContextCompat.getColor(
@@ -553,7 +553,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             builder.append(str1)
             val strDistance = SpannableString(tvdistance.text)
             if (distanceValue != null) {
-                if (distanceValue!! > 500) {
+                if (distanceValue!! > 100) {
                     strDistance.setSpan(
                         ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.red)),
                         0,
@@ -661,7 +661,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         if (dis2 < 1) {
                             val distMeter = dformat.format(dis2 * 1000).toDouble()
-                            if (distMeter > 500) {
+                            if (distMeter > 100) {
                                 tvdistance.text = distMeter.toString() + "m"
                             } else {
                                 tvdistance.setTextColor(

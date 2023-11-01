@@ -106,7 +106,7 @@
     <string name="sku_per_memo">SKU Per Memo</string>
     <string name="visit_ratio">Number of Visits</string>
     <string name="number_of_memo">Number of Memo</string>
-    <string name="visit_500m">Visit (0–500m)</string>
+    <string name="visit_500m">Visit (0–100m)</string>
     <string name="aiv">AIV</string>
     <string name="ads">ADS</string>
     <string name="rds">RDS</string>

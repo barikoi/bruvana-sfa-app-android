@@ -19,6 +19,12 @@ object Api {
     val SELECTED_SHOP_ID = "selected_shop_id"
     val SELECTED_ROUTE_ID = "selected_route_id"
     val SELECTED_ROUTE_NAME = "selected_route_name"
+    val SELECTED_MARKET_ID = "selected_market_id"
+    val SELECTED_MARKET_NAME = "selected_market_name"
+    val SELECTED_ROUTE_ID_LIST = "selected_route_id_list"
+    val SELECTED_ROUTE_NAME_LIST = "selected_route_name_list"
+    val SELECTED_MARKET_ID_LIST = "selected_market_id_list"
+    val SELECTED_MARKET_NAME_LIST = "selected_market_name_list"
     val ORDERED_ROUTE_ID = "ordered_route_id"
 
     val ROUTE_PAGE_SELECTED = "route_page_selected"

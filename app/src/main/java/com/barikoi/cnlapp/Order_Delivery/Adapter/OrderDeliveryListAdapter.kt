@@ -98,7 +98,7 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
                     dformat.format(orderList[position].distance.toDouble()/1000)+"km"
                 }
                 val strDistance = SpannableString(suffix)
-                if (mItem.distance.toDouble() > 500) {
+                if (mItem.distance.toDouble() > 100) {
                     strDistance.setSpan(
                         ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),
                         0,
