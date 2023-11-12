@@ -256,9 +256,9 @@ class VisitReportActivity : AppCompatActivity() {
     private fun getVisitReports(sr_id: String, startDate: String, endDate: String) {
         var url = ""
         if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)){
-            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate+"&route_id="+route_id+"&so_visit=1"
+            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate
         }else{
-            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate+"&route_id="+route_id
+            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate
         }
         progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(

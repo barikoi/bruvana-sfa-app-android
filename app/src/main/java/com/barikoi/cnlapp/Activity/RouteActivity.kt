@@ -5,13 +5,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.android.volley.NetworkResponse
@@ -87,12 +88,10 @@ class RouteActivity : AppCompatActivity() {
         fragments.add(ShopListFragment())
         viewPager2!!.setAdapter(ViewPagerAdapter(supportFragmentManager, lifecycle, fragments))
         // attaching tab mediator
-        // attaching tab mediator
         TabLayoutMediator(tabLayout2!!, viewPager2!!,
             TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        //viewPager.setCurrentItem(0);
 
         //viewPager.setCurrentItem(0);
         viewPager2!!.setUserInputEnabled(false)
@@ -103,11 +102,13 @@ class RouteActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
+                    viewPager2!!.setCurrentItem(0)
                     editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()
                     tvTitle!!.text = resources.getString(R.string.route_list)
                     RouteFragment.getAllRouteList(userId!!)
                 } else if (position == 1) {
+                    viewPager2!!.setCurrentItem(1)
                     editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
                     editor!!.commit()
                     tvTitle!!.text = resources.getString(R.string.shop_list)
