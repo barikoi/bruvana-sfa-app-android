@@ -106,34 +106,6 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
         setDateFilter(/*spinnerMenu.selectedItemPosition*/)
 
-        /*val menuList = arrayOf(
-            resources.getString(R.string.today_summary),
-            resources.getString(R.string.last_week_summary),
-            resources.getString(R.string.custom)
-        )
-        val adapter = ArrayAdapter(
-            applicationContext,
-            android.R.layout.simple_spinner_item, menuList
-        )
-        spinnerMenu.adapter = adapter
-        spinnerMenu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            @RequiresApi(Build.VERSION_CODES.N)
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerMenu.adapter.count > 0) {
-                    bodyLayout.visibility = View.GONE
-                    if (p2 == 2) {
-                        //tvDateRange.setText("Select date range")
-                    } else {
-                        setDateFilter(p2)
-                    }
-                }
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
-
-        }*/
     }
 
     private fun setDateFilter(/*position: Int*/) {
@@ -143,20 +115,6 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
-        /*if (position == 0) {
-            StartDate = df.format(end)
-            EndDate = df.format(end)
-            tvDateRange.setText(simpleFormat.format(end))
-            getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
-        } else if (position == 1) {
-            StartDate = df.format(start)
-            EndDate = df.format(start)
-            tvDateRange.setText(simpleFormat.format(start))
-            getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
-        } else {
-            tvDateRange.setText("Select date range")
-            tvDateRange.setText(customDate)
-        }*/
         StartDate = df.format(start)
         EndDate = df.format(end)
         customDate = simpleFormat.format(start) + " - " + simpleFormat.format(end)
@@ -312,12 +270,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
-        var size: Int = 0
-        /*if (data.size < 5) {
-            size = data.size
-        } else {
-            size = 5
-        }*/
+
         if (data.size > 0) {
             for (i in 0 until data.size) {
                 val tr = TableRow(applicationContext)

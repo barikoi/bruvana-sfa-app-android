@@ -35,21 +35,18 @@ import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_shop_list.*
+import kotlinx.android.synthetic.staging.fragment_shop_list.createShop
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 class ShopListFragment : Fragment(), OnEditShopListener {
-    //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var adapter: ShopListAdapter? = null
     private var userId: String? = ""
     private var listener: OnEditShopListener? = null
-    //private var mContext: Context? = null
-    //private var recylerView: RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

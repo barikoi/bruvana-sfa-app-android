@@ -91,7 +91,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+        checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -101,7 +101,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter.filter(s)
                 if (s!!.length == 0) {
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+ StartDate+" 00:00:00"+"&end_date="+ EndDate+" 23:59:59"+"&order_status=PENDING", queue!!, token!!, mCallback!!)
+                    if (sr_id!!.length == 0){
+                        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING&include_filter_by_user_id=1", queue!!, token!!, mCallback!!)
+                    }else{
+                        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&order_status=PENDING", queue!!, token!!, mCallback!!)
+                    }
                 }
 
             }
@@ -127,12 +131,12 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     companion object{
         var mCallback: OrderListSuccessListener? = PendingOrderFragment()
-        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, sr_id: String, route_id: String, territory_id: String, start: String, end: String) {
+        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, sr_id: String, territory_id: String, start: String, end: String) {
             if (mCallback!= null) {
                 if (sr_id.length == 0){
-                    getAllOrders(Api.get_saved_order+"?start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING", queue, token, mCallback!!)
+                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING&include_filter_by_user_id=1", queue, token, mCallback!!)
                 }else{
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id/*+"&route_id="+route_id*/+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
+                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
                 }
 
             }
@@ -291,14 +295,15 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
-        user_id = prefs!!.getString(Api.USER_ID, "")
         user_type = prefs!!.getString(Api.USER_TYPE, "")
         if (user_type.equals("TO", true)){
             sr_id = ""
             route_id = ""
+            user_id = OrderDeliveryUpdateActivity.user_id
         }else{
             sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+            user_id = prefs!!.getString(Api.USER_ID, "")
         }
         territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
         appDatabase = AppDatabase.getInstance(context)
@@ -607,7 +612,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     val message = response.getString("message")
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
-                            checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                            checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
                         }
 
                         override fun onCanceled() {

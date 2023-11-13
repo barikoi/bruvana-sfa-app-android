@@ -8,35 +8,43 @@ import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.Attendance.Model.SOList
+import com.barikoi.cnlapp.Fragment.RouteFragment
+import com.barikoi.cnlapp.Fragment.ShopListFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.BouncedOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.DeliveredOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.PendingOrderFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_order_delivery_update.*
-import kotlinx.android.synthetic.main.activity_order_delivery_update.btnBack
-import kotlinx.android.synthetic.main.activity_order_delivery_update.dateRangeLayout
-import kotlinx.android.synthetic.main.activity_order_delivery_update.tvDateRange
-import kotlinx.android.synthetic.main.activity_order_delivery_update.viewPager
-import kotlinx.android.synthetic.main.activity_order_delivery_update.viewpagertab
+import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
 
 class OrderDeliveryUpdateActivity : AppCompatActivity() {
 
     var token : String? = null
-    var user_id : String? = null
+
     var sr_id : String? = null
     var territory_id : String? = null
     var user_type : String? = null
@@ -44,10 +52,15 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
+    val soList: ArrayList<SOList> = ArrayList()
+
     companion object{
         var StartDate: String? = null
         var EndDate: String? = null
         var etSearchShop: AutoCompleteTextView? = null
+        private var srCode: String? = ""
+        var selected_so : Int? = null
+        var user_id : String? = null
     }
 
 
@@ -58,7 +71,6 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
-        user_id = prefs!!.getString(Api.USER_ID, "")
         user_type = prefs!!.getString(Api.USER_TYPE, "")
         //sr_id = prefs!!.getString(Api.SR_CODE, "")
         //route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
@@ -69,15 +81,38 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
         if (user_type.equals("TO", true)){
             sr_id = ""
             route_id = ""
+            user_id = ""
+            spinnerLayout.visibility = View.VISIBLE
+            getSOList()
         }else{
+            user_id = prefs!!.getString(Api.USER_ID, "")
             sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+            spinnerLayout.visibility = View.GONE
+            setDateFilter()
         }
         btnBack.setOnClickListener {
             onBackPressed()
             finish()
         }
-        setDateFilter()
+
+
+        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (spinnerSO.adapter.count >0) {
+                    selected_so = p2
+                    user_id = soList[p2].id
+                    srCode = soList[p2].employeeId
+                    setDateFilter()
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
 
     }
 
@@ -108,13 +143,13 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
                     viewPager.setCurrentItem(0)
-                    PendingOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                    PendingOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
                 } else if (position == 1) {
                     viewPager.setCurrentItem(1)
-                    DeliveredOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                    DeliveredOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }else if (position == 2) {
                     viewPager.setCurrentItem(2)
-                    BouncedOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, route_id!!, territory_id!!, StartDate!!, EndDate!!)
+                    BouncedOrderFragment.checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
                 }
             }
         })
@@ -169,5 +204,71 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
         setTabLayoutView()
+    }
+
+    private fun getSOList() {
+        ApiServices.apiGET(
+            Api.get_all_so_list,
+            queue!!, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    viewSOList(response)
+                    //progressBar.visibility = View.GONE
+                    //setDateFilter()
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                    //progressBar.visibility = View.GONE
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                    //progressBar.visibility = View.GONE
+                }
+
+            })
+    }
+    private fun viewSOList(response: String) {
+        try {
+            if (response != null){
+                soList.clear()
+                val obj = JSONObject(response)
+                val soArray = obj.getJSONArray("so")
+                val soNameList: ArrayList<String> = ArrayList()
+                if (soArray.length() >0){
+                    for (i in 0 until soArray.length()) {
+                        val soObj = soArray.getJSONObject(i)
+                        val imageUrl = "null"
+                        soList.add(
+                            SOList(
+                                soObj.getString("id"),
+                                soObj.getString("user_name"),
+                                soObj.getString("designation"),
+                                soObj.getString("employee_id"),
+                                soObj.getString("phone"),
+                                imageUrl
+                            )
+                        )
+                        soNameList.add(soObj.getString("user_name"))
+
+                    }
+                }
+                val adapter = ArrayAdapter(
+                    applicationContext,
+                    android.R.layout.simple_spinner_item, soNameList
+                )
+                spinnerSO.adapter = adapter
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 }
