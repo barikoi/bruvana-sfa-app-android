@@ -178,7 +178,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                         tryAgain2.visibility = View.GONE
                         bodyLayout.visibility = View.VISIBLE
                         val obj = JSONObject(response)
-                        val ordersArray = obj.getJSONArray("so_list")
+                        val toArray = obj.getJSONArray("so_list")
+                        val toObj = toArray.getJSONObject(0)
+                        val ordersArray = toObj.getJSONArray("sales_officers")
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
                         sowithOrderList!!.clear()
                         if (ordersArray.length() > 0) {
@@ -187,8 +189,8 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                 itemList.add(
                                     Pair(
                                         Pair(
-                                            orderObj.getString("sr_name"),
-                                            orderObj.getString("user_id")
+                                            orderObj.getString("user_name"),
+                                            orderObj.getString("id")
                                         ),
                                         dformat.format(
                                             orderObj.getString("so_ordered_value").toDouble()
@@ -197,24 +199,24 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                 )
                                 sowithOrderList!!.add(
                                     OrdersSO(
-                                        orderObj.getString("user_id"),
-                                        orderObj.getString("sr_name"),
+                                        orderObj.getString("id"),
+                                        orderObj.getString("user_name"),
                                         orderObj.getString("productive_outlets"),
                                         orderObj.getString("total_outlets"),
                                         dformat.format(orderObj.getDouble("total_bounced_amount"))
                                             .toDouble(),
-                                        orderObj.getJSONArray("orders")
+                                        (if(orderObj.has("orders")) orderObj.getJSONArray("orders") else JSONArray())!!
                                     )
                                 )
                             }
-                            if (!obj.getString("order_amount").equals("null")) ovCount.setText(
-                                dformat.format(obj.getString("order_amount").toDouble())
+                            if (!toObj.getString("order_amount").equals("null")) ovCount.setText(
+                                dformat.format(toObj.getString("order_amount").toDouble())
                             )
-                            if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(
-                                dformat.format(obj.getString("sku_per_memo").toDouble())
+                            if (!toObj.getString("sku_per_memo").equals("null")) bpcCount.setText(
+                                dformat.format(toObj.getString("sku_per_memo").toDouble())
                             )
-                            if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(
-                                dformat.format(obj.getString("number_of_memo").toDouble())
+                            if (!toObj.getString("number_of_memo").equals("null")) lpcCount.setText(
+                                dformat.format(toObj.getString("number_of_memo").toDouble())
                             )
                             createTableClickable(itemList, tabLayoutOrder)
                         }

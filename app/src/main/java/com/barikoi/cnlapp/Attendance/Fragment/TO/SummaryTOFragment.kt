@@ -139,7 +139,8 @@ class SummaryTOFragment : Fragment() {
             if (response != null) {
                 soList.clear()
                 val obj = JSONObject(response)
-                val soArray = obj.getJSONArray("so")
+                val toArray = obj.getJSONArray("so_list")
+                val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
                 val soNameList: ArrayList<String> = ArrayList()
                 soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
 
@@ -161,8 +162,7 @@ class SummaryTOFragment : Fragment() {
                                 soObj.getString("id"),
                                 soObj.getString("user_name"),
                                 soObj.getString("designation"),
-                                soObj.getString("employee_id"),
-                                soObj.getString("phone"),
+                                if(soObj.has("employee_id")) soObj.getString("employee_id") else "",
                                 imageUrl
                             )
                         )

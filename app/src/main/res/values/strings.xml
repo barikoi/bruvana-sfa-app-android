@@ -80,7 +80,7 @@
     <string name="date_range">Date Range</string>
     <string name="attendance">Attendance</string>
     <string name="history">History</string>
-    <string name="last_updated_time">Last updated time:</string>
+    <string name="last_updated_time">Last updated time</string>
     <string name="last_location">Last location</string>
 
     <!--attendance summary-->

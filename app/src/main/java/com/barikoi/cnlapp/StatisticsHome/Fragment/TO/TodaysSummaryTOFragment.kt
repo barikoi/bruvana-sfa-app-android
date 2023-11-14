@@ -99,7 +99,9 @@ class TodaysSummaryTOFragment : Fragment() {
                             summaryLayout.visibility = View.VISIBLE
                             tryAgain.visibility = View.GONE
                             val obj = JSONObject(response)
-                            val ordersArray = obj.getJSONArray("so_list")
+                            val toArray = obj.getJSONArray("so_list")
+                            val toObj = toArray.getJSONObject(0)
+                            val ordersArray = toObj.getJSONArray("sales_officers")
                             val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
                             if (ordersArray.length() >0){
                                 for(i in 0 until ordersArray.length()){
@@ -107,8 +109,8 @@ class TodaysSummaryTOFragment : Fragment() {
                                     itemList.add(
                                         Pair(
                                             Pair(
-                                                orderObj.getString("sr_name"),
-                                                orderObj.getString("user_id")
+                                                orderObj.getString("user_name"),
+                                                orderObj.getString("id")
                                             ),
                                             dformat.format(
                                                 orderObj.getString("so_ordered_value").toDouble()
@@ -117,9 +119,9 @@ class TodaysSummaryTOFragment : Fragment() {
                                     )
                                 }
                             }
-                            if (!obj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(obj.getString("order_amount").toDouble()))
-                            if (!obj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(obj.getString("sku_per_memo").toDouble()))
-                            if (!obj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(obj.getString("number_of_memo").toDouble()))
+                            if (!toObj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(toObj.getString("order_amount").toDouble()))
+                            if (!toObj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(toObj.getString("sku_per_memo").toDouble()))
+                            if (!toObj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(toObj.getString("number_of_memo").toDouble()))
                             createTableClickable(itemList, tabLayout2)
 
                         }
