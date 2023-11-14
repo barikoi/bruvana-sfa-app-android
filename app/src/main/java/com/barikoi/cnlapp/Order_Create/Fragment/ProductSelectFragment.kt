@@ -9,7 +9,6 @@ import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -24,32 +23,30 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
+import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
+import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.callback.LocationFetch
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_product_select.*
-import kotlinx.android.synthetic.main.fragment_product_select.imgRefresh
-import kotlinx.android.synthetic.main.fragment_product_select.progressBar
-import kotlinx.android.synthetic.main.fragment_product_select.tvLocation
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -57,7 +54,6 @@ import java.io.UnsupportedEncodingException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class ProductSelectFragment : Fragment(), OnValueChangeListener {
@@ -677,6 +673,32 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                         buttonLayout.visibility = View.VISIBLE
+
+                        val locationA = Location("point A")
+                        locationA.latitude = currentlatitude
+                        locationA.longitude = currentlongitude
+                        val locationB = Location("point B")
+                        locationB.latitude = shoplatitude
+                        locationB.longitude = shoplongitude
+                        val distanceRaw: Double = dformat.format(locationA.distanceTo(locationB).toDouble()).toDouble()
+                        Log.d("Distance", "Raw distance: "+distanceRaw)
+                        val distKm = dformat.format(distanceRaw/1000).toDouble()
+                        if (distKm < 1) {
+                            val distMeter = dformat.format(distanceRaw).toDouble()
+                            if (distMeter > 100) {
+                                tvdistanceRaw.text = distMeter.toString() + "m"
+                            } else {
+                                tvdistanceRaw.setTextColor(
+                                    ContextCompat.getColor(
+                                        mContext!!,
+                                        R.color.cnl_color_2
+                                    )
+                                )
+                                tvdistanceRaw.text = distMeter.toString() + "m"
+                            }
+                        } else {
+                            tvdistanceRaw.text = distKm.toString() + "km"
+                        }
 
                     } catch (e: JSONException) {
                         e.printStackTrace()

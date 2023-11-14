@@ -22,7 +22,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/tvdistance"
+            android:layout_toStartOf="@+id/layoutDistance"
             android:drawableLeft="@drawable/ic_shop_small"
             android:drawablePadding="8dp"
             android:text=""
@@ -31,35 +31,67 @@
             android:textStyle="bold"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="8dp"
-            android:layout_toLeftOf="@+id/tvdistance">
+            android:layout_toLeftOf="@+id/layoutDistance">
 
         </TextView>
-        <TextView
-            android:id="@+id/tvdistance"
+        <LinearLayout
+            android:id="@+id/layoutDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:elevation="10dp"
+            android:orientation="vertical"
+            android:gravity="end"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/cardview_bg_stroke_2dp"
-            android:backgroundTint="@color/white"
-            android:text=""
-            android:textSize="12sp"
-            android:textColor="@color/status_bounced"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="8dp">
+            android:layout_alignParentRight="true">
+            <TextView
+                android:id="@+id/tvdistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:elevation="10dp"
+                android:background="@drawable/cardview_bg_stroke_2dp"
+                android:backgroundTint="@color/white"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="@color/status_bounced"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginRight="8dp">
 
-        </TextView>
+            </TextView>
+            <TextView
+                android:id="@+id/tvdistanceRaw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:elevation="10dp"
+                android:background="@drawable/cardview_bg_stroke_2dp"
+                android:backgroundTint="@color/color_gray"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="@color/status_bounced"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginRight="8dp">
+
+            </TextView>
+        </LinearLayout>
+
     </RelativeLayout>
     <LinearLayout
         android:id="@+id/locationView"
@@ -168,7 +200,9 @@
             android:src="@drawable/ic_sortby"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="4dp"
-            app:tint="@color/text_title">
+            app:tint="@color/text_title"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="4dp">
 
         </ImageView>
     </LinearLayout>
@@ -196,7 +230,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/button_bg_green_stroke">
+        android:background="@drawable/button_bg_green_stroke"
+        android:layout_alignParentRight="true">
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
