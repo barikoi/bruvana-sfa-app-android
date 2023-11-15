@@ -106,7 +106,7 @@ class RouteActivity : AppCompatActivity() {
                     editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
                     editor!!.commit()
                     tvTitle!!.text = resources.getString(R.string.route_list)
-                    RouteFragment.getAllRouteList(userId!!)
+                    RouteFragment.getAllRouteList(userId!!, RouteFragment.mListener!!)
                 } else if (position == 1) {
                     viewPager2!!.setCurrentItem(1)
                     editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
@@ -132,7 +132,7 @@ class RouteActivity : AppCompatActivity() {
                     userId = soList[p2].id
                     srCode = soList[p2].employeeId
                     if (prefs!!.getInt(Api.ROUTE_PAGE_SELECTED, 0) == 0){
-                        RouteFragment.getAllRouteList(userId!!)
+                        RouteFragment.getAllRouteList(userId!!, RouteFragment.mListener!!)
                     }else if (prefs!!.getInt(Api.ROUTE_PAGE_SELECTED, 0) == 1){
                         ShopListFragment.getShopList(userId!!)
                     }

@@ -26,16 +26,18 @@ import com.barikoi.cnlapp.Adapter.RouteListAdapter
 import com.barikoi.cnlapp.Model.Markets
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.RouteShopList.Callback.OnRouteFetchSuccess
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import kotlinx.android.synthetic.lalmairetaildemo.fragment_route.*
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 
-class RouteFragment : Fragment() {
+class RouteFragment : Fragment(), OnRouteFetchSuccess {
     //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -52,7 +54,7 @@ class RouteFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_route, container, false)
         recylerView = view.findViewById(R.id.routelist)
         progressBar = view.findViewById(R.id.progress_bar3)
-        spinner = view.findViewById(R.id.spinnerRoutes)
+        //spinner = view.findViewById(R.id.spinnerRoutes)
         //getAllRouteList()
         return view
     }
@@ -60,19 +62,20 @@ class RouteFragment : Fragment() {
     /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getAllRouteList(userId!!)
-    }*/
-
+    }
+*/
     companion object{
         var arrayList: ArrayList<Routes>? = ArrayList()
         var marketList: ArrayList<Markets>? = ArrayList()
         var routesList: ArrayList<String>? = ArrayList()
         var selectedRouteId: String?= null
         var recylerView: RecyclerView? = null
-        var spinner: MoreSpinner? = null
+        var mListener: OnRouteFetchSuccess? = null
+        //var spinner: MoreSpinner? = null
         var progressBar: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
-        fun getAllRouteList(userId: String){
+        fun getAllRouteList(userId: String, mCallback: OnRouteFetchSuccess){
             arrayList!!.clear()
             routesList!!.clear()
             marketList!!.clear()
@@ -140,53 +143,9 @@ class RouteFragment : Fragment() {
                                     )
                                 }
                             }
-                            Log.d("CheckError", "routesList!!.size: "+routesList!!.size)
-                                Log.d("CheckError", "abc 1")
-                                if (routesList!!.size>0) {
-                                    if (spinner != null) {
-                                    Log.d("CheckError", "abc 2")
-                                    val adapter = ArrayAdapter(
-                                        mContext!!,
-                                        android.R.layout.simple_spinner_item, routesList!!
-                                    )
-                                    Log.d("CheckError", "abc 3")
-                                    spinner!!.adapter = adapter
-                                    Log.d("CheckError", "abc 4")
-                                    spinner!!.onItemSelectedListener = object :
-                                        AdapterView.OnItemSelectedListener {
-                                        override fun onItemSelected(
-                                            parent: AdapterView<*>,
-                                            view: View, position: Int, id: Long
-                                        ) {
-                                            Log.d("CheckError", "abc 5")
-                                            Log.d("CheckError", "arrayList!!.size: "+arrayList!!.size)
-                                            if (arrayList!!.size>0) {
-                                                selectedRouteId = arrayList!!.get(position).id
-                                                //getAllMarketList(selectedRouteId!!)
-                                                val marketItems = ArrayList<Markets>()
-                                                Log.d("CheckError", "marketList!!.size: "+marketList!!.size)
-                                                if (marketList!!.size>0) {
-                                                    for (i in 0 until marketList!!.size) {
-                                                        if (selectedRouteId == marketList!![i].route_id) {
-                                                            marketItems.add(marketList!![i])
-                                                        }
-                                                    }
-                                                }
-                                                Log.d("CheckError", "marketItems.size "+marketItems.size)
-                                                if (marketItems.size > 0) {
-                                                    val adapter = MarketListAdapter(marketItems)
-                                                    recylerView!!.setAdapter(adapter)
-                                                }
-                                            }
-                                        }
 
-                                        override fun onNothingSelected(parent: AdapterView<*>) {
-                                            //parent.lastVisiblePosition
-                                        }
-                                    }
+                            mCallback.onSuccess(routesList!!, arrayList, marketList!!)
 
-                                }
-                            }
                         }catch (e: JSONException) {
                             Sentry.captureException(e)
                             e.printStackTrace()
@@ -247,6 +206,73 @@ class RouteFragment : Fragment() {
         editor = prefs!!.edit()
         /*token = prefs.getString("token", "")
         user_id = prefs.getString("user_id", "")*/
+        mListener = this
         mContext = context
+    }
+
+    override fun onSuccess(
+        routeName: ArrayList<String>,
+        routes: ArrayList<Routes>?,
+        markets: ArrayList<Markets>
+    ) {
+        Log.d("CheckError", "routesList!!.size: "+routeName.size)
+        Log.d("CheckError", "abc 1")
+        Thread{
+            requireActivity().runOnUiThread(object : Runnable{
+                override fun run() {
+                    if (routeName.size>0) {
+                        if (spinnerRoutes != null) {
+                            Log.d("CheckError", "abc 2")
+                            val adapter2 = ArrayAdapter(
+                                mContext!!,
+                                android.R.layout.simple_spinner_item, routeName
+                            )
+                            Log.d("CheckError", "abc 3")
+                            spinnerRoutes.adapter = adapter2
+                            Log.d("CheckError", "abc 4")
+                            spinnerRoutes.onItemSelectedListener = object :
+                                AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>,
+                                    view: View, position: Int, id: Long
+                                ) {
+                                    Log.d("CheckError", "abc 5")
+                                    Log.d("CheckError", "arrayList!!.size: "+routes!!.size)
+                                    if (routes.size>0) {
+                                        selectedRouteId = routes.get(position).id
+                                        //getAllMarketList(selectedRouteId!!)
+                                        val marketItems = ArrayList<Markets>()
+                                        Log.d("CheckError", "marketList!!.size: "+markets!!.size)
+                                        if (markets.size>0) {
+                                            for (i in 0 until markets.size) {
+                                                if (selectedRouteId == markets[i].route_id) {
+                                                    marketItems.add(markets[i])
+                                                }
+                                            }
+                                        }
+                                        Log.d("CheckError", "marketItems.size "+marketItems.size)
+                                        if (marketItems.size > 0) {
+                                            val adapter = MarketListAdapter(marketItems)
+                                            recylerView!!.setAdapter(adapter)
+                                        }
+                                    }
+                                }
+
+                                override fun onNothingSelected(parent: AdapterView<*>) {
+                                    //parent.lastVisiblePosition
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            })
+        }.start()
+
+    }
+
+    override fun onError(error: String) {
+
     }
 }
