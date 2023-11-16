@@ -20,15 +20,13 @@ import com.android.volley.Request.Method.GET
 import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Activity.RouteActivity.Companion.userId
+import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.MarketListAdapter
-import com.barikoi.cnlapp.Adapter.RouteListAdapter
 import com.barikoi.cnlapp.Model.Markets
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RouteShopList.Callback.OnRouteFetchSuccess
 import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import kotlinx.android.synthetic.lalmairetaildemo.fragment_route.*
 import io.sentry.Sentry
@@ -41,6 +39,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
     //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
+    lateinit var ACTIVITY: RouteActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -208,6 +207,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
         user_id = prefs.getString("user_id", "")*/
         mListener = this
         mContext = context
+        ACTIVITY = context as RouteActivity
     }
 
     override fun onSuccess(
@@ -218,7 +218,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
         Log.d("CheckError", "routesList!!.size: "+routeName.size)
         Log.d("CheckError", "abc 1")
         Thread{
-            requireActivity().runOnUiThread(object : Runnable{
+            ACTIVITY.runOnUiThread(object : Runnable{
                 override fun run() {
                     if (routeName.size>0) {
                         if (spinnerRoutes != null) {
@@ -259,16 +259,25 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
                                 }
 
                                 override fun onNothingSelected(parent: AdapterView<*>) {
-                                    //parent.lastVisiblePosition
+
                                 }
                             }
 
                         }
                     }
                 }
-
             })
         }.start()
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("CheckError", "onPause: "+Thread.currentThread().isInterrupted)
+        if (!Thread.currentThread().isInterrupted){
+            Log.d("CheckError", "interrupt")
+            Thread.currentThread().interrupt()
+        }
 
     }
 
