@@ -20,6 +20,7 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Adapter.RouteListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.RouteShopList.Callback.OnRouteFetchSuccess
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import io.sentry.Sentry
@@ -28,7 +29,7 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 
-class RouteFragment : Fragment() {
+class RouteFragment : Fragment(), OnRouteFetchSuccess {
     //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -58,7 +59,8 @@ class RouteFragment : Fragment() {
         var progressBar: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
-        fun getAllRouteList(userId: String){
+        var mListener: OnRouteFetchSuccess? = null
+        fun getAllRouteList(userId: String, mCallback: OnRouteFetchSuccess){
             arrayList!!.clear()
             progressBar!!.visibility = View.VISIBLE
             val request = StringRequest(GET,
@@ -82,6 +84,8 @@ class RouteFragment : Fragment() {
                             arrayList!!.add(Routes(route_id, route_code, route_name, territory_name, area_name, outlet_count, ArrayList()))
 
                         }
+
+                        //mCallback.onSuccess(ArrayList(), arrayList, ArrayList())
 
                         val adapter = RouteListAdapter(arrayList!!)
                         recylerView!!.setAdapter(adapter)
@@ -134,8 +138,21 @@ class RouteFragment : Fragment() {
         queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
+        mListener = this
         /*token = prefs.getString("token", "")
         user_id = prefs.getString("user_id", "")*/
         mContext = context
+    }
+
+    override fun onSuccess(
+        routeName: ArrayList<String>,
+        routes: ArrayList<Routes>?,
+        markets: ArrayList<Any>
+    ) {
+
+    }
+
+    override fun onError(error: String) {
+
     }
 }

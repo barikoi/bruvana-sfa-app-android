@@ -139,10 +139,6 @@ class CreateOrderFragment : Fragment(){
                 } else if (position == 1) {
                     viewPager!!.setCurrentItem(1)
                     ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, userId!!, routeId!!)
-                    /*Log.d("Fragment", "viewpager tab 3: ${viewpagertab!!.getTabAt(1)!!.badge}")
-                    if (viewpagertab!!.getTabAt(1)!!.badge != null){
-                        viewpagertab!!.getTabAt(1)!!.badge!!.number = 3
-                    }*/
                 }
             }
         })

@@ -35,7 +35,7 @@ import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_shop_list.*
+import kotlinx.android.synthetic.production.fragment_shop_list.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

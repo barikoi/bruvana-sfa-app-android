@@ -20,7 +20,7 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_todays_summary.*
+import kotlinx.android.synthetic.main.fragment_todays_summary.view.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -36,6 +36,7 @@ class TodaysSummaryFragment : Fragment() {
     var srId: String ? = ""
     var userId: String ? = ""
     var routeId: String ? = ""
+    lateinit var mView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +47,8 @@ class TodaysSummaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_todays_summary, container, false)
+        mView = inflater.inflate(R.layout.fragment_todays_summary, container, false)
+        return mView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,7 +80,7 @@ class TodaysSummaryFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    progressBar.visibility = View.GONE
+                    mView.progressBar.visibility = View.GONE
                     if (response != null){
                         val obj = JSONObject(response)
                         val completedArray = obj.getJSONArray("today_summary")
@@ -108,7 +110,7 @@ class TodaysSummaryFragment : Fragment() {
                     }
                 }catch (e: Exception){
                     e.printStackTrace()
-                    progressBar.visibility = View.GONE
+                    mView.progressBar.visibility = View.GONE
                 }
 
             }
@@ -123,11 +125,11 @@ class TodaysSummaryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar.visibility = View.GONE
+                mView.progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                progressBar.visibility = View.GONE
+                mView.progressBar.visibility = View.GONE
             }
 
         })
@@ -137,8 +139,8 @@ class TodaysSummaryFragment : Fragment() {
 
 
     private fun createTable(data: ArrayList<Pair<String, String>>) {
-        tabLayoutToday.isStretchAllColumns = true
-        tabLayoutToday.bringToFront()
+        mView.tabLayoutToday.isStretchAllColumns = true
+        mView.tabLayoutToday.bringToFront()
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
             val c1 = TextView(mContext)
@@ -151,7 +153,7 @@ class TodaysSummaryFragment : Fragment() {
             c2.setText(data.get(i).second)
             tr.addView(c1)
             tr.addView(c2)
-            tabLayoutToday.addView(tr)
+            mView.tabLayoutToday.addView(tr)
         }
     }
 

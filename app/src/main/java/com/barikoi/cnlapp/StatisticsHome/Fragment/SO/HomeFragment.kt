@@ -29,8 +29,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_home.tvDateRange
+import kotlinx.android.synthetic.main.fragment_home.view.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -50,6 +49,7 @@ class HomeFragment : Fragment() {
     var userId: String ? = ""
     var routeId: String ? = ""
     var progressBar: ProgressBar? = null
+    lateinit var mView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,9 +61,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        progressBar = view.findViewById(R.id.progressBarHomeTO)
-        return view
+        mView = inflater.inflate(R.layout.fragment_home, container, false)
+        progressBar = mView.findViewById(R.id.progressBarHomeTO)
+        return mView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,8 +84,8 @@ class HomeFragment : Fragment() {
                             val obj = JSONObject(response)
                             val attedanceArray = obj.getJSONArray("attendances")
                             if (attedanceArray.length() >0){
-                                no_route_check.visibility = View.GONE
-                                bodyLayout.visibility = View.VISIBLE
+                                mView.no_route_check.visibility = View.GONE
+                                mView.bodyLayout.visibility = View.VISIBLE
                                 val attendanceObj = attedanceArray.getJSONObject(0)
                                 if (!attendanceObj.getString("route_id").equals("null")) {
                                     attendanceObj.getInt("route_id")
@@ -108,20 +108,20 @@ class HomeFragment : Fragment() {
                                     init()
                                 }else{
                                     progressBar!!.visibility = View.GONE
-                                    no_route_check.visibility = View.VISIBLE
-                                    bodyLayout.visibility = View.GONE
+                                    mView.no_route_check.visibility = View.VISIBLE
+                                    mView.bodyLayout.visibility = View.GONE
 
-                                    btn_tryAgain.setOnClickListener {
+                                    mView.btn_tryAgain.setOnClickListener {
                                         checkforAttendanceToday()
                                     }
                                 }
 
                             }else{
                                 progressBar!!.visibility = View.GONE
-                                no_route_check.visibility = View.VISIBLE
-                                bodyLayout.visibility = View.GONE
+                                mView.no_route_check.visibility = View.VISIBLE
+                                mView.bodyLayout.visibility = View.GONE
 
-                                btn_tryAgain.setOnClickListener {
+                                mView.btn_tryAgain.setOnClickListener {
                                     checkforAttendanceToday()
                                 }
                             }
@@ -163,7 +163,7 @@ class HomeFragment : Fragment() {
         //val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("LLL dd", Locale.ENGLISH)
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        mView.tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
@@ -173,22 +173,22 @@ class HomeFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayoutHome.setOnClickListener(View.OnClickListener {
+        mView.dateRangeLayoutHome.setOnClickListener(View.OnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayoutHome.setEnabled(false)
+            mView.dateRangeLayoutHome.setEnabled(false)
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayoutHome.setEnabled(true)
+            mView.dateRangeLayoutHome.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                mView.tvDateRange.setText(simpleFormat.format(s_date))
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                mView.tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
@@ -197,7 +197,7 @@ class HomeFragment : Fragment() {
             getSummaryTargets(Api.get_summary+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&user_id="+userId/*+"&route_id="+routeId*/)
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { mView.dateRangeLayoutHome.setEnabled(true) }
 
         getSummaryTargets(Api.get_summary+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&user_id="+userId/*+"&route_id="+routeId*/)
 
@@ -272,7 +272,7 @@ class HomeFragment : Fragment() {
                         itemList.add(TargetValue(mContext!!.resources.getString(R.string.bounce)+" (%)", bounced, bounce_completed))
 
                         val adapter = TargetAdapter(itemList, "SO")
-                        targetListView.adapter = adapter
+                        mView.targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setSecondPartSummary()
                         //setThirdPartSummary()
@@ -307,7 +307,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setSecondPartSummary() {
-        layoutSecond.visibility = View.VISIBLE
+        mView.layoutSecond.visibility = View.VISIBLE
         val titles = arrayOf(resources.getString(R.string.today_summary),resources.getString(R.string.last_week_summary), resources.getString(R.string.low_stock_product), resources.getString(R.string.last_week_product), resources.getString(R.string.today_category), resources.getString(R.string.last_week_category), resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
         val fragments = ArrayList<Fragment>()
         fragments.add(TodaysSummaryFragment())
@@ -318,25 +318,25 @@ class HomeFragment : Fragment() {
         fragments.add(LastWeekCategoryFragment())
         fragments.add(LastWeekDeliveryFragment())
         fragments.add(LastWeekBounceFragment())
-        dotsLayout.removeAllViews()
+        mView.dotsLayout.removeAllViews()
         addDots(fragments.size)
-        viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        mView.viewPager.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator
-        TabLayoutMediator(viewpagertab, viewPager,
+        TabLayoutMediator(mView.viewpagertab, mView.viewPager,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        viewPager.setCurrentItem(0);
+        mView.viewPager.setCurrentItem(0);
 
         //viewPager.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.getTabCount()) {
-            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+        for (i in 0 until mView.viewpagertab.getTabCount()) {
+            val tab = (mView.viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(12, 12, 8, 12)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        Log.d("Fragment", "viewpager current Item: " + mView.viewPager.getCurrentItem())
+        mView.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
@@ -357,42 +357,31 @@ class HomeFragment : Fragment() {
     }
 
     private fun setThirdPartSummary() {
-        layoutThird.visibility = View.VISIBLE
+        mView.layoutThird.visibility = View.VISIBLE
         val titles = arrayOf(resources.getString(R.string.last_week_delivery), resources.getString(R.string.bounce_list))
         val fragments = ArrayList<Fragment>()
         fragments.add(LastWeekDeliveryFragment())
         fragments.add(LastWeekBounceFragment())
-        viewPagerSecond.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        mView.viewPagerSecond.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
         // attaching tab mediator
-        TabLayoutMediator(viewpagertabSecond, viewPagerSecond,
+        TabLayoutMediator(mView.viewpagertabSecond, mView.viewPagerSecond,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        viewPagerSecond.setCurrentItem(0);
+        mView.viewPagerSecond.setCurrentItem(0);
 
-        viewPagerSecond.setUserInputEnabled(false)
-        for (i in 0 until viewpagertabSecond.getTabCount()) {
-            val tab = (viewpagertabSecond.getChildAt(0) as ViewGroup).getChildAt(i)
+        mView.viewPagerSecond.setUserInputEnabled(false)
+        for (i in 0 until mView.viewpagertabSecond.getTabCount()) {
+            val tab = (mView.viewpagertabSecond.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(15, 15, 10, 15)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPagerSecond.getCurrentItem())
-        viewPagerSecond.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        Log.d("Fragment", "viewpager current Item: " + mView.viewPagerSecond.getCurrentItem())
+        mView.viewPagerSecond.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
-                if (position == 0) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 0)
-                    editor!!.commit()*/
-                } else if (position == 1) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
-                    editor!!.commit()*/
-                }
-                else if (position == 2) {
-                    /*editor!!.putInt(Api.ROUTE_PAGE_SELECTED, 1)
-                    editor!!.commit()*/
-                }
             }
         })
     }
@@ -407,7 +396,7 @@ class HomeFragment : Fragment() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             params.setMargins(2)
-            dotsLayout.addView(dot, params)
+            mView.dotsLayout.addView(dot, params)
             dots.add(dot)
         }
     }
@@ -415,7 +404,7 @@ class HomeFragment : Fragment() {
         val res: Resources = resources
         for (i in 0 until dots.size) {
             val drawableId: Int =
-                if (i == idx) com.barikoi.cnlapp.R.drawable.ic_dot_selected else com.barikoi.cnlapp.R.drawable.ic_dot_unselected
+                if (i == idx) com.barikoi.cnlapp.R.drawable.ic_dot_selected else R.drawable.ic_dot_unselected
             val drawable: Drawable = res.getDrawable(drawableId)
             dots.get(i).setImageDrawable(drawable)
         }

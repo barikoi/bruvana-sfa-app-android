@@ -65,7 +65,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
 */
     companion object{
         var arrayList: ArrayList<Routes>? = ArrayList()
-        var marketList: ArrayList<Markets>? = ArrayList()
+        var marketList: ArrayList<Any>? = ArrayList()
         var routesList: ArrayList<String>? = ArrayList()
         var selectedRouteId: String?= null
         var recylerView: RecyclerView? = null
@@ -213,10 +213,11 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
     override fun onSuccess(
         routeName: ArrayList<String>,
         routes: ArrayList<Routes>?,
-        markets: ArrayList<Markets>
+        markets: ArrayList<Any>
     ) {
         Log.d("CheckError", "routesList!!.size: "+routeName.size)
         Log.d("CheckError", "abc 1")
+        val marketList = markets as ArrayList<Markets>
         Thread{
             ACTIVITY.runOnUiThread(object : Runnable{
                 override fun run() {
@@ -242,11 +243,11 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
                                         selectedRouteId = routes.get(position).id
                                         //getAllMarketList(selectedRouteId!!)
                                         val marketItems = ArrayList<Markets>()
-                                        Log.d("CheckError", "marketList!!.size: "+markets!!.size)
-                                        if (markets.size>0) {
-                                            for (i in 0 until markets.size) {
-                                                if (selectedRouteId == markets[i].route_id) {
-                                                    marketItems.add(markets[i])
+                                        Log.d("CheckError", "marketList!!.size: "+marketList.size)
+                                        if (marketList.size>0) {
+                                            for (i in 0 until marketList.size) {
+                                                if (selectedRouteId == marketList[i].route_id) {
+                                                    marketItems.add(marketList[i])
                                                 }
                                             }
                                         }

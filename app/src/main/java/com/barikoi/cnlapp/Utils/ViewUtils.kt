@@ -215,13 +215,19 @@ object ViewUtils {
                 }).addOnSuccessListener(object : OnSuccessListener<Location?> {
                 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
                 override fun onSuccess(location: Location) {
-                    if (!location.latitude.isNaN()) {
-                        if (!location.isFromMockProvider) {
-                            mListener.onFetchSuccess(location)
-                        } else {
-                            mListener.onFailure()
-                            Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT)
-                                .show()
+                    if (!location.toString().equals("null")) {
+                        if (!location.latitude.isNaN()) {
+                            if (!location.isFromMockProvider) {
+                                mListener.onFetchSuccess(location)
+                            } else {
+                                mListener.onFailure()
+                                Toast.makeText(
+                                    mContext,
+                                    "Disable mock location",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
                         }
                     } else {
                         mListener.onFailure()

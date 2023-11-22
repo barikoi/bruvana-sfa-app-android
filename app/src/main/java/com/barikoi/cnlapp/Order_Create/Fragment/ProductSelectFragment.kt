@@ -46,7 +46,7 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.barikoi.cnlapp.callback.LocationFetch
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_product_select.*
+import kotlinx.android.synthetic.main.fragment_product_select.view.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -94,198 +94,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
     var dformat = DecimalFormat("#.##")
+    lateinit var mView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val bundle = this.arguments
-
-        if (bundle != null) {
-            if (bundle.containsKey("from")) {
-                if (bundle.getString("from").equals("Shop")) {
-                    selectedShop = bundle.getSerializable("Shop") as Shops?
-                    shopName = selectedShop!!.shop_name
-                    outletMinOrder = selectedShop!!.min_order
-                    shopId = selectedShop!!.shop_id
-                    routeId = selectedShop!!.route_code
-                    addedProducts!!.clear()
-                } else if (bundle.getString("from").equals("Order")) {
-                    selectedOrder = bundle.getSerializable("Order") as OrderList?
-                    shopName = selectedOrder!!.outletName
-                    //outletMinOrder = selectedOrder!!.min_order
-                    shopId = selectedOrder!!.outletId
-                    routeId = selectedOrder!!.routeId
-                    addedProducts!!.clear()
-                    appDatabase!!.saveOrderDao().deleteALL()
-                    grandTotalPrice = selectedOrder!!.grandTotal.toDouble()
-                    totalCount = selectedOrder!!.totalQuantity.toInt()
-                    var itemCountt = 0
-                    for (i in 0 until selectedOrder!!.brands_array.size) {
-                        itemCountt = itemCountt + selectedOrder!!.brands_array[i].ordered_quantity
-                    }
-
-                    if (itemCountt == 1 || itemCountt == 0) {
-                        totalItemCount!!.setText(itemCountt.toString() + "Item")
-                    } else {
-                        totalItemCount!!.setText(itemCountt.toString() + "Items")
-                    }
-                    tvgrandTotal!!.setText("Total " + dformat.format(selectedOrder!!.grandTotal.toDouble()))
-                    appDatabase!!.saveOrderDao().insertAll(
-                        SaveOrder(
-                            null,
-                            selectedOrder!!.outletId,
-                            itemCountt,
-                            selectedOrder!!.grandTotal.toDouble()
-                        )
-                    )
-                }
-            }
-
-        }
-
-        shopTitle!!.text = shopName
-        minOV.text = "Min Order Value: " + outletMinOrder
-
-        imgRefresh.setOnClickListener {
-            rotateAnimation(imgRefresh, 0f, 380f)
-            getLocation("reversegeo")
-        }
-
-        try {
-            ApiServices.apiGET(
-                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
-                queue!!,
-                token!!,
-                object : ApiServiceListener {
-                    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-                    override fun onResponseSuccess(response: String) {
-                        getPreviousOrders(response)
-                    }
-
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onResponseFailure(error: VolleyError) {
-                        ViewUtils.getErrorResponse(error, mContext!!)
-                    }
-
-                    override fun onException(e: Exception) {
-                        Toast.makeText(
-                            mContext!!.applicationContext,
-                            e.message, Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                })
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Sentry.captureException(e)
-        }
-
-        if (selectedOrder != null) {
-            no_order.visibility = View.GONE
-            save_order.visibility = View.GONE
-            update_order.visibility = View.VISIBLE
-        } else {
-            no_order.visibility = View.VISIBLE
-            save_order.visibility = View.VISIBLE
-            update_order.visibility = View.GONE
-        }
-
-        update_order.setOnClickListener {
-            appDatabase!!.saveOrderDao().deleteALL()
-            val builder = SpannableStringBuilder()
-            val str1 = SpannableString("Are you sure want to update ")
-            builder.append(str1)
-            val str2 = SpannableString(shopName)
-            str2.setSpan(
-                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
-                0,
-                str2.length,
-                0
-            )
-            builder.append(str2)
-            val str3 = SpannableString("'s order?")
-            builder.append(str3)
-            ViewUtils.viewDialog(
-                mContext!!,
-                "", builder,
-                object :
-                    DialogListener {
-                    override fun onConfirmed() {
-                        progressBar.visibility = View.VISIBLE
-                        getLocation("update_order")
-                    }
-
-                    override fun onCanceled() {
-
-                    }
-                })
-
-        }
-        getAllProducts()
-    }
-
-    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
-        // Create an animation instance
-        val an: Animation = RotateAnimation(
-            fromDegrees, toDegrees, (v.width / 2).toFloat(),
-            (v.height / 2).toFloat()
-        )
-        an.setDuration(500)
-        an.setFillAfter(true)
-        an.repeatMode = Animation.RESTART
-        //v.clearAnimation();
-        v.startAnimation(an)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun getPreviousOrders(response: String) {
-        var lastOrderDate = ""
-        var lastDeliveryDate = ""
-        var orderStatus = ""
-        var outletCategory = ""
-        var minimum_order = ""
-        var brandArray = JSONArray()
-        //val productItems: ArrayList<ProductStatistics> = ArrayList()
-        val obj = JSONObject(response)
-        val outletArray = obj.getJSONArray("outlets")
-        minimum_order = outletArray.getJSONObject(0).getString("minimum_order")
-        outletCategory = outletArray.getJSONObject(0).getString("outlet_category")
-        val ordersArray = outletArray.getJSONObject(0).getJSONArray("orders")
-        if (ordersArray.length() > 0) {
-            for (i in 0 until ordersArray.length()) {
-                //productItems.clear()
-                val orderObj = ordersArray.getJSONObject(i)
-                brandArray = orderObj.getJSONArray("products")
-                //val outletName = outletObj.getString("outlet_name")
-                lastOrderDate = orderObj.getString("ordered_at")
-                lastDeliveryDate = orderObj.getString("delivered_at")
-                orderStatus = orderObj.getString("order_status")
-
-            }
-
-        }
-        viewDialog(
-            mContext!!,
-            shopName!!,
-            lastDeliveryDate,
-            orderStatus,
-            brandArray,
-            outletCategory,
-            lastOrderDate,
-            minimum_order
-        )
 
 
     }
@@ -295,18 +107,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_product_select, container, false)
+        mView = inflater.inflate(R.layout.fragment_product_select, container, false)
 
-        shopTitle = view.findViewById(R.id.selectedShop)
-        et_search = view.findViewById(R.id.editTextSearchProduct)
-        recylerView = view.findViewById(R.id.productlist)
-        totalItemCount = view.findViewById(R.id.totalItemCount)
-        tvgrandTotal = view.findViewById(R.id.totalAmount)
-        saveOrder = view.findViewById(R.id.save_order)
-        noOrder = view.findViewById(R.id.no_order)
-        loading = view.findViewById(R.id.progressBar)
-        sortTitle = view.findViewById(R.id.sortTitle)
-        sort_layout = view.findViewById(R.id.sortingLayout)
+        shopTitle = mView.findViewById(R.id.selectedShop)
+        et_search = mView.findViewById(R.id.editTextSearchProduct)
+        recylerView = mView.findViewById(R.id.productlist)
+        totalItemCount = mView.findViewById(R.id.totalItemCount)
+        tvgrandTotal = mView.findViewById(R.id.totalAmount)
+        saveOrder = mView.findViewById(R.id.save_order)
+        noOrder = mView.findViewById(R.id.no_order)
+        loading = mView.findViewById(R.id.progressBar)
+        sortTitle = mView.findViewById(R.id.sortTitle)
+        sort_layout = mView.findViewById(R.id.sortingLayout)
 
         sort_layout!!.setOnClickListener {
             val popup = PopupMenu(mContext, sortTitle)
@@ -406,7 +218,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     val builder = SpannableStringBuilder()
                     val str1 = SpannableString("You are ")
                     builder.append(str1)
-                    val strDistance = SpannableString(tvdistance.text)
+                    val strDistance = SpannableString(mView.tvdistance.text)
                     if (distanceValue != null) {
                         if (distanceValue!! > 100) {
                             strDistance.setSpan(
@@ -459,7 +271,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         object :
                             DialogListener {
                             override fun onConfirmed() {
-                                progressBar.visibility = View.VISIBLE
+                                mView.progressBar.visibility = View.VISIBLE
                                 getLocation("save_order")
                             }
 
@@ -472,7 +284,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     val builder = SpannableStringBuilder()
                     val str1 = SpannableString("You are ")
                     builder.append(str1)
-                    val strDistance = SpannableString(tvdistance.text)
+                    val strDistance = SpannableString(mView.tvdistance.text)
                     if (distanceValue != null) {
                         if (distanceValue!! > 100) {
                             strDistance.setSpan(
@@ -525,7 +337,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         object :
                             DialogListener {
                             override fun onConfirmed() {
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                             }
 
                             override fun onCanceled() {
@@ -547,7 +359,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val builder = SpannableStringBuilder()
             val str1 = SpannableString("You are ")
             builder.append(str1)
-            val strDistance = SpannableString(tvdistance.text)
+            val strDistance = SpannableString(mView.tvdistance.text)
             if (distanceValue != null) {
                 if (distanceValue!! > 100) {
                     strDistance.setSpan(
@@ -588,7 +400,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 ViewUtils.viewDialog(mContext!!, "", builder, object :
                     DialogListener {
                     override fun onConfirmed() {
-                        progressBar.visibility = View.VISIBLE
+                        mView.progressBar.visibility = View.VISIBLE
                         getLocation("no_order")
                     }
 
@@ -606,7 +418,196 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         }
 
-        return view
+        return mView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val bundle = this.arguments
+
+        if (bundle != null) {
+            if (bundle.containsKey("from")) {
+                if (bundle.getString("from").equals("Shop")) {
+                    selectedShop = bundle.getSerializable("Shop") as Shops?
+                    shopName = selectedShop!!.shop_name
+                    outletMinOrder = selectedShop!!.min_order
+                    shopId = selectedShop!!.shop_id
+                    routeId = selectedShop!!.route_code
+                    addedProducts!!.clear()
+                } else if (bundle.getString("from").equals("Order")) {
+                    selectedOrder = bundle.getSerializable("Order") as OrderList?
+                    shopName = selectedOrder!!.outletName
+                    //outletMinOrder = selectedOrder!!.min_order
+                    shopId = selectedOrder!!.outletId
+                    routeId = selectedOrder!!.routeId
+                    addedProducts!!.clear()
+                    appDatabase!!.saveOrderDao().deleteALL()
+                    grandTotalPrice = selectedOrder!!.grandTotal.toDouble()
+                    totalCount = selectedOrder!!.totalQuantity.toInt()
+                    var itemCountt = 0
+                    for (i in 0 until selectedOrder!!.brands_array.size) {
+                        itemCountt = itemCountt + selectedOrder!!.brands_array[i].ordered_quantity
+                    }
+
+                    if (itemCountt == 1 || itemCountt == 0) {
+                        totalItemCount!!.setText(itemCountt.toString() + "Item")
+                    } else {
+                        totalItemCount!!.setText(itemCountt.toString() + "Items")
+                    }
+                    tvgrandTotal!!.setText("Total " + dformat.format(selectedOrder!!.grandTotal.toDouble()))
+                    appDatabase!!.saveOrderDao().insertAll(
+                        SaveOrder(
+                            null,
+                            selectedOrder!!.outletId,
+                            itemCountt,
+                            selectedOrder!!.grandTotal.toDouble()
+                        )
+                    )
+                }
+            }
+
+        }
+
+        shopTitle!!.text = shopName
+        mView.minOV.text = "Min Order Value: " + outletMinOrder
+
+        mView.imgRefresh.setOnClickListener {
+            rotateAnimation(mView.imgRefresh, 0f, 380f)
+            getLocation("reversegeo")
+        }
+
+        try {
+            ApiServices.apiGET(
+                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
+                queue!!,
+                token!!,
+                object : ApiServiceListener {
+                    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+                    override fun onResponseSuccess(response: String) {
+                        getPreviousOrders(response)
+                    }
+
+                    override fun onJSONResponseSuccess(response: JSONObject) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onResponseFailure(error: VolleyError) {
+                        ViewUtils.getErrorResponse(error, mContext!!)
+                    }
+
+                    override fun onException(e: Exception) {
+                        Toast.makeText(
+                            mContext!!.applicationContext,
+                            e.message, Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Sentry.captureException(e)
+        }
+
+        if (selectedOrder != null) {
+            mView.no_order.visibility = View.GONE
+            mView.save_order.visibility = View.GONE
+            mView.update_order.visibility = View.VISIBLE
+        } else {
+            mView.no_order.visibility = View.VISIBLE
+            mView.save_order.visibility = View.VISIBLE
+            mView.update_order.visibility = View.GONE
+        }
+
+        mView.update_order.setOnClickListener {
+            appDatabase!!.saveOrderDao().deleteALL()
+            val builder = SpannableStringBuilder()
+            val str1 = SpannableString("Are you sure want to update ")
+            builder.append(str1)
+            val str2 = SpannableString(shopName)
+            str2.setSpan(
+                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
+                0,
+                str2.length,
+                0
+            )
+            builder.append(str2)
+            val str3 = SpannableString("'s order?")
+            builder.append(str3)
+            ViewUtils.viewDialog(
+                mContext!!,
+                "", builder,
+                object :
+                    DialogListener {
+                    override fun onConfirmed() {
+                        mView.progressBar.visibility = View.VISIBLE
+                        getLocation("update_order")
+                    }
+
+                    override fun onCanceled() {
+
+                    }
+                })
+
+        }
+        getAllProducts()
+    }
+
+    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
+        // Create an animation instance
+        val an: Animation = RotateAnimation(
+            fromDegrees, toDegrees, (v.width / 2).toFloat(),
+            (v.height / 2).toFloat()
+        )
+        an.setDuration(500)
+        an.setFillAfter(true)
+        an.repeatMode = Animation.RESTART
+        //v.clearAnimation();
+        v.startAnimation(an)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun getPreviousOrders(response: String) {
+        var lastOrderDate = ""
+        var lastDeliveryDate = ""
+        var orderStatus = ""
+        var outletCategory = ""
+        var minimum_order = ""
+        var brandArray = JSONArray()
+        //val productItems: ArrayList<ProductStatistics> = ArrayList()
+        val obj = JSONObject(response)
+        val outletArray = obj.getJSONArray("outlets")
+        minimum_order = outletArray.getJSONObject(0).getString("minimum_order")
+        outletCategory = outletArray.getJSONObject(0).getString("outlet_category")
+        val ordersArray = outletArray.getJSONObject(0).getJSONArray("orders")
+        if (ordersArray.length() > 0) {
+            for (i in 0 until ordersArray.length()) {
+                //productItems.clear()
+                val orderObj = ordersArray.getJSONObject(i)
+                brandArray = orderObj.getJSONArray("products")
+                //val outletName = outletObj.getString("outlet_name")
+                lastOrderDate = orderObj.getString("ordered_at")
+                lastDeliveryDate = orderObj.getString("delivered_at")
+                orderStatus = orderObj.getString("order_status")
+
+            }
+
+        }
+        viewDialog(
+            mContext!!,
+            shopName!!,
+            lastDeliveryDate,
+            orderStatus,
+            brandArray,
+            outletCategory,
+            lastOrderDate,
+            minimum_order
+        )
+
+
     }
 
     fun getLocation(choice: String) {
@@ -658,23 +659,24 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         if (dis2 < 1) {
                             val distMeter = dformat.format(dis2 * 1000).toDouble()
                             if (distMeter > 100) {
-                                tvdistance.text = distMeter.toString() + "m"
+                                mView.tvdistance.text = distMeter.toString() + "m"
                             } else {
-                                tvdistance.setTextColor(
+                                mView.tvdistance.setTextColor(
                                     ContextCompat.getColor(
                                         mContext!!,
                                         R.color.cnl_color_2
                                     )
                                 )
-                                tvdistance.text = distMeter.toString() + "m"
+                                mView.tvdistance.text = distMeter.toString() + "m"
                             }
                         } else {
-                            tvdistance.text = distance + "km"
+                            mView.tvdistance.text = distance + "km"
                         }
 
-                        buttonLayout.visibility = View.VISIBLE
+                        mView.buttonLayout.visibility = View.VISIBLE
 
-                        val locationA = Location("point A")
+                        //raw distance calculation
+                        /*val locationA = Location("point A")
                         locationA.latitude = currentlatitude
                         locationA.longitude = currentlongitude
                         val locationB = Location("point B")
@@ -698,7 +700,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                         } else {
                             tvdistanceRaw.text = distKm.toString() + "km"
-                        }
+                        }*/
 
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -738,7 +740,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
                         val city = place.getString("city")
                         val area = place.getString("area")
-                        tvLocation.text = address + ", " + area + ", " + city
+                        mView.tvLocation.text = address + ", " + area + ", " + city
                     } catch (e: JSONException) {
                         e.printStackTrace()
                         Sentry.captureException(e)
@@ -839,7 +841,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                             override fun onJSONResponseSuccess(response: JSONObject) {
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                                 val message = response.getString("message")
                                 //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
 
@@ -866,12 +868,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                             override fun onResponseFailure(error: VolleyError) {
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                                 ViewUtils.getErrorResponse(error, mContext!!)
                             }
 
                             override fun onException(e: Exception) {
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                             }
 
                         })
@@ -881,7 +883,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         "No products selected to order",
                         object : DialogListener {
                             override fun onConfirmed() {
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                             }
 
                             override fun onCanceled() {
@@ -913,7 +915,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("user_id", user_id)
             orderObj.put("employee_id", sr_id)
             orderObj.put("ordered_at", today)
-            if (tvdistance.text.toString().length > 0) orderObj.put(
+            if (mView.tvdistance.text.toString().length > 0) orderObj.put(
                 "distance_from_outlets",
                 distanceValue.toString()
             )
@@ -986,7 +988,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             override fun onJSONResponseSuccess(response: JSONObject) {
                                 val message = response.getString("message")
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                                 //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
                                 appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
                                 appDatabase!!.orderListDao().deleteByShop(shopId!!)
@@ -1016,7 +1018,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             override fun onResponseFailure(error: VolleyError) {
                                 try {
                                     ViewUtils.getErrorResponse(error, mContext!!)
-                                    progressBar.visibility = View.GONE
+                                    mView.progressBar.visibility = View.GONE
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
@@ -1024,7 +1026,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             override fun onException(e: Exception) {
                                 try {
-                                    progressBar.visibility = View.GONE
+                                    mView.progressBar.visibility = View.GONE
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
@@ -1038,7 +1040,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         "No products selected to order",
                         object : DialogListener {
                             override fun onConfirmed() {
-                                progressBar.visibility = View.GONE
+                                mView.progressBar.visibility = View.GONE
                             }
 
                             override fun onCanceled() {
@@ -1083,7 +1085,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     override fun onJSONResponseSuccess(response: JSONObject) {
                         val message = response.getString("message")
                         //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                        progressBar.visibility = View.GONE
+                        mView.progressBar.visibility = View.GONE
 
                         ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                             override fun onConfirmed() {
@@ -1107,12 +1109,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
 
                     override fun onResponseFailure(error: VolleyError) {
-                        progressBar.visibility = View.GONE
+                        mView.progressBar.visibility = View.GONE
                         ViewUtils.getErrorResponse(error, mContext!!)
                     }
 
                     override fun onException(e: Exception) {
-                        progressBar.visibility = View.GONE
+                        mView.progressBar.visibility = View.GONE
                     }
 
                 })
