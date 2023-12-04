@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -1187,7 +1188,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         override fun onConfirmed() {
                                             btnSubmitShop.isEnabled = true
                                             finish()
-                                            startActivity(getIntent())
+                                            startActivity(Intent(this@CreateShopActivity, RouteActivity::class.java))
                                         }
 
                                         override fun onCanceled() {

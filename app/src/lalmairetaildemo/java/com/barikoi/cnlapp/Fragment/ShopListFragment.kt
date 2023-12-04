@@ -65,56 +65,73 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
 
-        var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")
+        selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
         var selectedMarket = prefs!!.getString(Api.SELECTED_MARKET_NAME_LIST, "")
 
-        spinnerRoute!!.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                if(selectedRoute!!.length>0){
-                    val pos= (spinnerRoute!!.adapter as ArrayAdapter<String>).getPosition(selectedRoute)
-                    if(pos>-1) {
-                        selectedRoute = ""
-                        spinnerRoute!!.setSelection(pos)
-                    }
-                }
-                editor!!.putString(Api.SELECTED_ROUTE_ID_LIST, routeNameList!![position].first)
-                editor!!.putString(Api.SELECTED_ROUTE_NAME_LIST, routeNameList!![position].second)
-                editor!!.commit()
-                markets.clear()
-                if (marketList!!.size>0) {
-                    for (i in 0 until marketList!!.size) {
-                        if (marketList!![i].first == routesList!![position]) {
-                            markets.add(marketList!![i].second.second)
-                        }
+        try {
+            spinnerRoute!!.onItemSelectedListener = object :
+                AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?, position: Int, id: Long
+                ) {
+                    /*if(selectedRoute.length>0){
+                            if (spinnerRoute!!.adapter.count > 0) {
+                                val pos =
+                                    (spinnerRoute!!.adapter as ArrayAdapter<String>).getPosition(
+                                        selectedRoute
+                                    )
+                                Log.e("RouteList", "selectedRoute pos " + pos)
+                                Log.e(
+                                    "RouteList",
+                                    "selectedRoute count " + spinnerRoute!!.adapter.count
+                                )
+                                if (pos > -1) {
+                                    selectedRoute = ""
+                                    spinnerRoute!!.setSelection(pos)
+                                }
+                            }
+                    }*/
+                    editor!!.putString(Api.SELECTED_ROUTE_ID_LIST, routeNameList!![position].first)
+                    editor!!.putString(
+                        Api.SELECTED_ROUTE_NAME_LIST,
+                        routeNameList!![position].second
+                    )
+                    editor!!.commit()
+                    markets.clear()
+                    if (marketList!!.size > 0) {
+                        for (i in 0 until marketList!!.size) {
+                            if (marketList!![i].first == routesList!![position]) {
+                                markets.add(marketList!![i].second.second)
+                            }
 
-                    }
-                    if (markets.size > 0) {
-                        if (spinnerMarket != null) {
-                            val adapter = ArrayAdapter(
-                                mContext!!,
-                                android.R.layout.simple_spinner_item, markets
-                            )
-                            spinnerMarket!!.adapter = adapter
-                            /*if(selectedMarket!!.length>0){
+                        }
+                        if (markets.size > 0) {
+                            if (spinnerMarket != null) {
+                                val adapter = ArrayAdapter(
+                                    mContext!!,
+                                    android.R.layout.simple_spinner_item, markets
+                                )
+                                spinnerMarket!!.adapter = adapter
+                                /*if(selectedMarket!!.length>0){
                             val pos= (spinnerMarket!!.adapter as ArrayAdapter<String>).getPosition(selectedMarket)
                             if(pos>-1) {
                                 selectedMarket = ""
                                 spinnerMarket!!.setSelection(pos)
                             }
                         }*/
+                            }
                         }
                     }
+
                 }
 
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    //parent.lastVisiblePosition
+                }
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                //parent.lastVisiblePosition
-            }
+        }catch (e: Exception){
+            e.printStackTrace()
         }
 
         spinnerMarket!!.onItemSelectedListener = object :
@@ -239,6 +256,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         var spinnerRoute: MoreSpinner? = null
         var btncreateShop: AppCompatButton? = null
         var et_search: AutoCompleteTextView? = null
+        var selectedRoute : String = ""
 
         fun getShopList(userId: String) {
             allRouteList!!.clear()
@@ -374,7 +392,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         android.R.layout.simple_spinner_item, routesList!!
                                     )
                                     spinnerRoute!!.adapter = adapter
-
                                 }
                             }
 

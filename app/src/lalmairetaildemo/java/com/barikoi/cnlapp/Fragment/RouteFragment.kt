@@ -27,6 +27,7 @@ import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RouteShopList.Callback.OnRouteFetchSuccess
 import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import kotlinx.android.synthetic.lalmairetaildemo.fragment_route.*
 import io.sentry.Sentry
@@ -53,7 +54,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
         val view = inflater.inflate(R.layout.fragment_route, container, false)
         recylerView = view.findViewById(R.id.routelist)
         progressBar = view.findViewById(R.id.progress_bar3)
-        //spinner = view.findViewById(R.id.spinnerRoutes)
+        spinnerRoute = view.findViewById(R.id.spinnerRoutes)
         //getAllRouteList()
         return view
     }
@@ -70,7 +71,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
         var selectedRouteId: String?= null
         var recylerView: RecyclerView? = null
         var mListener: OnRouteFetchSuccess? = null
-        //var spinner: MoreSpinner? = null
+        var spinnerRoute: MoreSpinner? = null
         var progressBar: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
@@ -222,16 +223,13 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
             ACTIVITY.runOnUiThread(object : Runnable{
                 override fun run() {
                     if (routeName.size>0) {
-                        if (spinnerRoutes != null) {
+                        if (spinnerRoute != null) {
                             Log.d("CheckError", "abc 2")
-                            val adapter2 = ArrayAdapter(
-                                mContext!!,
-                                android.R.layout.simple_spinner_item, routeName
-                            )
+                            val adapter2 = ArrayAdapter(mContext!!, android.R.layout.simple_spinner_item, routeName)
                             Log.d("CheckError", "abc 3")
-                            spinnerRoutes.adapter = adapter2
+                            spinnerRoute!!.adapter = adapter2
                             Log.d("CheckError", "abc 4")
-                            spinnerRoutes.onItemSelectedListener = object :
+                            spinnerRoute!!.onItemSelectedListener = object :
                                 AdapterView.OnItemSelectedListener {
                                 override fun onItemSelected(
                                     parent: AdapterView<*>,

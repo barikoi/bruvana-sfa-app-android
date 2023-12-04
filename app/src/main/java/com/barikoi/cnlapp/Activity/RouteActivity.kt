@@ -96,6 +96,16 @@ class RouteActivity : AppCompatActivity() {
         //viewPager.setCurrentItem(0);
         viewPager2!!.setUserInputEnabled(false)
 
+        if (prefs!!.getInt(Api.ROUTE_PAGE_SELECTED, 0) == 1) {
+            viewPager2!!.setCurrentItem(1)
+            tvTitle!!.text = resources.getString(R.string.shop_list)
+            ShopListFragment.getShopList(userId!!)
+        }else{
+            viewPager2!!.setCurrentItem(0)
+            tvTitle!!.text = resources.getString(R.string.route_list)
+            RouteFragment.getAllRouteList(userId!!, RouteFragment.mListener!!)
+        }
+
         Log.d("Fragment", "viewpager current Item: " + viewPager2!!.getCurrentItem())
         viewPager2!!.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
