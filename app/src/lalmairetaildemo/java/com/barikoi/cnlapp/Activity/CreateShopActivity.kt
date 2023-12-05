@@ -562,6 +562,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                 }
                             }
                             if (p0.childCount>0) {
+
                                 if (p2 > 0) {
                                     val view1: TextView = p0.getChildAt(0) as TextView
                                     view1.setTextColor(resources.getColor(R.color.black))
