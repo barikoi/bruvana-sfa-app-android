@@ -175,7 +175,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
-                    val shops: ArrayList<Shops> = ArrayList()
+                    /*val shops: ArrayList<Shops> = ArrayList()
                     if (shopList!!.size > 0) {
                         for (i in 0 until shopList!!.size) {
                             if (markets.size > 0) {
@@ -188,7 +188,9 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                     }
                     adapter = ShopListAdapter(shops, listener!!)
                     recylerView!!.adapter = adapter
-                    adapter!!.notifyDataSetChanged()
+                    adapter!!.notifyDataSetChanged()*/
+
+                    getShopList(userId!!)
                 }
 
             }

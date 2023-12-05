@@ -103,7 +103,7 @@ class RouteActivity : AppCompatActivity() {
         }else{
             viewPager2!!.setCurrentItem(0)
             tvTitle!!.text = resources.getString(R.string.route_list)
-            RouteFragment.getAllRouteList(userId!!, RouteFragment.mListener!!)
+            //RouteFragment.getAllRouteList(userId!!, RouteFragment.mListener!!)
         }
 
         Log.d("Fragment", "viewpager current Item: " + viewPager2!!.getCurrentItem())

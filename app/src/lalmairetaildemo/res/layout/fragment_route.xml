@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_centerInParent="true"
             app:SpinKit_Color="@color/cnl_color_1" />
         <TextView

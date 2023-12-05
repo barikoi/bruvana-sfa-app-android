@@ -507,6 +507,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     }
 
     fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>){
+        var storedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
         if (spinnerRoutes != null) {
             val adapter = object : ArrayAdapter<String>(
                 applicationContext,
@@ -549,18 +550,31 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         p3: Long
                     ) {
                         if (p0 != null) {
-                            if (p2 > 0) {
-                                val view1: TextView = p0.getChildAt(0) as TextView
-                                view1.setTextColor(resources.getColor(R.color.black))
-                                if (routeNameList[p2].first.length > 0) {
-                                    selectedRoute = routeNameList[p2].first
+                            if(storedRoute.length>0){
+                                if (spinnerRoutes.adapter.count > 0) {
+                                    val pos = (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(storedRoute)
+                                    Log.e("RouteList", "selectedRoute pos " + pos)
+                                    Log.e("RouteList", "selectedRoute count " + spinnerRoutes.adapter.count)
+                                    if (pos > -1) {
+                                        storedRoute = ""
+                                        spinnerRoutes.setSelection(pos)
+                                    }
+                                }
+                            }
+                            if (p0.childCount>0) {
+                                if (p2 > 0) {
+                                    val view1: TextView = p0.getChildAt(0) as TextView
+                                    view1.setTextColor(resources.getColor(R.color.black))
+                                    if (routeNameList[p2].first.length > 0) {
+                                        selectedRoute = routeNameList[p2].first
+                                    } else {
+                                        selectedRoute = ""
+                                    }
                                 } else {
+                                    val view1: TextView = p0.getChildAt(0) as TextView
+                                    view1.setTextColor(resources.getColor(R.color.text_title_2))
                                     selectedRoute = ""
                                 }
-                            } else {
-                                val view1: TextView = p0.getChildAt(0) as TextView
-                                view1.setTextColor(resources.getColor(R.color.text_title_2))
-                                selectedRoute = ""
                             }
                         }
 
@@ -602,6 +616,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     }
 
     fun setMarkets(marketList: ArrayList<String>, marketNameList: ArrayList<Pair<String, Pair<String, String>>>){
+        var storedMarket = prefs!!.getString(Api.SELECTED_MARKET_NAME_LIST, "")
         if (spinnerMarkets != null) {
             val adapter = object : ArrayAdapter<String>(
                 applicationContext,
@@ -643,20 +658,29 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         p2: Int,
                         p3: Long
                     ) {
-                        if (p2 > 0) {
-                            val view1: TextView =
-                                p0!!.getChildAt(0) as TextView
-                            view1.setTextColor(resources.getColor(R.color.black))
-                            if (marketNameList[p2].second.first.length > 0) {
-                                selectedMarket = marketNameList[p2].second.first
+                        if (p0!!.childCount>0) {
+                            if(storedMarket!!.length>0){
+                                if (spinnerMarkets.adapter.count > 0) {
+                                    val pos = (spinnerMarkets.adapter as ArrayAdapter<String>).getPosition(storedMarket)
+                                    if (pos > -1) {
+                                        storedMarket = ""
+                                        spinnerMarkets.setSelection(pos)
+                                    }
+                                }
+                            }
+                            if (p2 > 0) {
+                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                view1.setTextColor(resources.getColor(R.color.black))
+                                if (marketNameList[p2].second.first.length > 0) {
+                                    selectedMarket = marketNameList[p2].second.first
+                                } else {
+                                    selectedMarket = ""
+                                }
                             } else {
+                                val view1: TextView = p0!!.getChildAt(0) as TextView
+                                view1.setTextColor(resources.getColor(R.color.text_title_2))
                                 selectedMarket = ""
                             }
-                        } else {
-                            val view1: TextView =
-                                p0!!.getChildAt(0) as TextView
-                            view1.setTextColor(resources.getColor(R.color.text_title_2))
-                            selectedMarket = ""
                         }
                     }
 

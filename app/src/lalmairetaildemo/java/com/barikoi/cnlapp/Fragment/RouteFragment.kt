@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.Fragment
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -40,7 +41,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
     //private var queue: RequestQueue? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
-    lateinit var ACTIVITY: RouteActivity
+    private var ACTIVITY: Activity = RouteActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,16 +71,13 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
         var routesList: ArrayList<String>? = ArrayList()
         var selectedRouteId: String?= null
         var recylerView: RecyclerView? = null
-        var mListener: OnRouteFetchSuccess? = null
+        var mListener: OnRouteFetchSuccess? = RouteFragment()
         var spinnerRoute: MoreSpinner? = null
         var progressBar: ProgressBar? = null
         var mContext: Context? = null
         var queue: RequestQueue? = null
         fun getAllRouteList(userId: String, mCallback: OnRouteFetchSuccess){
-            arrayList!!.clear()
-            routesList!!.clear()
-            marketList!!.clear()
-            progressBar!!.visibility = View.VISIBLE
+            //progressBar!!.visibility = View.VISIBLE
             Log.d("CheckError", "abc 0")
             try {
                 val request = StringRequest(GET,
@@ -88,6 +86,9 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
                         //success
                         Log.d("RouteFrag", response)
                         try {
+                            arrayList!!.clear()
+                            routesList!!.clear()
+                            marketList!!.clear()
                             progressBar!!.visibility = View.GONE
                             val data = JSONObject(response)
                             val routesArray = data.getJSONArray("routes")
@@ -206,7 +207,7 @@ class RouteFragment : Fragment(), OnRouteFetchSuccess {
         editor = prefs!!.edit()
         /*token = prefs.getString("token", "")
         user_id = prefs.getString("user_id", "")*/
-        mListener = this
+        //mListener = this
         mContext = context
         ACTIVITY = context as RouteActivity
     }
