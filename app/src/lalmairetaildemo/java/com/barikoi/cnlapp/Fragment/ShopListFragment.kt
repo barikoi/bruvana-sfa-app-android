@@ -99,10 +99,12 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                     )
                     editor!!.commit()
                     markets.clear()
-                    if (marketList!!.size > 0) {
-                        for (i in 0 until marketList!!.size) {
-                            if (marketList!![i].first == routesList!![position]) {
-                                markets.add(marketList!![i].second.second)
+                    marketList!!.clear()
+                    if (allMarketList!!.size > 0) {
+                        for (i in 0 until allMarketList!!.size) {
+                            if (allMarketList!![i].first == routesList!![position]) {
+                                markets.add(allMarketList!![i].second.second)
+                                marketList!!.add(Pair(allMarketList!![i].first, Pair(allMarketList!![i].second.first, allMarketList!![i].second.second)))
                             }
 
                         }
@@ -113,13 +115,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                     android.R.layout.simple_spinner_item, markets
                                 )
                                 spinnerMarket!!.adapter = adapter
-                                /*if(selectedMarket!!.length>0){
-                            val pos= (spinnerMarket!!.adapter as ArrayAdapter<String>).getPosition(selectedMarket)
-                            if(pos>-1) {
-                                selectedMarket = ""
-                                spinnerMarket!!.setSelection(pos)
-                            }
-                        }*/
                             }
                         }
                     }
@@ -245,6 +240,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
     companion object {
         var routesList: ArrayList<String>? = ArrayList()
+        var allMarketList: ArrayList<Pair<String,Pair<String,String>>>? = ArrayList()
         var marketList: ArrayList<Pair<String,Pair<String,String>>>? = ArrayList()
         val markets: ArrayList<String> = ArrayList()
         var allRouteList: ArrayList<Routes>? = ArrayList()
@@ -279,7 +275,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             shopList!!.clear()
                             routesList!!.clear()
                             routeNameList!!.clear()
-                            marketList!!.clear()
+                            allMarketList!!.clear()
                             for (i in 0 until routesArray.length()) {
                                 val route = routesArray.getJSONObject(i)
                                 val route_id = route.getString("id")
@@ -310,7 +306,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                     val market = marketsArray.getJSONObject(k)
                                     market_name = market.getString("name")
                                     market_id = market.getString("id")
-                                    marketList!!.add(Pair(route_name, Pair(market_id, market_name)))
+                                    allMarketList!!.add(Pair(route_name, Pair(market_id, market_name)))
 
                                     val route_outlet_list = market.getJSONArray("outlets")
                                     for (j in 0 until route_outlet_list.length()) {
