@@ -42,7 +42,7 @@ object Api {
 
     val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
     val distance = "https://barikoi.xyz/v1/api/distance/"
-    val APIKEY = "NDI5MzpIQzBBRjZFQ1ZF"
+    val APIKEY = "bkoi_bafbd0679040b36e59dc5b4490f7180170e2d9e56169f3080104af024c9e3ffa"
 
     val loginurl = base_url + "api/v1/login"
     val logouturl = base_url + "api/v1/logout"

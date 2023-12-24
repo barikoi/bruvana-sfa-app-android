@@ -420,30 +420,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     if (response != null) {
                         try {
                             val data = JSONObject(response)
-                            //var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
                             marketsList!!.clear()
                             marketNameList!!.clear()
                             if (data.has("routes") && !data.isNull("routes")) {
-                                //val routesList = java.util.ArrayList<String>()
                                 val routesArray = data.getJSONArray("routes")
                                 if (routesArray.length() > 0) {
-                                    /*routeNameList!!.add(
-                                        Pair(
-                                            "",
-                                            resources.getString(R.string.select_route)
-                                        )
-                                    )
-                                    routesList.add(resources.getString(R.string.select_route))*/
                                     for (i in 0 until routesArray.length()) {
                                         val routeObj = routesArray.getJSONObject(i)
-
-                                        /*routeNameList.add(
-                                            Pair(
-                                                routeObj.getString("id"),
-                                                routeObj.getString("route_name")
-                                            )
-                                        )
-                                        routesList.add(routeObj.getString("route_name"))*/
                                         marketNameList!!.add(Pair(routeObj.getString("route_name"),
                                             Pair(
                                                 routeObj.getString("market_id"),

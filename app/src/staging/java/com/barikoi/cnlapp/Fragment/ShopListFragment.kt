@@ -68,6 +68,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         btncreateShop = view.findViewById(R.id.createShop)
         adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
+        selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
 
         spinner!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
@@ -75,7 +76,12 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-
+                editor!!.putString(Api.SELECTED_ROUTE_ID_LIST, routeNameList!![position].first)
+                editor!!.putString(
+                    Api.SELECTED_ROUTE_NAME_LIST,
+                    routeNameList!![position].second
+                )
+                editor!!.commit()
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
                     if (shopList!![i].route_name == routesList!![position]) {
@@ -154,12 +160,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            /*if (result.getResultCode() == Activity.RESULT_OK) {
-                val intent = result.data
-                if (intent!!.getIntExtra("requestCode", 0) == 55) {
-                    getShopList(userId!!)
-                }
-            }*/
             if (result.getResultCode() == 55) {
                 getShopList(RouteActivity.userId!!)
             }
@@ -178,6 +178,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         var spinner: MoreSpinner? = null
         var btncreateShop: AppCompatButton? = null
         var et_search: AutoCompleteTextView? = null
+        var selectedRoute : String = ""
 
         fun getShopList(userId: String) {
             allRouteList!!.clear()

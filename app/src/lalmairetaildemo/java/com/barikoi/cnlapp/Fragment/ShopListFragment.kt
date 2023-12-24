@@ -75,23 +75,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                     parent: AdapterView<*>?,
                     view: View?, position: Int, id: Long
                 ) {
-                    /*if(selectedRoute.length>0){
-                            if (spinnerRoute!!.adapter.count > 0) {
-                                val pos =
-                                    (spinnerRoute!!.adapter as ArrayAdapter<String>).getPosition(
-                                        selectedRoute
-                                    )
-                                Log.e("RouteList", "selectedRoute pos " + pos)
-                                Log.e(
-                                    "RouteList",
-                                    "selectedRoute count " + spinnerRoute!!.adapter.count
-                                )
-                                if (pos > -1) {
-                                    selectedRoute = ""
-                                    spinnerRoute!!.setSelection(pos)
-                                }
-                            }
-                    }*/
                     editor!!.putString(Api.SELECTED_ROUTE_ID_LIST, routeNameList!![position].first)
                     editor!!.putString(
                         Api.SELECTED_ROUTE_NAME_LIST,
@@ -170,21 +153,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
-                    /*val shops: ArrayList<Shops> = ArrayList()
-                    if (shopList!!.size > 0) {
-                        for (i in 0 until shopList!!.size) {
-                            if (markets.size > 0) {
-                                if (shopList!![i].route_name == markets[spinnerMarket!!.selectedItemPosition]) {
-                                    shops.add(shopList!![i])
-                                }
-                            }
-
-                        }
-                    }
-                    adapter = ShopListAdapter(shops, listener!!)
-                    recylerView!!.adapter = adapter
-                    adapter!!.notifyDataSetChanged()*/
-
                     getShopList(userId!!)
                 }
 
@@ -214,8 +182,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                         .putExtra("requestCode", 55)
                         .putStringArrayListExtra("routes", routesList)
                         .putExtra("routeList", routeNameList)
-                        /*.putStringArrayListExtra("markets", markets)
-                        .putExtra("marketList", marketList)*/
                 )
             }else{
                 Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
@@ -226,12 +192,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            /*if (result.getResultCode() == Activity.RESULT_OK) {
-                val intent = result.data
-                if (intent!!.getIntExtra("requestCode", 0) == 55) {
-                    getShopList(userId!!)
-                }
-            }*/
             if (result.getResultCode() == 55) {
                 getShopList(RouteActivity.userId!!)
             }
