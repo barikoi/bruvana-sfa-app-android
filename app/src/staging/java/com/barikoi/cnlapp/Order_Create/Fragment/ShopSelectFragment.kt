@@ -339,11 +339,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                /*if (s!!.length>0){
-                    adapter!!.filter.filter(s)
-                }else{
-                    getShopList(userId!!)
-                }*/
                 adapter!!.filter.filter(s)
                 if (s!!.length == 0) {
                     val shops: ArrayList<Shops> = ArrayList()
@@ -584,6 +579,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         editor!!.putString(Api.SELECTED_SHOP_ID, shop.shop_id)
         editor!!.commit()
         appDatabase!!.saveOrderDao().deleteByShop(shop.shop_id)
+        et_search!!.text!!.clear()
         CreateOrderFragment.startFragmentWithValue("Shop", shop, ProductSelectFragment(), ACTIVITY)
     }
 

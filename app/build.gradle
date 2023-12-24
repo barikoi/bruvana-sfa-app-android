@@ -11,7 +11,7 @@ android {
     defaultConfig {
         minSdk 16
         targetSdk 33
-        versionCode 10
+        versionCode 11
         multiDexEnabled true
         flavorDimensions("default")
         resConfigs "en"
