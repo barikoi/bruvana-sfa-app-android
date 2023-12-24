@@ -1165,11 +1165,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                     })
             }else{
+                hideProgress(progressBarShop)
                 btnSubmitShop.isEnabled = true
                 Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
                     .show()
             }
         }else{
+            hideProgress(progressBarShop)
             btnSubmitShop.isEnabled = true
         }
     }
