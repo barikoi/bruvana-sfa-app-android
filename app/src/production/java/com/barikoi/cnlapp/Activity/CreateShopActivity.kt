@@ -536,6 +536,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     }
 
     fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>){
+        var storedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
         if (spinnerRoutes != null) {
             if (spinnerRoutes.adapter == null) {
                 val adapter = object : ArrayAdapter<String>(
@@ -580,18 +581,31 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         p3: Long
                     ) {
                         if (p0 != null) {
-                            if (p2 > 0) {
-                                val view1: TextView = p0.getChildAt(0) as TextView
-                                view1.setTextColor(resources.getColor(R.color.black))
-                                if (routeNameList[p2].first.length > 0) {
-                                    selectedRoute = routeNameList[p2].first
+                            if(storedRoute.length>0){
+                                if (spinnerRoutes.adapter.count > 0) {
+                                    val pos = (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(storedRoute)
+                                    Log.e("RouteList", "selectedRoute pos " + pos)
+                                    Log.e("RouteList", "selectedRoute count " + spinnerRoutes.adapter.count)
+                                    if (pos > -1) {
+                                        storedRoute = ""
+                                        spinnerRoutes.setSelection(pos)
+                                    }
+                                }
+                            }
+                            if (p0.childCount>0) {
+                                if (p2 > 0) {
+                                    val view1: TextView = p0.getChildAt(0) as TextView
+                                    view1.setTextColor(resources.getColor(R.color.black))
+                                    if (routeNameList[p2].first.length > 0) {
+                                        selectedRoute = routeNameList[p2].first
+                                    } else {
+                                        selectedRoute = ""
+                                    }
                                 } else {
+                                    val view1: TextView = p0.getChildAt(0) as TextView
+                                    view1.setTextColor(resources.getColor(R.color.text_title_2))
                                     selectedRoute = ""
                                 }
-                            } else {
-                                val view1: TextView = p0.getChildAt(0) as TextView
-                                view1.setTextColor(resources.getColor(R.color.text_title_2))
-                                selectedRoute = ""
                             }
                         }
                     }

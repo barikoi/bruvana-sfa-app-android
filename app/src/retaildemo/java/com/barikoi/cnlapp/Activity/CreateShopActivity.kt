@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -61,32 +62,7 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.activity_create_shop.*
-import kotlinx.android.synthetic.main.activity_create_shop.btnBack
-import kotlinx.android.synthetic.main.activity_create_shop.btnSubmitShop
-import kotlinx.android.synthetic.main.activity_create_shop.btnUpdateShop
-import kotlinx.android.synthetic.main.activity_create_shop.etAddress
-import kotlinx.android.synthetic.main.activity_create_shop.etContactNumber
-import kotlinx.android.synthetic.main.activity_create_shop.etLatitude
-import kotlinx.android.synthetic.main.activity_create_shop.etLongitude
-import kotlinx.android.synthetic.main.activity_create_shop.etOwnerName
-import kotlinx.android.synthetic.main.activity_create_shop.etShopName
-import kotlinx.android.synthetic.main.activity_create_shop.imageCounter
-import kotlinx.android.synthetic.main.activity_create_shop.imageViewScroll
-import kotlinx.android.synthetic.main.activity_create_shop.imagepicker
-import kotlinx.android.synthetic.main.activity_create_shop.isVerified
-import kotlinx.android.synthetic.main.activity_create_shop.locationMap
-import kotlinx.android.synthetic.main.activity_create_shop.progressBarShop
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerBuyer
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerCatOutlets
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerLayoutCategory
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerLayoutRoutes
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerLayoutType
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerMarketOpportunity
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerRoutes
-import kotlinx.android.synthetic.main.activity_create_shop.spinnerShopType
-import kotlinx.android.synthetic.main.activity_create_shop.tvTitle
-import kotlinx.android.synthetic.retaildemo.activity_create_shop.*
+import kotlinx.android.synthetic.lalmairetaildemo.activity_create_shop.*
 import org.json.JSONException
 import org.json.JSONObject
 import uk.co.senab.photoview.PhotoViewAttacher
@@ -444,30 +420,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     if (response != null) {
                         try {
                             val data = JSONObject(response)
-                            //var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
                             marketsList!!.clear()
                             marketNameList!!.clear()
                             if (data.has("routes") && !data.isNull("routes")) {
-                                //val routesList = java.util.ArrayList<String>()
                                 val routesArray = data.getJSONArray("routes")
                                 if (routesArray.length() > 0) {
-                                    /*routeNameList!!.add(
-                                        Pair(
-                                            "",
-                                            resources.getString(R.string.select_route)
-                                        )
-                                    )
-                                    routesList.add(resources.getString(R.string.select_route))*/
                                     for (i in 0 until routesArray.length()) {
                                         val routeObj = routesArray.getJSONObject(i)
-
-                                        /*routeNameList.add(
-                                            Pair(
-                                                routeObj.getString("id"),
-                                                routeObj.getString("route_name")
-                                            )
-                                        )
-                                        routesList.add(routeObj.getString("route_name"))*/
                                         marketNameList!!.add(Pair(routeObj.getString("route_name"),
                                             Pair(
                                                 routeObj.getString("market_id"),

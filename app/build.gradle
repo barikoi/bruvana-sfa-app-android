@@ -13,7 +13,7 @@ android {
         targetSdk 33
         versionCode 10
         multiDexEnabled true
-        flavorDimensions "default"
+        flavorDimensions("default")
         resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,8 +36,7 @@ android {
         production{
             applicationId "com.barikoi.cnlapp"
             dimension "default"
-            //versionName "0.1.11"
-            versionName "1.2.6"
+            versionName "1.2.7"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
             manifestPlaceholders = [
@@ -47,7 +46,7 @@ android {
         staging{
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
-            versionName "1.2.6_2"
+            versionName "1.2.7_1"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "https://api.cnl.barikoimaps.dev/"
