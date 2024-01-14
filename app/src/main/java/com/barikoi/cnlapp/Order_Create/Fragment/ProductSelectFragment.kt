@@ -94,7 +94,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
     var dformat = DecimalFormat("#.##")
+    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
     lateinit var mView: View
+    var startOrderTime : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -649,7 +651,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     try {
                         val data = JSONObject(response)
                         val dist = data.getString("Distance")
-                        /*val dist = "2.94872347923479237492374923 KM"*/
                         val dformat = DecimalFormat("#.##")
                         val dis2 = dist.substring(0, dist.indexOf(' ')).toDouble()
                         val distance = dformat.format(dis2)
@@ -907,7 +908,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         if (addedProducts!!.size > 0) {
             var orderedQuantity = 0
             var orderedAmount = 0.0
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time
@@ -921,6 +921,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("user_id", user_id)
             orderObj.put("employee_id", sr_id)
             orderObj.put("ordered_at", today)
+            if (startOrderTime != null) orderObj.put("order_start_time", startOrderTime)
+            orderObj.put("order_end_time", today)
             if (mView.tvdistance.text.toString().length > 0) orderObj.put(
                 "distance_from_outlets",
                 distanceValue.toString()
@@ -1367,6 +1369,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         startOrder.setOnClickListener {
+            startOrderTime = df.format(Calendar.getInstance().time)
             getLocation("reversegeo")
             dialog.dismiss()
         }

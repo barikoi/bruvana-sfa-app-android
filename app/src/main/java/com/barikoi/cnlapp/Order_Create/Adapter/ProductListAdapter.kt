@@ -65,12 +65,6 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             )
         }
 
-
-        /*holder.layoutAdd.setOnClickListener {
-            holder.layoutQty.visibility = View.VISIBLE
-            holder.layoutAdd.visibility = View.GONE
-        }*/
-
         if (productList[position].stock_available > 0) {
             holder.stockAvailable.text =
                 productList[position].stock_available.toString() + " in stock"
