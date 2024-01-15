@@ -94,7 +94,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
     var dformat = DecimalFormat("#.##")
-    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
     lateinit var mView: View
     var startOrderTime : String? = null
 
@@ -908,11 +908,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         if (addedProducts!!.size > 0) {
             var orderedQuantity = 0
             var orderedAmount = 0.0
-            val today = df.format(Calendar.getInstance().time)
+            val today = dateFormat.format(Calendar.getInstance().time)
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time
             cal.add(Calendar.DATE, 1)
-            val nextDay = df.format(cal.time)
+            val nextDay = dateFormat.format(cal.time)
 
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
@@ -1369,7 +1369,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         startOrder.setOnClickListener {
-            startOrderTime = df.format(Calendar.getInstance().time)
+            startOrderTime = dateFormat.format(Calendar.getInstance().time)
             getLocation("reversegeo")
             dialog.dismiss()
         }
