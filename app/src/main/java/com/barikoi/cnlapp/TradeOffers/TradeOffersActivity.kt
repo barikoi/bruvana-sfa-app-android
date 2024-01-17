@@ -118,6 +118,17 @@ class TradeOffersActivity : AppCompatActivity() {
                             for (i in 0 until productsArray.length()){
                                 val tradeProducts: ArrayList<TradeProduct> = ArrayList()
                                 val productObj = productsArray.getJSONObject(i)
+                                if (productObj.has("trade") && !productObj.isNull("trade")){
+                                    if (productObj.getJSONArray("trade").length()>0){
+                                        tradeProducts.add(
+                                            TradeProduct(
+                                                productObj.getJSONArray("trade").getJSONObject(0).getString("start_date"),
+                                                productObj.getJSONArray("trade").getJSONObject(0).getString("end_date"),
+                                                productObj.getJSONArray("trade").getJSONObject(0).getString("discounted_price")
+                                            )
+                                        )
+                                    }
+                                }
                                 var imageUrl = "null"
                                 if (productObj.has("images") && !productObj.isNull("images")){
                                     val imageArray = productObj.getJSONArray("images")

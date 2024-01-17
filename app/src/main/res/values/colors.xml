@@ -46,6 +46,7 @@
     <color name="status_bounced">#F51D1D</color>
     <color name="status_bounced_stroke">#D76F6F</color>
 
+    <color name="color_checked_already">#494949</color>
     <color name="color_gray_depp">#6D8890</color>
     <color name="color_gray_medium">#4F7270</color>
     <color name="color_gray_medium_light">#B2C3A8</color>

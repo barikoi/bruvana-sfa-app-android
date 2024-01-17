@@ -61,6 +61,10 @@
     <string name="submit">Submit</string>
     <string name="update">Update</string>
     <string name="check">Check</string>
+    <string name="check_in">Check In</string>
+    <string name="check_out">Check Out</string>
+    <string name="checked_out">Checked Out</string>
+    <string name="are_you_sure_want_to_check_out">Are you sure want to check out?</string>
     <string name="try_again">Try Again</string>
     <string name="refresh">Refresh</string>
 
