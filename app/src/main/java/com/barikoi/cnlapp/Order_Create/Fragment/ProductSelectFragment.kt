@@ -625,7 +625,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         location.latitude,
                         location.longitude,
                         selectedShop!!.latitude,
-                        selectedShop!!.longitude
+                        selectedShop!!.longitude,
+                        "foot"
                     )
                 } else {
                     submitOrder(location)
@@ -643,9 +644,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         currentlatitude: Double,
         currentlongitude: Double,
         shoplatitude: Double,
-        shoplongitude: Double
+        shoplongitude: Double,
+        profile:String
     ) {
-        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shoplongitude + "," + shoplatitude + "/" + currentlongitude + "," + currentlatitude+"?profile=foot",
+        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shoplongitude + "," + shoplatitude + "/" + currentlongitude + "," + currentlatitude+"?profile="+profile,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
@@ -722,9 +724,30 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
 
                 }
-
                 override fun onResponseFailure(error: VolleyError) {
-                    Sentry.captureException(error)
+                    if (error != null && error.networkResponse != null) {
+                        try {
+                            val s = String(error.networkResponse.data)
+                            Log.d("Routes", "message: $s")
+                            val data = JSONObject(s)
+                            if (data.has("status") && data.getString("status").equals("400")){
+                                getDistance(
+                                    currentlatitude,
+                                    currentlongitude,
+                                    shoplatitude,
+                                    shoplongitude,
+                                    "car"
+                                )
+                            }
+                        } catch (e: UnsupportedEncodingException) {
+                            Sentry.captureException(e)
+                            e.printStackTrace()
+                        } catch (e: JSONException) {
+                            Sentry.captureException(e)
+                            Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
+                            e.printStackTrace()
+                        }
+                    }
                 }
 
                 override fun onException(e: Exception) {
