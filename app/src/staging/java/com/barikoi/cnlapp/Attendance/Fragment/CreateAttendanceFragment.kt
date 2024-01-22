@@ -1,19 +1,13 @@
 package com.barikoi.cnlapp.Attendance.Fragment
 
-import android.Manifest
 import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,10 +22,12 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.barikoitrace.TraceMode
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewPager2
@@ -117,6 +113,7 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.setFragmetnt(this)
         imagepicker.setCameraLauncher(startCamera)
 
+        BarikoiTrace.initialize(mContext, Api.APIKEY)
         getImageFromDB()
 
         if (user_type.equals("TO", true)){
@@ -477,6 +474,35 @@ class CreateAttendanceFragment : Fragment() {
             }
 
         })
+    }
+    private fun startTracking() {
+        //to start the location tracking
+        if (BarikoiTrace.isBatteryOptimizationEnabled()) {
+            Log.d("Verifyf", "is batteryOptimized: " + BarikoiTrace.isBatteryOptimizationEnabled())
+            BarikoiTrace.requestDisableBatteryOptimization(mContext)
+        }
+        if (BarikoiTrace.isLocationTracking()) {
+            Log.d("Verifyf", "is tracking 3: " + BarikoiTrace.isLocationTracking())
+            Toast.makeText(
+                mContext,
+                "Service already running!! no need to start again",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else if (!BarikoiTrace.isLocationPermissionsGranted()) {
+            Log.d("Verifyf", "is Location: " + BarikoiTrace.isLocationPermissionsGranted())
+            BarikoiTrace.requestLocationPermissions(ACTIVITY)
+        } else if (!BarikoiTrace.isLocationSettingsOn()) {
+            Log.d("Verifyf", "is location settings on: " + BarikoiTrace.isLocationSettingsOn())
+            BarikoiTrace.requestLocationServices(ACTIVITY)
+        } else {
+            //start tracking using preferable tracking mode with updateInterval in seconds and distanceFilter in meters
+            BarikoiTrace.startTracking(TraceMode.Builder().setUpdateInterval(300).build())
+            Log.d("Verifyf", "is tracking 2: " + BarikoiTrace.isLocationTracking())
+            if (BarikoiTrace.isLocationTracking()) {
+                Toast.makeText(mContext, "Service started!!", Toast.LENGTH_SHORT).show()
+                Log.d("Verifyf", "is tracking")
+            }
+        }
     }
 
     fun getLocation(choice: String){
