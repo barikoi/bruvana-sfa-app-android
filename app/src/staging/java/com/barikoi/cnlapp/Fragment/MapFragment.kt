@@ -30,6 +30,7 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.socket.PusherClient
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -89,6 +90,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
     lateinit var ACTIVITY: MainActivity
 
+    private lateinit var pusherClient: PusherClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ACTIVITY = context as MainActivity
@@ -118,6 +121,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        // Socket initialization
+        pusherClient = PusherClient()
+        pusherClient.connect()
+
+
+
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
             spinnerLayoutSO.visibility = View.VISIBLE
             getSOList()
