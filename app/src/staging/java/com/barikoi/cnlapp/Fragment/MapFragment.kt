@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
@@ -42,12 +42,24 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.*
+import com.pusher.client.Pusher
+import com.pusher.client.PusherOptions
+import com.pusher.client.channel.Channel
+import com.pusher.client.channel.ChannelEventListener
+import com.pusher.client.channel.PrivateChannel
+import com.pusher.client.channel.PrivateChannelEventListener
+import com.pusher.client.channel.PusherEvent
+import com.pusher.client.channel.SubscriptionEventListener
+import com.pusher.client.connection.ConnectionEventListener
+import com.pusher.client.connection.ConnectionState
+import com.pusher.client.connection.ConnectionStateChange
+import com.pusher.client.util.HttpChannelAuthorizer
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_map.spinnerSO
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+
 
 class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var routesList: ArrayList<Pair<String, String>>? = ArrayList()
@@ -88,6 +100,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var loading: ProgressBar? = null
     private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
     lateinit var ACTIVITY: MainActivity
+    lateinit var pusher: Pusher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,7 +126,71 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         spinner = view.findViewById(R.id.spinnerRoutes)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
 
+        setupWebSocket()
         return view
+    }
+
+    private fun setupWebSocket() {
+        val groupName = prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase()
+
+        val channelAuthorizer = HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
+        val params: MutableMap<String, String> = java.util.HashMap()
+        params["Accept"] = "application/json"
+        val traceToken = prefs!!.getString(Api.TRACE_TOKEN, "")
+        if (traceToken != "") {
+            params["Authorization"] = "bearer $traceToken"
+        }
+        channelAuthorizer.setHeaders(params)
+        val options = PusherOptions()
+        options.setCluster("ap2").setChannelAuthorizer(channelAuthorizer)
+        options.setWsPort(6001)
+        options.setWssPort(6002)
+        options.setHost("backend.barikoi.com")
+        options.isUseTLS = true
+        pusher = Pusher("mykey", options)
+        pusher.connect()
+        pusher.connect(object : ConnectionEventListener {
+            override fun onConnectionStateChange(change: ConnectionStateChange) {
+                println("State changed from ${change.previousState} to ${change.currentState}")
+            }
+
+            override fun onError(
+                message: String,
+                code: String,
+                e: Exception
+            ) {
+                println("There was a problem connecting! code ($code), message ($message), exception($e)")
+            }
+        }, ConnectionState.ALL)
+
+        pusher.subscribePrivate("private-care_nutrition_39752", object : PrivateChannelEventListener {
+            override fun onSubscriptionSucceeded(channelName: String) {
+                println("Subscribed!")
+            }
+
+            override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
+                println("onAuthenticationFailure: $message")
+            }
+
+            override fun onEvent(event: PusherEvent?) {
+                println("Received event with data: $event")
+            }
+        })
+        val channel: Channel = pusher.getPrivateChannel("private-care_nutrition_39752")!!
+        channel.bind("care_nutrition_group_event_"+groupName, object : PrivateChannelEventListener{
+            override fun onEvent(event: PusherEvent?) {
+                println("Received event with data bind: $event")
+            }
+
+            override fun onSubscriptionSucceeded(channelName: String?) {
+                println("onSubscriptionSucceeded: $channelName")
+            }
+
+            override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
+                println("onAuthenticationFailure bind: $message")
+            }
+
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -699,12 +776,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onStop() {
         super.onStop()
         mapView!!.onStop()
+        pusher.disconnect()
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mapView!!.onDestroy()
+        pusher.disconnect()
     }
 
     override fun onLowMemory() {

@@ -145,6 +145,9 @@ dependencies {
     /*barikoi trace-sdk*/
     implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
 
+    /*pusher websocket*/
+    implementation 'com.pusher:pusher-java-client:2.4.4'
+
     //heap autocapture session
     /*implementation 'io.heap.core:heap-android-core:0.1.0'
     implementation 'io.heap.autocapture:heap-autocapture-view:0.1.0'*/
