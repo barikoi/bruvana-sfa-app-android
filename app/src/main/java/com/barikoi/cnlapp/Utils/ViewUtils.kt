@@ -24,6 +24,8 @@ import androidx.core.app.ActivityCompat
 import com.android.volley.NoConnectionError
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
+import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.barikoitrace.TraceMode
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.callback.LocationFetch
@@ -235,6 +237,36 @@ object ViewUtils {
         } else {
             mListener.onFailure()
             showGPSDisabledAlertToUser(activity)
+        }
+    }
+
+    fun startTracking(activity: Activity, mContext: Context) {
+        //to start the location tracking
+        if (BarikoiTrace.isBatteryOptimizationEnabled()) {
+            Log.d("BarikoiTrace", "is batteryOptimized: " + BarikoiTrace.isBatteryOptimizationEnabled())
+            BarikoiTrace.requestDisableBatteryOptimization(mContext)
+        }
+        if (BarikoiTrace.isLocationTracking()) {
+            Log.d("BarikoiTrace", "is tracking 3: " + BarikoiTrace.isLocationTracking())
+            Toast.makeText(
+                mContext,
+                "Service already running!! no need to start again",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else if (!BarikoiTrace.isLocationPermissionsGranted()) {
+            Log.d("BarikoiTrace", "is Location: " + BarikoiTrace.isLocationPermissionsGranted())
+            BarikoiTrace.requestLocationPermissions(activity)
+        } else if (!BarikoiTrace.isLocationSettingsOn()) {
+            Log.d("BarikoiTrace", "is location settings on: " + BarikoiTrace.isLocationSettingsOn())
+            BarikoiTrace.requestLocationServices(activity)
+        } else {
+            //start tracking using preferable tracking mode with updateInterval in seconds and distanceFilter in meters
+            BarikoiTrace.startTracking(TraceMode.Builder().setUpdateInterval(300).build())
+            Log.d("BarikoiTrace", "is tracking 2: " + BarikoiTrace.isLocationTracking())
+            if (BarikoiTrace.isLocationTracking()) {
+                Toast.makeText(mContext, "Service started!!", Toast.LENGTH_SHORT).show()
+                Log.d("BarikoiTrace", "is tracking")
+            }
         }
     }
 }

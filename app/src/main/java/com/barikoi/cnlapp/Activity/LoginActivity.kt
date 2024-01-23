@@ -96,14 +96,27 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString(Api.TERRITORY_ID, userObj.getString("territory_id"))
                         editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
                         editor.putString(Api.TOKEN, token)
+                        if (userObj.has("group_name") && !userObj.isNull("group_name")) {
+                            editor.putString(Api.TRACE_GROUP_NAME, userObj.getString("group_name"))
+                        }
+                        if (userObj.has("group_id") && !userObj.isNull("group_id")) {
+                            editor.putString(Api.TRACE_GROUP_ID, userObj.getString("group_id"))
+                        }
                         editor.commit()
+
+                        var email =""
+                        if(userObj.has("email") && !userObj.isNull("email")){
+                            email = userObj.getString("email")
+                        }
 
                         BarikoiTrace.setOrCreateUser(
                             userObj.getString("user_name"),
-                            userObj.getString("email"),
+                            email,
                             userObj.getString("phone"),
                             object : BarikoiTraceUserCallback {
-                                override fun onFailure(barikoiError: BarikoiTraceError) {}
+                                override fun onFailure(barikoiError: BarikoiTraceError) {
+                                    Log.d("BarikoiTrace", "User created onFailure: ${barikoiError.message}")
+                                }
                                 override fun onSuccess(traceUser: BarikoiTraceUser) {
                                     Log.d("BarikoiTrace", "User created: $traceUser")
                                 }

@@ -14,6 +14,8 @@ object Api {
     val EMAIL = "email"
     val TOKEN = "token"
     val USER_RANK = "user_rank"
+    val TRACE_GROUP_NAME = "trace_group_name"
+    val TRACE_GROUP_ID = "trace_group_id"
 
     val SELECTED_SHOP = "selected_shop"
     val SELECTED_SHOP_ID = "selected_shop_id"
