@@ -261,7 +261,7 @@ object ViewUtils {
             BarikoiTrace.requestLocationServices(activity)
         } else {
             //start tracking using preferable tracking mode with updateInterval in seconds and distanceFilter in meters
-            BarikoiTrace.startTracking(TraceMode.Builder().setUpdateInterval(300).build())
+            BarikoiTrace.startTracking(TraceMode.Builder().setUpdateInterval(10).build())
             Log.d("BarikoiTrace", "is tracking 2: " + BarikoiTrace.isLocationTracking())
             if (BarikoiTrace.isLocationTracking()) {
                 Toast.makeText(mContext, "Service started!!", Toast.LENGTH_SHORT).show()

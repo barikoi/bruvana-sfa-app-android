@@ -50,6 +50,9 @@ object Api {
     val loginurl = base_url + "api/v1/login"
     val logouturl = base_url + "api/v1/logout"
     val authUserCheck = base_url+ "api/v1/auth/user"
+    val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
+    val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"
+    val traceLogout = "https://backend.barikoi.com:8888/api/v1/dashboard/logout"
     //val route_outlet_list = base_url+"api/v1/route-list"
 
     /*order create*/

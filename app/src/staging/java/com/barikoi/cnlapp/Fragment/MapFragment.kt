@@ -131,11 +131,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     private fun setupWebSocket() {
-        val groupName = prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase()
+        val groupName = prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase().replace(" ","_")
 
         val channelAuthorizer = HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
         val params: MutableMap<String, String> = java.util.HashMap()
-        params["Accept"] = "application/json"
         val traceToken = prefs!!.getString(Api.TRACE_TOKEN, "")
         if (traceToken != "") {
             params["Authorization"] = "bearer $traceToken"
@@ -165,7 +164,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         pusher.subscribePrivate("private-care_nutrition_39752", object : PrivateChannelEventListener {
             override fun onSubscriptionSucceeded(channelName: String) {
-                println("Subscribed!")
+                println("Subscribed! "+channelName)
             }
 
             override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
@@ -175,11 +174,25 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             override fun onEvent(event: PusherEvent?) {
                 println("Received event with data: $event")
             }
-        })
-        val channel: Channel = pusher.getPrivateChannel("private-care_nutrition_39752")!!
-        channel.bind("care_nutrition_group_event_"+groupName, object : PrivateChannelEventListener{
+        }).bind("care_nutrition_group_event_"+groupName, object : PrivateChannelEventListener{
             override fun onEvent(event: PusherEvent?) {
                 println("Received event with data bind: $event")
+                val dataObj = JSONObject(event!!.data).getJSONObject("data")
+                println("Received data bind: $dataObj")
+                val userName = dataObj.getString("name")
+                println("Received userName bind: $userName")
+                val latitude = dataObj.getDouble("latitude")
+                val longitude = dataObj.getDouble("longitude")
+                val time = dataObj.getString("updated_at")
+                if (dataObj.getInt("active_status") == 1){
+                    val icon = IconFactory.getInstance(mContext!!)
+                        .fromResource(R.drawable.ic_active)
+                    plotTraceUser(userName, time, latitude, longitude, icon)
+                }else{
+                    val icon = IconFactory.getInstance(mContext!!)
+                        .fromResource(R.drawable.ic_inactive)
+                    plotTraceUser(userName, time, latitude, longitude, icon)
+                }
             }
 
             override fun onSubscriptionSucceeded(channelName: String?) {
@@ -189,7 +202,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
                 println("onAuthenticationFailure bind: $message")
             }
-
         })
     }
 
@@ -723,6 +735,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
 
         token = prefs!!.getString(Api.TOKEN, "")
+    }
+
+    private fun plotTraceUser(userName: String, time: String, lat: Double, lon: Double, icon: Icon) {
+        val m = mMap!!.addMarker(
+            MarkerOptions().position(LatLng(lat, lon))
+                .icon(icon)
+                .title(userName + "| " + time)
+        )
+        /*placemarkermap!![p.shop_code] = m*/
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 12.0))
     }
 
     private fun plotMarker(p: Shops, icon: Icon) {

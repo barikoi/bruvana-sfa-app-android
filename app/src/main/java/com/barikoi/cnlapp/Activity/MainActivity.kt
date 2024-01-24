@@ -123,6 +123,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         userLayout.visibility = View.VISIBLE
         tvUserName.setText(userName)
+        if (prefs!!.getString(Api.TRACE_TOKEN, "").equals("null") || prefs!!.getString(Api.TRACE_TOKEN, "").equals("")){
+            traceLogin()
+        }else{
+            prefs!!.getString(Api.TRACE_TOKEN, "")?.let { traceAuthCheck(it) }
+        }
+        traceLogin()
         getAuthUser(token, Api.authUserCheck+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59&app_version="+BuildConfig.VERSION_NAME)
         if (userType.equals("TO", true)){
             routeNameSelected.visibility = View.GONE
@@ -221,6 +227,82 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
             false
+        })
+
+    }
+
+    private fun traceLogin() {
+        val parameters: MutableMap<String, String> = HashMap()
+        parameters["email"] = "carenutrition@gmail.com"
+        parameters["password"] = "12345678"
+
+        ApiServices.apiPOST(
+            Api.traceLogin,
+            queue!!, "", parameters, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    try{
+                        val data = JSONObject(response)
+                        if (data.has("data") && !data.isNull("data")){
+                            editor!!.putString(Api.TRACE_TOKEN, data.getString("data"))
+                            editor!!.commit()
+                            traceAuthCheck(data.getString("data"))
+                        }
+                    }catch (e:Exception){
+                        Sentry.captureException(e)
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                    traceLogin()
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
+    }
+
+    private fun traceAuthCheck(tokenT: String) {
+        ApiServices.apiGET(Api.traceAuthCheck, queue!!, tokenT, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+                if (response != null){
+                    try {
+                        val obj = JSONObject(response)
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+
+                }
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponseFailure(error: VolleyError) {
+                /*ViewUtils.getErrorResponse(error, applicationContext)*/
+                traceLogin()
+            }
+
+            override fun onException(e: Exception) {
+                /*Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()*/
+                traceLogin()
+            }
+
         })
 
     }
