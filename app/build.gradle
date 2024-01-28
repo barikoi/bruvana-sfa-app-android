@@ -18,6 +18,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -33,7 +37,7 @@ android {
     }
 
     productFlavors {
-        production{
+        production {
             applicationId "com.barikoi.cnlapp"
             dimension "default"
             versionName "1.2.7"
@@ -43,7 +47,7 @@ android {
                     appIcon: "@mipmap/ic_launcher"
             ]
         }
-        staging{
+        staging {
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
             versionName "1.2.8_1"
@@ -54,7 +58,7 @@ android {
                     appIcon: "@mipmap/ic_launcher_2"
             ]
         }
-        retaildemo{
+        retaildemo {
             applicationId "com.barikoi.retaildemo"
             dimension "default"
             versionName "0.0.3"
@@ -65,7 +69,7 @@ android {
                     appIcon: "@mipmap/ic_launcher_demo"
             ]
         }
-        lalmairetaildemo{
+        lalmairetaildemo {
             applicationId "com.barikoi.lalmairetaildemo"
             dimension "default"
             versionName "0.0.6"
@@ -141,7 +145,7 @@ dependencies {
 
     //play store update
     implementation 'com.google.android.play:core:1.10.3'
-
+    
     /*barikoi trace-sdk*/
     implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
 

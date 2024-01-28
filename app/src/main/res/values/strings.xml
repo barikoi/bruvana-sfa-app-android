@@ -219,4 +219,6 @@
     <string name="take_image">Take Image</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="km">%1$s km</string>
+    <string name="not_available">Not Available</string>
 </resources>

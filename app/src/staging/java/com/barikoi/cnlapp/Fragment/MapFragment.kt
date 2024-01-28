@@ -110,6 +110,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     lateinit var ACTIVITY: MainActivity
     lateinit var pusher: Pusher
 
+    private lateinit var pusherClient: PusherClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ACTIVITY = context as MainActivity
@@ -226,6 +228,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        // Socket initialization
+        pusherClient = PusherClient()
+        pusherClient.connect()
+
+
+
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
             spinnerLayoutSO.visibility = View.VISIBLE
             getSOList()
