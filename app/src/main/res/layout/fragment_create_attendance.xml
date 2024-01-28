@@ -109,7 +109,7 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
@@ -117,19 +117,28 @@
                 android:orientation="horizontal">
 
                 <com.barikoi.cnlapp.imagecapture.ImageCapture
-                    android:id="@+id/imagePicker"
+                    android:id="@+id/attendanceImagePicker"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:visibility="gone" />
+                    android:layout_height="150dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
-                    android:id="@+id/layoutImagePick"
+                    android:id="@+id/llImagePickerView"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="150dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:padding="10dp">
+                    android:padding="10dp"
+                    android:visibility="gone"
+                    android:gravity="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -156,7 +165,7 @@
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/titleRoute"
@@ -182,7 +191,7 @@
                 android:padding="8dp"
                 android:visibility="visible">
 
-                <com.barikoi.cnlapp.Utils.MoreSpinner
+                <com.barikoi.cnlapp.utils.MoreSpinner
                     android:id="@+id/spinnerRoutes"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
