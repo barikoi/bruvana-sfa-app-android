@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils.extension
+package com.barikoi.cnlapp.utils.extension
 
 import android.view.View
 import android.view.animation.Animation

@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils.ApiService
+package com.barikoi.cnlapp.utils.ApiService
 
 import com.android.volley.NetworkResponse
 import com.android.volley.VolleyError

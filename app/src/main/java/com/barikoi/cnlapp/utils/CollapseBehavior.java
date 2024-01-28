@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils;
+package com.barikoi.cnlapp.utils;
 
 import android.content.Context;
 import android.os.Build;

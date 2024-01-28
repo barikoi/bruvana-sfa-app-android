@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils.ApiService
+package com.barikoi.cnlapp.utils.ApiService
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -23,8 +23,8 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.InputStreamVolleyRequest
-import com.barikoi.cnlapp.Utils.VolleyMultipartRequest
+import com.barikoi.cnlapp.utils.InputStreamVolleyRequest
+import com.barikoi.cnlapp.utils.VolleyMultipartRequest
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream

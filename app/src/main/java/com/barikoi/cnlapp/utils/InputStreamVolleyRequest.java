@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils;
+package com.barikoi.cnlapp.utils;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
