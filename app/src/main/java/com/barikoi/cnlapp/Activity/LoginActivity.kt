@@ -4,7 +4,6 @@ import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -13,8 +12,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
+import com.barikoi.barikoitrace.models.BarikoiTraceError
+import com.barikoi.barikoitrace.models.BarikoiTraceUser
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
@@ -56,26 +60,14 @@ class LoginActivity : AppCompatActivity() {
         )
         etSRCode = findViewById<View>(R.id.input_sr_code) as EditText
         etPassword = findViewById<View>(R.id.input_password) as EditText
-        //resetpass = findViewById<View>(R.id.textView_resetpass) as TextView
-        //signin_link = findViewById<View>(R.id.link_signup) as TextView
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
 
         login = findViewById<View>(R.id.btn_login) as Button
         login?.setOnClickListener(View.OnClickListener { login() })
-        /*signin_link?.setOnClickListener(View.OnClickListener {
-            val signup = Intent(this@LoginActivity, SignUpActivity::class.java)
-            startActivity(signup)
-            finish()
-        })*/
-
-        /*resetpass!!.setOnClickListener {
-            NetworkUtils.showresetpassInputDialog(this@LoginActivity)
-        }*/
     }
 
     private fun login() {
         if (!validate()) {
-            //onLoginFailed()
             return
         }
         val employee_id = etSRCode!!.text.toString().replace(" ", "");
@@ -104,7 +96,31 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString(Api.TERRITORY_ID, userObj.getString("territory_id"))
                         editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
                         editor.putString(Api.TOKEN, token)
+                        if (userObj.has("group_name") && !userObj.isNull("group_name")) {
+                            editor.putString(Api.TRACE_GROUP_NAME, userObj.getString("group_name"))
+                        }
+                        if (userObj.has("group_id") && !userObj.isNull("group_id")) {
+                            editor.putString(Api.TRACE_GROUP_ID, userObj.getString("group_id"))
+                        }
                         editor.commit()
+
+                        var email =""
+                        if(userObj.has("email") && !userObj.isNull("email")){
+                            email = userObj.getString("email")
+                        }
+
+                        BarikoiTrace.setOrCreateUser(
+                            userObj.getString("user_name"),
+                            email,
+                            userObj.getString("phone"),
+                            object : BarikoiTraceUserCallback {
+                                override fun onFailure(barikoiError: BarikoiTraceError) {
+                                    Log.d("BarikoiTrace", "User created onFailure: ${barikoiError.message}")
+                                }
+                                override fun onSuccess(traceUser: BarikoiTraceUser) {
+                                    Log.d("BarikoiTrace", "User created: $traceUser")
+                                }
+                            })
 
                         SentryAndroid.init(this) { options: SentryAndroidOptions ->
                             // Add a callback that will be used before the event is sent to Sentry.
@@ -120,23 +136,12 @@ class LoginActivity : AppCompatActivity() {
                                 }
                         }
 
-                        // Example
-                        /*Heap.identify("unique_identifier");
-                        val props: MutableMap<String, String> = HashMap()
-                        props["Name"] = userObj.getString("user_name")
-                        props["EmployeeId"] = userObj.getString("employee_id")
-                        props["Designation"] = userObj.getString("designation")
-                        addUserProperties(props)*/
-
                         routeToAppropriatePage(2)
-                        //OneSignal.setEmail(email);
                         pd!!.dismiss()
                     }else if(responsedata.has("message")){
                         pd!!.dismiss()
                         showDialog( responsedata.getString("message"))
                     }
-
-                    // onLoginFailed();
                 } catch (e: JSONException) {
                     pd!!.dismiss()
                     Sentry.captureException(e)
@@ -145,13 +150,11 @@ class LoginActivity : AppCompatActivity() {
             },
             Response.ErrorListener { error ->
                 pd!!.dismiss()
-                //NetworkcallUtils.handleResponse(error, getApplicationContext());
                 if (error is NoConnectionError) {
                     showDialog("Login failed,check your internet connection and try again")
                 }
                 if (error != null && error.networkResponse != null) {
                     try {
-                        //NetworkResponse response = error.networkResponse;
                         val s = String(error.networkResponse.data)
                         Log.d("Verify", "message: $s")
                         val data = JSONObject(s)

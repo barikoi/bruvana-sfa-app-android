@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
 import com.github.ybq.android.spinkit.style.ThreeBounce
@@ -45,7 +46,7 @@ class SplashActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
 
-
+        BarikoiTrace.initialize(applicationContext, Api.APIKEY)
 
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")

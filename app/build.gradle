@@ -145,10 +145,12 @@ dependencies {
 
     //play store update
     implementation 'com.google.android.play:core:1.10.3'
+    
+    /*barikoi trace-sdk*/
+    implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
 
-//    implementation 'com.pusher:pusher-java-client:2.4.4'
+    /*pusher websocket*/
     implementation 'com.pusher:pusher-java-client:2.4.4'
-
 
     //heap autocapture session
     /*implementation 'io.heap.core:heap-android-core:0.1.0'

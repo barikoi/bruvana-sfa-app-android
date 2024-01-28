@@ -3,10 +3,11 @@ package com.barikoi.cnlapp.Fragment
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
@@ -30,9 +32,15 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.MoreSpinner
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import com.barikoi.cnlapp.socket.PusherClient
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineCallback
+import com.mapbox.android.core.location.LocationEngineRequest
+import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
@@ -42,13 +50,24 @@ import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
+import com.pusher.client.Pusher
+import com.pusher.client.PusherOptions
+import com.pusher.client.channel.PrivateChannelEventListener
+import com.pusher.client.channel.PusherEvent
+import com.pusher.client.connection.ConnectionEventListener
+import com.pusher.client.connection.ConnectionState
+import com.pusher.client.connection.ConnectionStateChange
+import com.pusher.client.util.HttpChannelAuthorizer
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_map.spinnerSO
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+
 
 class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var routesList: ArrayList<Pair<String, String>>? = ArrayList()
@@ -57,12 +76,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     var shopList: ArrayList<Shops>? = ArrayList()
     var nonVerifiedShopList: ArrayList<Shops>? = ArrayList()
     var verifiedShopList: ArrayList<Shops>? = ArrayList()
-    var recylerView: RecyclerView? = null
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var spinner: MoreSpinner? = null
     var spinnerCategory: MoreSpinner? = null
     var cbVerified: AppCompatCheckBox? = null
+    var cbTrace: AppCompatCheckBox? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
 
@@ -71,8 +90,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     lateinit var fab: FloatingActionButton
     lateinit var shopCount: TextView
     private var locationEngine: LocationEngine? = null
+    private var locationEngineRequest: LocationEngineRequest? = null
 
-    //private var locationPlugin: LocationLayerPlugin? = null
     private var permissionsManager: PermissionsManager? = null
     private var userId: String? = ""
     private var srCode: String? = ""
@@ -89,6 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var loading: ProgressBar? = null
     private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
     lateinit var ACTIVITY: MainActivity
+    lateinit var pusher: Pusher
 
     private lateinit var pusherClient: PusherClient
 
@@ -111,12 +131,99 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         fab = view.findViewById(R.id.fab)
         shopCount = view.findViewById(R.id.shopCount)
         cbVerified = view.findViewById(R.id.isVerified)
+        cbTrace = view.findViewById(R.id.isTrace)
         loading = view.findViewById(R.id.progressBar1)
 
         spinner = view.findViewById(R.id.spinnerRoutes)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
 
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
+            cbVerified!!.visibility = View.VISIBLE
+            cbTrace!!.visibility = View.VISIBLE
+        } else {
+            cbVerified!!.visibility = View.GONE
+            cbTrace!!.visibility = View.GONE
+        }
+
         return view
+    }
+
+    private fun setupWebSocket() {
+        val groupName = prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase().replace(" ","_")
+
+        val channelAuthorizer = HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
+        val params: MutableMap<String, String> = java.util.HashMap()
+        val traceToken = prefs!!.getString(Api.TRACE_TOKEN, "")
+        if (traceToken != "") {
+            params["Authorization"] = "bearer $traceToken"
+        }
+        channelAuthorizer.setHeaders(params)
+        val options = PusherOptions()
+        options.setCluster("ap2").setChannelAuthorizer(channelAuthorizer)
+        options.setWsPort(6001)
+        options.setWssPort(6002)
+        options.setHost("backend.barikoi.com")
+        options.isUseTLS = true
+        pusher = Pusher("mykey", options)
+        pusher.connect()
+        pusher.connect(object : ConnectionEventListener {
+            override fun onConnectionStateChange(change: ConnectionStateChange) {
+                println("State changed from ${change.previousState} to ${change.currentState}")
+            }
+
+            override fun onError(
+                message: String,
+                code: String,
+                e: Exception
+            ) {
+                println("There was a problem connecting! code ($code), message ($message), exception($e)")
+            }
+        }, ConnectionState.ALL)
+
+        pusher.subscribePrivate("private-care_nutrition_39752", object : PrivateChannelEventListener {
+            override fun onSubscriptionSucceeded(channelName: String) {
+                println("Subscribed! "+channelName)
+            }
+
+            override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
+                println("onAuthenticationFailure: $message")
+            }
+
+            override fun onEvent(event: PusherEvent?) {
+                println("Received event with data: $event")
+            }
+        }).bind("care_nutrition_group_event_"+groupName, object : PrivateChannelEventListener{
+            override fun onEvent(event: PusherEvent?) {
+                println("Received event with data bind: $event")
+                val dataObj = JSONObject(event!!.data).getJSONObject("data")
+                println("Received data bind: $dataObj")
+                val userName = dataObj.getString("name")
+                println("Received userName bind: $userName")
+                val latitude = dataObj.getDouble("latitude")
+                val longitude = dataObj.getDouble("longitude")
+                val time = dataObj.getString("updated_at")
+                val iconTrace: Icon
+                if (dataObj.getInt("active_status") == 1){
+                    iconTrace = IconFactory.getInstance(mContext!!)
+                        .fromResource(R.drawable.trace_active)
+
+                }else{
+                    iconTrace  = IconFactory.getInstance(mContext!!)
+                        .fromResource(R.drawable.trace_inactive)
+                }
+                ACTIVITY.runOnUiThread {
+                    plotTraceUser(userName, time, latitude, longitude, iconTrace)
+                }
+            }
+
+            override fun onSubscriptionSucceeded(channelName: String?) {
+                println("onSubscriptionSucceeded: $channelName")
+            }
+
+            override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
+                println("onAuthenticationFailure bind: $message")
+            }
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -157,6 +264,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 "start"
                             )
                         }
+                    }
+                    if (cbTrace!!.isChecked) {
+                        setupWebSocket()
                     }
                 }
             }
@@ -659,6 +769,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         token = prefs!!.getString(Api.TOKEN, "")
     }
 
+    private fun plotTraceUser(userName: String, time: String, lat: Double, lon: Double, icon: Icon) {
+        mMap!!.clear()
+        mMap!!.addMarker(
+            MarkerOptions().position(LatLng(lat, lon))
+                .icon(icon)
+                .title(userName + "| " + time)
+        )
+        //placemarkermap!![p.shop_code] = m
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 17.0))
+    }
+
     private fun plotMarker(p: Shops, icon: Icon) {
 
         val shopname: String = p.shop_name
@@ -681,6 +802,83 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private fun enableLocationComponent(loadedMapStyle: Style) {
+        if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
+
+            // Get an instance of the component
+            val locationComponent = mMap!!.locationComponent
+
+            // Activate with options
+            locationComponent.activateLocationComponent(
+                LocationComponentActivationOptions.builder(mContext!!, loadedMapStyle)
+                    .build()
+            )
+            // Enable to make component visible
+            locationComponent.isLocationComponentEnabled = true
+
+            // Set the component's camera mode
+            locationComponent.cameraMode = CameraMode.TRACKING
+
+            // Set the component's render mode
+            locationComponent.renderMode = RenderMode.COMPASS
+            locationEngineRequest = locationComponent.locationEngineRequest
+            locationEngine = locationComponent.locationEngine
+            if (locationEngine != null) {
+                locationEngine!!.getLastLocation(object :
+                    LocationEngineCallback<LocationEngineResult?> {
+
+                    override fun onSuccess(result: LocationEngineResult?) {
+                        val lastLocation: Location = result!!.getLastLocation()!!
+                        if (lastLocation != null && !lastLocation.equals("null")) {
+                            //setCameraPosition(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 17.0);
+                        } else {
+                            //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, null)
+                            showEnableLocationSetting(ACTIVITY)
+                        }
+                    }
+
+                    override fun onFailure(exception: java.lang.Exception) {
+                        Toast.makeText(mContext!!,
+                            exception.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
+            }
+        } else {
+            permissionsManager = PermissionsManager(this as PermissionsListener)
+            permissionsManager!!.requestLocationPermissions(ACTIVITY)
+            //showEnableLocationSetting(this@CreateShopActivity)
+        }
+    }
+
+    private fun showEnableLocationSetting(activity: MainActivity) {
+        val locationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val task =
+            LocationServices.getSettingsClient(activity).checkLocationSettings(builder.build())
+        task.addOnSuccessListener(
+            activity
+        ) { response ->
+            val states = response.locationSettingsStates
+            if (states!!.isLocationPresent) {
+                //Do something
+            }
+        }
+        task.addOnFailureListener(activity) { e ->
+            if (e is ResolvableApiException) {
+                try {
+                    e.startResolutionForResult(activity, 999)
+                } catch (ex: SendIntentException) {
+                    ex.printStackTrace()
+                }
+            }
+        }
+    }
+
+
     private fun setCameraPosition(location: LatLng, zoom: Double?) {
         mMap?.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
@@ -697,7 +895,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     override fun onPermissionResult(granted: Boolean) {
-        enableLocation()
+        mMap!!.getStyle(object : Style.OnStyleLoaded {
+            override fun onStyleLoaded(style: Style) {
+                if (granted) {
+                    enableLocationComponent(style)
+                } else {
+                    Toast.makeText(
+                        mContext!!,
+                        "Permission not granted",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    //finish()
+                }
+            }
+        })
     }
 
     @SuppressLint("MissingPermission")
@@ -710,12 +921,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onStop() {
         super.onStop()
         mapView!!.onStop()
+        pusher.disconnect()
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mapView!!.onDestroy()
+        pusher.disconnect()
     }
 
     override fun onLowMemory() {
@@ -743,11 +956,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         mMap = mapboxMap
-        mMap!!.setStyle(Style.Builder().fromUrl(getString(R.string.map_view_styleUrl)))
-        enableLocation()
+        mMap!!.setStyle(
+            Style.Builder().fromUrl(getString(R.string.map_view_styleUrl))
+        ) { style: Style? -> enableLocationComponent(style!!) }
 
         val uiSettings: UiSettings = mapboxMap!!.uiSettings
         uiSettings.setCompassEnabled(false)
+        mMap!!.setMaxZoomPreference(25.5)
         if (userId!!.length > 0) {
             getShopList(Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1", "start")
         }
@@ -764,6 +979,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 enableLocation()
             }*/
         })
+
+        //setupWebSocket()
 
 
     }

@@ -70,6 +70,7 @@
 
     <string name="route_plan">Route Plan</string>
     <string name="verified">Verified</string>
+    <string name="see_location">See Location</string>
 
     <string name="route_code">Route Code</string>
     <string name="shop_count">Shop Count</string>

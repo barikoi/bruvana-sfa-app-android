@@ -21,8 +21,12 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.barikoitrace.TraceMode
+import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewPager2
 import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewpagertab2
@@ -348,36 +352,28 @@ class CreateAttendanceFragment : Fragment() {
 
                 override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    progressBar.visibility = View.GONE
-                    val data = JSONObject(String(response.data))
-                    val message = data.getString("message")
-                    appDatabase!!.imagesDao()!!.deleteAllImages()
-                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
-                        override fun onConfirmed() {
-                            editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
-                            editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
-                            editor!!.commit()
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                progressBar.visibility = View.GONE
+                val data = JSONObject(String(response.data))
+                val message = data.getString("message")
+                if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+                    ViewUtils.startTracking(ACTIVITY, mContext!!)
+                }
+                appDatabase!!.imagesDao()!!.deleteAllImages()
+                ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                    override fun onConfirmed() {
+                        editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                        editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
+                        editor!!.commit()
 
-                            val titles = arrayOf(
-                                mContext!!.resources.getString(R.string.attendance),
-                                mContext!!.resources.getString(R.string.history),
-                                mContext!!.resources.getString(R.string.summary)
-                            )
-                            val fragments = ArrayList<Fragment>()
-                            fragments.add(CreateAttendanceFragment())
-                            fragments.add(HistoryFragment())
-                            fragments.add(SummaryFragment())
-
-                            viewPager2!!.adapter = ViewPagerAdapter(
-                                parentFragmentManager,
-                                lifecycle,
-                                fragments
-                            )
-
-                            TabLayoutMediator(
-                                viewpagertab2!!, viewPager2!!
-                            ) { tab: TabLayout.Tab, position: Int ->
+                        val titles = arrayOf(mContext!!.resources.getString(R.string.attendance), mContext!!.resources.getString(R.string.history), mContext!!.resources.getString(R.string.summary))
+                        val fragments = ArrayList<Fragment>()
+                        fragments.add(CreateAttendanceFragment())
+                        fragments.add(HistoryFragment())
+                        fragments.add(SummaryFragment())
+                        viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+                        TabLayoutMediator(viewpagertab2!!, viewPager2!!,
+                            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                                 tab.text = titles[position]
                                 tab.parent
                             }.attach()
@@ -448,36 +444,29 @@ class CreateAttendanceFragment : Fragment() {
 
                 override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    progressBar.visibility = View.GONE
-                    val data = JSONObject(String(response.data))
-                    val message = data.getString("message")
-                    appDatabase!!.imagesDao()!!.deleteAllImages()
-                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
-                        override fun onConfirmed() {
-                            editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
-                            editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
-                            editor!!.commit()
-                            checkAttendance()
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                progressBar.visibility = View.GONE
+                val data = JSONObject(String(response.data))
+                val message = data.getString("message")
+                if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+                    BarikoiTrace.stopTracking()
+                }
+                appDatabase!!.imagesDao()!!.deleteAllImages()
+                ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                    override fun onConfirmed() {
+                        editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                        editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
+                        editor!!.commit()
+                        checkAttendance()
 
-                            val titles = arrayOf(
-                                mContext!!.resources.getString(R.string.attendance),
-                                mContext!!.resources.getString(R.string.history),
-                                mContext!!.resources.getString(R.string.summary)
-                            )
-                            val fragments = ArrayList<Fragment>()
-                            fragments.add(CreateAttendanceFragment())
-                            fragments.add(HistoryFragment())
-                            fragments.add(SummaryFragment())
-                            viewPager2!!.adapter = ViewPagerAdapter(
-                                parentFragmentManager,
-                                lifecycle,
-                                fragments
-                            )
-                            TabLayoutMediator(
-                                viewpagertab2!!,
-                                viewPager2!!
-                            ) { tab: TabLayout.Tab, position: Int ->
+                        val titles = arrayOf(mContext!!.resources.getString(R.string.attendance), mContext!!.resources.getString(R.string.history), mContext!!.resources.getString(R.string.summary))
+                        val fragments = ArrayList<Fragment>()
+                        fragments.add(CreateAttendanceFragment())
+                        fragments.add(HistoryFragment())
+                        fragments.add(SummaryFragment())
+                        viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+                        TabLayoutMediator(viewpagertab2!!, viewPager2!!,
+                            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                                 tab.text = titles[position]
                                 tab.parent
                             }.attach()

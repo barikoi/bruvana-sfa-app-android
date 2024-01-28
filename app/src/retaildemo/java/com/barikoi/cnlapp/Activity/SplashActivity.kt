@@ -45,7 +45,7 @@ class SplashActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
 
-
+        BarikoiTrace.initialize(applicationContext, Api.APIKEY)
 
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")

@@ -7,5 +7,6 @@ class SOList (
     var name: String,
     var designation: String,
     var employeeId: String,
+    /*var traceUserId: String,*/
     var imageUrl: String
     ):Serializable

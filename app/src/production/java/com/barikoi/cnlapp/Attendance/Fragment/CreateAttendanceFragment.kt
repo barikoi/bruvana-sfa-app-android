@@ -1,19 +1,13 @@
 package com.barikoi.cnlapp.Attendance.Fragment
 
-import android.Manifest
 import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,10 +22,12 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.barikoitrace.TraceMode
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.AttendanceFragment.Companion.viewPager2
@@ -116,7 +112,6 @@ class CreateAttendanceFragment : Fragment() {
         imagepicker.setMainactivity(ACTIVITY)
         imagepicker.setFragmetnt(this)
         imagepicker.setCameraLauncher(startCamera)
-
         getImageFromDB()
 
         if (user_type.equals("TO", true)){
@@ -158,15 +153,17 @@ class CreateAttendanceFragment : Fragment() {
 
         getLocation("reversegeo")
 
+        checkAttendance()
+
         imgRefresh.setOnClickListener {
             rotateAnimation(imgRefresh, 0f, 380f)
             getLocation("reversegeo")
         }
-        btnSubmit.setOnClickListener {
+        btnCheckIn.setOnClickListener {
             if (user_type.equals("TO", true)){
                 if (isImageAdded){
                     progressBar.visibility = View.VISIBLE
-                    getLocation("submit")
+                    getLocation("check_in")
                 }else{
                     if (!isImageAdded){
                         Toast.makeText(mContext, "Upload image for attendance", Toast.LENGTH_SHORT).show()
@@ -175,19 +172,84 @@ class CreateAttendanceFragment : Fragment() {
             }else{
                 if (selectedRoute.length > 0 && isImageAdded){
                     progressBar.visibility = View.VISIBLE
-                    getLocation("submit")
+                    getLocation("check_in")
                 }else{
                     if (!isImageAdded){
                         Toast.makeText(mContext, "Upload image for attendance", Toast.LENGTH_SHORT).show()
                     }
                     if (selectedRoute.length == 0){
-                        Toast.makeText(mContext, "Select route for attendance", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(mContext, "Select route for check in", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-
-
         }
+        btnCheckOut.setOnClickListener {
+            if (isImageAdded){
+                progressBar.visibility = View.VISIBLE
+                getLocation("check_out")
+            }else{
+                Toast.makeText(mContext, "Upload image for check out", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnCheckedAlready.setOnClickListener {
+            checkAttendance()
+        }
+    }
+
+    private fun checkAttendance() {
+        ApiServices.apiGET(
+            Api.check_today_attendance,
+            mQueue!!, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    try{
+                        val data = JSONObject(response)
+                        if (data.has("attendances") && !data.isNull("attendances")){
+                            val attendanceObj = data.getJSONObject("attendances")
+                            val check_in = attendanceObj.getString("checkin_time")
+                            val check_out = attendanceObj.getString("checkout_time")
+                            if (!check_in.equals("null") && !check_out.equals("null")){
+                                btnCheckIn.visibility = View.GONE
+                                btnCheckOut.visibility = View.GONE
+                                btnCheckedAlready.visibility = View.VISIBLE
+                            }else if (!check_in.equals("null") && check_out.equals("null")){
+                                btnCheckIn.visibility = View.GONE
+                                btnCheckOut.visibility = View.VISIBLE
+                                btnCheckedAlready.visibility = View.GONE
+                            }else{
+                                btnCheckIn.visibility = View.VISIBLE
+                                btnCheckOut.visibility = View.GONE
+                                btnCheckedAlready.visibility = View.GONE
+                            }
+                        }else{
+                            btnCheckIn.visibility = View.VISIBLE
+                            btnCheckOut.visibility = View.GONE
+                            btnCheckedAlready.visibility = View.GONE
+                        }
+
+                    }catch (e:Exception){
+                        Sentry.captureException(e)
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, mContext!!)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(mContext!!, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
     }
 
     fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
@@ -233,7 +295,7 @@ class CreateAttendanceFragment : Fragment() {
             }
         }
     }
-    fun submitAttendance(location: Location){
+    fun checkInAttendance(location: Location){
         val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = java.util.HashMap()
         var imagesList = ArrayList<Images>()
         imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
@@ -255,7 +317,7 @@ class CreateAttendanceFragment : Fragment() {
         if(route_id != null) params["route_id"] = route_id.toString()
         if(editTextReason.text.toString().length > 0) params["remarks"] = editTextReason.text.toString()
 
-        ApiServices.apiPOSTMultipart(Api.create_attendance, mQueue!!, token!!, params, byteparams, object : ApiServiceListener{
+        ApiServices.apiPOSTMultipart(Api.check_in, mQueue!!, token!!, params, byteparams, object : ApiServiceListener{
             override fun onResponseSuccess(response: String) {
 
             }
@@ -268,6 +330,9 @@ class CreateAttendanceFragment : Fragment() {
                 progressBar.visibility = View.GONE
                 val data = JSONObject(String(response.data))
                 val message = data.getString("message")
+                if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+                    ViewUtils.startTracking(ACTIVITY, mContext!!)
+                }
                 appDatabase!!.imagesDao()!!.deleteAllImages()
                 ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                     override fun onConfirmed() {
@@ -275,7 +340,7 @@ class CreateAttendanceFragment : Fragment() {
                         editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
                         editor!!.commit()
 
-                        val titles = arrayOf(mContext!!.resources.getString(R.string.attendance), mContext!!.resources.getString(R.string.history), resources.getString(R.string.summary))
+                        val titles = arrayOf(mContext!!.resources.getString(R.string.attendance), mContext!!.resources.getString(R.string.history), mContext!!.resources.getString(R.string.summary))
                         val fragments = ArrayList<Fragment>()
                         fragments.add(CreateAttendanceFragment())
                         fragments.add(HistoryFragment())
@@ -324,11 +389,104 @@ class CreateAttendanceFragment : Fragment() {
         })
     }
 
+    private fun checkOutAttendance(location: Location) {
+        val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = java.util.HashMap()
+        var imagesList = ArrayList<Images>()
+        imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
+        if (imagesList.size > 0) {
+            val fileExist = File(imagesList[0].filePath).canRead()
+            if (fileExist) {
+                val imagename = imagesList[0].filePath.substring(
+                    imagesList[0].filePath.lastIndexOf("/")
+                )
+                byteparams["images[0]"] = VolleyMultipartRequest.DataPart(
+                    imagename, ImageUtils.decodeFile(imagesList[0].filePath), "image/jpeg"
+                )
+            }
+        }
+        val params: MutableMap<String, String> = java.util.HashMap()
+        params["latitude"] = location.latitude.toString()
+        params["longitude"] = location.longitude.toString()
+
+        ApiServices.apiPOSTMultipart(Api.check_out, mQueue!!, token!!, params, byteparams, object : ApiServiceListener{
+            override fun onResponseSuccess(response: String) {
+
+            }
+
+            override fun onJSONResponseSuccess(response: JSONObject) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                progressBar.visibility = View.GONE
+                val data = JSONObject(String(response.data))
+                val message = data.getString("message")
+                if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+                    BarikoiTrace.stopTracking()
+                }
+                appDatabase!!.imagesDao()!!.deleteAllImages()
+                ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                    override fun onConfirmed() {
+                        editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                        editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
+                        editor!!.commit()
+                        checkAttendance()
+
+                        val titles = arrayOf(mContext!!.resources.getString(R.string.attendance), mContext!!.resources.getString(R.string.history), mContext!!.resources.getString(R.string.summary))
+                        val fragments = ArrayList<Fragment>()
+                        fragments.add(CreateAttendanceFragment())
+                        fragments.add(HistoryFragment())
+                        fragments.add(SummaryFragment())
+                        viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+                        TabLayoutMediator(viewpagertab2!!, viewPager2!!,
+                            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
+                                tab.text = titles[position]
+                                tab.parent
+                            }).attach()
+                        viewPager2!!.setCurrentItem(0);
+                        viewPager2!!.setUserInputEnabled(false)
+                        for (i in 0 until viewpagertab2!!.getTabCount()) {
+                            val tab = (viewpagertab2!!.getChildAt(0) as ViewGroup).getChildAt(i)
+                            val p = tab.layoutParams as ViewGroup.MarginLayoutParams
+                            p.setMargins(15, 15, 10, 15)
+                            tab.requestLayout()
+                        }
+                    }
+
+                    override fun onCanceled() {
+                        TODO("Not yet implemented")
+                    }
+
+                })
+            }
+
+            @RequiresApi(Build.VERSION_CODES.KITKAT)
+            override fun onResponseFailure(error: VolleyError) {
+                progressBar.visibility = View.GONE
+                val s = String(
+                    error.networkResponse.data,
+                    StandardCharsets.UTF_8
+                )
+                val data = JSONObject(s)
+                val message = data.getString("message")
+                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onException(e: Exception) {
+                progressBar.visibility = View.GONE
+                Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+            }
+
+        })
+    }
+
     fun getLocation(choice: String){
-        ViewUtils.getLocation(mContext!!, ACTIVITY, object : LocationFetch {
+        ViewUtils.getLocation(mContext!!, ACTIVITY, object : LocationFetch{
             override fun onFetchSuccess(location: Location) {
-                if (choice.equals("submit")){
-                    submitAttendance(location)
+                if (choice.equals("check_in")){
+                    checkInAttendance(location)
+                }else if(choice.equals("check_out")){
+                    checkOutAttendance(location)
                 }else if(choice.equals("reversegeo")){
                     reverseGeoAddress(mContext!!, location.latitude, location.longitude)
                 }
@@ -354,8 +512,8 @@ class CreateAttendanceFragment : Fragment() {
                         val routesList = ArrayList<String>()
                         val routesArray = data.getJSONArray("routes")
                         if (routesArray.length() > 0){
-                            routeNameList!!.add(Pair("", resources.getString(R.string.select_route)))
-                            routesList.add(resources.getString(R.string.select_route))
+                            routeNameList!!.add(Pair("", mContext!!.resources.getString(R.string.select_route)))
+                            routesList.add(mContext!!.resources.getString(R.string.select_route))
                             for(i in 0 until routesArray.length()){
                                 val routeObj = routesArray.getJSONObject(i)
 
@@ -384,7 +542,7 @@ class CreateAttendanceFragment : Fragment() {
                                             ) as TextView
                                             //set the color of first item in the drop down list to gray
                                             if (position == 0) {
-                                                view.setTextColor(resources.getColor(R.color.text_title_2))
+                                                view.setTextColor(mContext!!.resources.getColor(R.color.text_title_2))
                                                 view.visibility = View.GONE
                                             } else {
                                                 //here it is possible to define color for other items by

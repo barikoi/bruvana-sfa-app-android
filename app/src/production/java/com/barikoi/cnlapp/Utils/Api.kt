@@ -65,8 +65,10 @@ object Api {
     val submit_notice = base_url+"api/v1/notices"
 
     /*attendance*/
-    val create_attendance = base_url+"api/v1/attendance"
+    val check_in = base_url+"api/v1/attendance"
+    val check_out = base_url+"api/v1/checkout"
     val get_attendance = base_url+"api/v1/get-attendance"
+    val check_today_attendance = base_url+"api/v1/get-attendance-history"
 
     /*home view*/
     val get_summary = base_url+"api/v1/get-overview-stats"
