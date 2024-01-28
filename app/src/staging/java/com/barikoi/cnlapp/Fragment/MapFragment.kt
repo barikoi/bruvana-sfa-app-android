@@ -110,8 +110,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     lateinit var ACTIVITY: MainActivity
     lateinit var pusher: Pusher
 
-    private lateinit var pusherClient: PusherClient
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ACTIVITY = context as MainActivity
@@ -149,9 +147,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     private fun setupWebSocket() {
-        val groupName = prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase().replace(" ","_")
+        val groupName =
+            prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase().replace(" ", "_")
 
-        val channelAuthorizer = HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
+        val channelAuthorizer =
+            HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
         val params: MutableMap<String, String> = java.util.HashMap()
         val traceToken = prefs!!.getString(Api.TRACE_TOKEN, "")
         if (traceToken != "") {
@@ -180,61 +180,57 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             }
         }, ConnectionState.ALL)
 
-        pusher.subscribePrivate("private-care_nutrition_39752", object : PrivateChannelEventListener {
-            override fun onSubscriptionSucceeded(channelName: String) {
-                println("Subscribed! "+channelName)
-            }
-
-            override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                println("onAuthenticationFailure: $message")
-            }
-
-            override fun onEvent(event: PusherEvent?) {
-                println("Received event with data: $event")
-            }
-        }).bind("care_nutrition_group_event_"+groupName, object : PrivateChannelEventListener{
-            override fun onEvent(event: PusherEvent?) {
-                println("Received event with data bind: $event")
-                val dataObj = JSONObject(event!!.data).getJSONObject("data")
-                println("Received data bind: $dataObj")
-                val userName = dataObj.getString("name")
-                println("Received userName bind: $userName")
-                val latitude = dataObj.getDouble("latitude")
-                val longitude = dataObj.getDouble("longitude")
-                val time = dataObj.getString("updated_at")
-                val iconTrace: Icon
-                if (dataObj.getInt("active_status") == 1){
-                    iconTrace = IconFactory.getInstance(mContext!!)
-                        .fromResource(R.drawable.trace_active)
-
-                }else{
-                    iconTrace  = IconFactory.getInstance(mContext!!)
-                        .fromResource(R.drawable.trace_inactive)
+        pusher.subscribePrivate(
+            "private-care_nutrition_39752",
+            object : PrivateChannelEventListener {
+                override fun onSubscriptionSucceeded(channelName: String) {
+                    println("Subscribed! " + channelName)
                 }
-                ACTIVITY.runOnUiThread {
-                    plotTraceUser(userName, time, latitude, longitude, iconTrace)
+
+                override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
+                    println("onAuthenticationFailure: $message")
                 }
-            }
 
-            override fun onSubscriptionSucceeded(channelName: String?) {
-                println("onSubscriptionSucceeded: $channelName")
-            }
+                override fun onEvent(event: PusherEvent?) {
+                    println("Received event with data: $event")
+                }
+            })
+            .bind("care_nutrition_group_event_" + groupName, object : PrivateChannelEventListener {
+                override fun onEvent(event: PusherEvent?) {
+                    println("Received event with data bind: $event")
+                    val dataObj = JSONObject(event!!.data).getJSONObject("data")
+                    println("Received data bind: $dataObj")
+                    val userName = dataObj.getString("name")
+                    println("Received userName bind: $userName")
+                    val latitude = dataObj.getDouble("latitude")
+                    val longitude = dataObj.getDouble("longitude")
+                    val time = dataObj.getString("updated_at")
+                    val iconTrace: Icon
+                    if (dataObj.getInt("active_status") == 1) {
+                        iconTrace = IconFactory.getInstance(mContext!!)
+                            .fromResource(R.drawable.trace_active)
 
-            override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                println("onAuthenticationFailure bind: $message")
-            }
-        })
+                    } else {
+                        iconTrace = IconFactory.getInstance(mContext!!)
+                            .fromResource(R.drawable.trace_inactive)
+                    }
+                    ACTIVITY.runOnUiThread {
+                        plotTraceUser(userName, time, latitude, longitude, iconTrace)
+                    }
+                }
+
+                override fun onSubscriptionSucceeded(channelName: String?) {
+                    println("onSubscriptionSucceeded: $channelName")
+                }
+
+                override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
+                    println("onAuthenticationFailure bind: $message")
+                }
+            })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        // Socket initialization
-        pusherClient = PusherClient()
-        pusherClient.connect()
-
-
 
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
             spinnerLayoutSO.visibility = View.VISIBLE
@@ -310,12 +306,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             if (shopList!![j].route_name.equals(routesList!![position].second)) {
                                 //shops.add(shopList!![i])
                                 if (selected_category != null) {
-                                    if (selected_category.equals("All")){
+                                    if (selected_category.equals("All")) {
                                         nonVerifiedShopList!!.add(shopList!![j])
                                         icon = IconFactory.getInstance(mContext!!)
                                             .fromResource(R.drawable.map_marker_red)
                                         plotMarker(shopList!![j], icon)
-                                    }else if (shopList!![j].category.equals(selected_category, true)) {
+                                    } else if (shopList!![j].category.equals(
+                                            selected_category,
+                                            true
+                                        )
+                                    ) {
                                         nonVerifiedShopList!!.add(shopList!![j])
                                         icon = IconFactory.getInstance(mContext!!)
                                             .fromResource(R.drawable.map_marker_red)
@@ -336,7 +336,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             }
         }
 
-        categoryList = arrayListOf<String>("All","A", "B", "C", "D", "E", "F", "P", "MP", "WS")
+        categoryList = arrayListOf<String>("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
         val adapter = ArrayAdapter(
             mContext!!,
             android.R.layout.simple_spinner_item, categoryList!!
@@ -371,12 +371,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 Log.d("RouteList", "all shops for " + shopList!![j].route_code)
                                 if (shopList!![j].route_name.equals(routeName)) {
                                     if (selected_category != null) {
-                                        if (selected_category.equals("All")){
+                                        if (selected_category.equals("All")) {
                                             nonVerifiedShopList!!.add(shopList!![j])
                                             icon = IconFactory.getInstance(mContext!!)
                                                 .fromResource(R.drawable.map_marker_red)
                                             plotMarker(shopList!![j], icon)
-                                        }else if (shopList!![j].category.equals(selected_category, true)) {
+                                        } else if (shopList!![j].category.equals(
+                                                selected_category,
+                                                true
+                                            )
+                                        ) {
                                             nonVerifiedShopList!!.add(shopList!![j])
                                             icon = IconFactory.getInstance(mContext!!)
                                                 .fromResource(R.drawable.map_marker_red)
@@ -423,12 +427,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         Log.d("RouteList", "all shops for " + shopList!![j].route_code)
                         if (shopList!![j].route_name.equals(spinner!!.selectedItem)) {
                             if (selected_category != null) {
-                                if (selected_category.equals("All")){
+                                if (selected_category.equals("All")) {
                                     nonVerifiedShopList!!.add(shopList!![j])
                                     icon = IconFactory.getInstance(mContext!!)
                                         .fromResource(R.drawable.map_marker_red)
                                     plotMarker(shopList!![j], icon)
-                                }else if (shopList!![j].category.equals(selected_category, true)) {
+                                } else if (shopList!![j].category.equals(selected_category, true)) {
                                     nonVerifiedShopList!!.add(shopList!![j])
                                     icon = IconFactory.getInstance(mContext!!)
                                         .fromResource(R.drawable.map_marker_red)
@@ -498,7 +502,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 soObj.getString("id"),
                                 soObj.getString("user_name"),
                                 soObj.getString("designation"),
-                                if(soObj.has("employee_id")) soObj.getString("employee_id") else "",
+                                if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
                                 imageUrl
                             )
                         )
@@ -622,7 +626,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             val is_Verified = outlet.getInt("is_verified")
 
                             if (selected_category != null) {
-                                if (selected_category.equals("All")){
+                                if (selected_category.equals("All")) {
                                     val shops = Shops(
                                         outlet_id,
                                         outlet_name,
@@ -652,7 +656,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                     icon = IconFactory.getInstance(mContext!!)
                                         .fromResource(R.drawable.map_marker_green)
                                     plotMarker(shops, icon)
-                                }else if (outlet_category.equals(selected_category, true)) {
+                                } else if (outlet_category.equals(selected_category, true)) {
                                     val shops = Shops(
                                         outlet_id,
                                         outlet_name,
@@ -769,7 +773,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         token = prefs!!.getString(Api.TOKEN, "")
     }
 
-    private fun plotTraceUser(userName: String, time: String, lat: Double, lon: Double, icon: Icon) {
+    private fun plotTraceUser(
+        userName: String,
+        time: String,
+        lat: Double,
+        lon: Double,
+        icon: Icon
+    ) {
         mMap!!.clear()
         mMap!!.addMarker(
             MarkerOptions().position(LatLng(lat, lon))
@@ -839,7 +849,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     }
 
                     override fun onFailure(exception: java.lang.Exception) {
-                        Toast.makeText(mContext!!,
+                        Toast.makeText(
+                            mContext!!,
                             exception.message,
                             Toast.LENGTH_SHORT
                         ).show()
