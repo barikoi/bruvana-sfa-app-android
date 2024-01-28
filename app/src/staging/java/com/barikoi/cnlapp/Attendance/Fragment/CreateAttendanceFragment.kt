@@ -38,6 +38,7 @@ import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.barikoi.cnlapp.Utils.extension.rotateViewAnimation
+import com.barikoi.cnlapp.databinding.FragmentCreateAttendanceBinding
 import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -58,6 +59,8 @@ import java.util.concurrent.Executors
 
 
 class CreateAttendanceFragment : Fragment() {
+
+    private lateinit var binding: FragmentCreateAttendanceBinding
 
     private val _sdfWatchTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
     private val _sdfWatchDay = SimpleDateFormat("EEEE", Locale.ENGLISH)
@@ -90,9 +93,9 @@ class CreateAttendanceFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_create_attendance, container, false)
+    ): View {
+        binding = FragmentCreateAttendanceBinding.inflate(inflater, container, false)
+        return  binding.root;
     }
 
     private fun init() {
@@ -211,35 +214,38 @@ class CreateAttendanceFragment : Fragment() {
                             val checkIn = attendanceObj.getString("checkin_time")
                             val checkOut = attendanceObj.getString("checkout_time")
 
-                            if (checkIn.equals(null) && checkOut.equals(null)) {
-                                btnCheckIn.isVisible = true
-                                btnCheckOut.isVisible = false
-                                btnCheckedAlready.isVisible = false
-                            } else if (!checkIn.equals(null) && checkOut.equals(null)) {
-                                btnCheckIn.isVisible = false
-                                btnCheckOut.isVisible = true
-                                btnCheckedAlready.isVisible = false
+                            if (checkIn.equals("null") && checkOut.equals("null")) {
+                                binding.btnCheckIn.isVisible = true
+                                binding.btnCheckOut.isVisible = false
+                                binding.btnCheckedAlready.isVisible = false
 
-                                spinnerRoutes.isEnabled = false
-                                imagePicker.isVisible = false
-                                layoutImagePick.isVisible = true
-                                editTextReason.isEnabled = false
+                                binding.imagePicker.visibility = View.VISIBLE
+                                binding.layoutImagePick.visibility = View.GONE
+                            } else if (!checkIn.equals("null") && checkOut.equals("null")) {
+                                binding.btnCheckIn.isVisible = false
+                                binding.btnCheckOut.isVisible = true
+                                binding.btnCheckedAlready.isVisible = false
+
+                                binding.spinnerRoutes.isEnabled = false
+                                binding.imagePicker.isVisible = false
+                                binding.layoutImagePick.isVisible = true
+                                binding.editTextReason.isEnabled = false
 
                             } else {
-                                btnCheckIn.isVisible = false
-                                btnCheckOut.isVisible = false
-                                btnCheckedAlready.isVisible = true
+                                binding.btnCheckIn.isVisible = false
+                                binding.btnCheckOut.isVisible = false
+                                binding.btnCheckedAlready.isVisible = true
 
-                                spinnerRoutes.isEnabled = false
-                                imagePicker.isVisible = false
-                                layoutImagePick.isVisible = true
-                                editTextReason.isEnabled = false
+                                binding.spinnerRoutes.isEnabled = false
+                                binding.imagePicker.isVisible = false
+                                binding.layoutImagePick.isVisible = true
+                                binding.editTextReason.isEnabled = false
                             }
 
                         } else {
-                            btnCheckIn.isVisible = true
-                            btnCheckOut.isVisible = false
-                            btnCheckedAlready.isVisible = false
+                            binding.btnCheckIn.isVisible = true
+                            binding.btnCheckOut.isVisible = false
+                            binding.btnCheckedAlready.isVisible = false
                         }
 
                     } catch (e: Exception) {
@@ -259,7 +265,6 @@ class CreateAttendanceFragment : Fragment() {
                 override fun onException(e: Exception) {
                     Toast.makeText(mContext!!, e.message, Toast.LENGTH_SHORT).show()
                 }
-
             })
     }
 
