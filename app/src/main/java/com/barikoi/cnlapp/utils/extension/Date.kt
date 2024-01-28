@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils.extension
+package com.barikoi.cnlapp.utils.extension
 
 import java.text.SimpleDateFormat
 import java.util.Date
