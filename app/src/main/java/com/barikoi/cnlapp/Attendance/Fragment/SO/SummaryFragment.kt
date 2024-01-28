@@ -15,11 +15,11 @@ import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.fragment_summary.absentCount
 import kotlinx.android.synthetic.main.fragment_summary.dateRangeLayout

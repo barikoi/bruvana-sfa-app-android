@@ -94,14 +94,14 @@
                     android:paddingBottom="16dp"
                     android:visibility="visible">
 
-                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                    <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerRoutes"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
                 <RelativeLayout
                     android:id="@+id/spinnerLayoutMarkets"
@@ -116,14 +116,14 @@
                     android:paddingBottom="16dp"
                     android:visibility="visible">
 
-                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                    <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerMarkets"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <HorizontalScrollView
@@ -216,14 +216,14 @@
                     android:paddingBottom="16dp"
                     android:visibility="visible">
 
-                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                    <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerShopType"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -239,14 +239,14 @@
                     android:paddingBottom="16dp"
                     android:visibility="visible">
 
-                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                    <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerCatOutlets"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -263,7 +263,7 @@
                     android:paddingBottom="16dp"
                     android:visibility="visible">
 
-                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                    <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerMarketOpportunity"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
@@ -271,7 +271,7 @@
                         android:theme="@style/spinnerItemStyle"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -288,14 +288,14 @@
                     android:paddingBottom="16dp"
                     android:visibility="visible">
 
-                    <com.barikoi.cnlapp.Utils.MoreSpinner
+                    <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerBuyer"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                    </com.barikoi.cnlapp.Utils.MoreSpinner>
+                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <EditText

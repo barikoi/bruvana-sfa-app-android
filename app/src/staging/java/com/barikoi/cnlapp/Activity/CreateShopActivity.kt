@@ -32,9 +32,9 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.*
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.*
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall

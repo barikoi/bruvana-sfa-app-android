@@ -19,8 +19,8 @@ import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.TO.HistoryTOFragment
 import com.barikoi.cnlapp.Attendance.Fragment.TO.SummaryTOFragment
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_attendance.viewpagertab

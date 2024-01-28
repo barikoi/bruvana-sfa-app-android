@@ -20,8 +20,8 @@ import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
 import com.barikoi.barikoitrace.models.BarikoiTraceError
 import com.barikoi.barikoitrace.models.BarikoiTraceUser
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions

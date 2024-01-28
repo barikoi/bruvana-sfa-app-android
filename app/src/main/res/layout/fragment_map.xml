@@ -29,14 +29,14 @@
             android:padding="4dp"
             android:visibility="visible">
 
-            <com.barikoi.cnlapp.Utils.MoreSpinner
+            <com.barikoi.cnlapp.utils.MoreSpinner
                 android:id="@+id/spinnerSO"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:theme="@style/spinnerItemStyle"
                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-            </com.barikoi.cnlapp.Utils.MoreSpinner>
+            </com.barikoi.cnlapp.utils.MoreSpinner>
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/spinnerLayout"
@@ -49,14 +49,14 @@
             android:padding="4dp"
             android:visibility="visible">
 
-            <com.barikoi.cnlapp.Utils.MoreSpinner
+            <com.barikoi.cnlapp.utils.MoreSpinner
                 android:id="@+id/spinnerRoutes"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:theme="@style/spinnerItemStyle"
                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-            </com.barikoi.cnlapp.Utils.MoreSpinner>
+            </com.barikoi.cnlapp.utils.MoreSpinner>
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/spinnerLayout2"
@@ -68,14 +68,14 @@
             android:padding="4dp"
             android:visibility="visible">
 
-            <com.barikoi.cnlapp.Utils.MoreSpinner
+            <com.barikoi.cnlapp.utils.MoreSpinner
                 android:id="@+id/spinnerCategory"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:theme="@style/spinnerItemStyle"
                 tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-            </com.barikoi.cnlapp.Utils.MoreSpinner>
+            </com.barikoi.cnlapp.utils.MoreSpinner>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"

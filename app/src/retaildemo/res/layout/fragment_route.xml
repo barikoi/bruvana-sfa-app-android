@@ -28,7 +28,7 @@
                 android:visibility="visible"
                 android:background="@drawable/cardview_bg">
 
-                <com.barikoi.cnlapp.Utils.MoreSpinner
+                <com.barikoi.cnlapp.utils.MoreSpinner
                     android:id="@+id/spinnerRoutes"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
@@ -36,7 +36,7 @@
                     android:theme="@style/spinnerItemStyle"
                     tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </com.barikoi.cnlapp.utils.MoreSpinner>
             </RelativeLayout>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/routelist"

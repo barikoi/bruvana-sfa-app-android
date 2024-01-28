@@ -25,12 +25,12 @@ import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.MoreSpinner
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.MoreSpinner
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -183,7 +183,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             "private-care_nutrition_39752",
             object : PrivateChannelEventListener {
                 override fun onSubscriptionSucceeded(channelName: String) {
-                    println("Subscribed! " + channelName)
+                    println("Subscribed! $channelName")
                 }
 
                 override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
@@ -194,7 +194,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     println("Received event with data: $event")
                 }
             })
-            .bind("care_nutrition_group_event_" + groupName, object : PrivateChannelEventListener {
+            .bind("care_nutrition_group_event_$groupName", object : PrivateChannelEventListener {
                 override fun onEvent(event: PusherEvent?) {
                     println("Received event with data bind: $event")
                     val dataObj = JSONObject(event!!.data).getJSONObject("data")

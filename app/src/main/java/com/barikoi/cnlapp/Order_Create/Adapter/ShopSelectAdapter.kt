@@ -13,7 +13,7 @@ import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.ViewUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 

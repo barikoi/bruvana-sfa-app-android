@@ -16,7 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
+import com.barikoi.cnlapp.utils.Api
 import com.github.ybq.android.spinkit.style.ThreeBounce
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory

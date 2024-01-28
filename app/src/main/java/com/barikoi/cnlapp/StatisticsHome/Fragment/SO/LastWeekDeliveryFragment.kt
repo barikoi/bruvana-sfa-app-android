@@ -18,11 +18,11 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_last_week_delivery.deliveryLayout
 import kotlinx.android.synthetic.main.fragment_last_week_delivery.listView
 import kotlinx.android.synthetic.main.fragment_last_week_delivery.progressBar

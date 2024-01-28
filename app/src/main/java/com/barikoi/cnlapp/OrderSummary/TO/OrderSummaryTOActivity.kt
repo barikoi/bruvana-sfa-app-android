@@ -24,11 +24,11 @@ import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.ProductStock.Model.OrdersSO
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_order_summary_to.bodyLayout

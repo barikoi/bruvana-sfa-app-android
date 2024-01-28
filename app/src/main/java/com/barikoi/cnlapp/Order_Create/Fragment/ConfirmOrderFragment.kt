@@ -26,11 +26,11 @@ import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_confirm_order.bodyLayout
 import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
 import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check

@@ -21,11 +21,11 @@ import com.barikoi.cnlapp.Attendance.Adapter.TO.HistoryListTOAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
-import com.barikoi.cnlapp.Utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
 import kotlinx.android.synthetic.main.fragment_history_t_o.*

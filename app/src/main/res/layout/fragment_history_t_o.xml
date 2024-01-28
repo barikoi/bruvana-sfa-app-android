@@ -27,14 +27,14 @@
                 android:padding="4dp"
                 android:visibility="visible">
 
-                <com.barikoi.cnlapp.Utils.MoreSpinner
+                <com.barikoi.cnlapp.utils.MoreSpinner
                     android:id="@+id/spinnerSO"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:theme="@style/spinnerItemStyle"
                     tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
 
-                </com.barikoi.cnlapp.Utils.MoreSpinner>
+                </com.barikoi.cnlapp.utils.MoreSpinner>
             </RelativeLayout>
             <TextView
                 android:layout_width="match_parent"
