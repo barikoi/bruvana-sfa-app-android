@@ -2,9 +2,7 @@ package com.barikoi.cnlapp.Order_Delivery
 
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -13,16 +11,15 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Activity.RouteActivity
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Model.SOList
-import com.barikoi.cnlapp.Fragment.RouteFragment
-import com.barikoi.cnlapp.Fragment.ShopListFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.BouncedOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.DeliveredOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.PendingOrderFragment
@@ -39,7 +36,6 @@ import kotlinx.android.synthetic.main.activity_order_delivery_update.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class OrderDeliveryUpdateActivity : AppCompatActivity() {
 

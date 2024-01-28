@@ -13,7 +13,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.TradeOffers.Model.ProductAll
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class TradeOfferListAdapter (var mValues: List<ProductAll>) : RecyclerView.Adapter<TradeOfferListAdapter.ViewHolder>(){
     var products: List<ProductAll> = mValues

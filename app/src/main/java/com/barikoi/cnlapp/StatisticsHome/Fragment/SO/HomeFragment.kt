@@ -5,16 +5,21 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
-import com.android.volley.*
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity.Companion.routeName_selected
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.R
@@ -29,12 +34,25 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_home.view.*
+import kotlinx.android.synthetic.main.fragment_home.view.bodyLayout
+import kotlinx.android.synthetic.main.fragment_home.view.btn_tryAgain
+import kotlinx.android.synthetic.main.fragment_home.view.dateRangeLayoutHome
+import kotlinx.android.synthetic.main.fragment_home.view.dotsLayout
+import kotlinx.android.synthetic.main.fragment_home.view.layoutSecond
+import kotlinx.android.synthetic.main.fragment_home.view.layoutThird
+import kotlinx.android.synthetic.main.fragment_home.view.no_route_check
+import kotlinx.android.synthetic.main.fragment_home.view.targetListView
+import kotlinx.android.synthetic.main.fragment_home.view.tvDateRange
+import kotlinx.android.synthetic.main.fragment_home.view.viewPager
+import kotlinx.android.synthetic.main.fragment_home.view.viewPagerSecond
+import kotlinx.android.synthetic.main.fragment_home.view.viewpagertab
+import kotlinx.android.synthetic.main.fragment_home.view.viewpagertabSecond
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class HomeFragment : Fragment() {

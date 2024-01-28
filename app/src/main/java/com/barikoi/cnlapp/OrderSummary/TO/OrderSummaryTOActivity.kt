@@ -4,16 +4,17 @@ import android.app.ProgressDialog
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.widget.*
-import androidx.annotation.RequiresApi
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -30,12 +31,34 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.activity_order_summary_to.*
+import kotlinx.android.synthetic.main.activity_order_summary_to.bodyLayout
+import kotlinx.android.synthetic.main.activity_order_summary_to.bodyLayoutScroll
+import kotlinx.android.synthetic.main.activity_order_summary_to.bpcCount
+import kotlinx.android.synthetic.main.activity_order_summary_to.btnBack
+import kotlinx.android.synthetic.main.activity_order_summary_to.collectionLayout
+import kotlinx.android.synthetic.main.activity_order_summary_to.dateRangeLayout
+import kotlinx.android.synthetic.main.activity_order_summary_to.editTextSearchShop
+import kotlinx.android.synthetic.main.activity_order_summary_to.lpcCount
+import kotlinx.android.synthetic.main.activity_order_summary_to.orderList
+import kotlinx.android.synthetic.main.activity_order_summary_to.order_collection_count
+import kotlinx.android.synthetic.main.activity_order_summary_to.ovCount
+import kotlinx.android.synthetic.main.activity_order_summary_to.progressBar4
+import kotlinx.android.synthetic.main.activity_order_summary_to.progressBarHome
+import kotlinx.android.synthetic.main.activity_order_summary_to.spinnerMenu
+import kotlinx.android.synthetic.main.activity_order_summary_to.summaryLayout2
+import kotlinx.android.synthetic.main.activity_order_summary_to.tabLayoutOrder
+import kotlinx.android.synthetic.main.activity_order_summary_to.tabLayoutTarget
+import kotlinx.android.synthetic.main.activity_order_summary_to.targetLayout
+import kotlinx.android.synthetic.main.activity_order_summary_to.total_bounce_count
+import kotlinx.android.synthetic.main.activity_order_summary_to.tryAgain2
+import kotlinx.android.synthetic.main.activity_order_summary_to.tvDateRange
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {

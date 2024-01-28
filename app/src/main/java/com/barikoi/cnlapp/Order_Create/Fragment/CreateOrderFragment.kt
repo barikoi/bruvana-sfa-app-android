@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -28,11 +28,14 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_create_order.*
+import kotlinx.android.synthetic.main.fragment_create_order.bodyLayout
+import kotlinx.android.synthetic.main.fragment_create_order.btn_tryAgain
+import kotlinx.android.synthetic.main.fragment_create_order.no_route_check
 import org.json.JSONObject
 import java.io.Serializable
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class CreateOrderFragment : Fragment(){
     lateinit var ACTIVITY: MainActivity

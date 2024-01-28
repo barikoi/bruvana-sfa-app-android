@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnEditShopListener
-import java.util.*
+import java.util.Locale
 
 class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener): RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),
     Filterable {

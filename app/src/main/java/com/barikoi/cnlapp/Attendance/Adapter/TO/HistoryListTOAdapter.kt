@@ -10,7 +10,7 @@ import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 
 class HistoryListTOAdapter (val histories: List<HistoryList>) : RecyclerView.Adapter<HistoryListTOAdapter.ViewHolder>() {

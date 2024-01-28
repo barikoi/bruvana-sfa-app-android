@@ -8,8 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
-import kotlinx.android.synthetic.main.fragment_product_select.*
-import org.w3c.dom.Text
 
 class RouteListAdapter(val routes: List<Routes>) : RecyclerView.Adapter<RouteListAdapter.ViewHolder>() {
 

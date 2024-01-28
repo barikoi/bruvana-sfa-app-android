@@ -3,14 +3,14 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -23,9 +23,10 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_last_week_delivery.*
+import kotlinx.android.synthetic.main.fragment_last_week_delivery.deliveryLayout
+import kotlinx.android.synthetic.main.fragment_last_week_delivery.listView
+import kotlinx.android.synthetic.main.fragment_last_week_delivery.progressBar
 import org.json.JSONObject
-import kotlin.collections.ArrayList
 
 
 class LastWeekDeliveryFragment : Fragment() {

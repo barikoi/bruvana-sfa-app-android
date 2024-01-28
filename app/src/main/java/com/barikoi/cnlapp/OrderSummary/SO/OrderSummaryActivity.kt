@@ -1,12 +1,12 @@
 package com.barikoi.cnlapp.OrderSummary.SO
 
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -21,12 +21,22 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_order_summary.*
+import kotlinx.android.synthetic.main.activity_order_summary.bodyLayout
 import kotlinx.android.synthetic.main.activity_order_summary.btnBack
+import kotlinx.android.synthetic.main.activity_order_summary.btn_tryAgain
+import kotlinx.android.synthetic.main.activity_order_summary.dateRangeLayout
+import kotlinx.android.synthetic.main.activity_order_summary.editTextSearchShop
+import kotlinx.android.synthetic.main.activity_order_summary.no_route_check
+import kotlinx.android.synthetic.main.activity_order_summary.orderList
+import kotlinx.android.synthetic.main.activity_order_summary.progressBar
+import kotlinx.android.synthetic.main.activity_order_summary.progressBarOrder
+import kotlinx.android.synthetic.main.activity_order_summary.tvDateRange
 import kotlinx.android.synthetic.main.activity_order_summary.tvRouteName
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
 

@@ -10,7 +10,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.ActiveInactiveSO
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class ActiveInactiveAdapter(val histories: List<ActiveInactiveSO>) : RecyclerView.Adapter<ActiveInactiveAdapter.ViewHolder>() {
     override fun onCreateViewHolder(

@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.Order_Create.Adapter
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -12,11 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
+import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
+import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.Utils.Api
 import java.text.DecimalFormat

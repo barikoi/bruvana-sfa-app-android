@@ -2,15 +2,15 @@ package com.barikoi.cnlapp.Notice
 
 import android.app.Dialog
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -22,12 +22,17 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_notice.*
 import kotlinx.android.synthetic.main.activity_notice.btnBack
+import kotlinx.android.synthetic.main.activity_notice.dateRangeLayout
+import kotlinx.android.synthetic.main.activity_notice.fab_create_notice
+import kotlinx.android.synthetic.main.activity_notice.noticeList
+import kotlinx.android.synthetic.main.activity_notice.tvDateRange
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class NoticeActivity : AppCompatActivity() {
     private var prefs: SharedPreferences? = null

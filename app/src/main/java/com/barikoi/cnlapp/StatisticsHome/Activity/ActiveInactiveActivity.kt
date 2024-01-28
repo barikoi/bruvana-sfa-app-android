@@ -1,8 +1,8 @@
 package com.barikoi.cnlapp.StatisticsHome.Activity
 
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -15,15 +15,14 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import kotlinx.android.synthetic.main.activity_active_inactive.*
 import kotlinx.android.synthetic.main.activity_active_inactive.btnBack
+import kotlinx.android.synthetic.main.activity_active_inactive.soList
 import kotlinx.android.synthetic.main.activity_active_inactive.tvTitle
-import kotlinx.android.synthetic.main.activity_order_summary_to.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Calendar
+import java.util.Locale
 
 class ActiveInactiveActivity : AppCompatActivity() {
     var token : String? = null

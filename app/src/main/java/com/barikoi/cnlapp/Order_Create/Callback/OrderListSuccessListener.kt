@@ -1,9 +1,8 @@
 package com.barikoi.cnlapp.Order_Create.Callback
 
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import org.json.JSONArray
-import java.util.*
+import java.util.Date
 
 interface OrderListSuccessListener {
     fun onSuccess(array: JSONArray)

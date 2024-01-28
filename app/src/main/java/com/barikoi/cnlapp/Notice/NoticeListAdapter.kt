@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 
 class NoticeListAdapter (val notices: List<Notice>) : RecyclerView.Adapter<NoticeListAdapter.ViewHolder>(){

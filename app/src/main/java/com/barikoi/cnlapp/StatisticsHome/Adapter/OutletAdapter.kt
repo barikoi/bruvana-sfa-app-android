@@ -20,8 +20,7 @@ import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.bumptech.glide.Glide
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Locale
 
 
 class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String) : RecyclerView.Adapter<OutletAdapter.ViewHolder>() {

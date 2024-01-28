@@ -2,14 +2,14 @@ package com.barikoi.cnlapp.TradeOffers
 
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -23,10 +23,8 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-
 import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
-import kotlin.collections.ArrayList
 
 class TradeOffersActivity : AppCompatActivity() {
     private var prefs: SharedPreferences? = null

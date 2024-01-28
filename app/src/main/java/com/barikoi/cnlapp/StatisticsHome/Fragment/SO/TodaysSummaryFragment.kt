@@ -3,14 +3,14 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -20,11 +20,13 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_todays_summary.view.*
+import kotlinx.android.synthetic.main.fragment_todays_summary.view.progressBar
+import kotlinx.android.synthetic.main.fragment_todays_summary.view.tabLayoutToday
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class TodaysSummaryFragment : Fragment() {
 

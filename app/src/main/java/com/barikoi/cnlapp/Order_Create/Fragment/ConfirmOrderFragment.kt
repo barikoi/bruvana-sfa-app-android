@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,8 +12,11 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.*
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
@@ -29,17 +31,18 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
-import com.google.android.gms.location.*
-import kotlinx.android.synthetic.main.fragment_confirm_order.*
 import kotlinx.android.synthetic.main.fragment_confirm_order.bodyLayout
 import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
 import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
-import kotlinx.android.synthetic.main.fragment_confirm_order.view.*
-import kotlinx.android.synthetic.main.fragment_create_order.*
+import kotlinx.android.synthetic.main.fragment_confirm_order.tvRouteName
+import kotlinx.android.synthetic.main.fragment_confirm_order.view.bodyLayout
+import kotlinx.android.synthetic.main.fragment_confirm_order.view.no_route_check
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessListener {

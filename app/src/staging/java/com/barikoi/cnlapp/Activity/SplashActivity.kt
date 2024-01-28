@@ -7,13 +7,13 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import androidx.preference.PreferenceManager
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.Utils.Api
@@ -23,7 +23,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import io.sentry.Sentry
-import java.util.*
+import java.util.Locale
 
 class SplashActivity : AppCompatActivity() {
 

@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -23,6 +22,7 @@ import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.barikoitrace.BarikoiTrace
@@ -51,9 +51,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.appcontent_main.*
-import kotlinx.android.synthetic.main.fragment_create_attendance.btnCheckIn
-import kotlinx.android.synthetic.main.fragment_create_attendance.btnCheckOut
-import kotlinx.android.synthetic.main.fragment_create_attendance.btnCheckedAlready
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException

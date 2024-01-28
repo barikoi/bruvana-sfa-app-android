@@ -1,6 +1,5 @@
 package com.barikoi.cnlapp.StatisticsHome.Model
 
-import com.barikoi.cnlapp.Model.Products
 import java.io.Serializable
 
 class OutletStatistics (

@@ -2,7 +2,6 @@ package com.barikoi.cnlapp.Utils
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.Spinner
 import androidx.appcompat.widget.AppCompatSpinner
 
 class MoreSpinner: AppCompatSpinner {

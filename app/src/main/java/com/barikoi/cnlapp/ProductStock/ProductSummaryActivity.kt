@@ -2,14 +2,14 @@ package com.barikoi.cnlapp.ProductStock
 
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -21,11 +21,6 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_product_summary.*
-import kotlinx.android.synthetic.main.activity_product_summary.btnBack
-import kotlinx.android.synthetic.main.activity_product_summary.dateRangeLayout
-import kotlinx.android.synthetic.main.activity_product_summary.productList
-import kotlinx.android.synthetic.main.activity_product_summary.spinnerLayout
-import kotlinx.android.synthetic.main.activity_product_summary.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*

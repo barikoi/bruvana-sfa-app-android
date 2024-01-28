@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +13,8 @@ import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.core.view.marginLeft
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError

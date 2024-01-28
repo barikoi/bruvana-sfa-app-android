@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class ReasonListAdapter(val reasons: List<Pair<String, String>>) : RecyclerView.Adapter<ReasonListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(

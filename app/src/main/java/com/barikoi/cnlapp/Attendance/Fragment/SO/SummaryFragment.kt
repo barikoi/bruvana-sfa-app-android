@@ -3,13 +3,15 @@ package com.barikoi.cnlapp.Attendance.Fragment.SO
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.PreferenceManager
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.android.volley.*
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
 import com.barikoi.cnlapp.R
@@ -19,10 +21,17 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.fragment_summary.*
+import kotlinx.android.synthetic.main.fragment_summary.absentCount
+import kotlinx.android.synthetic.main.fragment_summary.dateRangeLayout
+import kotlinx.android.synthetic.main.fragment_summary.lateCount
+import kotlinx.android.synthetic.main.fragment_summary.presentCount
+import kotlinx.android.synthetic.main.fragment_summary.summaryListView
+import kotlinx.android.synthetic.main.fragment_summary.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class SummaryFragment : Fragment() {

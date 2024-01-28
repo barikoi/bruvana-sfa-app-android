@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.imagecapture
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +11,13 @@ import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.imagecapture.Model.ImageList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.imagecapture.Model.ImageList
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
-import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
+import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import java.io.File
 
 class ImageRecyclerAdapter(private val  mValues: ArrayList<ImageList>, private val taskId: String): RecyclerView.Adapter<ImageRecyclerAdapter.ViewHolder>(){

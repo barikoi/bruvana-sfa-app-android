@@ -6,7 +6,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
-import java.util.*
+import java.util.Locale
 
 class CNLApp: Application() {
     override fun onCreate() {

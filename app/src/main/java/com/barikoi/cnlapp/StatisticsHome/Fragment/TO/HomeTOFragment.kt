@@ -5,15 +5,19 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ProgressBar
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -24,7 +28,6 @@ import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
-import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.*
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.barikoi.cnlapp.Utils.Api
 import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
@@ -34,11 +37,29 @@ import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_home_t_o.*
+import kotlinx.android.synthetic.main.fragment_home_t_o.activeCount
+import kotlinx.android.synthetic.main.fragment_home_t_o.activeLayout
+import kotlinx.android.synthetic.main.fragment_home_t_o.bodyLayout
+import kotlinx.android.synthetic.main.fragment_home_t_o.btn_tryAgain
+import kotlinx.android.synthetic.main.fragment_home_t_o.dateRangeLayoutHome
+import kotlinx.android.synthetic.main.fragment_home_t_o.inactiveCount
+import kotlinx.android.synthetic.main.fragment_home_t_o.inactiveLayout
+import kotlinx.android.synthetic.main.fragment_home_t_o.lastweeksummary
+import kotlinx.android.synthetic.main.fragment_home_t_o.layoutFourth
+import kotlinx.android.synthetic.main.fragment_home_t_o.layoutSecond
+import kotlinx.android.synthetic.main.fragment_home_t_o.liveStockUpdate
+import kotlinx.android.synthetic.main.fragment_home_t_o.no_route_check
+import kotlinx.android.synthetic.main.fragment_home_t_o.tabLayout
+import kotlinx.android.synthetic.main.fragment_home_t_o.targetListView
+import kotlinx.android.synthetic.main.fragment_home_t_o.tvDateRange
+import kotlinx.android.synthetic.main.fragment_home_t_o.viewPager
+import kotlinx.android.synthetic.main.fragment_home_t_o.viewpagertab
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class HomeTOFragment : Fragment() {

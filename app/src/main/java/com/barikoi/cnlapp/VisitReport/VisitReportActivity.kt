@@ -2,13 +2,13 @@ package com.barikoi.cnlapp.VisitReport
 
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -21,15 +21,9 @@ import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.activity_visit_report.*
-import kotlinx.android.synthetic.main.activity_visit_report.dateRangeLayout
-import kotlinx.android.synthetic.main.activity_visit_report.spinnerLayout
-import kotlinx.android.synthetic.main.activity_visit_report.spinnerSO
-import kotlinx.android.synthetic.main.activity_visit_report.tabLayout
-import kotlinx.android.synthetic.main.activity_visit_report.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class VisitReportActivity : AppCompatActivity() {
     var token: String? = null

@@ -1,19 +1,23 @@
 package com.barikoi.cnlapp.StatisticsHome.Fragment.TO
 
 import android.app.ProgressDialog
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -24,7 +28,6 @@ import com.barikoi.cnlapp.Utils.ApiService.ApiServices
 import com.barikoi.cnlapp.Utils.RequestQueueSingleton
 import com.barikoi.cnlapp.Utils.ViewUtils
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.*
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.bpcCount
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.lpcCount
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.ovCount
@@ -34,11 +37,11 @@ import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.tabLayout2
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.tabLayoutTarget
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.targetLayout
 import kotlinx.android.synthetic.main.fragment_last_week_summary_t_o.tryAgain
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 
 class LastWeekSummaryTOFragment : Fragment() {

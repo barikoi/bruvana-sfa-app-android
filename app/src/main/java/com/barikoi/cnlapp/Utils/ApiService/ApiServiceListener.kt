@@ -1,7 +1,6 @@
 package com.barikoi.cnlapp.Utils.ApiService
 
 import com.android.volley.NetworkResponse
-import com.android.volley.Response
 import com.android.volley.VolleyError
 import org.json.JSONObject
 
