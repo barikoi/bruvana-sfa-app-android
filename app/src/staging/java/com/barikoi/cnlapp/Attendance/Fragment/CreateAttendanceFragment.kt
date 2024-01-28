@@ -31,10 +31,10 @@ import com.barikoi.cnlapp.Attendance.Fragment.SO.HistoryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.*
-import com.barikoi.cnlapp.Utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.Utils.ApiService.ApiServices
-import com.barikoi.cnlapp.Utils.extension.rotateViewAnimation
+import com.barikoi.cnlapp.utils.*
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.extension.rotateViewAnimation
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.FragmentCreateAttendanceBinding
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
@@ -106,11 +106,11 @@ class CreateAttendanceFragment : Fragment() {
 
         tvDate.text = dateTime
 
-        imagePicker.taskId = "taskId"
-        imagePicker.CAMERA = 4
-        imagePicker.setMainactivity(requireActivity())
-        imagePicker.setFragmetnt(this)
-        imagePicker.setCameraLauncher(startCamera)
+        attendanceImagePicker.taskId = "taskId"
+        attendanceImagePicker.CAMERA = 4
+        attendanceImagePicker.setMainactivity(requireActivity())
+        attendanceImagePicker.setFragmetnt(this)
+        attendanceImagePicker.setCameraLauncher(startCamera)
 
 
         getImageFromDB()
@@ -209,6 +209,8 @@ class CreateAttendanceFragment : Fragment() {
                 override fun onResponseSuccess(response: String) {
                     try {
                         val data = JSONObject(response)
+                        AppLogger.log("ATTENDANCE CHECK ${data}")
+
                         if (data.has("attendances") && !data.isNull("attendances")) {
                             val attendanceObj = data.getJSONObject("attendances")
                             val checkIn = attendanceObj.getString("checkin_time")
@@ -218,17 +220,16 @@ class CreateAttendanceFragment : Fragment() {
                                 binding.btnCheckIn.isVisible = true
                                 binding.btnCheckOut.isVisible = false
                                 binding.btnCheckedAlready.isVisible = false
-
-                                binding.imagePicker.visibility = View.VISIBLE
-                                binding.layoutImagePick.visibility = View.GONE
+                                binding.llImagePickerView.isVisible = false
+                                binding.attendanceImagePicker.isVisible = true
                             } else if (!checkIn.equals("null") && checkOut.equals("null")) {
                                 binding.btnCheckIn.isVisible = false
                                 binding.btnCheckOut.isVisible = true
                                 binding.btnCheckedAlready.isVisible = false
 
                                 binding.spinnerRoutes.isEnabled = false
-                                binding.imagePicker.isVisible = false
-                                binding.layoutImagePick.isVisible = true
+                                binding.attendanceImagePicker.isVisible = true
+                                binding.llImagePickerView.isVisible = false
                                 binding.editTextReason.isEnabled = false
 
                             } else {
@@ -237,8 +238,8 @@ class CreateAttendanceFragment : Fragment() {
                                 binding.btnCheckedAlready.isVisible = true
 
                                 binding.spinnerRoutes.isEnabled = false
-                                binding.imagePicker.isVisible = false
-                                binding.layoutImagePick.isVisible = true
+                                binding.attendanceImagePicker.isVisible = false
+                                binding.llImagePickerView.isVisible = true
                                 binding.editTextReason.isEnabled = false
                             }
 
@@ -246,6 +247,8 @@ class CreateAttendanceFragment : Fragment() {
                             binding.btnCheckIn.isVisible = true
                             binding.btnCheckOut.isVisible = false
                             binding.btnCheckedAlready.isVisible = false
+                            binding.llImagePickerView.isVisible = false
+                            binding.attendanceImagePicker.isVisible = true
                         }
 
                     } catch (e: Exception) {
@@ -280,9 +283,9 @@ class CreateAttendanceFragment : Fragment() {
 
                 if (fileExist) {
                     try {
-                        val bitmap = imagePicker.getRotateImage(dbPhotoPath)
+                        val bitmap = attendanceImagePicker.getRotateImage(dbPhotoPath)
                         isImageAdded = true
-                        imagePicker.setLocalImage(
+                        attendanceImagePicker.setLocalImage(
                             bitmap,
                             dbPhotoPath,
                             imageList[p]!!.position,
@@ -355,7 +358,7 @@ class CreateAttendanceFragment : Fragment() {
                     if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
                         ViewUtils.startTracking(requireActivity(), mContext!!)
                     }
-                    appDatabase!!.imagesDao()!!.deleteAllImages()
+//                    appDatabase!!.imagesDao()!!.deleteAllImages()
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
                             editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
@@ -729,7 +732,7 @@ class CreateAttendanceFragment : Fragment() {
         if (result.getResultCode() == RESULT_CANCELED) {
             if (filePath != null) {
                 Log.d("Image", "Canceled: $filePath")
-                imagePicker.deleteFileLocal(filePath)
+                attendanceImagePicker.deleteFileLocal(filePath)
                 editor!!.putString(ApiCall.IMAGE_PATH, "")
                 editor!!.apply()
             }
@@ -746,7 +749,7 @@ class CreateAttendanceFragment : Fragment() {
             } else {
                 imagePosition + 1
             }
-            imagePicker.AddNewImage(
+            attendanceImagePicker.AddNewImage(
                 result.data,
                 CAMERA,
                 imagePosition,
