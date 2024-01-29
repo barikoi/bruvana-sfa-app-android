@@ -49,6 +49,7 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.VisitReport.VisitReportActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.appcontent_main.*
 import org.json.JSONException
@@ -57,6 +58,8 @@ import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     var drawer: DrawerLayout? = null
     private var navigationDrawer: NavigationView? = null
