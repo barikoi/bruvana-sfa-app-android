@@ -65,14 +65,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var navigationDrawer: NavigationView? = null
     private var menu_drawer: ImageView? = null
     private var tvHeaderUserName: TextView? = null
-    private var token : String?= ""
+    private var token: String? = ""
     private var userId: String? = ""
     private var userType: String? = ""
     private var userName: String? = ""
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var nav_view: BottomNavigationView? = null
-    var queue : RequestQueue? = null
+    var queue: RequestQueue? = null
 
     companion object {
         var routeName_selected: TextView? = null
@@ -123,17 +123,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         userLayout.visibility = View.VISIBLE
         tvUserName.setText(userName)
-        if (prefs!!.getString(Api.TRACE_TOKEN, "").equals("null") || prefs!!.getString(Api.TRACE_TOKEN, "").equals("")){
+        if (prefs!!.getString(Api.TRACE_TOKEN, "")
+                .equals("null") || prefs!!.getString(Api.TRACE_TOKEN, "").equals("")
+        ) {
             traceLogin()
-        }else{
+        } else {
             prefs!!.getString(Api.TRACE_TOKEN, "")?.let { traceAuthCheck(it) }
         }
         traceLogin()
-        getAuthUser(token, Api.authUserCheck+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59&app_version="+BuildConfig.VERSION_NAME)
-        if (userType.equals("TO", true)){
+        getAuthUser(
+            token,
+            Api.authUserCheck + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59&app_version=" + BuildConfig.VERSION_NAME
+        )
+        if (userType.equals("TO", true)) {
             routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)
-        }else{
+        } else {
             setCurrentFragment(HomeFragment(), this@MainActivity)
         }
 
@@ -146,7 +151,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val versionName: String = BuildConfig.VERSION_NAME
         tvAppVersion.setText("version $versionName")
         tvHeaderUserName!!.text = userName
-        if (prefs!!.getString(Api.EMAIL, "")!!.length >0 && !prefs!!.getString(Api.EMAIL, "")!!.equals("null")){
+        if (prefs!!.getString(Api.EMAIL, "")!!.length > 0 && !prefs!!.getString(Api.EMAIL, "")!!
+                .equals("null")
+        ) {
             tvHeaderEmail.visibility = View.VISIBLE
             tvHeaderEmail.text = prefs!!.getString(Api.EMAIL, "")
         }
@@ -165,9 +172,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .show()
         }
 
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)){
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
             fab_order.visibility = View.GONE
-        }else{
+        } else {
             fab_order.visibility = View.VISIBLE
         }
 
@@ -182,7 +189,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         nav_view!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            if (fab_order.isVisible){
+            if (fab_order.isVisible) {
                 fab_order.background.setTint(resources.getColor(R.color.white))
                 fab_order.drawable.setTint(resources.getColor(R.color.fab_icon))
             }
@@ -191,13 +198,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     tvTitle.text = ""
                     tvTitle.visibility = View.GONE
                     userLayout.visibility = View.VISIBLE
-                    if (userType.equals("TO", true)){
+                    if (userType.equals("TO", true)) {
                         setCurrentFragment(HomeTOFragment(), this@MainActivity)
-                    }else{
+                    } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
                     return@OnNavigationItemSelectedListener true
                 }
+
                 R.id.navigation_route -> {
                     tvTitle!!.text = resources.getString(R.string.route_plan)
                     userLayout.visibility = View.GONE
@@ -218,6 +226,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     tvTitle.visibility = View.VISIBLE
                     return@OnNavigationItemSelectedListener true
                 }
+
                 R.id.navigation_attendance -> {
                     tvTitle.text = resources.getString(R.string.attendance)
                     tvTitle.visibility = View.VISIBLE
@@ -240,14 +249,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Api.traceLogin,
             queue!!, "", parameters, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
-                    try{
+                    try {
                         val data = JSONObject(response)
-                        if (data.has("data") && !data.isNull("data")){
+                        if (data.has("data") && !data.isNull("data")) {
                             editor!!.putString(Api.TRACE_TOKEN, data.getString("data"))
                             editor!!.commit()
                             traceAuthCheck(data.getString("data"))
                         }
-                    }catch (e:Exception){
+                    } catch (e: Exception) {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     }
@@ -273,12 +282,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun traceAuthCheck(tokenT: String) {
-        ApiServices.apiGET(Api.traceAuthCheck, queue!!, tokenT, object : ApiServiceListener{
+        ApiServices.apiGET(Api.traceAuthCheck, queue!!, tokenT, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
-                if (response != null){
+                if (response != null) {
                     try {
                         val obj = JSONObject(response)
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
 
@@ -308,24 +317,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getAuthUser(token: String?, url: String) {
-        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener{
+        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
-                if (response != null){
+                if (response != null) {
                     try {
                         val obj = JSONObject(response)
-                        if (obj.has("user")){
+                        if (obj.has("user")) {
                             val userObj = obj.getJSONObject("user")
-                            if (userObj.has("so_ranking") && !userObj.isNull("so_ranking")){
+                            if (userObj.has("so_ranking") && !userObj.isNull("so_ranking")) {
                                 rankLayout.visibility = View.VISIBLE
                                 tvRank.setText(userObj.getInt("so_ranking").toString())
                                 rank_suffix.setText(toOrdinal(userObj.getInt("so_ranking")))
-                            }else{
+                            } else {
                                 //rankLayout.visibility = View.VISIBLE
                                 //tvRank.setText("0")
                             }
                             //routeName_selected!!.setText(prefs!!.getString(Api.SELECTED_ROUTE_NAME, ""))
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
 
@@ -343,13 +352,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onResponseFailure(error: VolleyError) {
                 if (error is TimeoutError) {
                     //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                    Toast.makeText(applicationContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "Request timeout!! Check your internet connection or Contact Admin",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
                 if (error is NoConnectionError) {
                     //mListerner.onFailure("Turn on your internet connection and Try again")
-                    Toast.makeText(applicationContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "Turn on your internet connection and Try again",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-                if (error is AuthFailureError){
+                if (error is AuthFailureError) {
                     logout(applicationContext)
                 }
                 if (error != null && error.networkResponse != null) {
@@ -359,7 +376,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val data = JSONObject(s)
                         //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
                         //mListerner.onFailure(data.getString("message"))
-                        Toast.makeText(applicationContext, data.getString("message"), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            applicationContext,
+                            data.getString("message"),
+                            Toast.LENGTH_LONG
+                        ).show()
                     } catch (e: UnsupportedEncodingException) {
                         Sentry.captureException(e)
                         e.printStackTrace()
@@ -385,26 +406,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Api.check_today_attendance,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
-                    try{
+                    try {
                         val data = JSONObject(response)
-                        if (data.has("attendances") && !data.isNull("attendances")){
+                        if (data.has("attendances") && !data.isNull("attendances")) {
                             val attendanceObj = data.getJSONObject("attendances")
                             val check_in = attendanceObj.getString("checkin_time")
                             val check_out = attendanceObj.getString("checkout_time")
-                            if (!check_in.equals("null") && !check_out.equals("null")){
+                            if (!check_in.equals("null") && !check_out.equals("null")) {
                                 BarikoiTrace.stopTracking()
-                            }else if (!check_in.equals("null") && check_out.equals("null")){
-                                if (!BarikoiTrace.isLocationTracking()){
+                            } else if (!check_in.equals("null") && check_out.equals("null")) {
+                                if (!BarikoiTrace.isLocationTracking()) {
                                     ViewUtils.startTracking(this@MainActivity, applicationContext)
                                 }
-                            }else{
+                            } else {
                                 BarikoiTrace.stopTracking()
                             }
-                        }else{
+                        } else {
                             BarikoiTrace.stopTracking()
                         }
 
-                    }catch (e:Exception){
+                    } catch (e: Exception) {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     }
@@ -428,9 +449,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             })
     }
+
     fun toOrdinal(day: Int) =
-            if (day % 100 / 10 == 1) "th"
-            else when (day % 10) { 1 -> "st" 2 -> "nd" 3 -> "rd" else -> "th" }
+        if (day % 100 / 10 == 1) "th"
+        else when (day % 10) {
+            1 -> "st"
+            2 -> "nd"
+            3 -> "rd"
+            else -> "th"
+        }
 
     fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
         val fragmentManager = (activity as FragmentActivity).supportFragmentManager
@@ -443,24 +470,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.menu_order_summary) {
-            if (userType.equals("TO", true)){
+            if (userType.equals("TO", true)) {
                 startActivity(Intent(this@MainActivity, OrderSummaryTOActivity::class.java))
-            }else{
+            } else {
                 startActivity(Intent(this@MainActivity, OrderSummaryActivity::class.java))
             }
         } else if (id == R.id.menu_shop_route) {
             startActivity(Intent(this@MainActivity, RouteActivity::class.java))
         } else if (id == R.id.menu_order_delivery_update) {
             startActivity(Intent(this@MainActivity, OrderDeliveryUpdateActivity::class.java))
-        }else if (id == R.id.menu_notice){
+        } else if (id == R.id.menu_notice) {
             startActivity(Intent(this@MainActivity, NoticeActivity::class.java))
-        }else if (id == R.id.menu_visit_report){
+        } else if (id == R.id.menu_visit_report) {
             startActivity(Intent(this@MainActivity, VisitReportActivity::class.java))
-        }else if (id == R.id.menu_trade_offers){
-           startActivity(Intent(this@MainActivity, TradeOffersActivity::class.java))
-        }else if (id == R.id.menu_product_summary){
+        } else if (id == R.id.menu_trade_offers) {
+            startActivity(Intent(this@MainActivity, TradeOffersActivity::class.java))
+        } else if (id == R.id.menu_product_summary) {
             startActivity(Intent(this@MainActivity, ProductSummaryActivity::class.java))
-        } else if (id == R.id.menu_product_stock_update){
+        } else if (id == R.id.menu_product_stock_update) {
             startActivity(Intent(this@MainActivity, ProductStockUpdateActivity::class.java))
         }/*else if (id == R.id.menu_incentive){
 
@@ -485,7 +512,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         editor.remove(Api.SELECTED_SHOP)
         editor.remove(Api.SELECTED_SHOP_ID)
         editor.commit()
-        
+
         val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
         val request: StringRequest = object : StringRequest(
             Method.POST,
@@ -507,7 +534,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             data = JSONObject(s)
                             Toast.makeText(
                                 context.applicationContext,
-                                "Error: "+data.getString("message"),
+                                "Error: " + data.getString("message"),
                                 Toast.LENGTH_SHORT
                             ).show()
                             /*handleResponse(
