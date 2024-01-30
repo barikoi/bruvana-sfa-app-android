@@ -40,7 +40,6 @@ class RouteRepositoryImpl @Inject constructor(
                     )
                 }
             } catch (exception: Throwable) {
-
                 when (exception) {
                     is UnknownHostException -> {
                         emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
@@ -84,7 +83,11 @@ class RouteRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getOutlets(routeID: String, isVerify: String, outletCategory: String): Flow<ApiState<OutletsResponse>> {
+    override fun getOutlets(
+        routeID: String,
+        isVerify: String,
+        outletCategory: String
+    ): Flow<ApiState<OutletsResponse>> {
         return flow {
             try {
                 val response = apiService.getOutlets(routeID, isVerify, outletCategory)
