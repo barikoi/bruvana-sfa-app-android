@@ -43,6 +43,7 @@ import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.google.android.gms.location.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
@@ -56,18 +57,23 @@ import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class CreateAttendanceFragment : Fragment() {
 
     private lateinit var binding: FragmentCreateAttendanceBinding
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
 
     private val _sdfWatchTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
     private val _sdfWatchDay = SimpleDateFormat("EEEE", Locale.ENGLISH)
     private val _sdfWatchDate = SimpleDateFormat("MMMM dd", Locale.ENGLISH)
     private val _sdfWatchYear = SimpleDateFormat("yyyy", Locale.ENGLISH)
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
+
+    //    private var prefs: SharedPreferences? = null
+//    private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var user_id: String? = null
@@ -82,8 +88,6 @@ class CreateAttendanceFragment : Fragment() {
     private var mLocationCallback: LocationCallback? = null
 
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
-
-    var imagePickerEnable = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -355,15 +359,14 @@ class CreateAttendanceFragment : Fragment() {
                     progressBar.visibility = View.GONE
                     val data = JSONObject(String(response.data))
                     val message = data.getString("message")
-                    if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO", true)) {
                         ViewUtils.startTracking(requireActivity(), mContext!!)
                     }
 //                    appDatabase!!.imagesDao()!!.deleteAllImages()
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
-                            editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
-                            editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
-                            editor!!.commit()
+                            sharePrefUtils.saveString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                            sharePrefUtils.saveString(Api.SELECTED_ROUTE_NAME, selectedRoute)
 
                             val titles = arrayOf(
                                 mContext!!.resources.getString(R.string.attendance),
@@ -374,19 +377,18 @@ class CreateAttendanceFragment : Fragment() {
                             fragments.add(CreateAttendanceFragment())
                             fragments.add(HistoryFragment())
                             fragments.add(SummaryFragment())
-                            viewPager2!!.setAdapter(
-                                ViewPagerAdapter(
-                                    parentFragmentManager,
-                                    lifecycle,
-                                    fragments
-                                )
+                            viewPager2!!.adapter = ViewPagerAdapter(
+                                parentFragmentManager,
+                                lifecycle,
+                                fragments
                             )
 
-                            TabLayoutMediator(viewpagertab2!!, viewPager2!!,
-                                TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
-                                    tab.text = titles[position]
-                                    tab.parent
-                                }).attach()
+                            TabLayoutMediator(
+                                viewpagertab2!!, viewPager2!!
+                            ) { tab: TabLayout.Tab, position: Int ->
+                                tab.text = titles[position]
+                                tab.parent
+                            }.attach()
 
                             viewPager2!!.currentItem = 0
                             viewPager2!!.isUserInputEnabled = false
@@ -458,15 +460,14 @@ class CreateAttendanceFragment : Fragment() {
                     progressBar.visibility = View.GONE
                     val data = JSONObject(String(response.data))
                     val message = data.getString("message")
-                    if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO", true)) {
                         BarikoiTrace.stopTracking()
                     }
                     appDatabase!!.imagesDao()!!.deleteAllImages()
                     ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                         override fun onConfirmed() {
-                            editor!!.putString(Api.SELECTED_ROUTE_ID, route_id.toString())
-                            editor!!.putString(Api.SELECTED_ROUTE_NAME, selectedRoute)
-                            editor!!.commit()
+                            sharePrefUtils.saveString(Api.SELECTED_ROUTE_ID, route_id.toString())
+                            sharePrefUtils.saveString(Api.SELECTED_ROUTE_NAME, selectedRoute)
                             checkAttendance()
 
                             val titles = arrayOf(
@@ -616,9 +617,11 @@ class CreateAttendanceFragment : Fragment() {
                                     spinnerRoutes.adapter = adapter
                                 }
 
-                                if (prefs!!.getString(Api.SELECTED_ROUTE_ID, "")!!.isNotEmpty()) {
+                                if (sharePrefUtils.getString(Api.SELECTED_ROUTE_ID)!!
+                                        .isNotEmpty()
+                                ) {
                                     val selectedRouteId =
-                                        prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+                                        sharePrefUtils.getString(Api.SELECTED_ROUTE_ID)
                                     for (i in 0 until routeNameList!!.size) {
                                         if (routeNameList!![i].first == selectedRouteId) {
                                             spinnerRoutes.setSelection(i)
@@ -728,13 +731,12 @@ class CreateAttendanceFragment : Fragment() {
     private var startCamera = registerForActivityResult(
         StartActivityForResult()
     ) { result ->
-        val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+        val filePath = sharePrefUtils.getString(ApiCall.IMAGE_PATH)
         if (result.getResultCode() == RESULT_CANCELED) {
             if (filePath != null) {
                 Log.d("Image", "Canceled: $filePath")
                 attendanceImagePicker.deleteFileLocal(filePath)
-                editor!!.putString(ApiCall.IMAGE_PATH, "")
-                editor!!.apply()
+                sharePrefUtils.saveString(ApiCall.IMAGE_PATH, "")
             }
         }
         if (result.getResultCode() == RESULT_OK) {
@@ -754,12 +756,12 @@ class CreateAttendanceFragment : Fragment() {
                 CAMERA,
                 imagePosition,
                 "Attendance",
-                prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                sharePrefUtils.getString(ApiCall.IMAGE_PATH)!!
             )
             try {
                 val placeImage = Images(
                     null, imagePosition,
-                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Attendance"
+                    sharePrefUtils.getString(ApiCall.IMAGE_PATH)!!, "Attendance"
                 )
                 isImageAdded = true
                 if (imagePosition > 0) {
@@ -767,8 +769,7 @@ class CreateAttendanceFragment : Fragment() {
                     Executors.newSingleThreadExecutor().execute {
                         appDatabase!!.imagesDao()!!.insertAll(placeImage)
                     }
-                    editor!!.putString(ApiCall.IMAGE_PATH, "")
-                    editor!!.apply()
+                    sharePrefUtils.saveString(ApiCall.IMAGE_PATH, "")
                 }
             } catch (e: java.lang.Exception) {
                 Log.e("imageUtils", "OnActivity result 2: $e")
@@ -779,13 +780,11 @@ class CreateAttendanceFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = prefs!!.edit()
         mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
-        user_id = prefs!!.getString(Api.USER_ID, "")
-        token = prefs!!.getString(Api.TOKEN, "")
-        user_type = prefs!!.getString(Api.USER_TYPE, "")
+        user_id = sharePrefUtils.getString(Api.USER_ID)
+        token = sharePrefUtils.getString(Api.TOKEN)
+        user_type = sharePrefUtils.getString(Api.USER_TYPE)
         appDatabase = ImageDatabase.getInstance(mContext!!)
     }
 }
