@@ -47,6 +47,7 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.VisitReport.VisitReportActivity
+import com.barikoi.cnlapp.utils.AppLogger
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -410,12 +411,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val data = JSONObject(response)
                         if (data.has("attendances") && !data.isNull("attendances")) {
                             val attendanceObj = data.getJSONObject("attendances")
-                            val check_in = attendanceObj.getString("checkin_time")
-                            val check_out = attendanceObj.getString("checkout_time")
-                            if (!check_in.equals("null") && !check_out.equals("null")) {
+                            val checkIn = attendanceObj.getString("checkin_time")
+                            val checkOut = attendanceObj.getString("checkout_time")
+                            if (!checkIn.equals("null") && !checkOut.equals("null")) {
                                 BarikoiTrace.stopTracking()
-                            } else if (!check_in.equals("null") && check_out.equals("null")) {
+                            } else if (!checkIn.equals("null") && checkOut.equals("null")) {
                                 if (!BarikoiTrace.isLocationTracking()) {
+                                    AppLogger.log("TRACE START CALL")
                                     ViewUtils.startTracking(this@MainActivity, applicationContext)
                                 }
                             } else {
