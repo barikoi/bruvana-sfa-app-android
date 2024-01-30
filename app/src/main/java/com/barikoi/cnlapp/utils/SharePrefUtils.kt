@@ -2,6 +2,7 @@ package com.barikoi.cnlapp.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 
 
 class SharePrefUtils(
@@ -10,8 +11,7 @@ class SharePrefUtils(
     private var sharedPreferences: SharedPreferences? = null
 
     init {
-        sharedPreferences =
-            context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     fun saveString(key: String, value: String) {
