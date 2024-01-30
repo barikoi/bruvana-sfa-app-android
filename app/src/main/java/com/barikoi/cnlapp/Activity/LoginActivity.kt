@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
     var etSRCode: EditText? = null
     var etPassword: EditText? = null
     var signin_link: TextView? = null
-    var resetpass:TextView? = null
+    var resetpass: TextView? = null
     var login: Button? = null
     var skip: Button? = null
     private var loginSuccess: Boolean? = false
@@ -81,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
             Response.Listener { response ->
                 try {
                     val responsedata = JSONObject(response)
-                    if(responsedata.has("token")) {
+                    if (responsedata.has("token")) {
                         token = responsedata.getString("token")
                         val userObj = responsedata.getJSONObject("user")
                         val prefs = PreferenceManager.getDefaultSharedPreferences(
@@ -104,19 +104,28 @@ class LoginActivity : AppCompatActivity() {
                         }
                         editor.commit()
 
-                        var email =""
-                        if(userObj.has("email") && !userObj.isNull("email")){
+                        var email = ""
+                        if (userObj.has("email") && !userObj.isNull("email")) {
                             email = userObj.getString("email")
                         }
+                        val phone =
+                            if (userObj.getString("phone").length == 10) "0${userObj.getString("phone")}" else userObj.getString(
+                                "phone"
+                            )
 
+                        // TODO: CANT SAVE THE LOG
                         BarikoiTrace.setOrCreateUser(
                             userObj.getString("user_name"),
                             email,
-                            userObj.getString("phone"),
+                            phone,
                             object : BarikoiTraceUserCallback {
                                 override fun onFailure(barikoiError: BarikoiTraceError) {
-                                    Log.d("BarikoiTrace", "User created onFailure: ${barikoiError.message}")
+                                    Log.d(
+                                        "BarikoiTrace",
+                                        "User created onFailure: ${barikoiError.message}"
+                                    )
                                 }
+
                                 override fun onSuccess(traceUser: BarikoiTraceUser) {
                                     Log.d("BarikoiTrace", "User created: $traceUser")
                                 }
@@ -138,14 +147,15 @@ class LoginActivity : AppCompatActivity() {
 
                         routeToAppropriatePage(2)
                         pd!!.dismiss()
-                    }else if(responsedata.has("message")){
+                    } else if (responsedata.has("message")) {
                         pd!!.dismiss()
-                        showDialog( responsedata.getString("message"))
+                        showDialog(responsedata.getString("message"))
                     }
                 } catch (e: JSONException) {
                     pd!!.dismiss()
                     Sentry.captureException(e)
-                    Toast.makeText(applicationContext,"Error" +e.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "Error" + e.message, Toast.LENGTH_LONG)
+                        .show()
                 }
             },
             Response.ErrorListener { error ->
@@ -153,13 +163,13 @@ class LoginActivity : AppCompatActivity() {
                 if (error is NoConnectionError) {
                     showDialog("Login failed,check your internet connection and try again")
                 }
-                if (error != null && error.networkResponse != null) {
+                if (error?.networkResponse != null) {
                     try {
                         val s = String(error.networkResponse.data)
                         Log.d("Verify", "message: $s")
                         val data = JSONObject(s)
                         Log.d("Verify", "message: " + data.getString("message"))
-                        showDialog(""+data.getString("message"))
+                        showDialog("" + data.getString("message"))
                         throw Exception(data.getString("message"))
                     } catch (e: UnsupportedEncodingException) {
                         e.printStackTrace()
@@ -178,6 +188,7 @@ class LoginActivity : AppCompatActivity() {
                 parameters["Accept"] = "application/json"
                 return parameters
             }
+
             @Throws(AuthFailureError::class)
             override fun getParams(): Map<String, String>? {
                 val parameters: MutableMap<String, String> = HashMap()
@@ -254,10 +265,12 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(i)
                 finish()*/
             }
+
             1 -> {
                 val intent = intent
                 startActivity(intent)
             }
+
             2 -> {
                 val i = Intent(this, MainActivity::class.java)
                 startActivity(i)
