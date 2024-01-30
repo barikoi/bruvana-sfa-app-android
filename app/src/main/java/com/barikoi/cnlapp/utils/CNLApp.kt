@@ -4,10 +4,12 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import dagger.hilt.android.HiltAndroidApp
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import java.util.Locale
 
+@HiltAndroidApp
 class CNLApp: Application() {
     override fun onCreate() {
         super.onCreate()
