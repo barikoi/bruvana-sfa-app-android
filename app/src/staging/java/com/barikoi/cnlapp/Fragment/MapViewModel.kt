@@ -19,7 +19,6 @@ class MapViewModel @Inject constructor(
     private val routeRepository: RouteRepository
 ) : ViewModel() {
 
-
     private val _routeResponse = MutableLiveData<ApiState<RouteResponse>>()
     val routeResponse: LiveData<ApiState<RouteResponse>> = _routeResponse
 

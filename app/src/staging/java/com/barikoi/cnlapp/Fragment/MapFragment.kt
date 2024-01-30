@@ -2,12 +2,10 @@ package com.barikoi.cnlapp.Fragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.IntentSender.SendIntentException
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +24,6 @@ import com.barikoi.cnlapp.data.remote.models.SalesOfficer
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.MoreSpinner
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -62,6 +59,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -71,8 +69,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
-
-    var queue: RequestQueue? = null
     var spinnerRoutes: MoreSpinner? = null
     private var spinnerCategory: MoreSpinner? = null
     private var cbVerified: AppCompatCheckBox? = null
@@ -86,7 +82,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var locationEngineRequest: LocationEngineRequest? = null
 
     private var permissionsManager: PermissionsManager? = null
-    private var userId: String? = ""
     var selectedCategory: String = ""
 
     private var soNewList: List<SalesOfficer> = emptyList()
@@ -96,18 +91,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     var categoryList: ArrayList<String> = ArrayList()
     private var loading: ProgressBar? = null
-    private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
+    private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap()
     private lateinit var pusher: Pusher
 
     private val viewModel: MapViewModel by viewModels()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Mapbox.getInstance(requireContext(), null)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Mapbox.getInstance(requireContext(), null)
         val view = inflater.inflate(R.layout.fragment_map, container, false)
+
         mapView = view.findViewById(R.id.mapview)
         mapView!!.onCreate(savedInstanceState)
         mapView!!.getMapAsync(this)
@@ -127,6 +126,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             cbVerified!!.visibility = View.GONE
             cbTrace!!.visibility = View.GONE
         }
+
         startRouteObserve()
         startOutletsObserve()
 
@@ -220,6 +220,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
+    @SuppressLint("StringFormatMatches")
     private fun startOutletsObserve() {
         lifecycleScope.launch {
             viewModel.outletResponse.observe(viewLifecycleOwner) {
@@ -241,15 +242,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     is ApiState.Success -> {
                         AppLogger.log("startOutletsObserve:: Success ${it.data?.outlets?.size}")
 
+                        mMap!!.clear()
                         if (it.data?.outlets?.isEmpty() == true) {
-                            shopCount.text = "0 Outlet(s)"
+                            shopCount.text = getString(R.string.outlet_s, 0)
                             Toast.makeText(requireContext(), "Outlets empty.", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-
-                            shopCount.text = "${it.data?.outlets!!.size} Outlet(s)"
-                            mMap!!.clear()
-                            it.data?.outlets?.forEach { outlet ->
+                            shopCount.text = getString(R.string.outlet_s, it.data?.outlets!!.size)
+                            it.data.outlets.forEach { outlet ->
                                 plotMarker(outlet, getMarkerIcon())
                             }
                         }
@@ -262,7 +262,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private fun setupWebSocket() {
         val groupName =
-            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.toLowerCase().replace(" ", "_")
+            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
+
+        AppLogger.log("LIVE GROUP NAME:: $groupName")
 
         val channelAuthorizer =
             HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
@@ -298,35 +300,32 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             "private-care_nutrition_39752",
             object : PrivateChannelEventListener {
                 override fun onSubscriptionSucceeded(channelName: String) {
-                    println("Subscribed! $channelName")
+                    AppLogger.log("Subscribed! $channelName")
                 }
 
                 override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                    println("onAuthenticationFailure: $message")
+                    AppLogger.log("onAuthenticationFailure: $message")
                 }
 
                 override fun onEvent(event: PusherEvent?) {
-                    println("Received event with data: $event")
+                    AppLogger.log("Received event with data: $event")
                 }
             })
             .bind("care_nutrition_group_event_$groupName", object : PrivateChannelEventListener {
                 override fun onEvent(event: PusherEvent?) {
                     AppLogger.log("SOCKET DATA: ${event?.data}")
-                    println("Received event with data bind: $event")
                     val dataObj = JSONObject(event!!.data).getJSONObject("data")
-                    println("Received data bind: $dataObj")
                     val userName = dataObj.getString("name")
-                    println("Received userName bind: $userName")
                     val latitude = dataObj.getDouble("latitude")
                     val longitude = dataObj.getDouble("longitude")
                     val time = dataObj.getString("updated_at")
-                    val iconTrace: Icon
-                    if (dataObj.getInt("active_status") == 1) {
-                        iconTrace = IconFactory.getInstance(requireContext())
+
+                    val iconTrace: Icon = if (dataObj.getInt("active_status") == 1) {
+                        IconFactory.getInstance(requireContext())
                             .fromResource(R.drawable.trace_active)
 
                     } else {
-                        iconTrace = IconFactory.getInstance(requireContext())
+                        IconFactory.getInstance(requireContext())
                             .fromResource(R.drawable.trace_inactive)
                     }
                     requireActivity().runOnUiThread {
@@ -335,11 +334,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 }
 
                 override fun onSubscriptionSucceeded(channelName: String?) {
-                    println("onSubscriptionSucceeded: $channelName")
+                    AppLogger.log("onSubscriptionSucceeded: $channelName")
                 }
 
                 override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                    println("onAuthenticationFailure bind: $message")
+                    AppLogger.log("onAuthenticationFailure bind: $message")
                 }
             })
     }
@@ -411,6 +410,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
+                if (routeID.isEmpty()) {
+                    return
+                }
                 if (position == 0) {
                     selectedCategory = ""
                     if (isVerified.isChecked) {
@@ -442,18 +444,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
-        userId = sharePrefUtils.getString(Api.USER_ID)
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
-            userId = ""
-        } else {
-            userId = sharePrefUtils.getString(Api.USER_ID)
-        }
-    }
-
     private fun plotTraceUser(
         userName: String,
         time: String,
@@ -467,9 +457,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 .icon(icon)
                 .title("$userName| $time")
         )
-        //placemarkermap!![p.shop_code] = m
-        val zoom = if (mMap?.cameraPosition?.zoom!! > 17.0) mMap?.cameraPosition?.zoom
-        else 17.0
+        val zoom = if (mMap?.cameraPosition?.zoom!! > 17.0) mMap?.cameraPosition?.zoom else 17.0
 
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom!!))
     }
@@ -492,14 +480,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 .title(p.outletCategory + ", " + shopName)
         )
         placemarkermap!![p.outletCode] = m
-        mMap?.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    p.latitude.toDouble(),
-                    p.longitude.toDouble()
-                ), 12.0
+
+        if (!cbTrace!!.isChecked)
+            mMap?.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        p.latitude.toDouble(),
+                        p.longitude.toDouble()
+                    ), 12.0
+                )
             )
-        )
     }
 
     private fun enableLocation() {
@@ -539,7 +529,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     LocationEngineCallback<LocationEngineResult?> {
 
                     override fun onSuccess(result: LocationEngineResult?) {
-                        val lastLocation: Location = result!!.getLastLocation()!!
+                        val lastLocation: Location = result!!.lastLocation!!
                         if (lastLocation != null && !lastLocation.equals("null")) {
                             //setCameraPosition(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 17.0);
                         } else {
@@ -617,7 +607,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-    @SuppressLint("MissingPermission")
     override fun onStart() {
         super.onStart()
         mapView!!.onStart()
@@ -646,14 +635,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onResume() {
         super.onResume()
         mapView!!.onResume()
-        Log.d("Verify", "onResume")
-
     }
 
     override fun onPause() {
         super.onPause()
         mapView!!.onPause()
-        Log.d("Verify", "onPause")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -670,8 +656,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val uiSettings: UiSettings = mapboxMap.uiSettings
         uiSettings.isCompassEnabled = false
         mMap!!.setMaxZoomPreference(25.5)
-        if (userId!!.isNotEmpty()) {
-            viewModel.getRoutes(userId.toString())
+
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
+            AppLogger.log("MAP READY ROUTE CALL")
+            sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
 
         fab.setOnClickListener(View.OnClickListener {
