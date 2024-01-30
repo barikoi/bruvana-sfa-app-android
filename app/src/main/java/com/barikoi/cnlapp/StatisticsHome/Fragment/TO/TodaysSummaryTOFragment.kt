@@ -72,7 +72,6 @@ class TodaysSummaryTOFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTodaysSummary()
-        mContext!!.registerReceiver(broadcastReceiver, IntentFilter("TodaySummary"))
 
         tryAgain.setOnClickListener {
             setTodaysSummary()
@@ -382,11 +381,6 @@ class TodaysSummaryTOFragment : Fragment() {
 
         })
 
-    }
-    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            setTodaysSummary()
-        }
     }
 
     override fun onAttach(context: Context) {

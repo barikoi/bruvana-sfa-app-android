@@ -57,11 +57,6 @@ class LastWeekSummaryTOFragment : Fragment() {
     var StartDate: String? = null
     var EndDate: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,7 +68,6 @@ class LastWeekSummaryTOFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setLastWeekSummary()
-        mContext!!.registerReceiver(broadcastReceiver, IntentFilter("LastWeekSummary"))
 
         tryAgain.setOnClickListener {
             setLastWeekSummary()
@@ -138,13 +132,9 @@ class LastWeekSummaryTOFragment : Fragment() {
 
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     try{
@@ -399,12 +389,6 @@ class LastWeekSummaryTOFragment : Fragment() {
 
         })
 
-    }
-
-    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            setLastWeekSummary()
-        }
     }
 
 
