@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.IntentSender.SendIntentException
-import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -16,21 +15,19 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.android.volley.*
-import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Activity.MainActivity
-import com.barikoi.cnlapp.Attendance.Model.HistoryList
-import com.barikoi.cnlapp.Attendance.Model.SOList
-import com.barikoi.cnlapp.Model.Routes
-import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.data.remote.models.Outlet
+import com.barikoi.cnlapp.data.remote.models.Route
+import com.barikoi.cnlapp.data.remote.models.SalesOfficer
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
-import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -61,28 +58,25 @@ import com.pusher.client.connection.ConnectionEventListener
 import com.pusher.client.connection.ConnectionState
 import com.pusher.client.connection.ConnectionStateChange
 import com.pusher.client.util.HttpChannelAuthorizer
-import io.sentry.Sentry
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_map.*
-import org.json.JSONException
+import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
-    var routesList: ArrayList<Pair<String, String>>? = ArrayList()
-    var routeNameList: ArrayList<String>? = ArrayList()
-    var allRouteList: ArrayList<Routes>? = ArrayList()
-    var shopList: ArrayList<Shops>? = ArrayList()
-    var nonVerifiedShopList: ArrayList<Shops>? = ArrayList()
-    var verifiedShopList: ArrayList<Shops>? = ArrayList()
-    var mContext: Context? = null
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+
     var queue: RequestQueue? = null
-    var spinner: MoreSpinner? = null
-    var spinnerCategory: MoreSpinner? = null
-    var cbVerified: AppCompatCheckBox? = null
-    var cbTrace: AppCompatCheckBox? = null
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
+    var spinnerRoutes: MoreSpinner? = null
+    private var spinnerCategory: MoreSpinner? = null
+    private var cbVerified: AppCompatCheckBox? = null
+    private var cbTrace: AppCompatCheckBox? = null
 
     private var mMap: MapboxMap? = null
     private var mapView: MapView? = null
@@ -93,34 +87,26 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private var permissionsManager: PermissionsManager? = null
     private var userId: String? = ""
-    private var srCode: String? = ""
-    private var routeId: String? = ""
-    private var routeName: String? = ""
-    var token: String? = null
-    var selected_so: Int? = null
-    var selected_so_id: String? = null
-    var selected_category: String? = null
-    val soList: ArrayList<SOList> = ArrayList()
+    var selectedCategory: String = ""
+
+    private var soNewList: List<SalesOfficer> = emptyList()
+    private var routeNewList: List<Route> = emptyList()
+
+    private var routeID = ""
+
     var categoryList: ArrayList<String> = ArrayList()
-    val filteredsoList: ArrayList<HistoryList> = ArrayList()
-    internal lateinit var icon: Icon
     private var loading: ProgressBar? = null
     private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap<String, Marker>()
-    lateinit var ACTIVITY: MainActivity
-    lateinit var pusher: Pusher
+    private lateinit var pusher: Pusher
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        ACTIVITY = context as MainActivity
+    private val viewModel: MapViewModel by viewModels()
 
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        Mapbox.getInstance(mContext!!, null)
+        Mapbox.getInstance(requireContext(), null)
         val view = inflater.inflate(R.layout.fragment_map, container, false)
         mapView = view.findViewById(R.id.mapview)
         mapView!!.onCreate(savedInstanceState)
@@ -131,28 +117,157 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         cbTrace = view.findViewById(R.id.isTrace)
         loading = view.findViewById(R.id.progressBar1)
 
-        spinner = view.findViewById(R.id.spinnerRoutes)
+        spinnerRoutes = view.findViewById(R.id.spinnerRoutes)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
 
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
             cbVerified!!.visibility = View.VISIBLE
             cbTrace!!.visibility = View.VISIBLE
         } else {
             cbVerified!!.visibility = View.GONE
             cbTrace!!.visibility = View.GONE
         }
+        startRouteObserve()
+        startOutletsObserve()
 
         return view
     }
 
+
+    private fun startSoObserve() {
+        lifecycleScope.launch {
+            viewModel.soResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startSoObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startSoObserve: Error ${it.error}")
+
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startSoObserve::Loading")
+
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startSoObserve::Success ${it.data}")
+
+                        AppLogger.log("SIZE: ${it.data?.soList?.get(0)?.salesOfficers?.size}")
+
+                        soNewList = it.data?.soList?.get(0)?.salesOfficers ?: emptyList()
+                        val soNameList =
+                            it.data?.soList?.get(0)?.salesOfficers?.map { so -> so.userName }
+
+                        if (!soNameList.isNullOrEmpty()) {
+                            AppLogger.log("SIZE: ${soNameList.size}")
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item, soNameList
+                            )
+                            spinnerSO.adapter = adapter
+                        } else {
+                            Toast.makeText(requireContext(), "So is empty", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startRouteObserve() {
+        lifecycleScope.launch {
+            viewModel.routeResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startRouteObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startRouteObserve::Error ${it.error}")
+
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startRouteObserve::Loading")
+
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startRouteObserve:: Success ${it.data?.routes?.size}")
+
+                        routeNewList = it.data?.routes ?: emptyList()
+
+                        val routeNames = it.data?.routes?.map { route -> route.routeName }
+
+                        if (routeNewList.isNotEmpty()) {
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item, routeNames!!
+                            )
+                            spinnerRoutes!!.adapter = adapter
+
+                        } else {
+                            Toast.makeText(requireContext(), "Route is empty.", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startOutletsObserve() {
+        lifecycleScope.launch {
+            viewModel.outletResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startOutletsObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startOutletsObserve::Error ${it.error}")
+
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startOutletsObserve::Loading")
+
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startOutletsObserve:: Success ${it.data?.outlets?.size}")
+
+                        if (it.data?.outlets?.isEmpty() == true) {
+                            shopCount.text = "0 Outlet(s)"
+                            Toast.makeText(requireContext(), "Outlets empty.", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+
+                            shopCount.text = "${it.data?.outlets!!.size} Outlet(s)"
+                            mMap!!.clear()
+                            it.data?.outlets?.forEach { outlet ->
+                                plotMarker(outlet, getMarkerIcon())
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
     private fun setupWebSocket() {
         val groupName =
-            prefs!!.getString(Api.TRACE_GROUP_NAME, "")!!.toLowerCase().replace(" ", "_")
+            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.toLowerCase().replace(" ", "_")
 
         val channelAuthorizer =
             HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
         val params: MutableMap<String, String> = java.util.HashMap()
-        val traceToken = prefs!!.getString(Api.TRACE_TOKEN, "")
+        val traceToken = sharePrefUtils.getString(Api.TRACE_TOKEN)
         if (traceToken != "") {
             params["Authorization"] = "bearer $traceToken"
         }
@@ -196,6 +311,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             })
             .bind("care_nutrition_group_event_$groupName", object : PrivateChannelEventListener {
                 override fun onEvent(event: PusherEvent?) {
+                    AppLogger.log("SOCKET DATA: ${event?.data}")
                     println("Received event with data bind: $event")
                     val dataObj = JSONObject(event!!.data).getJSONObject("data")
                     println("Received data bind: $dataObj")
@@ -206,14 +322,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     val time = dataObj.getString("updated_at")
                     val iconTrace: Icon
                     if (dataObj.getInt("active_status") == 1) {
-                        iconTrace = IconFactory.getInstance(mContext!!)
+                        iconTrace = IconFactory.getInstance(requireContext())
                             .fromResource(R.drawable.trace_active)
 
                     } else {
-                        iconTrace = IconFactory.getInstance(mContext!!)
+                        iconTrace = IconFactory.getInstance(requireContext())
                             .fromResource(R.drawable.trace_inactive)
                     }
-                    ACTIVITY.runOnUiThread {
+                    requireActivity().runOnUiThread {
                         plotTraceUser(userName, time, latitude, longitude, iconTrace)
                     }
                 }
@@ -231,545 +347,111 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
             spinnerLayoutSO.visibility = View.VISIBLE
-            getSOList()
+            startSoObserve()
+            viewModel.getSoList()
         } else {
             spinnerLayoutSO.visibility = View.GONE
+        }
+
+        isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (isChecked) {
+                setupWebSocket()
+            } else {
+                if (this::pusher.isInitialized)
+                    pusher.disconnect()
+            }
         }
 
         spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO.adapter.count > 0) {
-                    selected_so = p2
-                    userId = soList[p2].id
-                    srCode = soList[p2].employeeId
-                    if (cbVerified!!.isChecked) {
-                        if (srCode!!.length > 0) {
-                            getShopList(
-                                Api.verified_shop_list + "?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId,
-                                "start"
-                            )
-                        }
-                    } else {
-                        if (userId!!.length > 0) {
-                            getShopList(
-                                Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
-                                "start"
-                            )
-                        }
-                    }
-                    if (cbTrace!!.isChecked) {
-                        setupWebSocket()
-                    }
-                }
+                viewModel.getRoutes(soNewList[p2].id.toString())
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
-
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
-        spinner!!.onItemSelectedListener = object :
+        spinnerRoutes!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-                placemarkermap!!.clear()
-                //loading!!.visibility = View.VISIBLE
-                routeId = routesList!!.get(position).first
-                routeName = routesList!!.get(position).second
-                //val shops: ArrayList<Shops> = ArrayList()
-                if (cbVerified!!.isChecked) {
-                    mMap!!.clear()
-                    if (srCode!!.length > 0) {
-                        getShopList(
-                            Api.verified_shop_list + "?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId,
-                            ""
-                        )
-                    }
+                routeID = routeNewList[position].id.toString()
+                if (isVerified.isChecked) {
+                    viewModel.getOutletList(
+                        routeNewList[position].id.toString(),
+                        "1",
+                        selectedCategory
+                    )
                 } else {
-                    nonVerifiedShopList!!.clear()
-                    if (shopList!!.size > 0) {
-                        mMap!!.clear()
-                        Log.d(
-                            "RouteList",
-                            "all routelist " + routesList!!.size.toString() + " position" + position
-                        )
-                        Log.d("RouteList", "all shops " + shopList!!.size.toString())
-                        for (j in 0 until shopList!!.size) {
-                            Log.d("RouteList", "all shops for " + shopList!![j].route_code)
-                            if (shopList!![j].route_name.equals(routesList!![position].second)) {
-                                //shops.add(shopList!![i])
-                                if (selected_category != null) {
-                                    if (selected_category.equals("All")) {
-                                        nonVerifiedShopList!!.add(shopList!![j])
-                                        icon = IconFactory.getInstance(mContext!!)
-                                            .fromResource(R.drawable.map_marker_red)
-                                        plotMarker(shopList!![j], icon)
-                                    } else if (shopList!![j].category.equals(
-                                            selected_category,
-                                            true
-                                        )
-                                    ) {
-                                        nonVerifiedShopList!!.add(shopList!![j])
-                                        icon = IconFactory.getInstance(mContext!!)
-                                            .fromResource(R.drawable.map_marker_red)
-                                        plotMarker(shopList!![j], icon)
-                                    }
-                                }
-                            }
-
-                        }
-                        shopCount.setText("${nonVerifiedShopList!!.size} outlet(s)")
-                    }
+                    viewModel.getOutletList(
+                        routeNewList[position].id.toString(),
+                        "0",
+                        selectedCategory
+                    )
                 }
-
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // write code to perform some action
-            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        categoryList = arrayListOf<String>("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
+        categoryList = arrayListOf("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
         val adapter = ArrayAdapter(
-            mContext!!,
-            android.R.layout.simple_spinner_item, categoryList!!
+            requireContext(),
+            android.R.layout.simple_spinner_item, categoryList
         )
         spinnerCategory!!.adapter = adapter
+
         spinnerCategory!!.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-
-                selected_category = categoryList.get(position)
-                if (shopList!!.size > 0) {
-                    placemarkermap!!.clear()
-                    //loading!!.visibility = View.VISIBLE
-                    //val shops: ArrayList<Shops> = ArrayList()
-                    if (cbVerified!!.isChecked) {
-                        mMap!!.clear()
-                        if (srCode!!.length > 0) {
-                            getShopList(
-                                Api.verified_shop_list + "?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId,
-                                ""
-                            )
-                        }
+                if (position == 0) {
+                    selectedCategory = ""
+                    if (isVerified.isChecked) {
+                        viewModel.getOutletList(routeID, "1", selectedCategory)
                     } else {
-                        nonVerifiedShopList!!.clear()
-                        if (shopList!!.size > 0) {
-                            mMap!!.clear()
-                            Log.d("RouteList", "all shops " + shopList!!.size.toString())
-                            for (j in 0 until shopList!!.size) {
-                                Log.d("RouteList", "all shops for " + shopList!![j].route_code)
-                                if (shopList!![j].route_name.equals(routeName)) {
-                                    if (selected_category != null) {
-                                        if (selected_category.equals("All")) {
-                                            nonVerifiedShopList!!.add(shopList!![j])
-                                            icon = IconFactory.getInstance(mContext!!)
-                                                .fromResource(R.drawable.map_marker_red)
-                                            plotMarker(shopList!![j], icon)
-                                        } else if (shopList!![j].category.equals(
-                                                selected_category,
-                                                true
-                                            )
-                                        ) {
-                                            nonVerifiedShopList!!.add(shopList!![j])
-                                            icon = IconFactory.getInstance(mContext!!)
-                                                .fromResource(R.drawable.map_marker_red)
-                                            plotMarker(shopList!![j], icon)
-                                        }
-                                    }
-                                    //shops.add(shopList!![i])
-
-                                }
-
-                            }
-                            shopCount.setText("${nonVerifiedShopList!!.size} outlet(s)")
-                        }
+                        viewModel.getOutletList(routeID, "0", selectedCategory)
+                    }
+                } else {
+                    selectedCategory = categoryList[position]
+                    if (isVerified.isChecked) {
+                        viewModel.getOutletList(routeID, "1", selectedCategory)
+                    } else {
+                        viewModel.getOutletList(routeID, "0", selectedCategory)
                     }
                 }
-
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // write code to perform some action
-            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
 
 
-        cbVerified!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+        cbVerified!!.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
-                mMap!!.clear()
-                if (srCode!!.length > 0) {
-                    getShopList(
-                        Api.verified_shop_list + "?verified_outlets=1&route_id=" + routeId + "&user_id=" + userId,
-                        "checkbox"
-                    )
-                }
+                viewModel.getOutletList(routeID, "1", selectedCategory)
             } else {
-                mMap!!.clear()
-                //getShopList(Api.route_outlet_list+"?sr_id="+userId)
-                if (shopList!!.size > 0) {
-                    nonVerifiedShopList!!.clear()
-                    mMap!!.clear()
-                    Log.d("RouteList", "spinner selected " + spinner!!.selectedItem)
-                    Log.d("RouteList", "all shops " + shopList!!.size.toString())
-                    for (j in 0 until shopList!!.size) {
-                        Log.d("RouteList", "all shops for " + shopList!![j].route_code)
-                        if (shopList!![j].route_name.equals(spinner!!.selectedItem)) {
-                            if (selected_category != null) {
-                                if (selected_category.equals("All")) {
-                                    nonVerifiedShopList!!.add(shopList!![j])
-                                    icon = IconFactory.getInstance(mContext!!)
-                                        .fromResource(R.drawable.map_marker_red)
-                                    plotMarker(shopList!![j], icon)
-                                } else if (shopList!![j].category.equals(selected_category, true)) {
-                                    nonVerifiedShopList!!.add(shopList!![j])
-                                    icon = IconFactory.getInstance(mContext!!)
-                                        .fromResource(R.drawable.map_marker_red)
-                                    plotMarker(shopList!![j], icon)
-                                }
-                            }
-                        }
-
-                    }
-                    shopCount.setText("${nonVerifiedShopList!!.size} outlet(s)")
-                }
+                viewModel.getOutletList(routeID, "0", selectedCategory)
             }
-        })
-    }
-
-    private fun getSOList() {
-        ApiServices.apiGET(
-            Api.get_all_so_list,
-            queue!!, token!!, object : ApiServiceListener {
-                override fun onResponseSuccess(response: String) {
-                    viewSOList(response)
-                    //setDateFilter()
-                }
-
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
-                }
-
-                override fun onException(e: Exception) {
-                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
-                }
-
-            })
-    }
-
-    private fun viewSOList(response: String) {
-        try {
-            if (response != null) {
-                soList.clear()
-                val obj = JSONObject(response)
-                val toArray = obj.getJSONArray("so_list")
-                val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
-                val soNameList: ArrayList<String> = ArrayList()
-                if (soArray.length() > 0) {
-                    for (i in 0 until soArray.length()) {
-                        val soObj = soArray.getJSONObject(i)
-                        var imageUrl = "null"
-                        if (soObj.has("images") && !soObj.isNull("images")) {
-                            val imageArray = soObj.getJSONArray("images")
-                            if (imageArray.length() > 0) {
-                                val imageobj = imageArray.getJSONObject(0)
-                                if (imageobj.has("image_url")) {
-                                    imageUrl = imageobj.getString("image_url")
-                                }
-                            }
-                        }
-                        soList.add(
-                            SOList(
-                                soObj.getString("id"),
-                                soObj.getString("user_name"),
-                                soObj.getString("designation"),
-                                if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
-                                imageUrl
-                            )
-                        )
-                        soNameList.add(soObj.getString("user_name"))
-
-                    }
-                }
-                val adapter = ArrayAdapter(
-                    mContext!!,
-                    android.R.layout.simple_spinner_item, soNameList
-                )
-                spinnerSO.adapter = adapter
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
-    }
-
-    fun getShopList(url: String, from: String) {
-        loading!!.visibility = View.VISIBLE
-        allRouteList!!.clear()
-        //routesList!!.clear()
-        val request = StringRequest(
-            Request.Method.GET,
-            url,
-            { response ->
-                //success
-                Log.d("RouteFrag", response)
-                try {
-                    loading!!.visibility = View.GONE
-                    verifiedShopList!!.clear()
-                    //allRouteList!!.clear()
-                    val data = JSONObject(response)
-                    if (data.has("routes")) {
-                        shopList!!.clear()
-                        routesList!!.clear()
-                        routeNameList!!.clear()
-                        val routesArray = data.getJSONArray("routes")
-                        for (i in 0 until routesArray.length()) {
-                            val route = routesArray.getJSONObject(i)
-                            val route_id = route.getString("id")
-                            val route_name = route.getString("route_name")
-                            val route_code = route.getString("route_code")
-                            val territory_name = route.getString("territory_name")
-                            routesList!!.add(Pair(route_id, route_name))
-                            routeNameList!!.add(route_name)
-                            //shopList!!.clear()
-                            val route_outlet_list = route.getJSONArray("outlets")
-                            for (j in 0 until route_outlet_list.length()) {
-                                val outlet = route_outlet_list.getJSONObject(j)
-                                val outlet_id = outlet.getString("id")
-                                val outlet_name = outlet.getString("outlet_name")
-                                val outlet_status = outlet.getString("outlet_status")
-                                val outlet_address = outlet.getString("address")
-                                val outlet_code = outlet.getString("outlet_code")
-                                val outlet_type = outlet.getString("outlet_type")
-                                /*val outlet_category = outlet.getString("outlet_category")*/
-                                val owner_name = outlet.getString("owner_name")
-                                val min_order = ""
-                                val market_opportunity = outlet.getString("market_opportunity")
-                                val contact_number = outlet.getString("phone_number")
-                                val is_buyer = outlet.getInt("is_buyer")
-                                /*val distributor_office = outlet.getString("distributor_office")
-                                val distributor_office_code = outlet.getString("distributor_office_code")*/
-                                val outlet_category = outlet.getString("outlet_category")
-                                val latitude = outlet.getDouble("latitude")
-                                val longitude = outlet.getDouble("longitude")
-                                val is_Verified = outlet.getInt("is_verified")
-                                shopList!!.add(
-                                    Shops(
-                                        outlet_id,
-                                        outlet_name,
-                                        outlet_status,
-                                        outlet_address,
-                                        outlet_code,
-                                        outlet_type,
-                                        outlet_category,
-                                        owner_name,
-                                        min_order,
-                                        market_opportunity,
-                                        contact_number,
-                                        is_buyer,
-                                        "",
-                                        ArrayList(),
-                                        /*distributor_office,
-                                distributor_office_code,*/
-                                        territory_name,
-                                        latitude,
-                                        longitude,
-                                        route_id,
-                                        route_name,
-                                        "",
-                                        is_Verified, 0, 0
-                                    )
-                                )
-                            }
-                            Log.d("RouteList", "all 1 " + shopList!!.size.toString())
-                        }
-                    } else if (data.has("outlets")) {
-                        val routesOutletArray = data.getJSONArray("outlets")
-                        for (i in 0 until routesOutletArray.length()) {
-                            val outlet = routesOutletArray.getJSONObject(i)
-                            val outlet_id = outlet.getString("id")
-                            val outlet_name = outlet.getString("outlet_name")
-                            val outlet_status = outlet.getString("outlet_status")
-                            val outlet_address = outlet.getString("address")
-                            val outlet_code = outlet.getString("outlet_code")
-                            val outlet_type = outlet.getString("outlet_type")
-                            val owner_name = outlet.getString("owner_name")
-                            val market_opportunity = outlet.getString("market_opportunity")
-                            val contact_number = outlet.getString("phone_number")
-                            val is_buyer = outlet.getInt("is_buyer")
-                            /*val distributor_office = outlet.getString("distributor_office")
-                            val distributor_office_code = outlet.getString("distributor_office_code")*/
-                            val outlet_category = outlet.getString("outlet_category")
-                            val latitude = outlet.getDouble("latitude")
-                            val longitude = outlet.getDouble("longitude")
-                            val route_id = outlet.getString("route_id")
-                            val route_name = outlet.getString("route_name")
-                            val territory_name = outlet.getString("territory_name")
-                            val is_Verified = outlet.getInt("is_verified")
-
-                            if (selected_category != null) {
-                                if (selected_category.equals("All")) {
-                                    val shops = Shops(
-                                        outlet_id,
-                                        outlet_name,
-                                        outlet_status,
-                                        outlet_address,
-                                        outlet_code,
-                                        outlet_type,
-                                        outlet_category,
-                                        owner_name,
-                                        "",
-                                        market_opportunity,
-                                        contact_number,
-                                        is_buyer,
-                                        "",
-                                        ArrayList(),
-                                        /*distributor_office,
-                                        distributor_office_code,*/
-                                        territory_name,
-                                        latitude,
-                                        longitude,
-                                        route_id,
-                                        route_name,
-                                        "",
-                                        is_Verified, 0, 0
-                                    )
-                                    verifiedShopList!!.add(shops)
-                                    icon = IconFactory.getInstance(mContext!!)
-                                        .fromResource(R.drawable.map_marker_green)
-                                    plotMarker(shops, icon)
-                                } else if (outlet_category.equals(selected_category, true)) {
-                                    val shops = Shops(
-                                        outlet_id,
-                                        outlet_name,
-                                        outlet_status,
-                                        outlet_address,
-                                        outlet_code,
-                                        outlet_type,
-                                        outlet_category,
-                                        owner_name,
-                                        "",
-                                        market_opportunity,
-                                        contact_number,
-                                        is_buyer,
-                                        "",
-                                        ArrayList(),
-                                        /*distributor_office,
-                                        distributor_office_code,*/
-                                        territory_name,
-                                        latitude,
-                                        longitude,
-                                        route_id,
-                                        route_name,
-                                        "",
-                                        is_Verified, 0, 0
-                                    )
-                                    verifiedShopList!!.add(shops)
-                                    icon = IconFactory.getInstance(mContext!!)
-                                        .fromResource(R.drawable.map_marker_green)
-                                    plotMarker(shops, icon)
-                                }
-                            }
-
-                        }
-                        shopCount.setText("${verifiedShopList!!.size} outlet(s)")
-                        Log.d("RouteList", "all verified 1 " + verifiedShopList!!.size.toString())
-                        Log.d("RouteList", "all verified 1 " + allRouteList!!.size.toString())
-
-                    }
-
-                    if (from.equals("start")) {
-                        if (spinner != null) {
-                            val adapter = ArrayAdapter(
-                                mContext!!,
-                                android.R.layout.simple_spinner_item, routeNameList!!
-                            )
-                            spinner!!.adapter = adapter
-
-                        }
-                    }
-
-                } catch (e: JSONException) {
-                    Sentry.captureException(e)
-                    e.printStackTrace()
-                }
-
-            },
-            { error ->
-                //error
-                Log.d("error", error.toString())
-                loading!!.visibility = View.GONE
-                if (error is TimeoutError) {
-                    Toast.makeText(
-                        mContext,
-                        "Request timeout!! Check your internet connection or Contact Admin",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                if (error is NoConnectionError) {
-                    Toast.makeText(
-                        mContext,
-                        "Turn on your internet connection and Try again",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                if (error != null && error.networkResponse != null) {
-                    try {
-                        val s = String(error.networkResponse.data)
-                        Log.d("Map", "message: $s")
-                        val data = JSONObject(s)
-                        Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
-                            .show()
-                    } catch (e: UnsupportedEncodingException) {
-                        Sentry.captureException(e)
-                        e.printStackTrace()
-                    } catch (e: JSONException) {
-                        Sentry.captureException(e)
-                        Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                        e.printStackTrace()
-                    }
-                }
-            }
-        )
-        queue!!.add(request)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
-        prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = prefs!!.edit()
-        /*token = prefs.getString("token", "")
-        user_id = prefs.getString("user_id", "")*/
-        mContext = context
-        userId = prefs!!.getString(Api.USER_ID, "")
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
+        userId = sharePrefUtils.getString(Api.USER_ID)
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
             userId = ""
-            srCode = ""
         } else {
-            userId = prefs!!.getString(Api.USER_ID, "")
-            srCode = prefs!!.getString(Api.EMPLOYEE_ID, "")
+            userId = sharePrefUtils.getString(Api.USER_ID)
         }
-
-        token = prefs!!.getString(Api.TOKEN, "")
     }
 
     private fun plotTraceUser(
@@ -783,26 +465,45 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         mMap!!.addMarker(
             MarkerOptions().position(LatLng(lat, lon))
                 .icon(icon)
-                .title(userName + "| " + time)
+                .title("$userName| $time")
         )
         //placemarkermap!![p.shop_code] = m
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 17.0))
+        val zoom = if (mMap?.cameraPosition?.zoom!! > 17.0) mMap?.cameraPosition?.zoom
+        else 17.0
+
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom!!))
     }
 
-    private fun plotMarker(p: Shops, icon: Icon) {
+    private fun getMarkerIcon(): Icon {
+        return if (isVerified.isChecked) {
+            IconFactory.getInstance(requireContext())
+                .fromResource(R.drawable.map_marker_green)
+        } else {
+            IconFactory.getInstance(requireContext())
+                .fromResource(R.drawable.map_marker_red)
+        }
+    }
 
-        val shopname: String = p.shop_name
+    private fun plotMarker(p: Outlet, icon: Icon) {
+        val shopName: String = p.outletName
         val m = mMap!!.addMarker(
-            MarkerOptions().position(LatLng(p.latitude, p.longitude))
+            MarkerOptions().position(LatLng(p.latitude.toDouble(), p.longitude.toDouble()))
                 .icon(icon)
-                .title(p.category + ", " + shopname)
+                .title(p.outletCategory + ", " + shopName)
         )
-        placemarkermap!![p.shop_code] = m
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(p.latitude, p.longitude), 12.0))
+        placemarkermap!![p.outletCode] = m
+        mMap?.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    p.latitude.toDouble(),
+                    p.longitude.toDouble()
+                ), 12.0
+            )
+        )
     }
 
     private fun enableLocation() {
-        if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
+        if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
             // Create an instance of LOST location engine
             //initializeLocationEngine()
         } else {
@@ -813,14 +514,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent(loadedMapStyle: Style) {
-        if (PermissionsManager.areLocationPermissionsGranted(mContext!!)) {
+        if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
 
             // Get an instance of the component
             val locationComponent = mMap!!.locationComponent
 
             // Activate with options
             locationComponent.activateLocationComponent(
-                LocationComponentActivationOptions.builder(mContext!!, loadedMapStyle)
+                LocationComponentActivationOptions.builder(requireContext(), loadedMapStyle)
                     .build()
             )
             // Enable to make component visible
@@ -843,13 +544,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             //setCameraPosition(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 17.0);
                         } else {
                             //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, null)
-                            showEnableLocationSetting(ACTIVITY)
+                            showEnableLocationSetting(requireActivity())
                         }
                     }
 
                     override fun onFailure(exception: java.lang.Exception) {
                         Toast.makeText(
-                            mContext!!,
+                            requireContext(),
                             exception.message,
                             Toast.LENGTH_SHORT
                         ).show()
@@ -858,12 +559,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             }
         } else {
             permissionsManager = PermissionsManager(this as PermissionsListener)
-            permissionsManager!!.requestLocationPermissions(ACTIVITY)
+            permissionsManager!!.requestLocationPermissions(requireActivity())
             //showEnableLocationSetting(this@CreateShopActivity)
         }
     }
 
-    private fun showEnableLocationSetting(activity: MainActivity) {
+    private fun showEnableLocationSetting(activity: Activity) {
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
@@ -900,45 +601,41 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         )
     }
 
-    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-
-    }
+    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {}
 
     override fun onPermissionResult(granted: Boolean) {
-        mMap!!.getStyle(object : Style.OnStyleLoaded {
-            override fun onStyleLoaded(style: Style) {
-                if (granted) {
-                    enableLocationComponent(style)
-                } else {
-                    Toast.makeText(
-                        mContext!!,
-                        "Permission not granted",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    //finish()
-                }
+        mMap!!.getStyle { style ->
+            if (granted) {
+                enableLocationComponent(style)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Permission not granted",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-        })
+        }
     }
 
     @SuppressLint("MissingPermission")
     override fun onStart() {
         super.onStart()
-
         mapView!!.onStart()
     }
 
     override fun onStop() {
         super.onStop()
         mapView!!.onStop()
-        pusher.disconnect()
+        if (this::pusher.isInitialized)
+            pusher.disconnect()
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mapView!!.onDestroy()
-        pusher.disconnect()
+        if (this::pusher.isInitialized)
+            pusher.disconnect()
     }
 
     override fun onLowMemory() {
@@ -970,11 +667,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             Style.Builder().fromUrl(getString(R.string.map_view_styleUrl))
         ) { style: Style? -> enableLocationComponent(style!!) }
 
-        val uiSettings: UiSettings = mapboxMap!!.uiSettings
-        uiSettings.setCompassEnabled(false)
+        val uiSettings: UiSettings = mapboxMap.uiSettings
+        uiSettings.isCompassEnabled = false
         mMap!!.setMaxZoomPreference(25.5)
-        if (userId!!.length > 0) {
-            getShopList(Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1", "start")
+        if (userId!!.isNotEmpty()) {
+            viewModel.getRoutes(userId.toString())
         }
 
         fab.setOnClickListener(View.OnClickListener {
@@ -991,7 +688,5 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         })
 
         //setupWebSocket()
-
-
     }
 }
