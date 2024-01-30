@@ -65,7 +65,12 @@ object ViewUtils {
         alert.show()
     }
 
-    fun viewDialog(mContext: Context, message: String, styleString: SpannableStringBuilder,listener: DialogListener){
+    fun viewDialog(
+        mContext: Context,
+        message: String,
+        styleString: SpannableStringBuilder,
+        listener: DialogListener
+    ) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -75,9 +80,9 @@ object ViewUtils {
         val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
         val btnNo = dialog.findViewById<AppCompatButton>(R.id.btn_no)
 
-        if (message.length>0) {
+        if (message.length > 0) {
             tvMessage.setText(message)
-        }else{
+        } else {
             tvMessage.setText(styleString, TextView.BufferType.SPANNABLE)
         }
 
@@ -98,7 +103,8 @@ object ViewUtils {
         )
 
     }
-    fun viewDialogCustom(mContext: Context, message: String, listener: DialogListener){
+
+    fun viewDialogCustom(mContext: Context, message: String, listener: DialogListener) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -127,7 +133,8 @@ object ViewUtils {
         )
 
     }
-    fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener){
+
+    fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener) {
         val dialog = Dialog(mContext)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
@@ -152,14 +159,22 @@ object ViewUtils {
 
     }
 
-    fun getErrorResponse(error: VolleyError, mContext: Context){
+    fun getErrorResponse(error: VolleyError, mContext: Context) {
         if (error is TimeoutError) {
             //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-            Toast.makeText(mContext, "Request timeout!! Check your internet connection or Contact Admin", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                mContext,
+                "Request timeout!! Check your internet connection or Contact Admin",
+                Toast.LENGTH_LONG
+            ).show()
         }
         if (error is NoConnectionError) {
             //mListerner.onFailure("Turn on your internet connection and Try again")
-            Toast.makeText(mContext, "Turn on your internet connection and Try again", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                mContext,
+                "Turn on your internet connection and Try again",
+                Toast.LENGTH_LONG
+            ).show()
         }
         if (error != null && error.networkResponse != null) {
             try {
@@ -222,7 +237,11 @@ object ViewUtils {
                                 mListener.onFetchSuccess(location)
                             } else {
                                 mListener.onFailure()
-                                Toast.makeText(mContext, "Disable mock location", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    mContext,
+                                    "Disable mock location",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     } else {
@@ -243,29 +262,29 @@ object ViewUtils {
     fun startTracking(activity: Activity, mContext: Context) {
         //to start the location tracking
         if (BarikoiTrace.isBatteryOptimizationEnabled()) {
-            Log.d("BarikoiTrace", "is batteryOptimized: " + BarikoiTrace.isBatteryOptimizationEnabled())
+            AppLogger.log("BarikoiTrace " + " is batteryOptimized: " + BarikoiTrace.isBatteryOptimizationEnabled())
             BarikoiTrace.requestDisableBatteryOptimization(mContext)
         }
         if (BarikoiTrace.isLocationTracking()) {
-            Log.d("BarikoiTrace", "is tracking 3: " + BarikoiTrace.isLocationTracking())
+            AppLogger.log("BarikoiTrace "+ "is tracking 3: " + BarikoiTrace.isLocationTracking())
             Toast.makeText(
                 mContext,
                 "Service already running!! no need to start again",
                 Toast.LENGTH_SHORT
             ).show()
         } else if (!BarikoiTrace.isLocationPermissionsGranted()) {
-            Log.d("BarikoiTrace", "is Location: " + BarikoiTrace.isLocationPermissionsGranted())
+            AppLogger.log("BarikoiTrace "+ "is Location: " + BarikoiTrace.isLocationPermissionsGranted())
             BarikoiTrace.requestLocationPermissions(activity)
         } else if (!BarikoiTrace.isLocationSettingsOn()) {
-            Log.d("BarikoiTrace", "is location settings on: " + BarikoiTrace.isLocationSettingsOn())
+            AppLogger.log("BarikoiTrace "+"is location settings on: " + BarikoiTrace.isLocationSettingsOn())
             BarikoiTrace.requestLocationServices(activity)
         } else {
             //start tracking using preferable tracking mode with updateInterval in seconds and distanceFilter in meters
             BarikoiTrace.startTracking(TraceMode.Builder().setUpdateInterval(10).build())
-            Log.d("BarikoiTrace", "is tracking 2: " + BarikoiTrace.isLocationTracking())
+            AppLogger.log("BarikoiTrace "+ "is tracking 2: " + BarikoiTrace.isLocationTracking())
             if (BarikoiTrace.isLocationTracking()) {
                 Toast.makeText(mContext, "Service started!!", Toast.LENGTH_SHORT).show()
-                Log.d("BarikoiTrace", "is tracking")
+              AppLogger.log("BarikoiTrace"+ "is tracking")
             }
         }
     }
