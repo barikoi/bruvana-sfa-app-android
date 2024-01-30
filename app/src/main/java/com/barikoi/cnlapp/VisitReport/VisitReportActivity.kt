@@ -57,10 +57,10 @@ class VisitReportActivity : AppCompatActivity() {
         }
 
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")){
-            spinnerLayout.visibility = View.VISIBLE
+            spinnerLayoutRoute.visibility = View.VISIBLE
             getSOList()
         }else{
-            spinnerLayout.visibility = View.GONE
+            spinnerLayoutRoute.visibility = View.GONE
             sr_id = user_id
         }
 

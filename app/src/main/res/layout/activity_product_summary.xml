@@ -72,7 +72,7 @@
         android:text="@string/todays_route">
     </TextView>-->
     <RelativeLayout
-        android:id="@+id/spinnerLayout"
+        android:id="@+id/spinnerLayoutRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/appbar"
@@ -97,7 +97,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
-        android:layout_below="@+id/spinnerLayout"
+        android:layout_below="@+id/spinnerLayoutRoute"
         android:gravity="start"
         android:textStyle="bold"
         android:textSize="15sp"

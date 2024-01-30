@@ -54,7 +54,7 @@ class ProductSummaryActivity : AppCompatActivity() {
             finish()
         }
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)){
-            spinnerLayout.visibility = View.VISIBLE
+            spinnerLayoutRoute.visibility = View.VISIBLE
             getDHList()
             spinnerDistributorHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 @RequiresApi(Build.VERSION_CODES.N)
@@ -74,7 +74,7 @@ class ProductSummaryActivity : AppCompatActivity() {
 
         }else{
             territorySuffix = "&user_id="+userId/*+"&route_id="+routeId*/
-            spinnerLayout.visibility = View.GONE
+            spinnerLayoutRoute.visibility = View.GONE
             setDateFilter()
         }
     }

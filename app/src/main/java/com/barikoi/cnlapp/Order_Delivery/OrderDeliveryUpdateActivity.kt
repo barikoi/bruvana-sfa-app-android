@@ -78,13 +78,13 @@ class OrderDeliveryUpdateActivity : AppCompatActivity() {
             sr_id = ""
             route_id = ""
             user_id = ""
-            spinnerLayout.visibility = View.VISIBLE
+            spinnerLayoutRoute.visibility = View.VISIBLE
             getSOList()
         }else{
             user_id = prefs!!.getString(Api.USER_ID, "")
             sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
-            spinnerLayout.visibility = View.GONE
+            spinnerLayoutRoute.visibility = View.GONE
             setDateFilter()
         }
         btnBack.setOnClickListener {

@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -20,7 +19,6 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.barikoitrace.BarikoiTrace
@@ -47,7 +45,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.activity_create_shop.*
 import kotlinx.android.synthetic.main.fragment_create_attendance.*
-import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerLayout
+import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerLayoutRoute
 import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerRoutes
 import org.json.JSONException
 import org.json.JSONObject
@@ -120,10 +118,10 @@ class CreateAttendanceFragment : Fragment() {
         getImageFromDB()
 
         if (user_type.equals("TO", true)) {
-            spinnerLayout.visibility = View.GONE
+            spinnerLayoutRoute.visibility = View.GONE
             titleRoute.visibility = View.GONE
         } else {
-            spinnerLayout.visibility = View.VISIBLE
+            spinnerLayoutRoute.visibility = View.VISIBLE
             titleRoute.visibility = View.VISIBLE
             getAllRoutes(Api.routes_withfilter + "?with_geometry=0&user_id=" + user_id)
 
