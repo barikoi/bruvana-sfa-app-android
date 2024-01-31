@@ -11,25 +11,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.android.volley.*
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.data.remote.models.SalesOfficer
+import com.barikoi.cnlapp.databinding.FragmentMapBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineRequest
@@ -41,6 +42,7 @@ import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -56,8 +58,11 @@ import com.pusher.client.connection.ConnectionState
 import com.pusher.client.connection.ConnectionStateChange
 import com.pusher.client.util.HttpChannelAuthorizer
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
@@ -69,32 +74,30 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
-    var spinnerRoutes: MoreSpinner? = null
-    private var spinnerCategory: MoreSpinner? = null
-    private var cbVerified: AppCompatCheckBox? = null
-    private var cbTrace: AppCompatCheckBox? = null
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
 
-    private var mMap: MapboxMap? = null
-    private var mapView: MapView? = null
-    lateinit var fab: FloatingActionButton
-    lateinit var shopCount: TextView
+    private val viewModel: MapViewModel by viewModels()
+
+    private lateinit var binding: FragmentMapBinding
+
+    private lateinit var mMap: MapboxMap
+
     private var locationEngine: LocationEngine? = null
     private var locationEngineRequest: LocationEngineRequest? = null
 
     private var permissionsManager: PermissionsManager? = null
-    var selectedCategory: String = ""
+    private var selectedCategory: String = ""
 
     private var soNewList: List<SalesOfficer> = emptyList()
+    private var selectedSo: SalesOfficer? = null
     private var routeNewList: List<Route> = emptyList()
 
     private var routeID = ""
 
-    var categoryList: ArrayList<String> = ArrayList()
-    private var loading: ProgressBar? = null
-    private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap()
+    private var categoryList: ArrayList<String> = ArrayList()
+    private var placeMarkerMap: java.util.HashMap<String, Marker>? = HashMap()
     private lateinit var pusher: Pusher
-
-    private val viewModel: MapViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,243 +107,30 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        binding = FragmentMapBinding.inflate(layoutInflater, container, false)
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        mapView = view.findViewById(R.id.mapview)
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync(this)
-        fab = view.findViewById(R.id.fab)
-        shopCount = view.findViewById(R.id.shopCount)
-        cbVerified = view.findViewById(R.id.isVerified)
-        cbTrace = view.findViewById(R.id.isTrace)
-        loading = view.findViewById(R.id.progressBar1)
+        binding.mapView.onCreate(savedInstanceState)
+        binding.mapView.getMapAsync(this)
 
-        spinnerRoutes = view.findViewById(R.id.spinnerRoutes)
-        spinnerCategory = view.findViewById(R.id.spinnerCategory)
+
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
-            cbVerified!!.visibility = View.VISIBLE
-            cbTrace!!.visibility = View.VISIBLE
+            binding.isVerified.isVisible = true
+            binding.isTrace.isVisible = true
         } else {
-            cbVerified!!.visibility = View.GONE
-            cbTrace!!.visibility = View.GONE
+            binding.isVerified.isVisible = false
+            binding.isTrace.isVisible = false
         }
 
         startRouteObserve()
         startOutletsObserve()
 
-        return view
-    }
+        viewModel.getSocketGroups(mapOf("Authorization" to "bearer ${sharePrefUtils.getString(Api.TRACE_TOKEN)}"))
+        startSocketGroupsObserve()
 
-
-    private fun startSoObserve() {
-        lifecycleScope.launch {
-            viewModel.soResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startSoObserve::Empty")
-                    }
-
-                    is ApiState.Error -> {
-                        AppLogger.log("startSoObserve: Error ${it.error}")
-
-                    }
-
-                    is ApiState.Loading -> {
-                        AppLogger.log("startSoObserve::Loading")
-
-                    }
-
-                    is ApiState.Success -> {
-                        AppLogger.log("startSoObserve::Success ${it.data}")
-
-                        AppLogger.log("SIZE: ${it.data?.soList?.get(0)?.salesOfficers?.size}")
-
-                        soNewList = it.data?.soList?.get(0)?.salesOfficers ?: emptyList()
-                        val soNameList =
-                            it.data?.soList?.get(0)?.salesOfficers?.map { so -> so.userName }
-
-                        if (!soNameList.isNullOrEmpty()) {
-                            AppLogger.log("SIZE: ${soNameList.size}")
-                            val adapter = ArrayAdapter(
-                                requireContext(),
-                                android.R.layout.simple_spinner_item, soNameList
-                            )
-                            spinnerSO.adapter = adapter
-                        } else {
-                            Toast.makeText(requireContext(), "So is empty", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun startRouteObserve() {
-        lifecycleScope.launch {
-            viewModel.routeResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startRouteObserve::Empty")
-                    }
-
-                    is ApiState.Error -> {
-                        AppLogger.log("startRouteObserve::Error ${it.error}")
-
-                    }
-
-                    is ApiState.Loading -> {
-                        AppLogger.log("startRouteObserve::Loading")
-
-                    }
-
-                    is ApiState.Success -> {
-                        AppLogger.log("startRouteObserve:: Success ${it.data?.routes?.size}")
-
-                        routeNewList = it.data?.routes ?: emptyList()
-
-                        val routeNames = it.data?.routes?.map { route -> route.routeName }
-
-                        if (routeNewList.isNotEmpty()) {
-                            val adapter = ArrayAdapter(
-                                requireContext(),
-                                android.R.layout.simple_spinner_item, routeNames!!
-                            )
-                            spinnerRoutes!!.adapter = adapter
-
-                        } else {
-                            Toast.makeText(requireContext(), "Route is empty.", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @SuppressLint("StringFormatMatches")
-    private fun startOutletsObserve() {
-        lifecycleScope.launch {
-            viewModel.outletResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startOutletsObserve::Empty")
-                    }
-
-                    is ApiState.Error -> {
-                        AppLogger.log("startOutletsObserve::Error ${it.error}")
-
-                    }
-
-                    is ApiState.Loading -> {
-                        AppLogger.log("startOutletsObserve::Loading")
-
-                    }
-
-                    is ApiState.Success -> {
-                        AppLogger.log("startOutletsObserve:: Success ${it.data?.outlets?.size}")
-
-                        mMap!!.clear()
-                        if (it.data?.outlets?.isEmpty() == true) {
-                            shopCount.text = getString(R.string.outlet_s, 0)
-                            Toast.makeText(requireContext(), "Outlets empty.", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            shopCount.text = getString(R.string.outlet_s, it.data?.outlets!!.size)
-                            it.data.outlets.forEach { outlet ->
-                                plotMarker(outlet, getMarkerIcon())
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setupWebSocket() {
-        val groupName =
-            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
-
-        AppLogger.log("LIVE GROUP NAME:: $groupName")
-
-        val channelAuthorizer =
-            HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
-        val params: MutableMap<String, String> = java.util.HashMap()
-        val traceToken = sharePrefUtils.getString(Api.TRACE_TOKEN)
-        if (traceToken != "") {
-            params["Authorization"] = "bearer $traceToken"
-        }
-        channelAuthorizer.setHeaders(params)
-        val options = PusherOptions()
-        options.setCluster("ap2").setChannelAuthorizer(channelAuthorizer)
-        options.setWsPort(6001)
-        options.setWssPort(6002)
-        options.setHost("backend.barikoi.com")
-        options.isUseTLS = true
-        pusher = Pusher("mykey", options)
-        pusher.connect()
-        pusher.connect(object : ConnectionEventListener {
-            override fun onConnectionStateChange(change: ConnectionStateChange) {
-                println("State changed from ${change.previousState} to ${change.currentState}")
-            }
-
-            override fun onError(
-                message: String,
-                code: String,
-                e: Exception
-            ) {
-                println("There was a problem connecting! code ($code), message ($message), exception($e)")
-            }
-        }, ConnectionState.ALL)
-
-        pusher.subscribePrivate(
-            "private-care_nutrition_39752",
-            object : PrivateChannelEventListener {
-                override fun onSubscriptionSucceeded(channelName: String) {
-                    AppLogger.log("Subscribed! $channelName")
-                }
-
-                override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                    AppLogger.log("onAuthenticationFailure: $message")
-                }
-
-                override fun onEvent(event: PusherEvent?) {
-                    AppLogger.log("Received event with data: $event")
-                }
-            })
-            .bind("care_nutrition_group_event_$groupName", object : PrivateChannelEventListener {
-                override fun onEvent(event: PusherEvent?) {
-                    AppLogger.log("SOCKET DATA: ${event?.data}")
-                    val dataObj = JSONObject(event!!.data).getJSONObject("data")
-                    val userName = dataObj.getString("name")
-                    val latitude = dataObj.getDouble("latitude")
-                    val longitude = dataObj.getDouble("longitude")
-                    val time = dataObj.getString("updated_at")
-
-                    val iconTrace: Icon = if (dataObj.getInt("active_status") == 1) {
-                        IconFactory.getInstance(requireContext())
-                            .fromResource(R.drawable.trace_active)
-
-                    } else {
-                        IconFactory.getInstance(requireContext())
-                            .fromResource(R.drawable.trace_inactive)
-                    }
-                    requireActivity().runOnUiThread {
-                        plotTraceUser(userName, time, latitude, longitude, iconTrace)
-                    }
-                }
-
-                override fun onSubscriptionSucceeded(channelName: String?) {
-                    AppLogger.log("onSubscriptionSucceeded: $channelName")
-                }
-
-                override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                    AppLogger.log("onAuthenticationFailure bind: $message")
-                }
-            })
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -354,25 +144,38 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             spinnerLayoutSO.visibility = View.GONE
         }
 
-        isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+        binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
-                setupWebSocket()
+                runBlocking {
+                    initSocket()
+                }
+                subscribeSocket(null)
             } else {
+
+                if (routeID.isNotEmpty()) {
+                    viewModel.getOutletList(
+                        routeID,
+                        if (binding.isVerified.isChecked) "1" else "0",
+                        selectedCategory
+                    )
+                }
+
                 if (this::pusher.isInitialized)
                     pusher.disconnect()
             }
         }
 
-        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                viewModel.getRoutes(soNewList[p2].id.toString())
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.getRoutes(soNewList[position].id.toString())
+                selectedSo = soNewList[position]
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
-        spinnerRoutes!!.onItemSelectedListener = object :
+        binding.spinnerRoutes.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -402,9 +205,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             requireContext(),
             android.R.layout.simple_spinner_item, categoryList
         )
-        spinnerCategory!!.adapter = adapter
+        binding.spinnerCategory.adapter = adapter
 
-        spinnerCategory!!.onItemSelectedListener = object :
+        binding.spinnerCategory.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -435,13 +238,257 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
 
 
-        cbVerified!!.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+        binding.isVerified.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
                 viewModel.getOutletList(routeID, "1", selectedCategory)
             } else {
                 viewModel.getOutletList(routeID, "0", selectedCategory)
             }
         }
+    }
+
+    private fun startSoObserve() {
+        lifecycleScope.launch {
+            viewModel.soResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startSoObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startSoObserve: Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startSoObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startSoObserve::Success ${it.data}")
+
+                        AppLogger.log("SIZE: ${it.data?.soList?.get(0)?.salesOfficers?.size}")
+
+                        soNewList = it.data?.soList?.get(0)?.salesOfficers ?: emptyList()
+                        val soNameList =
+                            it.data?.soList?.get(0)?.salesOfficers?.map { so -> so.userName }
+
+                        if (!soNameList.isNullOrEmpty()) {
+                            AppLogger.log("SIZE: ${soNameList.size}")
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item, soNameList
+                            )
+                            binding.spinnerSO.adapter = adapter
+                        } else {
+                            Toast.makeText(requireContext(), "So is empty", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startRouteObserve() {
+        lifecycleScope.launch {
+            viewModel.routeResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startRouteObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startRouteObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startRouteObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startRouteObserve:: Success ${it.data?.routes?.size}")
+
+                        routeNewList = it.data?.routes ?: emptyList()
+
+                        val routeNames = it.data?.routes?.map { route -> route.routeName }
+
+                        if (routeNewList.isNotEmpty()) {
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item, routeNames!!
+                            )
+                            binding.spinnerRoutes.adapter = adapter
+
+                        } else {
+                            Toast.makeText(requireContext(), "Route is empty.", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("StringFormatMatches")
+    private fun startOutletsObserve() {
+        lifecycleScope.launch {
+            viewModel.outletResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startOutletsObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startOutletsObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startOutletsObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startOutletsObserve:: Success ${it.data?.outlets?.size}")
+
+                        mMap.clear()
+                        if (it.data?.outlets?.isEmpty() == true) {
+                            binding.shopCount.text = getString(R.string.outlet_s, 0)
+                            Toast.makeText(requireContext(), "Outlets empty.", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            binding.shopCount.text =
+                                getString(R.string.outlet_s, it.data?.outlets!!.size)
+                            it.data.outlets.forEach { outlet ->
+                                plotMarker(outlet, getMarkerIcon())
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startSocketGroupsObserve() {
+        lifecycleScope.launch {
+            viewModel.socketGroupResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startSocketGroupsObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startSocketGroupsObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startSocketGroupsObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startSocketGroupsObserve:: Success ${it.data?.groups}")
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initSocket() {
+        val groupName =
+            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
+
+        AppLogger.log("LIVE GROUP NAME:: $groupName")
+
+        val channelAuthorizer =
+            HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
+        val params: MutableMap<String, String> = java.util.HashMap()
+        val traceToken = sharePrefUtils.getString(Api.TRACE_TOKEN)
+        if (traceToken != "") {
+            params["Authorization"] = "bearer $traceToken"
+        }
+        channelAuthorizer.setHeaders(params)
+        val options = PusherOptions()
+        options.setCluster("ap2").channelAuthorizer = channelAuthorizer
+        options.setWsPort(6001)
+        options.setWssPort(6002)
+        options.setHost("backend.barikoi.com")
+        options.isUseTLS = true
+        pusher = Pusher("mykey", options)
+        pusher.connect()
+        pusher.connect(object : ConnectionEventListener {
+            override fun onConnectionStateChange(change: ConnectionStateChange) {
+                println("PUSHER:: State changed from ${change.previousState} to ${change.currentState}")
+            }
+
+            override fun onError(
+                message: String,
+                code: String,
+                e: Exception
+            ) {
+                toast("Live location not working. Please try again latter.")
+                AppLogger.log("PUSHER:: There was a problem connecting! code ($code), message ($message), exception($e)")
+            }
+        }, ConnectionState.ALL)
+    }
+
+    private fun subscribeSocket(userId: String?) {
+        pusher.subscribePrivate(
+            "private-care_nutrition_39752",
+            object : PrivateChannelEventListener {
+                override fun onSubscriptionSucceeded(channelName: String) {
+                    AppLogger.log("PUSHER:: Subscribed! $channelName")
+                }
+
+                override fun onAuthenticationFailure(message: String?, e: Exception?) {
+                    AppLogger.log("PUSHER:: onAuthenticationFailure: $message")
+                    Sentry.captureException(e?.cause!!)
+                }
+
+                override fun onEvent(event: PusherEvent?) {
+                    AppLogger.log("PUSHER:: onEvent Received event with data: $event")
+                }
+            })
+            .bind(
+                "care_nutrition_group_event_madaripur_vacant_3181",
+                object : PrivateChannelEventListener {
+                    override fun onEvent(event: PusherEvent?) {
+                        AppLogger.log("PUSHER:: DATA: ${event?.data}")
+                        val dataObj = JSONObject(event!!.data).getJSONObject("data")
+                        val userName = dataObj.getString("name")
+                        val latitude = dataObj.getDouble("latitude")
+                        val longitude = dataObj.getDouble("longitude")
+                        val time = dataObj.getString("updated_at")
+
+                        val iconTrace: Icon = if (dataObj.getInt("active_status") == 1) {
+                            IconFactory.getInstance(requireContext())
+                                .fromResource(R.drawable.trace_active)
+
+                        } else {
+                            IconFactory.getInstance(requireContext())
+                                .fromResource(R.drawable.trace_inactive)
+                        }
+
+                        requireActivity().runOnUiThread {
+                            plotTraceUser(userName, time, latitude, longitude, iconTrace)
+                        }
+                    }
+
+                    override fun onSubscriptionSucceeded(channelName: String?) {
+                        AppLogger.log("PUSHER:: onSubscriptionSucceeded: $channelName")
+                    }
+
+                    override fun onAuthenticationFailure(
+                        message: String?,
+                        e: Exception?
+                    ) {
+                        Sentry.captureException(e?.cause!!)
+                        AppLogger.log("PUSHER:: onAuthenticationFailure bind: $message")
+                    }
+                })
     }
 
     private fun plotTraceUser(
@@ -451,15 +498,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         lon: Double,
         icon: Icon
     ) {
-        mMap!!.clear()
-        mMap!!.addMarker(
+        mMap.clear()
+        mMap.addMarker(
             MarkerOptions().position(LatLng(lat, lon))
                 .icon(icon)
                 .title("$userName| $time")
         )
-        val zoom = if (mMap?.cameraPosition?.zoom!! > 17.0) mMap?.cameraPosition?.zoom else 17.0
+        val zoom = if (mMap.cameraPosition.zoom > 17.0) mMap.cameraPosition.zoom else 17.0
 
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom!!))
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom))
     }
 
     private fun getMarkerIcon(): Icon {
@@ -474,15 +522,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private fun plotMarker(p: Outlet, icon: Icon) {
         val shopName: String = p.outletName
-        val m = mMap!!.addMarker(
+        val m = mMap.addMarker(
             MarkerOptions().position(LatLng(p.latitude.toDouble(), p.longitude.toDouble()))
                 .icon(icon)
                 .title(p.outletCategory + ", " + shopName)
         )
-        placemarkermap!![p.outletCode] = m
+        placeMarkerMap!![p.outletCode] = m
 
-        if (!cbTrace!!.isChecked)
-            mMap?.moveCamera(
+        if (!binding.isTrace.isChecked)
+            mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(
                         p.latitude.toDouble(),
@@ -581,7 +629,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
 
     private fun setCameraPosition(location: LatLng, zoom: Double?) {
-        mMap?.moveCamera(
+        mMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
                     location.latitude,
@@ -594,7 +642,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {}
 
     override fun onPermissionResult(granted: Boolean) {
-        mMap!!.getStyle { style ->
+        mMap.getStyle { style ->
             if (granted) {
                 enableLocationComponent(style)
             } else {
@@ -609,12 +657,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onStart() {
         super.onStart()
-        mapView!!.onStart()
+        binding.mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView!!.onStop()
+        binding.mapView.onStop()
         if (this::pusher.isInitialized)
             pusher.disconnect()
 
@@ -622,47 +670,47 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView!!.onDestroy()
+        binding.mapView.onDestroy()
         if (this::pusher.isInitialized)
             pusher.disconnect()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView!!.onLowMemory()
+        binding.mapView.onLowMemory()
     }
 
     override fun onResume() {
         super.onResume()
-        mapView!!.onResume()
+        binding.mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView!!.onPause()
+        binding.mapView.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
+        binding.mapView.onSaveInstanceState(outState)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         mMap = mapboxMap
-        mMap!!.setStyle(
+        mMap.setStyle(
             Style.Builder().fromUrl(getString(R.string.map_view_styleUrl))
         ) { style: Style? -> enableLocationComponent(style!!) }
 
         val uiSettings: UiSettings = mapboxMap.uiSettings
         uiSettings.isCompassEnabled = false
-        mMap!!.setMaxZoomPreference(25.5)
+        mMap.setMaxZoomPreference(25.5)
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
             AppLogger.log("MAP READY ROUTE CALL")
             sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
 
-        fab.setOnClickListener(View.OnClickListener {
+        binding.fab.setOnClickListener(View.OnClickListener {
             /*if (locationEngine != null) {
                 val lastLocation = locationEngine!!.lastLocation
                 if (lastLocation != null) {

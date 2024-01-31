@@ -193,7 +193,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
             val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
 
-            mapView = dialog.findViewById<MapView>(R.id.mapview)
+            mapView = dialog.findViewById(R.id.map_view)
             mapView!!.onCreate(savedInstanceState)
             mapView!!.getMapAsync(this)
             mapView!!.onStart()

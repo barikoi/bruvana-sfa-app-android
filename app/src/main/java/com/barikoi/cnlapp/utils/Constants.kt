@@ -10,6 +10,9 @@ object Constants {
     const val KEY_USER_NAME = "userName"
     const val KEY_USER_EMAIL = "userEmail"
 
+    const val CNL_OK_CLIENT = "cnl"
+    const val TRACE_OK_CLIENT = "trace"
+
     var token: String? = null
     var isLoggedIn = false
 }
