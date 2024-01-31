@@ -11,25 +11,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.android.volley.*
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.data.remote.models.SalesOfficer
+import com.barikoi.cnlapp.databinding.FragmentMapBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineRequest
@@ -69,32 +70,30 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
-    var spinnerRoutes: MoreSpinner? = null
-    private var spinnerCategory: MoreSpinner? = null
-    private var cbVerified: AppCompatCheckBox? = null
-    private var cbTrace: AppCompatCheckBox? = null
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
 
-    private var mMap: MapboxMap? = null
-    private var mapView: MapView? = null
-    lateinit var fab: FloatingActionButton
-    lateinit var shopCount: TextView
+    private val viewModel: MapViewModel by viewModels()
+
+    private lateinit var binding: FragmentMapBinding
+
+    private lateinit var mMap: MapboxMap
+
     private var locationEngine: LocationEngine? = null
     private var locationEngineRequest: LocationEngineRequest? = null
 
     private var permissionsManager: PermissionsManager? = null
-    var selectedCategory: String = ""
+    private var selectedCategory: String = ""
 
     private var soNewList: List<SalesOfficer> = emptyList()
     private var routeNewList: List<Route> = emptyList()
 
     private var routeID = ""
 
-    var categoryList: ArrayList<String> = ArrayList()
-    private var loading: ProgressBar? = null
-    private var placemarkermap: java.util.HashMap<String, Marker>? = HashMap()
+    private var categoryList: ArrayList<String> = ArrayList()
+    private var placeMarkerMap: java.util.HashMap<String, Marker>? = HashMap()
     private lateinit var pusher: Pusher
 
-    private val viewModel: MapViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,33 +103,137 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        binding = FragmentMapBinding.inflate(layoutInflater, container, false)
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        mapView = view.findViewById(R.id.mapview)
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync(this)
-        fab = view.findViewById(R.id.fab)
-        shopCount = view.findViewById(R.id.shopCount)
-        cbVerified = view.findViewById(R.id.isVerified)
-        cbTrace = view.findViewById(R.id.isTrace)
-        loading = view.findViewById(R.id.progressBar1)
+        binding.mapView.onCreate(savedInstanceState)
+        binding.mapView.getMapAsync(this)
 
-        spinnerRoutes = view.findViewById(R.id.spinnerRoutes)
-        spinnerCategory = view.findViewById(R.id.spinnerCategory)
+
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
-            cbVerified!!.visibility = View.VISIBLE
-            cbTrace!!.visibility = View.VISIBLE
+            binding.isVerified.isVisible = true
+            binding.isTrace.isVisible = true
         } else {
-            cbVerified!!.visibility = View.GONE
-            cbTrace!!.visibility = View.GONE
+            binding.isVerified.isVisible = false
+            binding.isTrace.isVisible = false
         }
 
         startRouteObserve()
         startOutletsObserve()
 
-        return view
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+            spinnerLayoutSO.visibility = View.VISIBLE
+            startSoObserve()
+            viewModel.getSoList()
+        } else {
+            spinnerLayoutSO.visibility = View.GONE
+        }
+
+        binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (isChecked) {
+                setupWebSocket()
+            } else {
+
+                if (routeID.isNotEmpty()) {
+                    viewModel.getOutletList(
+                        routeID,
+                        if (binding.isVerified.isChecked) "1" else "0",
+                        selectedCategory
+                    )
+                }
+
+                if (this::pusher.isInitialized)
+                    pusher.disconnect()
+            }
+        }
+
+        binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                viewModel.getRoutes(soNewList[p2].id.toString())
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
+        binding.spinnerRoutes.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
+                routeID = routeNewList[position].id.toString()
+                if (isVerified.isChecked) {
+                    viewModel.getOutletList(
+                        routeNewList[position].id.toString(),
+                        "1",
+                        selectedCategory
+                    )
+                } else {
+                    viewModel.getOutletList(
+                        routeNewList[position].id.toString(),
+                        "0",
+                        selectedCategory
+                    )
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        categoryList = arrayListOf("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item, categoryList
+        )
+        binding.spinnerCategory.adapter = adapter
+
+        binding.spinnerCategory.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
+                if (routeID.isEmpty()) {
+                    return
+                }
+                if (position == 0) {
+                    selectedCategory = ""
+                    if (isVerified.isChecked) {
+                        viewModel.getOutletList(routeID, "1", selectedCategory)
+                    } else {
+                        viewModel.getOutletList(routeID, "0", selectedCategory)
+                    }
+                } else {
+                    selectedCategory = categoryList[position]
+                    if (isVerified.isChecked) {
+                        viewModel.getOutletList(routeID, "1", selectedCategory)
+                    } else {
+                        viewModel.getOutletList(routeID, "0", selectedCategory)
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+
+
+        binding.isVerified.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (isChecked) {
+                viewModel.getOutletList(routeID, "1", selectedCategory)
+            } else {
+                viewModel.getOutletList(routeID, "0", selectedCategory)
+            }
+        }
     }
 
 
@@ -144,12 +247,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     is ApiState.Error -> {
                         AppLogger.log("startSoObserve: Error ${it.error}")
-
+                        toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startSoObserve::Loading")
-
                     }
 
                     is ApiState.Success -> {
@@ -167,7 +269,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 requireContext(),
                                 android.R.layout.simple_spinner_item, soNameList
                             )
-                            spinnerSO.adapter = adapter
+                            binding.spinnerSO.adapter = adapter
                         } else {
                             Toast.makeText(requireContext(), "So is empty", Toast.LENGTH_SHORT)
                                 .show()
@@ -188,12 +290,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     is ApiState.Error -> {
                         AppLogger.log("startRouteObserve::Error ${it.error}")
-
+                        toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startRouteObserve::Loading")
-
                     }
 
                     is ApiState.Success -> {
@@ -208,7 +309,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                                 requireContext(),
                                 android.R.layout.simple_spinner_item, routeNames!!
                             )
-                            spinnerRoutes!!.adapter = adapter
+                            binding.spinnerRoutes.adapter = adapter
 
                         } else {
                             Toast.makeText(requireContext(), "Route is empty.", Toast.LENGTH_SHORT)
@@ -231,24 +332,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     is ApiState.Error -> {
                         AppLogger.log("startOutletsObserve::Error ${it.error}")
-
+                        toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startOutletsObserve::Loading")
-
                     }
 
                     is ApiState.Success -> {
                         AppLogger.log("startOutletsObserve:: Success ${it.data?.outlets?.size}")
 
-                        mMap!!.clear()
+                        mMap.clear()
                         if (it.data?.outlets?.isEmpty() == true) {
-                            shopCount.text = getString(R.string.outlet_s, 0)
+                            binding.shopCount.text = getString(R.string.outlet_s, 0)
                             Toast.makeText(requireContext(), "Outlets empty.", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-                            shopCount.text = getString(R.string.outlet_s, it.data?.outlets!!.size)
+                            binding.shopCount.text =
+                                getString(R.string.outlet_s, it.data?.outlets!!.size)
                             it.data.outlets.forEach { outlet ->
                                 plotMarker(outlet, getMarkerIcon())
                             }
@@ -343,106 +444,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             })
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
-            spinnerLayoutSO.visibility = View.VISIBLE
-            startSoObserve()
-            viewModel.getSoList()
-        } else {
-            spinnerLayoutSO.visibility = View.GONE
-        }
-
-        isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            if (isChecked) {
-                setupWebSocket()
-            } else {
-                if (this::pusher.isInitialized)
-                    pusher.disconnect()
-            }
-        }
-
-        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            @RequiresApi(Build.VERSION_CODES.N)
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                viewModel.getRoutes(soNewList[p2].id.toString())
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-        }
-
-        spinnerRoutes!!.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                routeID = routeNewList[position].id.toString()
-                if (isVerified.isChecked) {
-                    viewModel.getOutletList(
-                        routeNewList[position].id.toString(),
-                        "1",
-                        selectedCategory
-                    )
-                } else {
-                    viewModel.getOutletList(
-                        routeNewList[position].id.toString(),
-                        "0",
-                        selectedCategory
-                    )
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
-        categoryList = arrayListOf("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item, categoryList
-        )
-        spinnerCategory!!.adapter = adapter
-
-        spinnerCategory!!.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                if (routeID.isEmpty()) {
-                    return
-                }
-                if (position == 0) {
-                    selectedCategory = ""
-                    if (isVerified.isChecked) {
-                        viewModel.getOutletList(routeID, "1", selectedCategory)
-                    } else {
-                        viewModel.getOutletList(routeID, "0", selectedCategory)
-                    }
-                } else {
-                    selectedCategory = categoryList[position]
-                    if (isVerified.isChecked) {
-                        viewModel.getOutletList(routeID, "1", selectedCategory)
-                    } else {
-                        viewModel.getOutletList(routeID, "0", selectedCategory)
-                    }
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
-
-
-        cbVerified!!.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            if (isChecked) {
-                viewModel.getOutletList(routeID, "1", selectedCategory)
-            } else {
-                viewModel.getOutletList(routeID, "0", selectedCategory)
-            }
-        }
-    }
 
     private fun plotTraceUser(
         userName: String,
@@ -474,15 +476,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private fun plotMarker(p: Outlet, icon: Icon) {
         val shopName: String = p.outletName
-        val m = mMap!!.addMarker(
+        val m = mMap.addMarker(
             MarkerOptions().position(LatLng(p.latitude.toDouble(), p.longitude.toDouble()))
                 .icon(icon)
                 .title(p.outletCategory + ", " + shopName)
         )
-        placemarkermap!![p.outletCode] = m
+        placeMarkerMap!![p.outletCode] = m
 
-        if (!cbTrace!!.isChecked)
-            mMap?.moveCamera(
+        if (!binding.isTrace.isChecked)
+            mMap.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(
                         p.latitude.toDouble(),
@@ -609,12 +611,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onStart() {
         super.onStart()
-        mapView!!.onStart()
+        binding.mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView!!.onStop()
+        binding.mapView.onStop()
         if (this::pusher.isInitialized)
             pusher.disconnect()
 
@@ -622,47 +624,47 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView!!.onDestroy()
+        binding.mapView.onDestroy()
         if (this::pusher.isInitialized)
             pusher.disconnect()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView!!.onLowMemory()
+        binding.mapView.onLowMemory()
     }
 
     override fun onResume() {
         super.onResume()
-        mapView!!.onResume()
+        binding.mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView!!.onPause()
+        binding.mapView.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
+        binding.mapView.onSaveInstanceState(outState)
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         mMap = mapboxMap
-        mMap!!.setStyle(
+        mMap.setStyle(
             Style.Builder().fromUrl(getString(R.string.map_view_styleUrl))
         ) { style: Style? -> enableLocationComponent(style!!) }
 
         val uiSettings: UiSettings = mapboxMap.uiSettings
         uiSettings.isCompassEnabled = false
-        mMap!!.setMaxZoomPreference(25.5)
+        mMap.setMaxZoomPreference(25.5)
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
             AppLogger.log("MAP READY ROUTE CALL")
             sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
 
-        fab.setOnClickListener(View.OnClickListener {
+        binding.fab.setOnClickListener(View.OnClickListener {
             /*if (locationEngine != null) {
                 val lastLocation = locationEngine!!.lastLocation
                 if (lastLocation != null) {
