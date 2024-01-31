@@ -4,8 +4,10 @@ import android.content.Context
 import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.ApiService
+import com.barikoi.cnlapp.data.remote.repository.SocketApiService
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.Constants
+import com.barikoi.cnlapp.utils.Constants.CNL_OK_CLIENT
+import com.barikoi.cnlapp.utils.Constants.TRACE_OK_CLIENT
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import dagger.Module
@@ -18,6 +20,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -26,13 +29,20 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun getApiInterface(retrofit: Retrofit): ApiService {
+    fun getApiInterface(@Named("CNL_OK_CLIENT") retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 
     @Singleton
     @Provides
-    fun getOkhttpClink(sharePrefUtils: SharePrefUtils): OkHttpClient {
+    fun provideTraceApiInterface(@Named("TRACE_OK_CLIENT") retrofit: Retrofit): SocketApiService {
+        return retrofit.create(SocketApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    @Named(CNL_OK_CLIENT)
+    fun provideCNOkClient(sharePrefUtils: SharePrefUtils): OkHttpClient {
         return OkHttpClient
             .Builder().apply {
                 addInterceptor { chain ->
@@ -54,12 +64,50 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun getRetrofitInstance(
-        okHttpClient: OkHttpClient,
+    @Named(TRACE_OK_CLIENT)
+    fun provideTraceOkClient(sharePrefUtils: SharePrefUtils): OkHttpClient {
+        return OkHttpClient
+            .Builder().apply {
+                addInterceptor { chain ->
+                    val request = chain.request().newBuilder()
+                        .addHeader(
+                            "Authorization",
+                            "Bearer ${sharePrefUtils.getString(Api.TRACE_TOKEN)}"
+                        )
+                        .build()
+                    chain.proceed(request)
+                }
+            }
+            .callTimeout(5, TimeUnit.MINUTES)
+            .writeTimeout(5, TimeUnit.MINUTES)
+            .readTimeout(5, TimeUnit.MINUTES)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("CNL_OK_CLIENT")
+    fun provideCNLRetrofitInstance(
+        @Named(CNL_OK_CLIENT) okHttpClient: OkHttpClient,
         @ApplicationContext context: Context
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(context.getString(R.string.url_base))
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("TRACE_OK_CLIENT")
+    fun provideTraceRetrofitInstance(
+        @Named(TRACE_OK_CLIENT) okHttpClient: OkHttpClient,
+        @ApplicationContext context: Context
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://backend.barikoi.com:8888/api/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
