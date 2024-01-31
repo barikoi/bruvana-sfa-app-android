@@ -5,10 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
-import com.barikoi.cnlapp.data.remote.RouteRepository
+import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
+import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
+import com.barikoi.cnlapp.data.remote.repository.SocketRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val routeRepository: RouteRepository
+    private val routeRepository: RouteRepository,
+    private val socketRepository: SocketRepository
 ) : ViewModel() {
 
     private val _routeResponse = MutableLiveData<ApiState<RouteResponse>>()
@@ -30,6 +33,17 @@ class MapViewModel @Inject constructor(
     private val _outletResponse = MutableLiveData<ApiState<OutletsResponse>>()
     val outletResponse: LiveData<ApiState<OutletsResponse>> = _outletResponse
 
+
+    private val _socketGroupResponse = MutableLiveData<ApiState<SocketGroupResponse>>()
+    val socketGroupResponse: LiveData<ApiState<SocketGroupResponse>> = _socketGroupResponse
+
+    fun getSocketGroups(map: Map<String,String>) {
+        viewModelScope.launch {
+            socketRepository.getAllGroup(map).collectLatest {
+                _socketGroupResponse.postValue(it)
+            }
+        }
+    }
 
     fun getSoList() {
         viewModelScope.launch {
