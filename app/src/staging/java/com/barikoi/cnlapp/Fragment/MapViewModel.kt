@@ -10,6 +10,7 @@ import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
+import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
 import com.barikoi.cnlapp.data.remote.repository.SocketRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -37,10 +38,22 @@ class MapViewModel @Inject constructor(
     private val _socketGroupResponse = MutableLiveData<ApiState<SocketGroupResponse>>()
     val socketGroupResponse: LiveData<ApiState<SocketGroupResponse>> = _socketGroupResponse
 
-    fun getSocketGroups(map: Map<String,String>) {
+
+    private val _socketUsersResponse = MutableLiveData<ApiState<SocketUserResponse>>()
+    val socketUsersResponse: LiveData<ApiState<SocketUserResponse>> = _socketUsersResponse
+
+    fun getSocketGroups(map: Map<String, String>) {
         viewModelScope.launch {
             socketRepository.getAllGroup(map).collectLatest {
                 _socketGroupResponse.postValue(it)
+            }
+        }
+    }
+
+    fun getSocketUserByGroup(groupId: String) {
+        viewModelScope.launch {
+            socketRepository.getAllUsersByGroupID(groupId).collectLatest {
+                _socketUsersResponse.postValue(it)
             }
         }
     }
