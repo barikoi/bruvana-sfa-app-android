@@ -42,6 +42,7 @@ import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -57,8 +58,11 @@ import com.pusher.client.connection.ConnectionState
 import com.pusher.client.connection.ConnectionStateChange
 import com.pusher.client.util.HttpChannelAuthorizer
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
@@ -86,6 +90,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var selectedCategory: String = ""
 
     private var soNewList: List<SalesOfficer> = emptyList()
+    private var selectedSo: SalesOfficer? = null
     private var routeNewList: List<Route> = emptyList()
 
     private var routeID = ""
@@ -93,7 +98,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var categoryList: ArrayList<String> = ArrayList()
     private var placeMarkerMap: java.util.HashMap<String, Marker>? = HashMap()
     private lateinit var pusher: Pusher
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +127,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         startRouteObserve()
         startOutletsObserve()
 
+        viewModel.getSocketGroups(mapOf("Authorization" to "bearer ${sharePrefUtils.getString(Api.TRACE_TOKEN)}"))
+        startSocketGroupsObserve()
+
         return binding.root
     }
 
@@ -139,7 +146,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
-                setupWebSocket()
+                runBlocking {
+                    initSocket()
+                }
+                subscribeSocket(null)
             } else {
 
                 if (routeID.isNotEmpty()) {
@@ -157,8 +167,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                viewModel.getRoutes(soNewList[p2].id.toString())
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.getRoutes(soNewList[position].id.toString())
+                selectedSo = soNewList[position]
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
@@ -235,7 +246,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             }
         }
     }
-
 
     private fun startSoObserve() {
         lifecycleScope.launch {
@@ -361,7 +371,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-    private fun setupWebSocket() {
+    private fun startSocketGroupsObserve() {
+        lifecycleScope.launch {
+            viewModel.socketGroupResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startSocketGroupsObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startSocketGroupsObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startSocketGroupsObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startSocketGroupsObserve:: Success ${it.data?.groups}")
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initSocket() {
         val groupName =
             sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
 
@@ -376,7 +412,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
         channelAuthorizer.setHeaders(params)
         val options = PusherOptions()
-        options.setCluster("ap2").setChannelAuthorizer(channelAuthorizer)
+        options.setCluster("ap2").channelAuthorizer = channelAuthorizer
         options.setWsPort(6001)
         options.setWssPort(6002)
         options.setHost("backend.barikoi.com")
@@ -385,7 +421,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         pusher.connect()
         pusher.connect(object : ConnectionEventListener {
             override fun onConnectionStateChange(change: ConnectionStateChange) {
-                println("State changed from ${change.previousState} to ${change.currentState}")
+                println("PUSHER:: State changed from ${change.previousState} to ${change.currentState}")
             }
 
             override fun onError(
@@ -393,58 +429,67 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 code: String,
                 e: Exception
             ) {
-                println("There was a problem connecting! code ($code), message ($message), exception($e)")
+                toast("Live location not working. Please try again latter.")
+                AppLogger.log("PUSHER:: There was a problem connecting! code ($code), message ($message), exception($e)")
             }
         }, ConnectionState.ALL)
+    }
 
+    private fun subscribeSocket(userId: String?) {
         pusher.subscribePrivate(
             "private-care_nutrition_39752",
             object : PrivateChannelEventListener {
                 override fun onSubscriptionSucceeded(channelName: String) {
-                    AppLogger.log("Subscribed! $channelName")
+                    AppLogger.log("PUSHER:: Subscribed! $channelName")
                 }
 
-                override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                    AppLogger.log("onAuthenticationFailure: $message")
+                override fun onAuthenticationFailure(message: String?, e: Exception?) {
+                    AppLogger.log("PUSHER:: onAuthenticationFailure: $message")
+                    Sentry.captureException(e?.cause!!)
                 }
 
                 override fun onEvent(event: PusherEvent?) {
-                    AppLogger.log("Received event with data: $event")
+                    AppLogger.log("PUSHER:: onEvent Received event with data: $event")
                 }
             })
-            .bind("care_nutrition_group_event_$groupName", object : PrivateChannelEventListener {
-                override fun onEvent(event: PusherEvent?) {
-                    AppLogger.log("SOCKET DATA: ${event?.data}")
-                    val dataObj = JSONObject(event!!.data).getJSONObject("data")
-                    val userName = dataObj.getString("name")
-                    val latitude = dataObj.getDouble("latitude")
-                    val longitude = dataObj.getDouble("longitude")
-                    val time = dataObj.getString("updated_at")
+            .bind(
+                "care_nutrition_group_event_madaripur_vacant_3181",
+                object : PrivateChannelEventListener {
+                    override fun onEvent(event: PusherEvent?) {
+                        AppLogger.log("PUSHER:: DATA: ${event?.data}")
+                        val dataObj = JSONObject(event!!.data).getJSONObject("data")
+                        val userName = dataObj.getString("name")
+                        val latitude = dataObj.getDouble("latitude")
+                        val longitude = dataObj.getDouble("longitude")
+                        val time = dataObj.getString("updated_at")
 
-                    val iconTrace: Icon = if (dataObj.getInt("active_status") == 1) {
-                        IconFactory.getInstance(requireContext())
-                            .fromResource(R.drawable.trace_active)
+                        val iconTrace: Icon = if (dataObj.getInt("active_status") == 1) {
+                            IconFactory.getInstance(requireContext())
+                                .fromResource(R.drawable.trace_active)
 
-                    } else {
-                        IconFactory.getInstance(requireContext())
-                            .fromResource(R.drawable.trace_inactive)
+                        } else {
+                            IconFactory.getInstance(requireContext())
+                                .fromResource(R.drawable.trace_inactive)
+                        }
+
+                        requireActivity().runOnUiThread {
+                            plotTraceUser(userName, time, latitude, longitude, iconTrace)
+                        }
                     }
-                    requireActivity().runOnUiThread {
-                        plotTraceUser(userName, time, latitude, longitude, iconTrace)
+
+                    override fun onSubscriptionSucceeded(channelName: String?) {
+                        AppLogger.log("PUSHER:: onSubscriptionSucceeded: $channelName")
                     }
-                }
 
-                override fun onSubscriptionSucceeded(channelName: String?) {
-                    AppLogger.log("onSubscriptionSucceeded: $channelName")
-                }
-
-                override fun onAuthenticationFailure(message: String?, e: java.lang.Exception?) {
-                    AppLogger.log("onAuthenticationFailure bind: $message")
-                }
-            })
+                    override fun onAuthenticationFailure(
+                        message: String?,
+                        e: Exception?
+                    ) {
+                        Sentry.captureException(e?.cause!!)
+                        AppLogger.log("PUSHER:: onAuthenticationFailure bind: $message")
+                    }
+                })
     }
-
-
 
     private fun plotTraceUser(
         userName: String,
@@ -453,15 +498,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         lon: Double,
         icon: Icon
     ) {
-        mMap!!.clear()
-        mMap!!.addMarker(
+        mMap.clear()
+        mMap.addMarker(
             MarkerOptions().position(LatLng(lat, lon))
                 .icon(icon)
                 .title("$userName| $time")
         )
-        val zoom = if (mMap?.cameraPosition?.zoom!! > 17.0) mMap?.cameraPosition?.zoom else 17.0
+        val zoom = if (mMap.cameraPosition.zoom > 17.0) mMap.cameraPosition.zoom else 17.0
 
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom!!))
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom))
     }
 
     private fun getMarkerIcon(): Icon {
@@ -484,7 +530,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         placeMarkerMap!![p.outletCode] = m
 
         if (!binding.isTrace.isChecked)
-            mMap.moveCamera(
+            mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(
                         p.latitude.toDouble(),
@@ -583,7 +629,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
 
     private fun setCameraPosition(location: LatLng, zoom: Double?) {
-        mMap?.moveCamera(
+        mMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
                     location.latitude,
@@ -596,7 +642,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {}
 
     override fun onPermissionResult(granted: Boolean) {
-        mMap!!.getStyle { style ->
+        mMap.getStyle { style ->
             if (granted) {
                 enableLocationComponent(style)
             } else {
