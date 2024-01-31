@@ -7,6 +7,7 @@ import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.utils.AppLogger
+import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.net.UnknownHostException
@@ -40,6 +41,8 @@ class RouteRepositoryImpl @Inject constructor(
                     )
                 }
             } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
                 when (exception) {
                     is UnknownHostException -> {
                         emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
@@ -68,6 +71,7 @@ class RouteRepositoryImpl @Inject constructor(
                     )
                 }
             } catch (exception: Throwable) {
+                Sentry.captureException(exception)
 
                 when (exception) {
                     is UnknownHostException -> {
@@ -101,6 +105,7 @@ class RouteRepositoryImpl @Inject constructor(
                     )
                 }
             } catch (exception: Throwable) {
+                Sentry.captureException(exception)
 
                 when (exception) {
                     is UnknownHostException -> {
