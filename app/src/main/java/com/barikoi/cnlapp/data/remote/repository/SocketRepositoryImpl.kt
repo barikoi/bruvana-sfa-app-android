@@ -14,14 +14,14 @@ import javax.inject.Inject
 
 interface SocketRepository {
 
-    fun getAllGroup(map: Map<String, String>): Flow<ApiState<SocketGroupResponse>>
+    fun getAllGroup(): Flow<ApiState<SocketGroupResponse>>
     fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketUserResponse>>
 
 }
 
 class SocketRepositoryImpl @Inject constructor(private val socketApiService: SocketApiService) :
     SocketRepository {
-    override fun getAllGroup(map: Map<String, String>): Flow<ApiState<SocketGroupResponse>> {
+    override fun getAllGroup(): Flow<ApiState<SocketGroupResponse>> {
         return flow {
             try {
                 val response =
