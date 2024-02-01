@@ -19,11 +19,14 @@ import com.android.volley.*
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.model.SocketEventResponse
+import com.barikoi.cnlapp.data.remote.models.LocalUser
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.data.remote.models.SalesOfficer
 import com.barikoi.cnlapp.databinding.FragmentMapBinding
 import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.Api.TRACE_GROUP_ID
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.toast
@@ -31,6 +34,7 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
+import com.google.gson.Gson
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineRequest
@@ -42,7 +46,6 @@ import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -60,10 +63,8 @@ import com.pusher.client.util.HttpChannelAuthorizer
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
 
@@ -92,6 +93,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var soNewList: List<SalesOfficer> = emptyList()
     private var selectedSo: SalesOfficer? = null
     private var routeNewList: List<Route> = emptyList()
+    private var socketLocalUserList: List<LocalUser> = emptyList()
 
     private var routeID = ""
 
@@ -127,8 +129,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         startRouteObserve()
         startOutletsObserve()
 
-        viewModel.getSocketGroups(mapOf("Authorization" to "bearer ${sharePrefUtils.getString(Api.TRACE_TOKEN)}"))
-        startSocketGroupsObserve()
+//        viewModel.getSocketGroups()
+//        startSocketGroupsObserve()
 
         return binding.root
     }
@@ -137,20 +139,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         super.onViewCreated(view, savedInstanceState)
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
-            spinnerLayoutSO.visibility = View.VISIBLE
+            binding.spinnerLayoutSO.visibility = View.VISIBLE
             startSoObserve()
             viewModel.getSoList()
         } else {
-            spinnerLayoutSO.visibility = View.GONE
+            binding.spinnerLayoutSO.visibility = View.GONE
         }
 
         binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
+                sharePrefUtils.getString(TRACE_GROUP_ID)?.let { viewModel.getSocketUserByGroup(it) }
                 runBlocking {
                     initSocket()
                 }
                 subscribeSocket(null)
             } else {
+                if (this::pusher.isInitialized)
+                    pusher.disconnect()
 
                 if (routeID.isNotEmpty()) {
                     viewModel.getOutletList(
@@ -159,9 +164,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         selectedCategory
                     )
                 }
-
-                if (this::pusher.isInitialized)
-                    pusher.disconnect()
             }
         }
 
@@ -170,6 +172,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
                 viewModel.getRoutes(soNewList[position].id.toString())
                 selectedSo = soNewList[position]
+
+                if (binding.isTrace.isChecked) {
+                    sharePrefUtils.getString(TRACE_GROUP_ID)
+                        ?.let { viewModel.getSocketUserByGroup(it) }
+                }
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
@@ -182,18 +189,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 view: View, position: Int, id: Long
             ) {
                 routeID = routeNewList[position].id.toString()
-                if (isVerified.isChecked) {
-                    viewModel.getOutletList(
-                        routeNewList[position].id.toString(),
-                        "1",
-                        selectedCategory
-                    )
-                } else {
-                    viewModel.getOutletList(
-                        routeNewList[position].id.toString(),
-                        "0",
-                        selectedCategory
-                    )
+
+                if (!binding.isTrace.isChecked) {
+                    if (isVerified.isChecked) {
+                        viewModel.getOutletList(
+                            routeNewList[position].id.toString(),
+                            "1",
+                            selectedCategory
+                        )
+                    } else {
+                        viewModel.getOutletList(
+                            routeNewList[position].id.toString(),
+                            "0",
+                            selectedCategory
+                        )
+                    }
                 }
             }
 
@@ -245,6 +255,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 viewModel.getOutletList(routeID, "0", selectedCategory)
             }
         }
+
+        startSocketGroupUsersObserve()
     }
 
     private fun startSoObserve() {
@@ -397,11 +409,54 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-    private fun initSocket() {
-        val groupName =
-            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
+    private fun startSocketGroupUsersObserve() {
+        lifecycleScope.launch {
+            viewModel.socketUsersResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startSocketGroupUsersObserve::Empty")
+                    }
 
-        AppLogger.log("LIVE GROUP NAME:: $groupName")
+                    is ApiState.Error -> {
+                        AppLogger.log("startSocketGroupUsersObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startSocketGroupUsersObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log(
+                            "startSocketGroupUsersObserve:: Success ${
+                                it.data?.users?.get(
+                                    0
+                                )?.localUsers
+                            }"
+                        )
+                        socketLocalUserList = it.data?.users?.get(0)?.localUsers ?: emptyList()
+
+                        it.data?.users?.get(0)?.localUsers?.forEach { localUser ->
+                            AppLogger.log("LOCAL USER:: $localUser")
+                            if (selectedSo?.userName == localUser.name) {
+                                AppLogger.log("MARKER TRACE:: True")
+                                plotTraceUser(
+                                    localUser.name,
+                                    localUser.positionUpdatedAt,
+                                    localUser.userLastLat,
+                                    localUser.userLastLon,
+                                    getLiveMarkerIcon(localUser.activeStatus)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun initSocket() {
 
         val channelAuthorizer =
             HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
@@ -436,6 +491,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     private fun subscribeSocket(userId: String?) {
+        val groupName =
+            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
+
+        AppLogger.log("LIVE GROUP NAME:: $groupName")
         pusher.subscribePrivate(
             "private-care_nutrition_39752",
             object : PrivateChannelEventListener {
@@ -453,27 +512,25 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 }
             })
             .bind(
-                "care_nutrition_group_event_madaripur_vacant_3181",
+                "care_nutrition_group_event_$groupName",
                 object : PrivateChannelEventListener {
                     override fun onEvent(event: PusherEvent?) {
+
+                        val liveUserResponse =
+                            Gson().fromJson(event?.data, SocketEventResponse::class.java)
+
                         AppLogger.log("PUSHER:: DATA: ${event?.data}")
-                        val dataObj = JSONObject(event!!.data).getJSONObject("data")
-                        val userName = dataObj.getString("name")
-                        val latitude = dataObj.getDouble("latitude")
-                        val longitude = dataObj.getDouble("longitude")
-                        val time = dataObj.getString("updated_at")
-
-                        val iconTrace: Icon = if (dataObj.getInt("active_status") == 1) {
-                            IconFactory.getInstance(requireContext())
-                                .fromResource(R.drawable.trace_active)
-
-                        } else {
-                            IconFactory.getInstance(requireContext())
-                                .fromResource(R.drawable.trace_inactive)
-                        }
 
                         requireActivity().runOnUiThread {
-                            plotTraceUser(userName, time, latitude, longitude, iconTrace)
+                            if (selectedSo?.userName == liveUserResponse.liveUser.name) {
+                                plotTraceUser(
+                                    liveUserResponse.liveUser.name,
+                                    liveUserResponse.liveUser.updatedAt,
+                                    liveUserResponse.liveUser.latitude.toDouble(),
+                                    liveUserResponse.liveUser.longitude.toDouble(),
+                                    getLiveMarkerIcon(liveUserResponse.liveUser.activeStatus)
+                                )
+                            }
                         }
                     }
 
@@ -508,6 +565,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoom))
+    }
+
+    private fun getLiveMarkerIcon(isActive: Int): Icon {
+        return if (isActive == 1) {
+            IconFactory.getInstance(requireContext())
+                .fromResource(R.drawable.trace_active)
+        } else {
+            IconFactory.getInstance(requireContext())
+                .fromResource(R.drawable.trace_inactive)
+        }
     }
 
     private fun getMarkerIcon(): Icon {
