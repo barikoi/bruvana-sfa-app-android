@@ -111,7 +111,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMapBinding.inflate(layoutInflater, container, false)
-        val view = inflater.inflate(R.layout.fragment_map, container, false)
 
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
@@ -128,9 +127,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         startRouteObserve()
         startOutletsObserve()
-
-//        viewModel.getSocketGroups()
-//        startSocketGroupsObserve()
 
         return binding.root
     }
@@ -559,7 +555,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         mMap.addMarker(
             MarkerOptions().position(LatLng(lat, lon))
                 .icon(icon)
-                .title("$userName| $time")
+                .title("$userName | $time")
         )
         val zoom = if (mMap.cameraPosition.zoom > 17.0) mMap.cameraPosition.zoom else 17.0
 
