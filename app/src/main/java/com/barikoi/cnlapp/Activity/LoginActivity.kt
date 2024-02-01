@@ -21,6 +21,7 @@ import com.barikoi.barikoitrace.models.BarikoiTraceError
 import com.barikoi.barikoitrace.models.BarikoiTraceUser
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import io.sentry.Sentry
 import io.sentry.SentryEvent
@@ -80,6 +81,7 @@ class LoginActivity : AppCompatActivity() {
             Method.POST, Api.loginurl,
             Response.Listener { response ->
                 try {
+                    AppLogger.log("LOGIN DATA:: $response")
                     val responsedata = JSONObject(response)
                     if (responsedata.has("token")) {
                         token = responsedata.getString("token")
