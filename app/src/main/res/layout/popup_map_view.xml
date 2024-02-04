@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_margin="8dp"
-    android:background="@color/white">
+    android:background="@color/white"
+    app:cardCornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
+
             <ImageButton
                 android:id="@+id/btnClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_margin="8dp"
                 android:background="@color/white"
-                android:src="@drawable/ic_cross"
-                android:layout_alignParentRight="true">
-
-            </ImageButton>
+                android:src="@drawable/ic_cross" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -35,51 +35,53 @@
                 android:layout_margin="8dp"
                 android:text="@string/adjust_shop_location"
                 android:textColor="@color/text_title"
-                android:textStyle="bold"
-                android:textSize="15sp">
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-            </TextView>
         </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="400dp">
+
             <ImageView
                 android:id="@+id/markerSelector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:visibility="visible"
                 android:translationZ="90dp"
+                android:visibility="visible"
                 app:srcCompat="@drawable/ic_marker_selector" />
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_above="@+id/btnSubmit"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="end|bottom"
                 android:layout_marginRight="11dp"
                 android:layout_marginBottom="8dp"
-                android:layout_above="@+id/btnSubmit"
                 android:src="@drawable/ic_gps"
                 android:tint="@color/black"
+                android:visibility="visible"
                 app:backgroundTint="@android:color/white"
                 app:borderWidth="0dp"
                 app:elevation="6dp"
                 app:fabSize="mini"
-                android:visibility="visible"
                 app:layout_anchorGravity="top|end"
                 app:layout_dodgeInsetEdges="bottom"
                 app:pressedTranslationZ="12dp" />
+
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/map_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                mapbox:mapbox_cameraZoom="12"
                 app:mapbox_uiAttribution="false"
                 app:mapbox_uiAttributionMarginLeft="5dp"
-                app:mapbox_uiLogo="false">
-            </com.mapbox.mapboxsdk.maps.MapView>
+                app:mapbox_uiLogo="false"
+                mapbox:mapbox_cameraZoom="12" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSubmit"
@@ -98,11 +100,9 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                android:textStyle="bold">
+                android:textStyle="bold" />
 
-            </androidx.appcompat.widget.AppCompatButton>
         </RelativeLayout>
-
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
