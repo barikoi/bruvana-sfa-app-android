@@ -205,7 +205,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     val target = mMap!!.cameraPosition.target
                     latitude = target.latitude
                     longitude = target.longitude
-                    var dformat = DecimalFormat("#.#####")
+                    val dformat = DecimalFormat("#.#####")
                     if (latitude!! > 0.0 && longitude!! > 0.0) {
                         etLatitude.setText(dformat.format(latitude).toString())
                         etLongitude.setText(dformat.format(longitude).toString())

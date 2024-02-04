@@ -354,7 +354,7 @@ class VisitReportActivity : AppCompatActivity() {
             c2.setTextColor(resources.getColor(R.color.text_title))
             c2.setText(data.get(i).second)
             c2.gravity = Gravity.CENTER
-            c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
+            c2.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
             tr.addView(c1)
             tr.addView(c2)
             tab_Layout.addView(tr)
@@ -392,7 +392,7 @@ class VisitReportActivity : AppCompatActivity() {
             tr.addView(c1)
             tr.addView(c2)
             tab_Layout.addView(tr)
-            tab_Layout.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
+            tab_Layout.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
         }
     }
 }

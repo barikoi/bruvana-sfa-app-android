@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_margin="16dp"
-            android:background="@drawable/button_whitebg_stroke"
+            android:background="@drawable/button_white_bg_stroke"
             android:backgroundTint="@color/cnl_color_1"
             android:text="@string/submit"
             android:textAllCaps="false"
