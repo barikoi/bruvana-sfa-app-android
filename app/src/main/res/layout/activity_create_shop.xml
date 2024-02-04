@@ -42,9 +42,8 @@
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="8dp"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_back">
+                        android:src="@drawable/ic_back"/>
 
-                    </ImageButton>
 
                     <TextView
                         android:id="@+id/tvTitle"

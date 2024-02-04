@@ -101,7 +101,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var inputVerified: Int? = 0
 
     var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
-    var routesList : java.util.ArrayList<String>? = ArrayList()
+    var routesList: java.util.ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,18 +129,18 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         spinnerLayoutCategory.setBackgroundDrawable(gd)
         etAddress.setBackgroundDrawable(gd)
         etOwnerName.setBackgroundDrawable(gd)
-        if (userType.equals("TO", true)){
+        if (userType.equals("TO", true)) {
             isVerified.visibility = View.VISIBLE
-        }else{
+        } else {
             isVerified.visibility = View.GONE
         }
-        if (intent.hasExtra("fromEdit")){
+        if (intent.hasExtra("fromEdit")) {
             btnUpdateShop.visibility = View.VISIBLE
             btnSubmitShop.visibility = View.GONE
             tvTitle.text = resources.getString(R.string.update_shop_information)
             shops = intent.getSerializableExtra("fromEdit") as Shops
             getShopDetails(shops!!)
-        }else{
+        } else {
             btnUpdateShop.visibility = View.GONE
             btnSubmitShop.visibility = View.VISIBLE
             tvTitle.text = resources.getString(R.string.new_shop_creation)
@@ -151,14 +151,17 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         imagepicker.setCameraLauncher(startCamera)
 
         routesList = intent.getStringArrayListExtra("routes")
-        routeNameList = intent.getParcelableArrayListExtra<Parcelable>("routeList") as java.util.ArrayList<Pair<String, String>>
+        routeNameList =
+            intent.getParcelableArrayListExtra<Parcelable>("routeList") as java.util.ArrayList<Pair<String, String>>
 
-        if (routesList!!.size > 0){
+        if (routesList!!.size > 0) {
             routesList!!.add(0, resources.getString(R.string.select_route))
-            routeNameList!!.add(0, Pair(
-                "",
-                resources.getString(R.string.select_route)
-            ))
+            routeNameList!!.add(
+                0, Pair(
+                    "",
+                    resources.getString(R.string.select_route)
+                )
+            )
             setRoutes(routesList!!, routeNameList!!)
         }
         //getRoutes()
@@ -169,9 +172,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         getImageFromDB()
 
         isVerified.setOnCheckedChangeListener { compoundButton, isChecked ->
-            if (isChecked){
+            if (isChecked) {
                 inputVerified = 1
-            }else{
+            } else {
                 inputVerified = 0
             }
 
@@ -205,7 +208,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     val target = mMap!!.cameraPosition.target
                     latitude = target.latitude
                     longitude = target.longitude
-                    var dformat = DecimalFormat("#.#####")
+                    val dformat = DecimalFormat("#.#####")
                     if (latitude!! > 0.0 && longitude!! > 0.0) {
                         etLatitude.setText(dformat.format(latitude).toString())
                         etLongitude.setText(dformat.format(longitude).toString())
@@ -254,13 +257,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         longitude = shops.longitude
         inputVerified = shops.isVerified
 
-        if (shops.isVerified == 1){
+        if (shops.isVerified == 1) {
             isVerified.isChecked = true
-        }else{
+        } else {
             isVerified.isChecked = false
         }
-        
-        if (shops.imageArray.size > 0){
+
+        if (shops.imageArray.size > 0) {
             generateImages(shops.imageArray)
         }
     }
@@ -319,30 +322,37 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private fun getImageFromDB() {
         appDatabase!!.imagesDao()!!.deleteAllImages()
         var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
-        imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
-        if (imageList!!.size > 0){
-            for(p in 0 until imageList.size){
+        imageList =
+            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
+        if (imageList!!.size > 0) {
+            for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
-                val fileExist : Boolean = File(dbPhotoPath).canRead()
-                if(fileExist) {
+                val fileExist: Boolean = File(dbPhotoPath).canRead()
+                if (fileExist) {
                     isImageAdded = true
                     imageCounter.visibility = View.VISIBLE
                     imageCounter.text = (imageList.size).toString() + " Photos Added"
                     try {
                         var bitmap = imagepicker.getRotateImage(dbPhotoPath)
-                        imagepicker.setLocalImage(bitmap, dbPhotoPath, imageList[p]!!.position, "", "Shop")
-                    } catch (e:Exception ) {
+                        imagepicker.setLocalImage(
+                            bitmap,
+                            dbPhotoPath,
+                            imageList[p]!!.position,
+                            "",
+                            "Shop"
+                        )
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                    Log.d("Imagepos", "ImageList Pos: " + imageList[p]!!.position + "p: " +(p + 1))
+                    Log.d("Imagepos", "ImageList Pos: " + imageList[p]!!.position + "p: " + (p + 1))
                     if (imageList[p]!!.position != p + 1) {
                         Executors.newSingleThreadExecutor().execute {
-                                appDatabase!!.imagesDao()!!.updatePosition(dbPhotoPath, p + 1, "Shop")
-                            }
+                            appDatabase!!.imagesDao()!!.updatePosition(dbPhotoPath, p + 1, "Shop")
+                        }
                     }
-                }else{
+                } else {
                     Executors.newSingleThreadExecutor()
-                        .execute { appDatabase!!.imagesDao()!!.deleteImage(p+1, "Shop") }
+                        .execute { appDatabase!!.imagesDao()!!.deleteImage(p + 1, "Shop") }
                 }
 
 
@@ -366,7 +376,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
                 var imagePosition = 0
                 var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
-                imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
+                imageList = appDatabase!!.imagesDao()!!
+                    .getAllImageDB("Shop") as java.util.ArrayList<Images?>?
                 imageCounter.visibility = View.VISIBLE
                 imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
                 /*if (imageList!!.size > 0){
@@ -381,11 +392,17 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 } else {
                     imagePosition + 1
                 }
-                imagepicker.AddNewImage(result.data, CAMERA, imagePosition, "Shop", prefs!!.getString(ApiCall.IMAGE_PATH, "")!!)
+                imagepicker.AddNewImage(
+                    result.data,
+                    CAMERA,
+                    imagePosition,
+                    "Shop",
+                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                )
                 try {
                     val placeImage = Images(
                         null, imagePosition,
-                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!,"Shop"
+                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
                     )
                     isImageAdded = true
                     if (imagePosition > 0) {
@@ -535,7 +552,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             })
     }
 
-    fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>){
+    fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>) {
         var storedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
         if (spinnerRoutes != null) {
             if (spinnerRoutes.adapter == null) {
@@ -581,18 +598,24 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         p3: Long
                     ) {
                         if (p0 != null) {
-                            if(storedRoute.length>0){
+                            if (storedRoute.length > 0) {
                                 if (spinnerRoutes.adapter.count > 0) {
-                                    val pos = (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(storedRoute)
+                                    val pos =
+                                        (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(
+                                            storedRoute
+                                        )
                                     Log.e("RouteList", "selectedRoute pos " + pos)
-                                    Log.e("RouteList", "selectedRoute count " + spinnerRoutes.adapter.count)
+                                    Log.e(
+                                        "RouteList",
+                                        "selectedRoute count " + spinnerRoutes.adapter.count
+                                    )
                                     if (pos > -1) {
                                         storedRoute = ""
                                         spinnerRoutes.setSelection(pos)
                                     }
                                 }
                             }
-                            if (p0.childCount>0) {
+                            if (p0.childCount > 0) {
                                 if (p2 > 0) {
                                     val view1: TextView = p0.getChildAt(0) as TextView
                                     view1.setTextColor(resources.getColor(R.color.black))
@@ -616,10 +639,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                 }
 
-            if (shops != null){
-                if(shops!!.route_name.length>0){
-                    val pos= (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
-                    if(pos>-1) {
+            if (shops != null) {
+                if (shops!!.route_name.length > 0) {
+                    val pos =
+                        (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
+                    if (pos > -1) {
                         spinnerRoutes.setSelection(pos)
                     }
                 }
@@ -700,10 +724,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                                     }
 
-                                if (shops != null){
-                                    if(shops!!.shop_type.length>0){
-                                        val pos= (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(shops!!.shop_type)
-                                        if(pos>-1) {
+                                if (shops != null) {
+                                    if (shops!!.shop_type.length > 0) {
+                                        val pos =
+                                            (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(
+                                                shops!!.shop_type
+                                            )
+                                        if (pos > -1) {
                                             spinnerShopType.setSelection(pos)
                                         }
                                     }
@@ -808,10 +835,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         }
 
                                     }
-                                if (shops != null){
-                                    if(shops!!.category.length>0){
-                                        val pos= (spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(shops!!.category)
-                                        if(pos>-1) {
+                                if (shops != null) {
+                                    if (shops!!.category.length > 0) {
+                                        val pos =
+                                            (spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(
+                                                shops!!.category
+                                            )
+                                        if (pos > -1) {
                                             spinnerCatOutlets.setSelection(pos)
                                         }
                                     }
@@ -918,10 +948,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                                     }
 
-                                if (shops != null){
-                                    if(shops!!.market_opportunity.length>0){
-                                        val pos= (spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(shops!!.market_opportunity)
-                                        if(pos>-1) {
+                                if (shops != null) {
+                                    if (shops!!.market_opportunity.length > 0) {
+                                        val pos =
+                                            (spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(
+                                                shops!!.market_opportunity
+                                            )
+                                        if (pos > -1) {
                                             spinnerMarketOpportunity.setSelection(pos)
                                         }
                                     }
@@ -1014,12 +1047,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
         }
 
-        if (shops != null){
-            if(shops!!.is_buyer >-1){
+        if (shops != null) {
+            if (shops!!.is_buyer > -1) {
                 //val pos= (spinBuyer.adapter as ArrayAdapter<String>).getPosition(p.getRetailData()[0].is_buyer)
-                if (shops!!.is_buyer == 0 ){
+                if (shops!!.is_buyer == 0) {
                     spinnerBuyer.setSelection(2)
-                }else{
+                } else {
                     spinnerBuyer.setSelection(1)
                 }
             }
@@ -1078,7 +1111,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     val fileExist = File(imagesList[i].filePath).canRead()
                     if (fileExist) {
                         val imagename = imagesList[i].filePath.substring(
-                            imagesList[i].filePath.lastIndexOf("/"))
+                            imagesList[i].filePath.lastIndexOf("/")
+                        )
                         byteparams["images[" + i + "]"] = VolleyMultipartRequest.DataPart(
                             imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
                         )
@@ -1093,7 +1127,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["owner_name"] = URLEncoder.encode(etOwnerName.text.toString(), "utf-8")
             if (etContactNumber.text.trim().length > 0) params["phone_number"] =
                 URLEncoder.encode(etContactNumber.text.toString(), "utf-8")
-            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] = selectedMarketOpportunity!!
+            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] =
+                selectedMarketOpportunity!!
             if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
             params["outlet_created_at"] = today
             params["created_by_user_id"] = userId!!
@@ -1140,9 +1175,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         }
 
                                     })
-                            }catch (e: Exception){
+                            } catch (e: Exception) {
                                 Sentry.captureException(e)
-                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    e.message.toString(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
 
@@ -1159,9 +1198,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                 val message = data.getString("message")
                                 Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
                                     .show()
-                            }catch (e: Exception){
+                            } catch (e: Exception) {
                                 Sentry.captureException(e)
-                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    e.message.toString(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
 
@@ -1169,22 +1212,30 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                             try {
                                 btnSubmitShop.isEnabled = true
                                 hideProgress(progressBarShop)
-                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT)
+                                Toast.makeText(
+                                    applicationContext,
+                                    e.message.toString(),
+                                    Toast.LENGTH_SHORT
+                                )
                                     .show()
-                            }catch (e: Exception){
+                            } catch (e: Exception) {
                                 Sentry.captureException(e)
-                                Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    e.message.toString(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
 
                     })
-            }else{
+            } else {
                 hideProgress(progressBarShop)
                 btnSubmitShop.isEnabled = true
                 Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
                     .show()
             }
-        }else{
+        } else {
             hideProgress(progressBarShop)
             btnSubmitShop.isEnabled = true
         }
@@ -1242,10 +1293,14 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     val fileExist = File(imagesList[i].filePath).canRead()
                     if (fileExist) {
                         val imagename = imagesList[i].filePath.substring(
-                            imagesList[i].filePath.lastIndexOf("/"))
-                        byteparams["images[" + (shops!!.imageArray.size+i) + "]"] = VolleyMultipartRequest.DataPart(
-                            imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
+                            imagesList[i].filePath.lastIndexOf("/")
                         )
+                        byteparams["images[" + (shops!!.imageArray.size + i) + "]"] =
+                            VolleyMultipartRequest.DataPart(
+                                imagename,
+                                ImageUtils.decodeFile(imagesList[i].filePath),
+                                "image/jpeg"
+                            )
                     }
                 }
             }
@@ -1258,7 +1313,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["owner_name"] = URLEncoder.encode(etOwnerName.text.toString(), "utf-8")
             if (etContactNumber.text.trim().length > 0) params["phone_number"] =
                 URLEncoder.encode(etContactNumber.text.toString(), "utf-8")
-            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] = selectedMarketOpportunity!!
+            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] =
+                selectedMarketOpportunity!!
             if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
             params["outlet_updated_at"] = today
             params["updated_by_user_id"] = userId!!
@@ -1304,9 +1360,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                     }
 
                                 })
-                        }catch (e: Exception){
+                        } catch (e: Exception) {
                             Sentry.captureException(e)
-                            Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                applicationContext,
+                                e.message.toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
 
@@ -1322,9 +1382,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                             val data = JSONObject(s)
                             val message = data.getString("message")
                             Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-                        }catch (e: Exception){
+                        } catch (e: Exception) {
                             Sentry.captureException(e)
-                            Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                applicationContext,
+                                e.message.toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
 
@@ -1333,14 +1397,18 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                             btnUpdateShop.isEnabled = true
                             hideProgress(progressBarShop)
                             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                        }catch (e: Exception){
+                        } catch (e: Exception) {
                             Sentry.captureException(e)
-                            Toast.makeText(applicationContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                applicationContext,
+                                e.message.toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
 
                 })
-        }else{
+        } else {
             btnUpdateShop.isEnabled = true
         }
     }
@@ -1350,7 +1418,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
             val request: StringRequest = object : StringRequest(
                 Method.GET,
-                Api.reverseGeo + "?key=" +Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+                Api.reverseGeo + "?key=" + Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
                 Response.Listener { response: String? ->
                     try {
                         val data = JSONObject(response)
@@ -1362,7 +1430,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         val city = place.getString("city")
                         val area = place.getString("area")
                         //address[0] = jsonArray.getJSONObject(0).getString("Address");
-                        etAddress.setText(address+", "+area+", "+city)
+                        etAddress.setText(address + ", " + area + ", " + city)
                     } catch (e: JSONException) {
                         e.printStackTrace()
                         Sentry.captureException(e)
@@ -1427,7 +1495,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     }
 
                     override fun onFailure(exception: Exception) {
-                        Toast.makeText(this@CreateShopActivity, exception.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@CreateShopActivity,
+                            exception.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                 })
