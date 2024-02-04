@@ -103,7 +103,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(requireContext(), null)
     }
 
     override fun onCreateView(
@@ -116,7 +115,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         binding.mapView.getMapAsync(this)
 
 
-
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
             binding.isVerified.isVisible = true
             binding.isTrace.isVisible = true
@@ -127,6 +125,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         startRouteObserve()
         startOutletsObserve()
+        startSocketGroupUsersObserve()
 
         return binding.root
     }
@@ -222,16 +221,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 if (routeID.isEmpty()) {
                     return
                 }
+                if (binding.isTrace.isChecked) {
+                    return
+                }
+
                 if (position == 0) {
                     selectedCategory = ""
-                    if (isVerified.isChecked) {
+                    if (binding.isVerified.isChecked) {
                         viewModel.getOutletList(routeID, "1", selectedCategory)
                     } else {
                         viewModel.getOutletList(routeID, "0", selectedCategory)
                     }
                 } else {
                     selectedCategory = categoryList[position]
-                    if (isVerified.isChecked) {
+                    if (binding.isVerified.isChecked) {
                         viewModel.getOutletList(routeID, "1", selectedCategory)
                     } else {
                         viewModel.getOutletList(routeID, "0", selectedCategory)
@@ -251,8 +254,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 viewModel.getOutletList(routeID, "0", selectedCategory)
             }
         }
-
-        startSocketGroupUsersObserve()
     }
 
     private fun startSoObserve() {
