@@ -52,7 +52,6 @@ import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponent
@@ -181,13 +180,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
 
         btnBack.setOnClickListener {
-            //setResult(55)
-            finish()
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
         locationMap.setOnClickListener {
-            Mapbox.getInstance(applicationContext, null)
             val dialog = Dialog(this)
             dialog.setCancelable(false)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -225,14 +221,15 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
             btnClose.setOnClickListener {
                 dialog.dismiss()
-                //mapView!!.onStop()
+                mapView!!.onStop()
             }
-            dialog.show()
             val window = dialog.window
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
+
+            dialog.show()
         }
 
         btnSubmitShop.setOnClickListener {
@@ -257,11 +254,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         longitude = shops.longitude
         inputVerified = shops.isVerified
 
-        if (shops.isVerified == 1) {
-            isVerified.isChecked = true
-        } else {
-            isVerified.isChecked = false
-        }
+        isVerified.isChecked = shops.isVerified == 1
 
         if (shops.imageArray.size > 0) {
             generateImages(shops.imageArray)
@@ -354,8 +347,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     Executors.newSingleThreadExecutor()
                         .execute { appDatabase!!.imagesDao()!!.deleteImage(p + 1, "Shop") }
                 }
-
-
             }
         }
     }
@@ -532,13 +523,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
