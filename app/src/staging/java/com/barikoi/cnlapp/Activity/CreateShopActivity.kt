@@ -263,7 +263,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun generateImages(imageArray: ArrayList<String>) {
 
-        if (!imageArray.isEmpty()) {
+        if (imageArray.isNotEmpty()) {
             imageViewScroll.visibility = View.VISIBLE
             val layout = findViewById<View>(R.id.imageViewLayout) as LinearLayout
             for (i in 0 until imageArray.size) {
@@ -303,8 +303,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         .thumbnail(.2.toFloat())
                         .into(ivPreview)
                     btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
-                    val pAttacher: PhotoViewAttacher
-                    pAttacher = PhotoViewAttacher(ivPreview)
+                    val pAttacher: PhotoViewAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
                     nagDialog.show()
                 }
