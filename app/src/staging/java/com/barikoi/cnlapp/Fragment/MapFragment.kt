@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.barikoi.cnlapp.Fragment
 
 import android.annotation.SuppressLint
@@ -15,7 +17,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.android.volley.*
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
@@ -41,7 +42,6 @@ import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
@@ -88,22 +88,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var locationEngineRequest: LocationEngineRequest? = null
 
     private var permissionsManager: PermissionsManager? = null
-    private var selectedCategory: String = ""
 
     private var soNewList: List<SalesOfficer> = emptyList()
     private var selectedSo: SalesOfficer? = null
-    private var routeNewList: List<Route> = emptyList()
-    private var socketLocalUserList: List<LocalUser> = emptyList()
 
+    private var routeNewList: List<Route> = emptyList()
     private var routeID = ""
 
-    private var categoryList: ArrayList<String> = ArrayList()
-    private var placeMarkerMap: java.util.HashMap<String, Marker>? = HashMap()
-    private lateinit var pusher: Pusher
+    private var socketLocalUserList: List<LocalUser> = emptyList()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var categoryList: ArrayList<String> = ArrayList()
+    private var selectedCategory: String = ""
+
+    private lateinit var pusher: Pusher
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -139,27 +136,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             viewModel.getSoList()
         } else {
             binding.spinnerLayoutSO.visibility = View.GONE
-        }
-
-        binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            if (isChecked) {
-                sharePrefUtils.getString(TRACE_GROUP_ID)?.let { viewModel.getSocketUserByGroup(it) }
-                runBlocking {
-                    initSocket()
-                }
-                subscribeSocket(null)
-            } else {
-                if (this::pusher.isInitialized)
-                    pusher.disconnect()
-
-                if (routeID.isNotEmpty()) {
-                    viewModel.getOutletList(
-                        routeID,
-                        if (binding.isVerified.isChecked) "1" else "0",
-                        selectedCategory
-                    )
-                }
-            }
         }
 
         binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -245,15 +221,43 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
+        binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (isChecked) {
+                sharePrefUtils.getString(TRACE_GROUP_ID)?.let { viewModel.getSocketUserByGroup(it) }
+                runBlocking {
+                    initSocket()
+                }
+                subscribeSocket()
+            } else {
+                if (this::pusher.isInitialized)
+                    pusher.disconnect()
+
+                if (routeID.isNotEmpty()) {
+                    viewModel.getOutletList(
+                        routeID,
+                        if (binding.isVerified.isChecked) "1" else "0",
+                        selectedCategory
+                    )
+                }
+            }
+        }
 
 
         binding.isVerified.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (routeID.isEmpty()) {
+                return@setOnCheckedChangeListener
+            }
+            if (binding.isTrace.isChecked) {
+                return@setOnCheckedChangeListener
+            }
             if (isChecked) {
                 viewModel.getOutletList(routeID, "1", selectedCategory)
             } else {
                 viewModel.getOutletList(routeID, "0", selectedCategory)
             }
         }
+
+
     }
 
     private fun startSoObserve() {
@@ -326,13 +330,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         if (routeNewList.isNotEmpty()) {
                             val adapter = ArrayAdapter(
                                 requireContext(),
-                                android.R.layout.simple_spinner_item, routeNames!!
+                                android.R.layout.simple_spinner_item, routeNames ?: emptyList<String>()
                             )
                             binding.spinnerRoutes.adapter = adapter
 
                         } else {
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item, routeNames ?: emptyList<String>()
+                            )
+                            binding.spinnerRoutes.adapter = adapter
                             Toast.makeText(requireContext(), "Route is empty.", Toast.LENGTH_SHORT)
                                 .show()
+
+                            routeID = ""
+                            mMap.clear()
+                            binding.shopCount.text = getString(R.string.outlet_s, "0")
                         }
                     }
                 }
@@ -362,6 +375,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         AppLogger.log("startOutletsObserve:: Success ${it.data?.outlets?.size}")
 
                         mMap.clear()
+
                         if (it.data?.outlets?.isEmpty() == true) {
                             binding.shopCount.text = getString(R.string.outlet_s, 0)
                             Toast.makeText(requireContext(), "Outlets empty.", Toast.LENGTH_SHORT)
@@ -487,7 +501,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }, ConnectionState.ALL)
     }
 
-    private fun subscribeSocket(userId: String?) {
+    private fun subscribeSocket() {
         val groupName =
             sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
 
@@ -591,7 +605,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 .icon(icon)
                 .title(p.outletCategory + ", " + shopName)
         )
-        placeMarkerMap!![p.outletCode] = m
 
         if (!binding.isTrace.isChecked)
             mMap.animateCamera(
@@ -619,7 +632,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
 
             // Get an instance of the component
-            val locationComponent = mMap!!.locationComponent
+            val locationComponent = mMap.locationComponent
 
             // Activate with options
             locationComponent.activateLocationComponent(
@@ -642,7 +655,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     override fun onSuccess(result: LocationEngineResult?) {
                         val lastLocation: Location = result!!.lastLocation!!
-                        if (lastLocation != null && !lastLocation.equals("null")) {
+                        if (!lastLocation.equals("null")) {
                             //setCameraPosition(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 17.0);
                         } else {
                             //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, null)
@@ -774,7 +787,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
 
-        binding.fab.setOnClickListener(View.OnClickListener {
+        binding.fab.setOnClickListener {
             /*if (locationEngine != null) {
                 val lastLocation = locationEngine!!.lastLocation
                 if (lastLocation != null) {
@@ -785,7 +798,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             } else {
                 enableLocation()
             }*/
-        })
+        }
 
         //setupWebSocket()
     }
