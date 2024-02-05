@@ -18,11 +18,11 @@ data class So(
     @SerializedName("number_of_memo")
     val numberOfMemo: Int,
     @SerializedName("order_amount")
-    val orderAmount: Int,
+    val orderAmount: Double,
     @SerializedName("sales_officers")
     val salesOfficers: List<SalesOfficer>,
     @SerializedName("sku_per_memo")
-    val skuPerMemo: Int,
+    val skuPerMemo: String,
     @SerializedName("territory_id")
     val territoryId: Int,
     @SerializedName("user_name")
@@ -31,22 +31,22 @@ data class So(
 
 
 data class SalesOfficer(
-    @SerializedName("designation")
-    val designation: String,
     @SerializedName("id")
     val id: Int,
+    @SerializedName("designation")
+    val designation: String,
     @SerializedName("num_of_memo")
-    val numOfMemo: Int,
+    val numOfMemo: String,
     @SerializedName("phone")
     val phone: String,
     @SerializedName("productive_outlets")
     val productiveOutlets: Int,
     @SerializedName("so_ordered_value")
-    val soOrderedValue: Int,
+    val soOrderedValue: Double,
     @SerializedName("territory_id")
     val territoryId: Int,
     @SerializedName("total_bounced_amount")
-    val totalBouncedAmount: Int,
+    val totalBouncedAmount: Double,
     @SerializedName("total_outlets")
     val totalOutlets: Int,
     @SerializedName("trace_id")

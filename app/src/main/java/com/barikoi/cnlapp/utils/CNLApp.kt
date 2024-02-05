@@ -4,15 +4,17 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import com.mapbox.mapboxsdk.Mapbox
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import java.util.Locale
 
 @HiltAndroidApp
-class CNLApp: Application() {
+class CNLApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        Mapbox.getInstance(this, null)
         appContext = applicationContext
         SentryAndroid.init(
             this
@@ -28,7 +30,7 @@ class CNLApp: Application() {
 
     companion object {
 
-        lateinit  var appContext: Context
+        lateinit var appContext: Context
 
     }
 

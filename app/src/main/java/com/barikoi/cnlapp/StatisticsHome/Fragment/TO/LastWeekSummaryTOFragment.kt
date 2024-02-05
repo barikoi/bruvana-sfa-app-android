@@ -1,10 +1,7 @@
 package com.barikoi.cnlapp.StatisticsHome.Fragment.TO
 
 import android.app.ProgressDialog
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -221,7 +218,7 @@ class LastWeekSummaryTOFragment : Fragment() {
                 c2.setTextColor(resources.getColor(R.color.text_title))
                 c2.setText(data.get(i).second)
                 c2.gravity = Gravity.CENTER
-                c2.background = resources.getDrawable(R.drawable.button_whitebg_stroke)
+                c2.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
                 tr.addView(c1)
                 tr.addView(c2)
 

@@ -42,9 +42,8 @@
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="8dp"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_back">
+                        android:src="@drawable/ic_back" />
 
-                    </ImageButton>
 
                     <TextView
                         android:id="@+id/tvTitle"
@@ -56,9 +55,7 @@
                         android:textColor="@color/text_title"
                         android:textSize="17sp"
                         android:textStyle="bold"
-                        android:visibility="visible">
-
-                    </TextView>
+                        android:visibility="visible" />
 
                 </RelativeLayout>
 
@@ -99,9 +96,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
-                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
-                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <HorizontalScrollView
@@ -136,9 +132,8 @@
                         android:id="@+id/imagepicker"
                         android:layout_width="match_parent"
                         android:layout_height="120dp"
-                        android:visibility="visible">
+                        android:visibility="visible" />
 
-                    </com.barikoi.cnlapp.imagecapture.ImageCapture>
 
                     <TextView
                         android:id="@+id/imageCounter"
@@ -152,9 +147,8 @@
                         android:paddingBottom="8dp"
                         android:text=""
                         android:textSize="12sp"
-                        android:visibility="gone">
+                        android:visibility="gone" />
 
-                    </TextView>
                 </RelativeLayout>
 
                 <EditText
@@ -199,9 +193,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
-                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
-                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -222,9 +215,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
-                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
-                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -245,11 +237,9 @@
                         android:id="@+id/spinnerMarketOpportunity"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
-
                         android:theme="@style/spinnerItemStyle"
-                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
-                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -271,9 +261,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:theme="@style/spinnerItemStyle"
-                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
-                    </com.barikoi.cnlapp.utils.MoreSpinner>
                 </RelativeLayout>
 
                 <EditText
@@ -415,14 +404,14 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:gravity="start"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/adjust_shop_location_link"
             android:textAllCaps="false"
             android:textColor="@color/text_title_blue"
             android:textColorLink="@color/text_title_blue"
             android:textSize="15sp"
-            android:textStyle="bold">
-
-        </TextView>
+            android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/isVerified"

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -13,7 +12,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -62,9 +60,9 @@ import java.util.*
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-    var drawer: DrawerLayout? = null
+    private var drawer: DrawerLayout? = null
     private var navigationDrawer: NavigationView? = null
-    private var menu_drawer: ImageView? = null
+    private var menuDrawer: ImageView? = null
     private var tvHeaderUserName: TextView? = null
     private var token: String? = ""
     private var userId: String? = ""
@@ -72,14 +70,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var userName: String? = ""
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
-    private var nav_view: BottomNavigationView? = null
+    private var navView: BottomNavigationView? = null
     var queue: RequestQueue? = null
 
     companion object {
         var routeName_selected: TextView? = null
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -92,11 +89,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userId = prefs!!.getString(Api.USER_ID, "")
         userType = prefs!!.getString(Api.USER_TYPE, "")
         userName = prefs!!.getString(Api.NAME, "")
-        nav_view = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
+        navView = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
 
-        nav_view!!.background = null
-        nav_view!!.menu.getItem(2).isEnabled = false
-        nav_view!!.menu.getItem(2).isVisible = false
+        navView!!.background = null
+        navView!!.menu.getItem(2).isEnabled = false
+        navView!!.menu.getItem(2).isVisible = false
 
         navigationDrawer = findViewById(R.id.nav_view)
         navigationDrawer!!.setNavigationItemSelectedListener(this)
@@ -104,13 +101,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         routeName_selected = findViewById(R.id.routeNameSelected)
 
-        menu_drawer = findViewById<ImageView>(R.id.drawer)
-        menu_drawer!!.setOnClickListener(View.OnClickListener {
+        menuDrawer = findViewById<ImageView>(R.id.drawer)
+        menuDrawer!!.setOnClickListener {
             drawer!!.openDrawer(
                 GravityCompat.START,
                 true
             )
-        })
+        }
 
         checkAttendance()
 
@@ -182,14 +179,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fab_order.setOnClickListener {
             fab_order.background.setTint(resources.getColor(R.color.cnl_color_2))
             fab_order.drawable.setTint(resources.getColor(R.color.white))
-            nav_view!!.selectedItemId = R.id.navigation_order
+            navView!!.selectedItemId = R.id.navigation_order
             userLayout.visibility = View.GONE
             tvTitle.text = resources.getString(R.string.order_collection)
             tvTitle.visibility = View.VISIBLE
             setCurrentFragment(CreateOrderFragment(), this@MainActivity)
         }
 
-        nav_view!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        navView!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
             if (fab_order.isVisible) {
                 fab_order.background.setTint(resources.getColor(R.color.white))
                 fab_order.drawable.setTint(resources.getColor(R.color.fab_icon))
@@ -461,7 +458,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             else -> "th"
         }
 
-    fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
+    private fun setCurrentFragment(fragment: Fragment?, activity: Activity) {
         val fragmentManager = (activity as FragmentActivity).supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentLayout, fragment!!)

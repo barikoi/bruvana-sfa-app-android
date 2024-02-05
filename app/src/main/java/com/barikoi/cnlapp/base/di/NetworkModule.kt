@@ -2,6 +2,7 @@ package com.barikoi.cnlapp.base.di
 
 import android.content.Context
 import com.android.volley.RequestQueue
+import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.ApiService
 import com.barikoi.cnlapp.data.remote.repository.SocketApiService
@@ -58,7 +59,12 @@ object NetworkModule {
             .callTimeout(5, TimeUnit.MINUTES)
             .writeTimeout(5, TimeUnit.MINUTES)
             .readTimeout(5, TimeUnit.MINUTES)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(
+                HttpLoggingInterceptor().setLevel(
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                    else HttpLoggingInterceptor.Level.NONE
+                )
+            )
             .build()
     }
 
@@ -81,7 +87,12 @@ object NetworkModule {
             .callTimeout(5, TimeUnit.MINUTES)
             .writeTimeout(5, TimeUnit.MINUTES)
             .readTimeout(5, TimeUnit.MINUTES)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(
+                HttpLoggingInterceptor().setLevel(
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                    else HttpLoggingInterceptor.Level.NONE
+                )
+            )
             .build()
     }
 

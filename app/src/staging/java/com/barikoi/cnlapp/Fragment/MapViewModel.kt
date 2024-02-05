@@ -42,9 +42,9 @@ class MapViewModel @Inject constructor(
     private val _socketUsersResponse = MutableLiveData<ApiState<SocketUserResponse>>()
     val socketUsersResponse: LiveData<ApiState<SocketUserResponse>> = _socketUsersResponse
 
-    fun getSocketGroups(map: Map<String, String>) {
+    fun getSocketGroups() {
         viewModelScope.launch {
-            socketRepository.getAllGroup(map).collectLatest {
+            socketRepository.getAllGroup().collectLatest {
                 _socketGroupResponse.postValue(it)
             }
         }
