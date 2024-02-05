@@ -11,7 +11,7 @@ fun Date.formatDate(): String {
 
 /**
  * @param {@link Date()}
- * @return Sunday, February 04, 2024
+ * @return formatted date: Sunday, February 04, 2024
  */
 fun Date.formatDateToFullName(): String {
     val df = SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.ENGLISH)
