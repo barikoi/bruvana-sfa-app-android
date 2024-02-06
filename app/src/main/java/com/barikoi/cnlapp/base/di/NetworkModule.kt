@@ -4,8 +4,8 @@ import android.content.Context
 import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.data.remote.ApiService
-import com.barikoi.cnlapp.data.remote.repository.SocketApiService
+import com.barikoi.cnlapp.data.remote.api.ApiService
+import com.barikoi.cnlapp.data.remote.api.SocketApiService
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Constants.CNL_OK_CLIENT
 import com.barikoi.cnlapp.utils.Constants.TRACE_OK_CLIENT

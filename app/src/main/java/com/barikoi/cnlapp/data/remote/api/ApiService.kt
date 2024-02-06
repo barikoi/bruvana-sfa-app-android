@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.data.remote
+package com.barikoi.cnlapp.data.remote.api
 
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse

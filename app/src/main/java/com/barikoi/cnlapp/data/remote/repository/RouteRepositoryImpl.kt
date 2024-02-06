@@ -3,7 +3,7 @@ package com.barikoi.cnlapp.data.remote.repository
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
-import com.barikoi.cnlapp.data.remote.ApiService
+import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse

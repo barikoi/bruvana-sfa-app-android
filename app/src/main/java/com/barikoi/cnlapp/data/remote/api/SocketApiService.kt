@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.data.remote.repository
+package com.barikoi.cnlapp.data.remote.api
 
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
 import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
