@@ -24,9 +24,9 @@ import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.MoreSpinner
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.MoreSpinner
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_shop_select.*

@@ -1,9 +1,9 @@
 package com.barikoi.cnlapp.base.di
 
-import com.barikoi.cnlapp.data.remote.ApiService
+import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
-import com.barikoi.cnlapp.data.remote.repository.SocketApiService
+import com.barikoi.cnlapp.data.remote.api.SocketApiService
 import com.barikoi.cnlapp.data.remote.repository.SocketRepository
 import com.barikoi.cnlapp.data.remote.repository.SocketRepositoryImpl
 import dagger.Module

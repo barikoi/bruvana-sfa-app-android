@@ -21,8 +21,8 @@ import com.barikoi.cnlapp.Adapter.RouteListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RouteShopList.Callback.OnRouteFetchSuccess
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject

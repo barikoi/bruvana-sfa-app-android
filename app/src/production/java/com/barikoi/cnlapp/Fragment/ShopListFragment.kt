@@ -30,9 +30,9 @@ import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.Utils.Api
-import com.barikoi.cnlapp.Utils.MoreSpinner
-import com.barikoi.cnlapp.Utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.MoreSpinner
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import io.sentry.Sentry
 import kotlinx.android.synthetic.production.fragment_shop_list.*
