@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Utils
+package com.barikoi.cnlapp.utils
 
 import com.barikoi.cnlapp.R
 
@@ -91,4 +91,11 @@ object Api {
 
     /*visit-report*/
     val get_visit_report = base_url+"api/v1/visited-report"
+
+    const val TRACE_GROUP_NAME = "TRACE_GROUP_NAME"
+    const val TRACE_GROUP_ID = "TRACE_GROUP_ID"
+    const val TRACE_TOKEN = "TRACE_TOKEN"
+
+    val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
+    val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"
 }
