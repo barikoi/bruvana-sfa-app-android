@@ -68,7 +68,7 @@
                 android:textSize="12sp"
                 android:textColor="@color/cnl_color_2"
                 android:textAllCaps="false"
-                android:background="@drawable/button_whitebg_stroke">
+                android:background="@drawable/button_white_bg_stroke">
 
             </androidx.appcompat.widget.AppCompatButton>
         </LinearLayout>
