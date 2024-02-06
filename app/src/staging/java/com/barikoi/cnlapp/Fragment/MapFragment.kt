@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "UNUSED_VARIABLE")
 
 package com.barikoi.cnlapp.Fragment
 
@@ -44,7 +44,6 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -330,14 +329,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         if (routeNewList.isNotEmpty()) {
                             val adapter = ArrayAdapter(
                                 requireContext(),
-                                android.R.layout.simple_spinner_item, routeNames ?: emptyList<String>()
+                                android.R.layout.simple_spinner_item,
+                                routeNames ?: emptyList<String>()
                             )
                             binding.spinnerRoutes.adapter = adapter
 
                         } else {
                             val adapter = ArrayAdapter(
                                 requireContext(),
-                                android.R.layout.simple_spinner_item, routeNames ?: emptyList<String>()
+                                android.R.layout.simple_spinner_item,
+                                routeNames ?: emptyList<String>()
                             )
                             binding.spinnerRoutes.adapter = adapter
                             Toast.makeText(requireContext(), "Route is empty.", Toast.LENGTH_SHORT)
@@ -733,11 +734,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     override fun onStart() {
+        AppLogger.log("LIFE CYCLE:: onStart")
         super.onStart()
         binding.mapView.onStart()
     }
 
     override fun onStop() {
+        AppLogger.log("LIFE CYCLE:: onStop")
         super.onStop()
         binding.mapView.onStop()
         if (this::pusher.isInitialized)
@@ -746,6 +749,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     override fun onDestroy() {
+        AppLogger.log("LIFE CYCLE:: onDestroy")
         super.onDestroy()
         binding.mapView.onDestroy()
         if (this::pusher.isInitialized)
@@ -758,11 +762,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     override fun onResume() {
+        AppLogger.log("LIFE CYCLE:: onResume")
         super.onResume()
         binding.mapView.onResume()
+
+        if (binding.isTrace.isChecked) {
+            runBlocking { initSocket() }
+            subscribeSocket()
+        }
     }
 
     override fun onPause() {
+        AppLogger.log("LIFE CYCLE:: onPause")
         super.onPause()
         binding.mapView.onPause()
     }
