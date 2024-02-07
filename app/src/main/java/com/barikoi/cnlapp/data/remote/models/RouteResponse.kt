@@ -25,6 +25,8 @@ data class Route(
     val routeCode: String,
     @SerializedName("route_name")
     val routeName: String,
+    @SerializedName("outlet_count")
+    val outletCount: String,
     @SerializedName("territory_id")
     val territoryId: Int,
     @SerializedName("territory_name")
