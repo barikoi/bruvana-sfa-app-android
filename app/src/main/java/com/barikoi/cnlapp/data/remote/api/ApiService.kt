@@ -12,6 +12,12 @@ interface ApiService {
     @GET("api/v1/routes")
     suspend fun getRoute(@Query("user_id") userId: String): Response<RouteResponse>
 
+    @GET("api/v1/routes")
+    suspend fun getRouteWithOutlet(
+        @Query("user_id") userId: String,
+        @Query("with_outlets") filterWithOutlet: String
+    ): Response<RouteResponse>
+
     @GET("api/v1/get-so")
     suspend fun getSoList(): Response<SoResponse>
 
