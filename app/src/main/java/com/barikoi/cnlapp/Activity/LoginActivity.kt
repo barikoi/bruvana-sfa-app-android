@@ -64,7 +64,7 @@ class LoginActivity : AppCompatActivity() {
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
 
         login = findViewById<View>(R.id.btn_login) as Button
-        login?.setOnClickListener(View.OnClickListener { login() })
+        login?.setOnClickListener { login() }
     }
 
     private fun login() {
@@ -147,8 +147,8 @@ class LoginActivity : AppCompatActivity() {
                                 }
                         }
 
-                        routeToAppropriatePage(2)
                         pd!!.dismiss()
+                        routeToAppropriatePage(2)
                     } else if (responsedata.has("message")) {
                         pd!!.dismiss()
                         showDialog(responsedata.getString("message"))
@@ -156,12 +156,14 @@ class LoginActivity : AppCompatActivity() {
                 } catch (e: JSONException) {
                     pd!!.dismiss()
                     Sentry.captureException(e)
-                    Toast.makeText(applicationContext, "Error" + e.message, Toast.LENGTH_LONG)
-                        .show()
+                } catch (e: Exception) {
+                    pd!!.dismiss()
+                    Sentry.captureException(e)
                 }
             },
             Response.ErrorListener { error ->
                 pd!!.dismiss()
+                Toast.makeText(this, "ERROR: $error", Toast.LENGTH_LONG).show()
                 if (error is NoConnectionError) {
                     showDialog("Login failed,check your internet connection and try again")
                 }
