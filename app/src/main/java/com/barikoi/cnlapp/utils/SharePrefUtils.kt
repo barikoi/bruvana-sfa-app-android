@@ -30,6 +30,14 @@ class SharePrefUtils(
         return sharedPreferences?.getLong(key, 0)
     }
 
+    fun saveInt(key: String, value: Int) {
+        sharedPreferences?.edit()?.putInt(key, value)?.apply()
+    }
+
+    fun getInt(key: String): Int? {
+        return sharedPreferences?.getInt(key, 0)
+    }
+
     fun saveBoolean(key: String, value: Boolean) {
         sharedPreferences?.edit()?.putBoolean(key, value)?.apply()
     }
