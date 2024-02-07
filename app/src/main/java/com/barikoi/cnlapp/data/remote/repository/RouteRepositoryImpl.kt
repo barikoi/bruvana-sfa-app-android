@@ -16,6 +16,7 @@ import javax.inject.Inject
 
 interface RouteRepository {
     fun getRoutes(userId: String): Flow<ApiState<RouteResponse>>
+    fun getRouteWithOutlet(userId: String, filterWithOutlet:String): Flow<ApiState<RouteResponse>>
     fun getSoList(): Flow<ApiState<SoResponse>>
 
     fun getOutlets(
@@ -32,6 +33,39 @@ class RouteRepositoryImpl @Inject constructor(
         return flow {
             try {
                 val response = apiService.getRoute(userId)
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code())
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override fun getRouteWithOutlet(
+        userId: String,
+        filterWithOutlet: String
+    ): Flow<ApiState<RouteResponse>> {
+        return flow {
+            try {
+                val response = apiService.getRouteWithOutlet(userId, filterWithOutlet)
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {
