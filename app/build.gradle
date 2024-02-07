@@ -117,7 +117,7 @@ android {
 }
 
 def getDateTime() {
-    return new Date().format('yyyy-MM-dd_HH:mm:ss')
+    return new Date().format('yyyy-MM-dd_HH-mm-ss')
 }
 
 kapt {
