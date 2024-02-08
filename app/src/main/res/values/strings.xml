@@ -238,5 +238,7 @@
     <string name="failure_failed_to_cache">Failed to cache.</string>
     <string name="location">Location</string>
     <string name="outlet_s">%1$s Outlet(s)</string>
+    <string name="select_date_range">Select date range</string>
+    <string name="date_range_">%1$s - %2$s</string>
 
 </resources>
