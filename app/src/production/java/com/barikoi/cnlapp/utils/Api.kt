@@ -96,6 +96,6 @@ object Api {
     const val TRACE_GROUP_ID = "TRACE_GROUP_ID"
     const val TRACE_TOKEN = "TRACE_TOKEN"
 
-    val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
-    val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"
+    const val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
+    const val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"
 }
