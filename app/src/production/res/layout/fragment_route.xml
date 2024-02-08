@@ -1,49 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefresh"
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/background_app"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    >
-    <RelativeLayout
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/routelist"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/background_app"
+        android:scrollbarThumbVertical="@color/black"
+        android:scrollbars="vertical"
+        app:layoutManager="LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/single_route_list" />
 
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progress_bar3"
+        style="@style/SpinKitView.Large.ThreeBounce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/cnl_color_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/routelist"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:scrollbarThumbVertical="@color/black"
-            android:background="@color/background_app"
-            app:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/single_route_list" />
-        <com.github.ybq.android.spinkit.SpinKitView
-            android:id="@+id/progress_bar3"
-            style="@style/SpinKitView.Large.ThreeBounce"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:visibility="gone"
-            android:layout_centerInParent="true"
-            app:SpinKit_Color="@color/cnl_color_1" />
-        <TextView
-            android:id="@+id/tvNoContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_centerInParent="true"
-            android:textSize="20sp"
-            android:textColor="@color/cnl_color_1"
-            android:textAlignment="center"
-            android:visibility="gone"
-            android:gravity="center_horizontal">
-        </TextView>
-    </RelativeLayout>
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvNoContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="8dp"
+        android:gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textColor="@color/cnl_color_1"
+        android:textSize="20sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
