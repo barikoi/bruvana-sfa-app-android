@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "UNUSED_VARIABLE")
 
 package com.barikoi.cnlapp.Fragment
 
@@ -44,7 +44,6 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -602,7 +601,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private fun plotMarker(p: Outlet, icon: Icon) {
         val shopName: String = p.outletName
-        mMap.addMarker(
+        val m = mMap.addMarker(
             MarkerOptions().position(LatLng(p.latitude.toDouble(), p.longitude.toDouble()))
                 .icon(icon)
                 .title(p.outletCategory + ", " + shopName)
@@ -743,7 +742,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onStop() {
         AppLogger.log("LIFE CYCLE:: onStop")
         super.onStop()
-        AppLogger
         binding.mapView.onStop()
         if (this::pusher.isInitialized)
             pusher.disconnect()
@@ -767,6 +765,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         AppLogger.log("LIFE CYCLE:: onResume")
         super.onResume()
         binding.mapView.onResume()
+
+        if (binding.isTrace.isChecked) {
+            runBlocking { initSocket() }
+            subscribeSocket()
+        }
     }
 
     override fun onPause() {
@@ -810,5 +813,4 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         //setupWebSocket()
     }
-
 }
