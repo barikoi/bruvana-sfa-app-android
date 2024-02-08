@@ -14,6 +14,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +27,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
-import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
@@ -52,6 +52,7 @@ import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponent
@@ -99,8 +100,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var selectedBuyer: Int? = -1
     private var inputVerified: Int? = 0
 
-    var routeNameList: java.util.ArrayList<Pair<String, String>>? = ArrayList()
-    var routesList: java.util.ArrayList<String>? = ArrayList()
+    var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+    var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,7 +152,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
         routesList = intent.getStringArrayListExtra("routes")
         routeNameList =
-            intent.getParcelableArrayListExtra<Parcelable>("routeList") as java.util.ArrayList<Pair<String, String>>
+            intent.getParcelableArrayListExtra<Parcelable>("routeList") as ArrayList<Pair<String, String>>
 
         if (routesList!!.size > 0) {
             routesList!!.add(0, resources.getString(R.string.select_route))
@@ -180,10 +181,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
 
         btnBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            //setResult(55)
+            finish()
+            onBackPressed()
         }
 
         locationMap.setOnClickListener {
+            Mapbox.getInstance(applicationContext, null)
             val dialog = Dialog(this)
             dialog.setCancelable(false)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -192,7 +196,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
             val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
 
-            mapView = dialog.findViewById(R.id.map_view)
+            mapView = dialog.findViewById<MapView>(R.id.map_view)
             mapView!!.onCreate(savedInstanceState)
             mapView!!.getMapAsync(this)
             mapView!!.onStart()
@@ -204,7 +208,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     val target = mMap!!.cameraPosition.target
                     latitude = target.latitude
                     longitude = target.longitude
-                    val dformat = DecimalFormat("#.#####")
+                    var dformat = DecimalFormat("#.#####")
                     if (latitude!! > 0.0 && longitude!! > 0.0) {
                         etLatitude.setText(dformat.format(latitude).toString())
                         etLongitude.setText(dformat.format(longitude).toString())
@@ -221,15 +225,14 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
             btnClose.setOnClickListener {
                 dialog.dismiss()
-                mapView!!.onStop()
+                //mapView!!.onStop()
             }
+            dialog.show()
             val window = dialog.window
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-
-            dialog.show()
         }
 
         btnSubmitShop.setOnClickListener {
@@ -254,7 +257,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         longitude = shops.longitude
         inputVerified = shops.isVerified
 
-        isVerified.isChecked = shops.isVerified == 1
+        if (shops.isVerified == 1) {
+            isVerified.isChecked = true
+        } else {
+            isVerified.isChecked = false
+        }
 
         if (shops.imageArray.size > 0) {
             generateImages(shops.imageArray)
@@ -263,7 +270,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun generateImages(imageArray: ArrayList<String>) {
 
-        if (imageArray.isNotEmpty()) {
+        if (!imageArray.isEmpty()) {
             imageViewScroll.visibility = View.VISIBLE
             val layout = findViewById<View>(R.id.imageViewLayout) as LinearLayout
             for (i in 0 until imageArray.size) {
@@ -303,7 +310,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         .thumbnail(.2.toFloat())
                         .into(ivPreview)
                     btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
-                    val pAttacher: PhotoViewAttacher = PhotoViewAttacher(ivPreview)
+                    val pAttacher: PhotoViewAttacher
+                    pAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
                     nagDialog.show()
                 }
@@ -346,6 +354,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     Executors.newSingleThreadExecutor()
                         .execute { appDatabase!!.imagesDao()!!.deleteImage(p + 1, "Shop") }
                 }
+
+
             }
         }
     }
@@ -522,9 +532,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {}
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    TODO("Not yet implemented")
+                }
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
