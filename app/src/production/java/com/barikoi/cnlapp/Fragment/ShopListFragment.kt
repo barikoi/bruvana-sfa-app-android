@@ -160,12 +160,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            /*if (result.getResultCode() == Activity.RESULT_OK) {
-                val intent = result.data
-                if (intent!!.getIntExtra("requestCode", 0) == 55) {
-                    getShopList(userId!!)
-                }
-            }*/
             if (result.getResultCode() == 55) {
                 getShopList(RouteActivity.userId!!)
             }
