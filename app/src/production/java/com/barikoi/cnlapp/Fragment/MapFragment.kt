@@ -110,14 +110,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
 
-
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
-            binding.isVerified.isVisible = true
-            binding.isTrace.isVisible = true
-        } else {
-            binding.isVerified.isVisible = false
-            binding.isTrace.isVisible = false
-        }
+        binding.isTrace.isVisible = sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
 
         startRouteObserve()
         startOutletsObserve()
