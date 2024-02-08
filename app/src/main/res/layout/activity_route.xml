@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_app"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
@@ -17,38 +18,40 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:contentInsetRight="0dp"
+            android:background="@color/background_app"
             app:contentInsetEnd="0dp"
-            android:background="@color/background_app">
+            app:contentInsetLeft="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetStart="0dp">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
+
                 <ImageButton
                     android:id="@+id/btnBack"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginLeft="8dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_back">
 
                 </ImageButton>
+
                 <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:layout_centerVertical="true"
-                    android:textStyle="bold"
-                    android:textSize="17sp"
-                    android:visibility="visible"
+                    android:gravity="center"
+                    android:text=""
                     android:textColor="@color/text_title"
-                    android:text="">
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
 
-                </TextView>
 
             </RelativeLayout>
 
@@ -56,24 +59,26 @@
 
 
     </com.google.android.material.appbar.AppBarLayout>
+
     <LinearLayout
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/appbar"
         android:layout_margin="8dp"
+        android:background="@color/background_app"
         android:orientation="vertical"
-        android:visibility="visible"
-        android:background="@color/background_app">
+        android:visibility="visible">
+
         <RelativeLayout
             android:id="@+id/spinnerLayoutSO2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/stroke_background"
             android:backgroundTint="@color/white"
             android:padding="4dp"
@@ -84,22 +89,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:theme="@style/spinnerItemStyle"
-                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
-            </com.barikoi.cnlapp.utils.MoreSpinner>
         </RelativeLayout>
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/viewpagertab"
             style="@style/TabLayoutStyle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:layout_alignParentTop="true"
             android:layout_margin="8dp"
             android:background="@drawable/cardview_bg"
-            app:tabIndicatorHeight="30dp"
-            app:tabIndicatorGravity="center"
             app:tabIndicator="@drawable/tab_selected"
             app:tabIndicatorColor="@color/cnl_color_1"
-            android:layout_alignParentTop="true"
+            app:tabIndicatorGravity="center"
+            app:tabIndicatorHeight="30dp"
             app:tabMinWidth="120dp"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/white"
@@ -109,18 +114,18 @@
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/background_app"
             android:layout_below="@+id/viewpagertab2"
-            />
+            android:background="@color/background_app" />
 
     </LinearLayout>
+
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar"
         style="@style/SpinKitView.Large.Circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:padding="8dp"
         android:visibility="visible"
-        android:layout_centerInParent="true"
         app:SpinKit_Color="@color/cnl_color_1" />
 </RelativeLayout>
