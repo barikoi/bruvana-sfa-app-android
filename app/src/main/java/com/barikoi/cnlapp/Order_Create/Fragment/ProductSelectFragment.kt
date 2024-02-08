@@ -45,6 +45,9 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.callback.LocationFetch
+import com.barikoi.cnlapp.databinding.FragmentProductSelectBinding
+import com.barikoi.cnlapp.utils.AppLogger
+import com.google.gson.Gson
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_product_select.view.*
 import org.json.JSONArray
@@ -57,6 +60,8 @@ import java.util.*
 
 
 class ProductSelectFragment : Fragment(), OnValueChangeListener {
+
+    private lateinit var binding: FragmentProductSelectBinding
 
     var recylerView: RecyclerView? = null
     var shopTitle: TextView? = null
@@ -96,7 +101,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var dformat = DecimalFormat("#.##")
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
     lateinit var mView: View
-    var startOrderTime : String? = null
+    var startOrderTime: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,6 +146,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             sortTitle!!.setText(resources.getString(R.string.ztoa))
                         }
+
                         R.id.menu_atoz -> {
                             productsList!!.sortBy {
                                 it.product_name
@@ -152,6 +158,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             sortTitle!!.setText(resources.getString(R.string.atoz))
                         }
+
                         R.id.menu_mostfrequent -> {
                             productsList!!.sortByDescending {
                                 it.quantity_last_month
@@ -164,6 +171,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             sortTitle!!.setText(resources.getString(R.string.most_frequent))
                         }
+
                         R.id.menu_lowstock -> {
                             productsList!!.sortBy {
                                 it.stock_available
@@ -175,6 +183,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             sortTitle!!.setText(resources.getString(R.string.low_stock))
                         }
+
                         R.id.menu_highstock -> {
                             productsList!!.sortByDescending {
                                 it.stock_available
@@ -365,7 +374,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             if (distanceValue != null) {
                 if (distanceValue!! > 100.0) {
                     strDistance.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(mContext!!, R.color.status_bounced)),
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                mContext!!,
+                                R.color.status_bounced
+                            )
+                        ),
                         0,
                         strDistance.length,
                         0
@@ -645,9 +659,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         currentlongitude: Double,
         shoplatitude: Double,
         shoplongitude: Double,
-        profile:String
+        profile: String
     ) {
-        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shoplongitude + "," + shoplatitude + "/" + currentlongitude + "," + currentlatitude+"?profile="+profile,
+        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shoplongitude + "," + shoplatitude + "/" + currentlongitude + "," + currentlatitude + "?profile=" + profile,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
@@ -724,13 +738,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
 
                 }
+
                 override fun onResponseFailure(error: VolleyError) {
                     if (error != null && error.networkResponse != null) {
                         try {
                             val s = String(error.networkResponse.data)
                             Log.d("Routes", "message: $s")
                             val data = JSONObject(s)
-                            if (data.has("status") && data.getString("status").equals("400")){
+                            if (data.has("status") && data.getString("status").equals("400")) {
                                 getDistance(
                                     currentlatitude,
                                     currentlongitude,
@@ -1456,6 +1471,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                                 tvGrandTotal.setText(dformat.format(grandTotal).toString())
                             }
+
                             R.id.menu_bounced_product -> {
                                 productItems.clear()
                                 filterTitle.setText(mContext.resources.getString(R.string.bounced))
