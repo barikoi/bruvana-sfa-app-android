@@ -56,10 +56,10 @@ class VisitReportActivity : AppCompatActivity() {
             finish()
         }
 
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")){
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO")) {
             spinnerLayoutRoute.visibility = View.VISIBLE
             getSOList()
-        }else{
+        } else {
             spinnerLayoutRoute.visibility = View.GONE
             sr_id = user_id
         }
@@ -94,10 +94,10 @@ class VisitReportActivity : AppCompatActivity() {
 
         }
 
-        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO.adapter.count >0) {
+                if (spinnerSO.adapter.count > 0) {
                     sr_id = soList[p2].id
                     tabLayout.visibility = View.GONE
                     tabLayout2.visibility = View.GONE
@@ -213,14 +213,14 @@ class VisitReportActivity : AppCompatActivity() {
 
     private fun viewSOList(response: String) {
         try {
-            if (response != null){
+            if (response != null) {
                 soList.clear()
                 val obj = JSONObject(response)
                 val toArray = obj.getJSONArray("so_list")
                 val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
                 val soNameList: ArrayList<String> = ArrayList()
                 var imageUrl = "null"
-                if (soArray.length() >0){
+                if (soArray.length() > 0) {
                     for (i in 0 until soArray.length()) {
                         val soObj = soArray.getJSONObject(i)
                         soList.add(
@@ -228,7 +228,7 @@ class VisitReportActivity : AppCompatActivity() {
                                 soObj.getString("id"),
                                 soObj.getString("user_name"),
                                 soObj.getString("designation"),
-                                if(soObj.has("employee_id")) soObj.getString("employee_id") else "",
+                                if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
                                 imageUrl
                             )
                         )
@@ -242,17 +242,19 @@ class VisitReportActivity : AppCompatActivity() {
                 )
                 spinnerSO.adapter = adapter
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     private fun getVisitReports(sr_id: String, startDate: String, endDate: String) {
         var url = ""
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)){
-            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate
-        }else{
-            url = Api.get_visit_report+"?user_id="+sr_id+"&start_date="+startDate+"&end_date="+endDate
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("SO", true)) {
+            url =
+                Api.get_visit_report + "?user_id=" + sr_id + "&start_date=" + startDate + "&end_date=" + endDate
+        } else {
+            url =
+                Api.get_visit_report + "?user_id=" + sr_id + "&start_date=" + startDate + "&end_date=" + endDate
         }
         progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(
@@ -261,10 +263,10 @@ class VisitReportActivity : AppCompatActivity() {
                 override fun onResponseSuccess(response: String) {
                     try {
                         progressBar.visibility = View.GONE
-                        if (response != null){
+                        if (response != null) {
                             val obj = JSONObject(response)
                             val productsArray = obj.getJSONArray("visited_report")
-                            val itemList : ArrayList<Pair<String, String>> = ArrayList()
+                            val itemList: ArrayList<Pair<String, String>> = ArrayList()
                             if (productsArray.length() > 0) {
                                 for (i in 0 until productsArray.length()) {
                                     val productObj = productsArray.getJSONObject(i)
@@ -278,14 +280,14 @@ class VisitReportActivity : AppCompatActivity() {
                                 createTable(itemList, tabLayout)
                             }
 
-                            if (obj.has("total_visited_report") && !obj.isNull("total_visited_report")){
+                            if (obj.has("total_visited_report") && !obj.isNull("total_visited_report")) {
                                 val visitedArray = obj.getJSONArray("total_visited_report")
-                                val visitedList : ArrayList<Pair<String, String>> = ArrayList()
-                                if (visitedArray.length()>0){
+                                val visitedList: ArrayList<Pair<String, String>> = ArrayList()
+                                if (visitedArray.length() > 0) {
                                     for (i in 0 until visitedArray.length()) {
                                         val visitedObj = visitedArray.getJSONObject(i)
                                         val keys = visitedObj.keys()
-                                        while(keys.hasNext()){
+                                        while (keys.hasNext()) {
                                             val key = keys.next() as String
                                             visitedList.add(
                                                 Pair(
@@ -301,8 +303,8 @@ class VisitReportActivity : AppCompatActivity() {
                             }
 
                         }
-                    }catch (e: Exception){
-                        progressBar.visibility= View.GONE
+                    } catch (e: Exception) {
+                        progressBar.visibility = View.GONE
                         e.printStackTrace()
                     }
                 }
@@ -316,12 +318,12 @@ class VisitReportActivity : AppCompatActivity() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    progressBar.visibility= View.GONE
+                    progressBar.visibility = View.GONE
                     ViewUtils.getErrorResponse(error, applicationContext)
                 }
 
                 override fun onException(e: Exception) {
-                    progressBar.visibility= View.GONE
+                    progressBar.visibility = View.GONE
                     Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                 }
 
@@ -336,7 +338,10 @@ class VisitReportActivity : AppCompatActivity() {
 
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
-            val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+            val tableRowParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.FILL_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            )
             val leftMargin = 0
             val topMargin = 0
             val rightMargin = 0
@@ -370,7 +375,10 @@ class VisitReportActivity : AppCompatActivity() {
 
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
-            val tableRowParams = TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+            val tableRowParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.FILL_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            )
             val leftMargin = 0
             val topMargin = 0
             val rightMargin = 0
