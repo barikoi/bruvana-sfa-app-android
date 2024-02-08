@@ -1,56 +1,49 @@
 package com.barikoi.cnlapp.Adapter
 
-import android.graphics.drawable.GradientDrawable
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Model.Routes
-import com.barikoi.cnlapp.R
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.barikoi.cnlapp.data.remote.models.Route
+import com.barikoi.cnlapp.databinding.SingleRouteListBinding
 
-class RouteListAdapter(val routes: List<Routes>) : RecyclerView.Adapter<RouteListAdapter.ViewHolder>() {
+class RouteListAdapter :
+    RecyclerView.Adapter<RouteListAdapter.RouteViewHolder>() {
 
+    private var routesList: List<Route> = emptyList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_route_list, parent, false)
-        return ViewHolder(v)
+    override fun onBindViewHolder(holder: RouteViewHolder, position: Int) {
+        holder.bindData(routesList[position])
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemCount.text = (position+1).toString()
-        holder.routeName.text = routes[position].route_name
-        holder.territoryName.text = routes[position].territory_name
-        holder.areaName.text = routes[position].area_name
-        holder.routeCode.text = routes[position].route_code
-        holder.shopCount.text = routes[position].outlet_count
-
-        val gd = GradientDrawable()
-        gd.setColor(holder.itemView.resources.getColor(R.color.white))
-        gd.cornerRadius = 5f
-        gd.setStroke(2, holder.itemView.resources.getColor(R.color.cnl_color_1))
-        holder.itemCount.setBackgroundDrawable(gd)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
+        return RouteViewHolder(
+            SingleRouteListBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+        )
     }
 
-    override fun getItemCount(): Int {
-        return routes.size
+    @SuppressLint("NotifyDataSetChanged")
+    fun setRouteListData(routesList: List<Route>) {
+        this.routesList = routesList
+        notifyDataSetChanged()
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val itemCount: TextView
-        internal val routeName: TextView
-        internal val territoryName: TextView
-        internal val areaName: TextView
-        internal val routeCode: TextView
-        internal val shopCount: TextView
-        init {
-            itemCount = itemView.findViewById(R.id.item_count_id)
-            routeName = itemView.findViewById(R.id.route_name)
-            territoryName = itemView.findViewById(R.id.territory_name)
-            areaName = itemView.findViewById(R.id.area_name)
-            routeCode = itemView.findViewById(R.id.route_code)
-            shopCount = itemView.findViewById(R.id.shop_count)
+    override fun getItemCount(): Int = routesList.size
 
+    inner class RouteViewHolder(private val binding: SingleRouteListBinding) :
+        ViewHolder(binding.root) {
+
+        @SuppressLint("SetTextI18n")
+        fun bindData(route: Route) {
+            binding.itemCountId.text = (adapterPosition + 1).toString()
+            binding.routeName.text = route.routeName
+            binding.territoryName.text = route.territoryName
+            binding.areaName.text = route.areaName
+            binding.routeCode.text = route.routeCode
+            binding.shopCount.text = route.outletCount
         }
     }
 }
