@@ -31,5 +31,7 @@ data class LiveUser(
     @SerializedName("updated_at")
     val updatedAt: String,
     @SerializedName("user_id")
-    val userId: Int
+    val userId: Int,
+    @SerializedName("phone")
+    val phone: String
 )
