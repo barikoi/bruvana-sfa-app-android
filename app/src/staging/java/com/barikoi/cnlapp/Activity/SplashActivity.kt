@@ -209,9 +209,6 @@ class SplashActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         mAppUpdateManager!!.appUpdateInfo.addOnSuccessListener { result ->
-            println("AppUpdateService:1 " + result.updateAvailability())
-            println("AppUpdateService:2 " + UpdateAvailability.UPDATE_AVAILABLE)
-            println("AppUpdateService:3 " + result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
             if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
             ) {
@@ -222,7 +219,6 @@ class SplashActivity : AppCompatActivity() {
                         this@SplashActivity,
                         RC_APP_UPDATE
                     )
-                    println("checkForAppUpdateAvailability")
                 } catch (e: SendIntentException) {
                     e.printStackTrace()
                 }
@@ -232,7 +228,7 @@ class SplashActivity : AppCompatActivity() {
         }
         mAppUpdateManager!!.appUpdateInfo.addOnFailureListener {
             Sentry.captureMessage("checkForAppUpdate onFailure onResume")
-            println("checkForAppUpdate onFailure")
+            AppLogger.log("checkForAppUpdate onFailure $it")
             checkPermissions()
         }
 
