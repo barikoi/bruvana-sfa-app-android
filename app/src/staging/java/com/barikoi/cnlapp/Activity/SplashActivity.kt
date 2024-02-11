@@ -1,68 +1,62 @@
 package com.barikoi.cnlapp.Activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
+import android.os.Looper
 import android.view.View
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
-import androidx.preference.PreferenceManager
 import com.barikoi.barikoitrace.BarikoiTrace
-import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.utils.Api
-import com.github.ybq.android.spinkit.style.ThreeBounce
+import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import java.util.Locale
+import javax.inject.Inject
 
+@Suppress("DEPRECATION")
+@SuppressLint("CustomSplashScreen")
+@AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySplashBinding
 
-    private var token : String?= ""
-    private var userId: String? = ""
-    private var isFirst = true
-    private var MULTIPLE_PERMISSIONS = 10
-    private var progressBar: ProgressBar? = null
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    private val RC_APP_UPDATE = 11
-    var mAppUpdateManager: AppUpdateManager? = null
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    private var token: String? = ""
+    private var mAppUpdateManager: AppUpdateManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+
+        binding = ActivitySplashBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         mAppUpdateManager = AppUpdateManagerFactory.create(this)
-        prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        editor = prefs!!.edit()
 
         BarikoiTrace.initialize(applicationContext, Api.APIKEY)
 
-        token = prefs!!.getString(Api.TOKEN, "")
-        userId = prefs!!.getString(Api.USER_ID, "")
-        isFirst = prefs!!.getBoolean("isFirst", true)
-        val user_name = prefs!!.getString(Api.NAME, "")
-        val user_email = prefs!!.getString(Api.EMAIL, "")
-        val user_phone = prefs!!.getString(Api.PHONE, "")
+        token = sharePrefUtils.getString(Api.TOKEN)
 
-        progressBar = findViewById(R.id.progressBar)
-        progressBar!!.setIndeterminateDrawable(ThreeBounce())
         showProgress()
 
         mAppUpdateManager!!.appUpdateInfo.addOnSuccessListener { result ->
-            println("AppUpdateService:1 " + result.updateAvailability())
-            println("AppUpdateService:2 " + UpdateAvailability.UPDATE_AVAILABLE)
-            println("AppUpdateService:3 " + result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
+            AppLogger.log("AppUpdateService:1 " + result.updateAvailability())
+            AppLogger.log("AppUpdateService:2 " + UpdateAvailability.UPDATE_AVAILABLE)
+            AppLogger.log("AppUpdateService:3 " + result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
             if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
             ) {
@@ -73,7 +67,7 @@ class SplashActivity : AppCompatActivity() {
                         this@SplashActivity,
                         RC_APP_UPDATE
                     )
-                    println("checkForAppUpdateAvailability")
+                    AppLogger.log("checkForAppUpdateAvailability")
                 } catch (e: SendIntentException) {
                     e.printStackTrace()
                 }
@@ -83,7 +77,7 @@ class SplashActivity : AppCompatActivity() {
         }
 
         mAppUpdateManager!!.appUpdateInfo.addOnFailureListener {
-            println("checkForAppUpdate onFailure")
+            AppLogger.log("checkForAppUpdate:: onFailure $it")
             checkPermissions()
         }
     }
@@ -101,65 +95,59 @@ class SplashActivity : AppCompatActivity() {
         val listPermissionsNeeded: MutableList<String> = ArrayList()
         for (p in permissions) {
             result = ActivityCompat.checkSelfPermission(this, p)
-            //            Log.d("Verifyf", "user LatLoc result: " +result);
             if (result != PackageManager.PERMISSION_GRANTED) {
                 listPermissionsNeeded.add(p)
             }
         }
-        if (!listPermissionsNeeded.isEmpty()) {
+        if (listPermissionsNeeded.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
                 listPermissionsNeeded.toTypedArray(),
                 MULTIPLE_PERMISSIONS
             )
             return false
-        }
-        else {
-            Log.d("Splash", "request permission if list not empty")
-            val handler: Handler = Handler()
-            handler.postDelayed(Runnable {
+        } else {
+            AppLogger.log("Splash:: request permission if list not empty")
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed({
                 init()
-                handler.removeCallbacksAndMessages(null) }, 2000)
-            //init()
+                handler.removeCallbacksAndMessages(null)
+            }, 2000)
 
         }
         return true
     }
 
-    fun init(){
-        if (!token.equals("")){
+    fun init() {
+        if (!token.equals("")) {
             routeToAppropriatePage(2)
-        }else{
-            if (isFirst) {
-                hideProgress()
-                val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-                val editor = prefs.edit()
-                editor.putBoolean("isFirst", false)
-                editor.commit()
+        } else {
+            hideProgress()
+            if (sharePrefUtils.getBooleanWithDefaultTrue("isFirst")) {
+                sharePrefUtils.saveBoolean("isFirst", false)
                 routeToAppropriatePage(1)
             } else {
-                hideProgress()
-                //Toast.makeText(this, getString(R.string.no_auth_token), Toast.LENGTH_SHORT).show()
                 routeToAppropriatePage(1)
             }
         }
     }
 
-    private fun routeToAppropriatePage(routeopt: Int) {
-        // Example routing
-        when (routeopt) {
+    private fun routeToAppropriatePage(routeOpt: Int) {
+        when (routeOpt) {
             0 -> {
                 /*val i = Intent(this, SignUpActivity::class.java)
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(i)
                 finish()*/
             }
+
             1 -> {
                 val i = Intent(this, LoginActivity::class.java)
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(i)
                 finish()
             }
+
             2 -> {
                 val i = Intent(this, MainActivity::class.java)
                 startActivity(i)
@@ -167,12 +155,13 @@ class SplashActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun showProgress() {
-        progressBar!!.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
     }
 
     private fun hideProgress() {
-        progressBar!!.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
     }
 
     override fun onRequestPermissionsResult(
@@ -183,21 +172,19 @@ class SplashActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissionsList, grantResults)
         when (requestCode) {
             MULTIPLE_PERMISSIONS -> {
-                if (grantResults.size > 0) {
+                if (grantResults.isNotEmpty()) {
                     var permissionsDenied = ""
-                    val count = 0
                     for (per in permissionsList) {
                         if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                             permissionsDenied += """
                             
                             $per
                             """.trimIndent()
-                            //init()
                         }
                     }
                     // Show permissionsDenied
                     //sendLocation();
-                    Log.d("MainActivity", "result: $requestCode")
+                    AppLogger.log("result: $requestCode")
                     init()
                 }
                 return
@@ -213,15 +200,11 @@ class SplashActivity : AppCompatActivity() {
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
-        //restartActivity()
     }
 
     override fun onResume() {
         super.onResume()
         mAppUpdateManager!!.appUpdateInfo.addOnSuccessListener { result ->
-            println("AppUpdateService:1 " + result.updateAvailability())
-            println("AppUpdateService:2 " + UpdateAvailability.UPDATE_AVAILABLE)
-            println("AppUpdateService:3 " + result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
             if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
             ) {
@@ -232,7 +215,6 @@ class SplashActivity : AppCompatActivity() {
                         this@SplashActivity,
                         RC_APP_UPDATE
                     )
-                    println("checkForAppUpdateAvailability")
                 } catch (e: SendIntentException) {
                     e.printStackTrace()
                 }
@@ -242,9 +224,14 @@ class SplashActivity : AppCompatActivity() {
         }
         mAppUpdateManager!!.appUpdateInfo.addOnFailureListener {
             Sentry.captureMessage("checkForAppUpdate onFailure onResume")
-            println("checkForAppUpdate onFailure")
+            AppLogger.log("checkForAppUpdate onFailure $it")
             checkPermissions()
         }
 
+    }
+
+    companion object {
+        const val MULTIPLE_PERMISSIONS = 10
+        const val RC_APP_UPDATE = 11
     }
 }

@@ -42,8 +42,12 @@ class SharePrefUtils(
         sharedPreferences?.edit()?.putBoolean(key, value)?.apply()
     }
 
-    fun getBoolean(key: String): Boolean? {
-        return sharedPreferences?.getBoolean(key, false)
+    fun getBoolean(key: String): Boolean {
+        return sharedPreferences?.getBoolean(key, false)!!
+    }
+
+    fun getBooleanWithDefaultTrue(key: String): Boolean {
+        return sharedPreferences?.getBoolean(key, true)!!
     }
 
     fun clear() {
