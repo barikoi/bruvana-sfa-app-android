@@ -443,7 +443,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                         it.data?.users?.get(0)?.localUsers?.forEach { localUser ->
                             AppLogger.log("LOCAL USER:: $localUser")
-                            if (selectedSo?.userName == localUser.name) {
+                            if (selectedSo?.phone == localUser.phone) {
                                 AppLogger.log("MARKER TRACE:: True")
                                 plotTraceUser(
                                     localUser.name,
@@ -527,7 +527,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         AppLogger.log("PUSHER:: DATA: ${event?.data}")
 
                         requireActivity().runOnUiThread {
-                            if (selectedSo?.userName == liveUserResponse.liveUser.name) {
+                            if (selectedSo?.phone == liveUserResponse.liveUser.phone) {
                                 plotTraceUser(
                                     liveUserResponse.liveUser.name,
                                     liveUserResponse.liveUser.updatedAt,
