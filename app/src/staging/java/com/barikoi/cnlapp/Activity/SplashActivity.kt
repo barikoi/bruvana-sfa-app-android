@@ -36,8 +36,6 @@ class SplashActivity : AppCompatActivity() {
     lateinit var sharePrefUtils: SharePrefUtils
 
     private var token: String? = ""
-    private var userId: String? = ""
-    private var isFirst = true
     private var mAppUpdateManager: AppUpdateManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +50,6 @@ class SplashActivity : AppCompatActivity() {
         BarikoiTrace.initialize(applicationContext, Api.APIKEY)
 
         token = sharePrefUtils.getString(Api.TOKEN)
-        userId = sharePrefUtils.getString(Api.USER_ID)
-        isFirst = sharePrefUtils.getBooleanWithDefaultTrue("isFirst")
 
         showProgress()
 
@@ -127,7 +123,7 @@ class SplashActivity : AppCompatActivity() {
             routeToAppropriatePage(2)
         } else {
             hideProgress()
-            if (isFirst) {
+            if (sharePrefUtils.getBooleanWithDefaultTrue("isFirst")) {
                 sharePrefUtils.saveBoolean("isFirst", false)
                 routeToAppropriatePage(1)
             } else {
