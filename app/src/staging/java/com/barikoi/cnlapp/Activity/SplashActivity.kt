@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
+import com.barikoi.barikoitrace.models.BarikoiTraceError
+import com.barikoi.barikoitrace.models.BarikoiTraceUser
 import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
@@ -107,6 +110,7 @@ class SplashActivity : AppCompatActivity() {
             )
             return false
         } else {
+//            traceInit()
             AppLogger.log("Splash:: request permission if list not empty")
             val handler = Handler(Looper.getMainLooper())
             handler.postDelayed({
@@ -116,6 +120,26 @@ class SplashActivity : AppCompatActivity() {
 
         }
         return true
+    }
+
+    private fun traceInit() {
+        if (token != null && token!!.isNotEmpty()) {
+            BarikoiTrace.setOrCreateUser(
+                sharePrefUtils.getString(Api.NAME),
+                sharePrefUtils.getString(Api.EMAIL),
+                sharePrefUtils.getString(Api.PHONE),
+                object : BarikoiTraceUserCallback {
+                    override fun onFailure(barikoiError: BarikoiTraceError) {
+                        AppLogger.log(
+                            "traceInit:: User created onFailure: ${barikoiError.message}"
+                        )
+                    }
+
+                    override fun onSuccess(traceUser: BarikoiTraceUser) {
+                        AppLogger.log("traceInit:: User created: $traceUser")
+                    }
+                })
+        }
     }
 
     fun init() {
