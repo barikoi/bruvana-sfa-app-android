@@ -7,6 +7,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.api.SocketApiService
 import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.Api.TRACE_BASE_URL
 import com.barikoi.cnlapp.utils.Constants.CNL_OK_CLIENT
 import com.barikoi.cnlapp.utils.Constants.TRACE_OK_CLIENT
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
@@ -118,7 +119,7 @@ object NetworkModule {
         @ApplicationContext context: Context
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://backend.barikoi.com:8888/api/v1/")
+            .baseUrl(TRACE_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
