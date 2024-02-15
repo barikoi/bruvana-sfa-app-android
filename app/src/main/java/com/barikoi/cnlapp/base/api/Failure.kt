@@ -13,6 +13,7 @@ sealed class Failure {
         object BadRequest : Failure()
         object CanNotConnectToTheServer : Failure()
         object TooManyRequest : Failure()
+        object TokenExpired : Failure()
         object InternalServerError : Failure()
     }
 }
@@ -22,6 +23,7 @@ fun getErrorTypeByHTTPCode(httpCode: Int): Failure {
         400 -> return Failure.HTTP.BadRequest
         401 -> return Failure.HTTP.UnauthorizedError
         403 -> return Failure.HTTP.Forbidden
+        440 -> return Failure.HTTP.TokenExpired
         404 -> return Failure.HTTP.NotFound
         405 -> return Failure.HTTP.MethodNotAllowed
         429 -> return Failure.HTTP.TooManyRequest
