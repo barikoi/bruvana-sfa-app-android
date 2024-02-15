@@ -236,10 +236,15 @@
     <string name="failure_unauthorized_error">Unauthorized error.</string>
 
     <string name="failure_failed_to_cache">Failed to cache.</string>
+    <string name="failure_token_expired">Failed to cache.</string>
     <string name="location">Location</string>
     <string name="outlet_s">%1$s Outlet(s)</string>
     <string name="select_date_range">Select date range</string>
     <string name="date_range_">%1$s - %2$s</string>
     <string name="logo">logo</string>
+    <string name="create_order">Create Order</string>
+    <string name="star">Star</string>
+    <string name="drawer">Drawer</string>
+    <string name="version">version %1$s</string>
 
 </resources>
