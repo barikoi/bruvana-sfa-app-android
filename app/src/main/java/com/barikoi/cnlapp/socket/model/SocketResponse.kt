@@ -33,3 +33,11 @@ data class SocketResponse(
     @SerializedName("__v")
     val v: Int
 )
+
+
+data class Location(
+    @SerializedName("coordinates")
+    val coordinates: List<Double>,
+    @SerializedName("type")
+    val type: String
+)
