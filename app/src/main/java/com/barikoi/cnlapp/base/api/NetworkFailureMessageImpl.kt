@@ -32,6 +32,7 @@ class NetworkFailureMessageImpl(
             is Failure.HTTP.TooManyRequest -> context.getString(R.string.failure_too_many_request)
             is Failure.HTTP.UnauthorizedError -> context.getString(R.string.failure_unauthorized_error)
             is Failure.FailedToCache -> context.getString(R.string.failure_failed_to_cache)
+            is Failure.HTTP.TokenExpired -> context.getString(R.string.failure_token_expired)
         }
     }
 }
