@@ -71,6 +71,10 @@ android {
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "https://api.cnl.barikoimaps.dev/"
+
+            buildConfigField "String", "TRACE_EMAIL", '"miraz@barikoi.xyz"'
+            buildConfigField "String", "TRACE_PASS", '"m12345678M"'
+
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher_2"
             ]
@@ -192,4 +196,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    implementation ('io.socket:socket.io-client:2.1.0') {
+        exclude group: 'org.json', module: 'json'
+    }
 }
