@@ -11,11 +11,15 @@ object SocketHandler {
 
     @Synchronized
     fun setSocket(token: String) {
+        AppLogger.log("TOKEN: $token")
         try {
             mSocket =
-                IO.socket("http://tracev2.barikoimaps.dev:4001?authorization=Bearer+${token}")
+                IO.socket("http://tracev2.barikoimaps.dev?authorization=Bearer+${token}")
         } catch (e: URISyntaxException) {
             AppLogger.log("SocketHandler:: $e")
+        } catch (e: Exception) {
+            AppLogger.log("SocketHandler:: $e")
+
         }
     }
 
@@ -27,6 +31,10 @@ object SocketHandler {
     @Synchronized
     fun establishConnection() {
         mSocket.connect()
+
+        if (mSocket.connected()) {
+            AppLogger.log("SOCKET : $mSocket")
+        }
     }
 
     @Synchronized
