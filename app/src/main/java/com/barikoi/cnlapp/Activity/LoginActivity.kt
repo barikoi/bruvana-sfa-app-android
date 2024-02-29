@@ -1,7 +1,6 @@
 package com.barikoi.cnlapp.Activity
 
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,9 +19,12 @@ import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
 import com.barikoi.barikoitrace.models.BarikoiTraceError
 import com.barikoi.barikoitrace.models.BarikoiTraceUser
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.ActivityLoginBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
@@ -32,81 +34,77 @@ import io.sentry.protocol.User
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLoginBinding
 
-    //var etPhoneNumber: EditText? = null
-    var etSRCode: EditText? = null
-    var etPassword: EditText? = null
-    var signin_link: TextView? = null
-    var resetpass: TextView? = null
-    var login: Button? = null
-    var skip: Button? = null
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
     private var loginSuccess: Boolean? = false
     var pd: ProgressDialog? = null
-    private var player_id: String? = null
+    private var playerId: String? = null
     private var queue: RequestQueue? = null
     private var token: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-        init()
-    }
 
-    private fun init() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(
-            applicationContext
-        )
-        etSRCode = findViewById<View>(R.id.input_sr_code) as EditText
-        etPassword = findViewById<View>(R.id.input_password) as EditText
-        queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        login = findViewById<View>(R.id.btn_login) as Button
-        login?.setOnClickListener { login() }
+        queue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
+
+        binding.btnLogin.setOnClickListener { login() }
     }
 
     private fun login() {
         if (!validate()) {
             return
         }
-        val employee_id = etSRCode!!.text.toString().replace(" ", "");
-        val password = etPassword!!.text.toString()
+        val employeeId = binding.inputSrCode.text.toString().replace(" ", "");
+        val password = binding.inputPassword.text.toString()
+
         pd = ProgressDialog(this)
         pd!!.setMessage("Authenticating...")
         pd!!.show()
-        val queue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
         val request: StringRequest = object : StringRequest(
             Method.POST, Api.loginurl,
             Response.Listener { response ->
                 try {
                     AppLogger.log("LOGIN DATA:: $response")
-                    val responsedata = JSONObject(response)
-                    if (responsedata.has("token")) {
-                        token = responsedata.getString("token")
-                        val userObj = responsedata.getJSONObject("user")
-                        val prefs = PreferenceManager.getDefaultSharedPreferences(
-                            applicationContext
+                    val responseData = JSONObject(response)
+                    if (responseData.has("token")) {
+                        token = responseData.getString("token")
+                        val userObj = responseData.getJSONObject("user")
+
+                        sharePrefUtils.saveString(Api.EMAIL, userObj.getString("email"))
+                        sharePrefUtils.saveString(Api.NAME, userObj.getString("user_name"))
+                        sharePrefUtils.saveString(Api.USER_ID, userObj.getString("id"))
+                        sharePrefUtils.saveString(Api.USER_TYPE, userObj.getString("designation"))
+                        sharePrefUtils.saveString(Api.PHONE, userObj.getString("phone"))
+                        sharePrefUtils.saveString(
+                            Api.TERRITORY_ID,
+                            userObj.getString("territory_id")
                         )
-                        val editor = prefs.edit()
-                        editor.putString(Api.EMAIL, userObj.getString("email"))
-                        editor.putString(Api.NAME, userObj.getString("user_name"))
-                        editor.putString(Api.USER_ID, userObj.getString("id"))
-                        editor.putString(Api.USER_TYPE, userObj.getString("designation"))
-                        editor.putString(Api.PHONE, userObj.getString("phone"))
-                        editor.putString(Api.TERRITORY_ID, userObj.getString("territory_id"))
-                        editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
-                        editor.putString(Api.TOKEN, token)
+                        sharePrefUtils.saveString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
+                        sharePrefUtils.saveString(Api.TOKEN, token!!)
                         if (userObj.has("group_name") && !userObj.isNull("group_name")) {
-                            editor.putString(Api.TRACE_GROUP_NAME, userObj.getString("group_name"))
+                            sharePrefUtils.saveString(
+                                Api.TRACE_GROUP_NAME,
+                                userObj.getString("group_name")
+                            )
                         }
                         if (userObj.has("group_id") && !userObj.isNull("group_id")) {
-                            editor.putString(Api.TRACE_GROUP_ID, userObj.getString("group_id"))
+                            sharePrefUtils.saveString(
+                                Api.TRACE_GROUP_ID,
+                                userObj.getString("group_id")
+                            )
                         }
-                        editor.commit()
 
-                        var email = ""
+                        var email = "ff"
                         if (userObj.has("email") && !userObj.isNull("email")) {
                             email = userObj.getString("email")
                         }
@@ -129,6 +127,7 @@ class LoginActivity : AppCompatActivity() {
                                 }
 
                                 override fun onSuccess(traceUser: BarikoiTraceUser) {
+                                    sharePrefUtils.saveString(Api.TRACE_USER_ID, traceUser.userId)
                                     Log.d("BarikoiTrace", "User created: $traceUser")
                                 }
                             })
@@ -140,7 +139,7 @@ class LoginActivity : AppCompatActivity() {
                                 SentryOptions.BeforeSendCallback { event: SentryEvent, hint: Any? ->
                                     val userSentry = User()
                                     userSentry.id = userObj.getString("employee_id")
-                                    userSentry.email = employee_id
+                                    userSentry.email = employeeId
                                     userSentry.username = userObj.getString("user_name")
                                     event.user = userSentry
                                     event
@@ -148,10 +147,11 @@ class LoginActivity : AppCompatActivity() {
                         }
 
                         pd!!.dismiss()
-                        routeToAppropriatePage(2)
-                    } else if (responsedata.has("message")) {
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+                    } else if (responseData.has("message")) {
                         pd!!.dismiss()
-                        showDialog(responsedata.getString("message"))
+                        showDialog(responseData.getString("message"))
                     }
                 } catch (e: JSONException) {
                     pd!!.dismiss()
@@ -194,12 +194,9 @@ class LoginActivity : AppCompatActivity() {
             }
 
             @Throws(AuthFailureError::class)
-            override fun getParams(): Map<String, String>? {
+            override fun getParams(): Map<String, String> {
                 val parameters: MutableMap<String, String> = HashMap()
-                //parameters.put("id", id.getText().toString());
-                Log.d("MainActivity", "login email: $employee_id")
-                //parameters.put("device_ID",player_id);
-                parameters["employee_id"] = employee_id
+                parameters["employee_id"] = employeeId
                 parameters["password"] = password
                 return parameters
             }
@@ -208,16 +205,16 @@ class LoginActivity : AppCompatActivity() {
             30 * 1000, 0,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
-        queue.add(request)
+        queue?.add(request)
     }
 
     fun showDialog(message: String) {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(message)
             .setCancelable(false)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+            .setPositiveButton("OK") { dialog, _ ->
                 dialog.cancel()
-            })
+            }
         val alert = builder.create()
         alert.show()
 
@@ -230,56 +227,23 @@ class LoginActivity : AppCompatActivity() {
 
     fun onLoginFailed() {
         showDialog("Login failed,check if SR Code and password is correct")
-
     }
 
     private fun validate(): Boolean {
         var valid = true
-        /*val phoneNumber = etPhoneNumber!!.text.toString()
-        if (phoneNumber.isEmpty()) {
-            etPhoneNumber!!.error = "Enter a valid phone number"
-            valid = false
-        } else {
-            etPhoneNumber!!.requestFocus()
-            etPhoneNumber!!.error = null
-        }*/
-
-        val email = etSRCode!!.text.toString().replace(" ", "");
+        val email = binding.inputSrCode.text.toString().replace(" ", "");
         if (email.isEmpty()) {
-            etSRCode!!.setError("Enter a valid SR code")
+            binding.inputSrCode.error = "Enter a valid SR code"
             valid = false
         } else {
-            etSRCode!!.setError(null)
+            binding.inputSrCode.error = null
         }
-        if (etPassword!!.text.toString().length < 6) {
-            etPassword!!.error = "Enter a valid password (minimum 6 characters)"
+        if (binding.inputPassword.text.toString().length < 6) {
+            binding.inputPassword.error = "Enter a valid password (minimum 6 characters)"
             valid = false
         } else {
-            etPassword!!.error = null
+            binding.inputPassword.error = null
         }
         return valid
-    }
-
-    private fun routeToAppropriatePage(routeopt: Int) {
-        // Example routing
-        when (routeopt) {
-            0 -> {
-                /*val i = Intent(this, SignupActivity::class.java)
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                startActivity(i)
-                finish()*/
-            }
-
-            1 -> {
-                val intent = intent
-                startActivity(intent)
-            }
-
-            2 -> {
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
-                finish()
-            }
-        }
     }
 }
