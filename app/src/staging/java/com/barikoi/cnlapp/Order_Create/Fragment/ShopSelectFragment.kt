@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -24,19 +25,27 @@ import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
+import com.barikoi.cnlapp.callback.LocationFetch
+import com.barikoi.cnlapp.databinding.FragmentShopSelectBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+import kotlin.math.acos
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 @SuppressLint("NotifyDataSetChanged")
 class ShopSelectFragment : Fragment(), OnSelectListener {
+    private lateinit var binding: FragmentShopSelectBinding
+
     var recyclerView: RecyclerView? = null
     var queue: RequestQueue? = null
     var spinner: MoreSpinner? = null
@@ -56,12 +65,24 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     private var loading: ProgressBar? = null
     private var appDatabase: AppDatabase? = null
 
+    var loc: Location? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewUtils.getLocation(requireContext(), requireActivity(), object : LocationFetch {
+            override fun onFetchSuccess(location: Location) {
+                loc = location
+            }
+
+            override fun onFailure() {
+                loc = null
+            }
+        })
 
         sortingLayout.setOnClickListener {
             val popup = PopupMenu(requireContext(), sortTitle)
@@ -289,11 +310,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_shop_select, container, false)
+        binding = FragmentShopSelectBinding.inflate(inflater, container, false)
+
         recyclerView = view.findViewById(R.id.shoplist)
         loading = view.findViewById(R.id.progressBar)
         spinner = view.findViewById(R.id.spinnerRoutes)
         etSearch = view.findViewById(R.id.editTextSearchShop)
-        adapter = ShopSelectAdapter(ArrayList<Shops>(), listener!!)
+        adapter = ShopSelectAdapter(ArrayList(), listener!!)
         recyclerView!!.adapter = adapter
 
         var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
@@ -493,14 +516,30 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("last_ordered_at"),
                                         outletObj.getInt("is_verified"),
                                         outletObj.getInt("ordered_today"),
-                                        outletObj.getInt("is_no_order")
+                                        outletObj.getInt("is_no_order"),
+                                        if (loc == null) dis(
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ) else dis(
+                                            loc!!.latitude,
+                                            loc!!.longitude,
+                                            outletObj.getDouble("latitude"),
+                                            outletObj.getDouble("longitude")
+                                        )
                                     )
 
                                     shopList!!.add(shops)
                                 }
 
+
                                 if (shopList!!.size > 0) {
-                                    adapter = ShopSelectAdapter(shopList!!, listener!!)
+
+                                    val distanceSorted = shopList!!.sortedBy { it.distance }
+                                    val orderedSorted = distanceSorted.sortedBy { it.isOrdered }
+
+                                    adapter = ShopSelectAdapter(orderedSorted, listener!!)
                                     recyclerView!!.adapter = adapter
                                     adapter!!.notifyDataSetChanged()
                                 }
@@ -566,6 +605,25 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         queue!!.add(request)
+    }
+
+
+    private fun dis(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startPoint = Location("locationA")
+        startPoint.latitude = lat1
+        startPoint.longitude = lon1
+
+        val endPoint = Location("locationB")
+        endPoint.latitude = lat2
+        endPoint.longitude = lon2
+
+        val distance = startPoint.distanceTo(endPoint)
+
+
+
+        Log.e("DIS", "DIS:: ${distance / 1000}")
+
+        return distance
     }
 
     override fun onAttach(context: Context) {
