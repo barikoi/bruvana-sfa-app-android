@@ -50,7 +50,7 @@ class SplashActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         mAppUpdateManager = AppUpdateManagerFactory.create(this)
 
-        BarikoiTrace.initialize(applicationContext, Api.APIKEY)
+        BarikoiTrace.initialize(applicationContext, Api.APIKEY_V2)
 
         token = sharePrefUtils.getString(Api.TOKEN)
 
