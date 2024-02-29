@@ -1,6 +1,10 @@
 package com.barikoi.cnlapp.utils.extension
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.Date
 import java.util.Locale
 
@@ -11,6 +15,16 @@ fun Date.formatDate(): String {
     val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
     return df.format(this)
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("SimpleDateFormat")
+fun String.convertDate(): String? {
+    val instant: Instant = Instant.parse(this)
+    val myDate = Date.from(instant)
+    val formatter = SimpleDateFormat("dd-MM-yy HH:mm:ss")
+    return formatter.format(myDate)
+}
+
 
 /**
  * @return Date format February 08, 2024
