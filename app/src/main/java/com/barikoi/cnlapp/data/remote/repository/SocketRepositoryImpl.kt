@@ -3,16 +3,15 @@ package com.barikoi.cnlapp.data.remote.repository
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
+import com.barikoi.cnlapp.data.model.socket.SocketGroupUsersResponse
 import com.barikoi.cnlapp.data.remote.api.SocketApiService
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
-import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
 import com.barikoi.cnlapp.data.remote.models.trace.TraceLoginResponse
 import com.barikoi.cnlapp.data.remote.models.trace.request.TraceLognRequest
 import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.http.Body
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ interface SocketRepository {
 
     fun traceLogin(loginRequest: TraceLognRequest): Flow<ApiState<TraceLoginResponse>>
     fun getAllGroup(): Flow<ApiState<SocketGroupResponse>>
-    fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketUserResponse>>
+    fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketGroupUsersResponse>>
 
 }
 
@@ -88,7 +87,7 @@ class SocketRepositoryImpl @Inject constructor(private val socketApiService: Soc
         }
     }
 
-    override fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketUserResponse>> {
+    override fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketGroupUsersResponse>> {
         return flow {
             try {
                 val response =
