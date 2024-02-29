@@ -17,7 +17,8 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): RecyclerView.Adapter<ShopSelectAdapter.ViewHolder>(),
+class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener) :
+    RecyclerView.Adapter<ShopSelectAdapter.ViewHolder>(),
     Filterable {
 
     var shopList: List<Shops> = mValues
@@ -25,7 +26,8 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_statistics, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_outlet_statistics, parent, false)
         return ViewHolder(v)
     }
 
@@ -36,26 +38,32 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
         holder.setIsRecyclable(false)
 
-        holder.shopName.text= shopList[position].shop_name
+
+        holder.shopName.text = shopList[position].shop_name
         holder.ownerName.text = shopList[position].shop_owner
-        if (!shopList[position].lastOrderDate.equals("null")){
+        if (!shopList[position].lastOrderDate.equals("null")) {
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(shopList[position].lastOrderDate))
-            holder.lastOrderDate.text = holder.itemView.context.resources.getString(com.barikoi.cnlapp.R.string.last_order_date)+orderDate
+            holder.lastOrderDate.text =
+                holder.itemView.context.resources.getString(com.barikoi.cnlapp.R.string.last_order_date) + orderDate
         }
-        if (shopList[position].category.length > 0 && !shopList[position].category.equals("null", true)) {
+        if (shopList[position].category.length > 0 && !shopList[position].category.equals(
+                "null",
+                true
+            )
+        ) {
             holder.tvCategory.text =
                 shopList[position].category.get(0).toString().uppercase(Locale.getDefault())
         }
 
-        if (shopList[position].isOrdered == 1){
+        if (shopList[position].isOrdered == 1) {
             holder.isOrdered.setImageResource(R.drawable.ic_ordered)
             holder.isOrdered.visibility = View.VISIBLE
-        }else if (shopList[position].isNoOrdered == 1){
+        } else if (shopList[position].isNoOrdered == 1) {
             holder.isOrdered.setImageResource(R.drawable.ic_no_ordered)
             holder.isOrdered.visibility = View.VISIBLE
-        } else{
+        } else {
             holder.isOrdered.visibility = View.GONE
         }
         /*if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
@@ -69,18 +77,21 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
 
         holder.btnDetails.setOnClickListener {
-            if (shopList[position].isOrdered == 1 || shopList[position].isNoOrdered == 1){
-                ViewUtils.viewDialogResponse(holder.itemView.context, "Already visited this outlet for today", object : DialogListener{
-                    override fun onConfirmed() {
+            if (shopList[position].isOrdered == 1 || shopList[position].isNoOrdered == 1) {
+                ViewUtils.viewDialogResponse(
+                    holder.itemView.context,
+                    "Already visited this outlet for today",
+                    object : DialogListener {
+                        override fun onConfirmed() {
 
-                    }
+                        }
 
-                    override fun onCanceled() {
+                        override fun onCanceled() {
 
-                    }
+                        }
 
-                })
-            }else{
+                    })
+            } else {
                 mListener.onShopSelected(shopList[position])
             }
 
@@ -104,7 +115,9 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.shop_name.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
+                        if (row.shop_name.toLowerCase()
+                                .contains(charString.lowercase(Locale.getDefault()))
+                        ) {
                             filteredList.add(row)
                         }
                     }
@@ -130,6 +143,7 @@ class ShopSelectAdapter(var mValues: List<Shops>, mListener: OnSelectListener): 
         internal val imageShop: ImageView
         internal val isOrdered: ImageView
         internal val btnDetails: AppCompatButton
+
         init {
             ownerName = itemView.findViewById(R.id.ownerName)
             tvCategory = itemView.findViewById(R.id.tvcategory)
