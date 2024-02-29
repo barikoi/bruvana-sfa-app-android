@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.data.remote.api
 
+import com.barikoi.cnlapp.data.model.socket.SocketGroupUsersResponse
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
 import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
 import com.barikoi.cnlapp.data.remote.models.trace.TraceLoginResponse
@@ -8,6 +9,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SocketApiService {
@@ -19,8 +21,8 @@ interface SocketApiService {
     suspend fun getSocketGroups(
     ): Response<SocketGroupResponse>
 
-    @GET("company/group/users")
+    @GET("company/get-group/{group_id}")
     suspend fun getSocketUsersByGroup(
-        @Query("group_id") groupId: String
-    ): Response<SocketUserResponse>
+        @Path("group_id") groupId: String
+    ): Response<SocketGroupUsersResponse>
 }
