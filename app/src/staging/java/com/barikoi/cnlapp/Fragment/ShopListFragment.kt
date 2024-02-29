@@ -274,7 +274,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         route_id,
                                         route_name,
                                         "",
-                                        is_Verified,0, 0
+                                        is_Verified,0,
+                                        0,0.0f
                                     )
                                 )
                             }
