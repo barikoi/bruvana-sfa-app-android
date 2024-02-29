@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 interface RouteRepository {
     fun getRoutes(userId: String): Flow<ApiState<RouteResponse>>
-    fun getRouteWithOutlet(userId: String, filterWithOutlet:String): Flow<ApiState<RouteResponse>>
+    fun getRouteWithOutlet(userId: String, filterWithOutlet: String): Flow<ApiState<RouteResponse>>
     fun getSoList(): Flow<ApiState<SoResponse>>
 
     fun getOutlets(
