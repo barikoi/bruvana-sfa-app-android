@@ -20,16 +20,18 @@ import androidx.lifecycle.lifecycleScope
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
-import com.barikoi.cnlapp.data.model.SocketEventResponse
-import com.barikoi.cnlapp.data.remote.models.LocalUser
+import com.barikoi.cnlapp.data.model.socket.GroupUser
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.data.remote.models.SalesOfficer
 import com.barikoi.cnlapp.databinding.FragmentMapBinding
+import com.barikoi.cnlapp.socket.SocketHandler
+import com.barikoi.cnlapp.socket.model.SocketResponse
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Api.TRACE_GROUP_ID
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.convertDate
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -51,20 +53,10 @@ import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
-import com.pusher.client.Pusher
-import com.pusher.client.PusherOptions
-import com.pusher.client.channel.PrivateChannelEventListener
-import com.pusher.client.channel.PusherEvent
-import com.pusher.client.connection.ConnectionEventListener
-import com.pusher.client.connection.ConnectionState
-import com.pusher.client.connection.ConnectionStateChange
-import com.pusher.client.util.HttpChannelAuthorizer
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -94,12 +86,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var routeNewList: List<Route> = emptyList()
     private var routeID = ""
 
-    private var socketLocalUserList: List<LocalUser> = emptyList()
+    private var socketLocalUserList: List<GroupUser> = emptyList()
 
     private var categoryList: ArrayList<String> = ArrayList()
     private var selectedCategory: String = ""
-
-    private lateinit var pusher: Pusher
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -138,7 +128,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                 if (binding.isTrace.isChecked) {
                     sharePrefUtils.getString(TRACE_GROUP_ID)
-                        ?.let { viewModel.getSocketUserByGroup(it) }
+                        ?.let { viewModel.getSocketUserByGroup("65c9e5ff8c5c69794c6f3683") }
                 }
             }
 
@@ -154,7 +144,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 routeID = routeNewList[position].id.toString()
 
                 if (!binding.isTrace.isChecked) {
-                    if (isVerified.isChecked) {
+                    if (binding.isVerified.isChecked) {
                         viewModel.getOutletList(
                             routeNewList[position].id.toString(),
                             "1",
@@ -215,15 +205,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
-                sharePrefUtils.getString(TRACE_GROUP_ID)?.let { viewModel.getSocketUserByGroup(it) }
-                runBlocking {
-                    initSocket()
-                }
+                sharePrefUtils.getString(TRACE_GROUP_ID)
+                    ?.let { viewModel.getSocketUserByGroup("65c9e5ff8c5c69794c6f3683") }
                 subscribeSocket()
             } else {
-                if (this::pusher.isInitialized)
-                    pusher.disconnect()
-
+                SocketHandler.closeConnection()
                 if (routeID.isNotEmpty()) {
                     viewModel.getOutletList(
                         routeID,
@@ -433,25 +419,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     is ApiState.Success -> {
                         AppLogger.log(
-                            "startSocketGroupUsersObserve:: Success ${
-                                it.data?.users?.get(
-                                    0
-                                )?.localUsers
-                            }"
+                            "startSocketGroupUsersObserve:: Success ${it.data?.data?.groupUsers}"
                         )
-                        socketLocalUserList = it.data?.users?.get(0)?.localUsers ?: emptyList()
+                        socketLocalUserList = it.data?.data?.groupUsers ?: emptyList()
 
-                        it.data?.users?.get(0)?.localUsers?.forEach { localUser ->
+                        it.data?.data?.groupUsers?.forEach { localUser ->
                             AppLogger.log("LOCAL USER:: $localUser")
                             if (selectedSo?.phone == localUser.phone) {
                                 AppLogger.log("MARKER TRACE:: True")
                                 plotTraceUser(
-                                    localUser.name,
-                                    localUser.positionUpdatedAt,
+                                    selectedSo?.userName!!,
+                                    localUser.positionUpdatedAt.convertDate()!!,
                                     localUser.userLastLat,
                                     localUser.userLastLon,
-                                    getLiveMarkerIcon(localUser.activeStatus)
+                                    getLiveMarkerIcon(1)
                                 )
+                            } else {
+                                toast("User not found.")
                             }
                         }
                     }
@@ -463,94 +447,36 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private fun initSocket() {
 
-        val channelAuthorizer =
-            HttpChannelAuthorizer("https://backend.barikoi.com:8888/api/broadcasting/auth")
-        val params: MutableMap<String, String> = java.util.HashMap()
-        val traceToken = sharePrefUtils.getString(Api.TRACE_TOKEN)
-        if (traceToken != "") {
-            params["Authorization"] = "bearer $traceToken"
-        }
-        channelAuthorizer.setHeaders(params)
-        val options = PusherOptions()
-        options.setCluster("ap2").channelAuthorizer = channelAuthorizer
-        options.setWsPort(6001)
-        options.setWssPort(6002)
-        options.setHost("backend.barikoi.com")
-        options.isUseTLS = true
-        pusher = Pusher("mykey", options)
-        pusher.connect()
-        pusher.connect(object : ConnectionEventListener {
-            override fun onConnectionStateChange(change: ConnectionStateChange) {
-                println("PUSHER:: State changed from ${change.previousState} to ${change.currentState}")
-            }
-
-            override fun onError(
-                message: String,
-                code: String,
-                e: Exception
-            ) {
-                toast("Live location not working. Please try again latter.")
-                AppLogger.log("PUSHER:: There was a problem connecting! code ($code), message ($message), exception($e)")
-            }
-        }, ConnectionState.ALL)
     }
 
     private fun subscribeSocket() {
-        val groupName =
-            sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
+        SocketHandler.setSocket(sharePrefUtils.getString(Api.TRACE_TOKEN)!!)
+        SocketHandler.establishConnection()
+        val socketHandler = SocketHandler.getSocket()
 
-        AppLogger.log("LIVE GROUP NAME:: $groupName")
-        pusher.subscribePrivate(
-            "private-care_nutrition_39752",
-            object : PrivateChannelEventListener {
-                override fun onSubscriptionSucceeded(channelName: String) {
-                    AppLogger.log("PUSHER:: Subscribed! $channelName")
+        AppLogger.log("socketHandler::ID:: ${socketHandler.id()}")
+
+        socketHandler.emit("joinGroup", "group_65c9e5ff8c5c69794c6f3683")
+        socketHandler.on("gpx") { arg ->
+            AppLogger.log("socketHandler:: ${arg[0]}")
+            val socketResponse = Gson().fromJson(arg[0].toString(), SocketResponse::class.java)
+            AppLogger.log("socketHandler:: $socketResponse")
+
+            requireActivity().runOnUiThread {
+                if (selectedSo?.phone == socketResponse.phone) {
+                    plotTraceUser(
+                        selectedSo?.userName!!,
+                        socketResponse.updatedAt.convertDate()!!,
+                        socketResponse.latitude,
+                        socketResponse.longitude,
+                        getLiveMarkerIcon(1)
+                    )
+                } else {
+                    toast("User not found.")
                 }
 
-                override fun onAuthenticationFailure(message: String?, e: Exception?) {
-                    AppLogger.log("PUSHER:: onAuthenticationFailure: $message")
-                    Sentry.captureException(e?.cause!!)
-                }
-
-                override fun onEvent(event: PusherEvent?) {
-                    AppLogger.log("PUSHER:: onEvent Received event with data: $event")
-                }
-            })
-            .bind(
-                "care_nutrition_group_event_$groupName",
-                object : PrivateChannelEventListener {
-                    override fun onEvent(event: PusherEvent?) {
-
-                        val liveUserResponse =
-                            Gson().fromJson(event?.data, SocketEventResponse::class.java)
-
-                        AppLogger.log("PUSHER:: DATA: ${event?.data}")
-
-                        requireActivity().runOnUiThread {
-                            if (selectedSo?.phone == liveUserResponse.liveUser.phone) {
-                                plotTraceUser(
-                                    liveUserResponse.liveUser.name,
-                                    liveUserResponse.liveUser.updatedAt,
-                                    liveUserResponse.liveUser.latitude.toDouble(),
-                                    liveUserResponse.liveUser.longitude.toDouble(),
-                                    getLiveMarkerIcon(liveUserResponse.liveUser.activeStatus)
-                                )
-                            }
-                        }
-                    }
-
-                    override fun onSubscriptionSucceeded(channelName: String?) {
-                        AppLogger.log("PUSHER:: onSubscriptionSucceeded: $channelName")
-                    }
-
-                    override fun onAuthenticationFailure(
-                        message: String?,
-                        e: Exception?
-                    ) {
-                        Sentry.captureException(e?.cause!!)
-                        AppLogger.log("PUSHER:: onAuthenticationFailure bind: $message")
-                    }
-                })
+            }
+        }
     }
 
     private fun plotTraceUser(
@@ -736,8 +662,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         AppLogger.log("LIFE CYCLE:: onStop")
         super.onStop()
         binding.mapView.onStop()
-        if (this::pusher.isInitialized)
-            pusher.disconnect()
+        SocketHandler.closeConnection()
 
     }
 
@@ -745,8 +670,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         AppLogger.log("LIFE CYCLE:: onDestroy")
         super.onDestroy()
         binding.mapView.onDestroy()
-        if (this::pusher.isInitialized)
-            pusher.disconnect()
+        SocketHandler.closeConnection()
     }
 
     override fun onLowMemory() {
@@ -768,6 +692,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onPause() {
         AppLogger.log("LIFE CYCLE:: onPause")
         super.onPause()
+        SocketHandler.closeConnection()
         binding.mapView.onPause()
     }
 
