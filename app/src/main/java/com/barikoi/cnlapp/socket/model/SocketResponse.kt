@@ -4,6 +4,10 @@ package com.barikoi.cnlapp.socket.model
 import com.google.gson.annotations.SerializedName
 
 data class SocketResponse(
+    @SerializedName("user_name")
+    val name: String,
+    @SerializedName("phone")
+    val phone: String,
     @SerializedName("accuracy")
     val accuracy: Double,
     @SerializedName("altitude")
@@ -33,7 +37,6 @@ data class SocketResponse(
     @SerializedName("__v")
     val v: Int
 )
-
 
 data class Location(
     @SerializedName("coordinates")
