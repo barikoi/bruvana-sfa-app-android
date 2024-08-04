@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="nav_view">
+
+    <group android:id="@+id/nav_language_route">
+        <item
+            android:id="@+id/menu_language"
+            android:title="@string/language"
+            app:actionLayout="@layout/custom_lang_nav_menu"
+            tools:ignore="UnusedAttribute" />
+
+    </group>
+
+    <group android:id="@+id/nav_shop_route">
+        <item
+            android:id="@+id/menu_shop_route"
+            android:title="@string/title_shop_route" />
+    </group>
+    <group android:id="@+id/nav_order_delivery_update">
+        <item
+            android:id="@+id/menu_order_delivery_update"
+            android:title="@string/order_delivery_update" />
+    </group>
+    <group android:id="@+id/nav_order_summary">
+        <item
+            android:id="@+id/menu_order_summary"
+            android:title="@string/title_order_summary" />
+    </group>
+    <group android:id="@+id/nav_notice">
+        <item
+            android:id="@+id/menu_notice"
+            android:title="@string/title_notice" />
+    </group>
+    <group android:id="@+id/nav_visit_report">
+        <item
+            android:id="@+id/menu_visit_report"
+            android:title="@string/title_visit_report" />
+    </group>
+    <group android:id="@+id/nav_trade_offers">
+        <item
+            android:id="@+id/menu_trade_offers"
+            android:title="@string/title_trade_offers" />
+    </group>
+    <group android:id="@+id/nav_product_summary">
+        <item
+            android:id="@+id/menu_product_summary"
+            android:title="@string/title_product_summary" />
+    </group>
+    <group android:id="@+id/nav_product_stock_update">
+        <item
+            android:id="@+id/menu_product_stock_update"
+            android:title="@string/title_product_stock_update" />
+    </group>
+
+    <group android:id="@+id/nav_product_stock_request">
+        <item
+            android:id="@+id/menu_product_stock_request"
+            android:title="@string/title_product_stock_request" />
+    </group>
+
+    <group
+        android:id="@+id/nav_request_approval"
+        android:enabled="true">
+
+        <item
+            android:id="@+id/menu_request_approval"
+            android:title="@string/title_approval"
+            app:actionLayout="@layout/custom_approval_nav_menu"
+            tools:ignore="UnusedAttribute" />
+    </group>
+
+</menu>
