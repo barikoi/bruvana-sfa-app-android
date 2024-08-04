@@ -1,96 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llMain"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="center_vertical"
-    android:layout_marginBottom="8dp"
-    android:padding="4dp"
-    android:background="@drawable/cardview_bg"
-    android:backgroundTint="@color/white"
-    android:orientation="vertical">
-    <LinearLayout
+    android:layout_margin="8dp"
+    app:cardCornerRadius="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
-        android:padding="4dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <CheckBox
+            android:id="@+id/cbSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/cnl_color_1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+
+            android:padding="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.cardview.widget.CardView
+            android:id="@+id/ivCard"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:gravity="center"
             android:layout_margin="4dp"
-            app:cardCornerRadius="10dp"
+            android:background="@color/color_gray"
+            android:gravity="center"
             android:visibility="visible"
-            android:background="@color/white">
+            app:cardCornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cbSelect"
+            app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/imageProduct"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
                 android:src="@drawable/product" />
+
             <com.github.ybq.android.spinkit.SpinKitView
                 android:id="@+id/progressBar"
+                style="@style/SpinKitView.Small.Circle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                style="@style/SpinKitView.Small.Circle"
-                android:visibility="gone"
-                android:padding="8dp">
-
-            </com.github.ybq.android.spinkit.SpinKitView>
+                android:padding="8dp"
+                android:visibility="gone" />
 
         </androidx.cardview.widget.CardView>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/productName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:layout_marginLeft="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:maxLines="2"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tvSoldQuantity"
+            app:layout_constraintEnd_toStartOf="@id/llPerUnitSold"
+            app:layout_constraintStart_toEndOf="@+id/ivCard"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
 
-            <TextView
-                android:id="@+id/productName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:maxWidth="200dp"
-                android:text=""
-                android:textColor="@color/black"
-                android:textSize="12sp"
-                android:textStyle="bold">
-
-            </TextView>
-            <TextView
-                android:id="@+id/tvSoldQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:gravity="center_vertical"
-                android:visibility="visible"
-                android:text=""
-                android:textStyle="bold"
-                android:textColor="@color/cnl_color_2"
-                android:textSize="10sp">
-
-            </TextView>
-        </LinearLayout>
         <TextView
-            android:id="@+id/tvPerUnitSold"
+            android:id="@+id/tvSoldQuantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/shops_ordered_this_month"
+            android:textColor="@color/cnl_color_2"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llPerUnitSold"
+            app:layout_constraintStart_toEndOf="@+id/ivCard"
+            app:layout_constraintTop_toBottomOf="@+id/productName"
+            tools:ignore="SmallSp" />
+
+        <LinearLayout
+            android:id="@+id/llPerUnitSold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:layout_marginRight="8dp"
             android:background="@drawable/cardview_bg"
-            android:textColor="@color/text_title"
-            android:text="0.0"
-            android:textStyle="bold"
-            android:textSize="12sp"/>
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/etPerUnitSold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="2"
+                android:gravity="center"
+                android:imeOptions="actionNext"
+                android:inputType="numberDecimal"
+                android:maxEms="5"
+                android:padding="0dp"
+                android:text="@string/_0_0"
+                android:textColor="@color/text_title"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvPerUnitSold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="3"
+                android:gravity="center"
+                android:imeOptions="actionNext"
+                android:inputType="numberDecimal"
+                android:maxEms="5"
+                android:text="@string/_0_0"
+                android:textColor="@color/text_title"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvPerUnit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
