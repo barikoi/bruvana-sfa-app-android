@@ -1,75 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_app"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginTop="24dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
                 android:gravity="start"
-                android:textStyle="bold"
-                android:textSize="15sp"
+                android:text="@string/date_range"
                 android:textColor="@color/text_title"
-                android:text="@string/date_range">
-            </TextView>
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/dateRangeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                app:cardCornerRadius="5dp"
                 android:background="@null"
                 android:backgroundTint="@color/white"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:cardCornerRadius="5dp">
+
                 <TextView
                     android:id="@+id/tvDateRange"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginBottom="8dp"
                     android:drawableLeft="@drawable/ic_date_range"
                     android:drawablePadding="4dp"
                     android:gravity="start"
                     android:text=""
                     android:textColor="@color/text_title_2"
-                    android:textSize="14sp">
+                    android:textSize="14sp" />
 
-                </TextView>
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/historyListView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/single_attendance_history">
-
-            </androidx.recyclerview.widget.RecyclerView>
+                tools:listitem="@layout/single_attendance_history" />
 
         </LinearLayout>
 
     </ScrollView>
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar"
+        style="@style/SpinKitView.Large.Circle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="8dp"
+        android:visibility="visible"
+        app:SpinKit_Color="@color/cnl_color_1" />
+
 </RelativeLayout>

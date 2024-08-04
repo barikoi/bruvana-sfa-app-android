@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_app"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     tools:context=".Order_Create.Fragment.ShopSelectFragment">
+
     <RelativeLayout
         android:id="@+id/shopLayout"
         android:layout_width="match_parent"
@@ -14,94 +15,98 @@
         android:layout_marginTop="8dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
+
         <TextView
             android:id="@+id/selectedShop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_gravity="center"
-            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_toStartOf="@+id/layoutDistance"
+            android:layout_toLeftOf="@+id/layoutDistance"
             android:drawableLeft="@drawable/ic_shop_small"
             android:drawablePadding="8dp"
             android:text=""
-            android:textSize="17sp"
             android:textColor="@color/text_title"
-            android:textStyle="bold"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="8dp"
-            android:layout_toLeftOf="@+id/layoutDistance">
+            android:textSize="17sp"
+            android:textStyle="bold"/>
 
-        </TextView>
+
         <LinearLayout
             android:id="@+id/layoutDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="end"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true">
+            android:layout_alignParentRight="true"
+            android:gravity="end"
+            android:orientation="vertical">
+
             <TextView
                 android:id="@+id/tvdistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:elevation="10dp"
                 android:background="@drawable/cardview_bg_stroke_2dp"
                 android:backgroundTint="@color/white"
+                android:elevation="10dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="4dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="4dp"
                 android:text=""
-                android:textSize="12sp"
-                android:textColor="@color/status_bounced"
                 android:textAllCaps="false"
-                android:textStyle="bold"
-                android:layout_marginRight="8dp">
+                android:textColor="@color/status_bounced"
+                android:textSize="12sp"
+                android:textStyle="bold">
 
             </TextView>
+
             <TextView
                 android:id="@+id/tvdistanceRaw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:visibility="gone"
-                android:elevation="10dp"
                 android:background="@drawable/cardview_bg_stroke_2dp"
                 android:backgroundTint="@color/color_gray"
+                android:elevation="10dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="4dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="4dp"
                 android:text=""
-                android:textSize="12sp"
-                android:textColor="@color/status_bounced"
                 android:textAllCaps="false"
+                android:textColor="@color/status_bounced"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                android:layout_marginRight="8dp">
+                android:visibility="gone">
 
             </TextView>
         </LinearLayout>
 
     </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/locationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/shopLayout"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -125,11 +130,11 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginEnd="8dp"
-            android:scaleType="centerCrop"
+            android:layout_marginRight="8dp"
             android:background="@null"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_refresh"
-            app:tint="@color/text_title"
-            android:layout_marginRight="8dp">
+            app:tint="@color/text_title">
 
         </ImageButton>
     </LinearLayout>
@@ -138,72 +143,74 @@
         android:id="@+id/minOV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/locationView"
-        android:text="Min Order Value"
-        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:text="@string/min_order_value"
         android:textColor="@color/cnl_color_1"
-        android:textSize="13sp">
+        android:textSize="13sp"
+        android:textStyle="bold">
 
     </TextView>
+
     <AutoCompleteTextView
         android:id="@+id/editTextSearchProduct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:padding="10dp"
         android:layout_below="@+id/minOV"
         android:layout_gravity="center_vertical"
-        android:ems="10"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/stroke_background"
+        android:backgroundTint="@color/white"
         android:drawableRight="@drawable/ic_search"
         android:drawablePadding="8dp"
         android:drawableTint="@color/color_gray"
+        android:ems="10"
         android:hint="@string/search_product"
         android:imeOptions="actionNext"
         android:inputType="textCapWords"
-        android:background="@drawable/stroke_background"
-        android:backgroundTint="@color/white"
-        android:textSize="12sp"
-        />
+        android:padding="10dp"
+        android:textSize="12sp" />
+
     <LinearLayout
         android:id="@+id/sortingLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_below="@+id/editTextSearchProduct"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/rounded_corner_lightgray"
-        android:padding="4dp"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="8dp"
+        android:background="@drawable/rounded_corner_lightgray"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:layout_alignParentRight="true">
+        android:padding="4dp">
 
         <TextView
             android:id="@+id/sortTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_marginStart="8dp"
-            android:padding="4dp"
-            android:textSize="12sp"
-            android:textColor="@color/text_title"
-            android:text="@string/sort_by"
-            android:textStyle="bold"
-            android:layout_marginEnd="4dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="4dp">
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="@string/sort_by"
+            android:textColor="@color/text_title"
+            android:textSize="12sp"
+            android:textStyle="bold">
 
         </TextView>
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_sortby"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="4dp"
-            app:tint="@color/text_title"
+            android:layout_marginLeft="4dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginLeft="4dp">
+            android:src="@drawable/ic_sortby"
+            app:tint="@color/text_title">
 
         </ImageView>
     </LinearLayout>
@@ -212,8 +219,8 @@
         android:id="@+id/productlist"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@+id/sortingLayout"
         android:layout_above="@+id/orderSummary"
+        android:layout_below="@+id/sortingLayout"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@color/background_app"
@@ -226,111 +233,118 @@
         android:id="@+id/orderSummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="4dp"
         android:layout_above="@+id/buttonLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:layout_alignParentEnd="true"
         android:background="@drawable/button_bg_green_stroke"
-        android:layout_alignParentRight="true">
+        android:padding="4dp">
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:paddingRight="16dp"
+            android:background="@drawable/button_bg_green_stroke"
             android:paddingLeft="16dp"
-            android:background="@drawable/button_bg_green_stroke">
-        <TextView
-            android:id="@+id/totalItemCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_marginRight="8dp"
-            android:textColor="@color/white"
-            android:text="0 Item"
-            android:textStyle="bold"
-            android:textSize="12sp"
-            android:layout_alignParentLeft="true" />
-        <View
-            android:id="@+id/dash"
-            android:layout_width="1dp"
-            android:layout_height="20dp"
-            android:layout_margin="2dp"
-            android:layout_centerVertical="true"
-            android:background="@color/white"
-            android:layout_toRightOf="@+id/totalItemCount">
+            android:paddingTop="4dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="4dp">
 
-        </View>
+            <TextView
+                android:id="@+id/totalItemCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="0 Item"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/totalAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:layout_toRightOf="@+id/dash"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="Total 0.0 "
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            <View
+                android:id="@+id/dash"
+                android:layout_width="1dp"
+                android:layout_height="20dp"
+                android:layout_centerVertical="true"
+                android:layout_margin="2dp"
+                android:layout_toRightOf="@+id/totalItemCount"
+                android:background="@color/white">
+
+            </View>
+
+            <TextView
+                android:id="@+id/totalAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:layout_toRightOf="@+id/dash"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="Total 0.0 "
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </RelativeLayout>
     </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:visibility="invisible"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="invisible">
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/no_order"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:text="@string/no_order"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:textAllCaps="false"
-            android:textStyle="bold"
             android:background="@drawable/button_white_bg_stroke"
-            android:backgroundTint="@color/btn_no_order">
+            android:backgroundTint="@color/btn_no_order"
+            android:text="@string/no_order"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold">
 
         </androidx.appcompat.widget.AppCompatButton>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/save_order"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:text="@string/confirm_order"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAllCaps="false"
             android:background="@drawable/button_white_bg_stroke"
-            android:backgroundTint="@color/cnl_color_1">
+            android:backgroundTint="@color/cnl_color_1"
+            android:text="@string/confirm_order"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold">
 
         </androidx.appcompat.widget.AppCompatButton>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/update_order"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:visibility="gone"
-            android:text="@string/update_order"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAllCaps="false"
             android:background="@drawable/button_white_bg_stroke"
-            android:backgroundTint="@color/cnl_color_1">
+            android:backgroundTint="@color/cnl_color_1"
+            android:text="@string/update_order"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone">
 
         </androidx.appcompat.widget.AppCompatButton>
     </LinearLayout>
@@ -340,8 +354,8 @@
         style="@style/SpinKitView.Large.ThreeBounce"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
         android:visibility="gone"
         app:SpinKit_Color="@color/cnl_color_1" />
 </RelativeLayout>

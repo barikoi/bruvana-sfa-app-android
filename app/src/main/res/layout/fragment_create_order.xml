@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/createOrder"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:id="@+id/createOrder"
     tools:context=".Order_Create.Fragment.CreateOrderFragment">
+
     <RelativeLayout
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="16dp"
+        android:background="@color/background_app"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:background="@color/background_app">
+        android:visibility="gone">
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/viewpagertabOrder"
             style="@style/TabLayoutStyle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:layout_alignParentTop="true"
             android:background="@drawable/cardview_bg"
-            app:tabIndicatorHeight="30dp"
-            app:tabIndicatorGravity="center"
+            android:elevation="2dp"
             app:tabIndicator="@drawable/tab_selected"
             app:tabIndicatorColor="@color/cnl_color_1"
-            android:layout_alignParentTop="true"
+            app:tabIndicatorGravity="center"
+            app:tabIndicatorHeight="30dp"
+            app:tabInlineLabel="true"
             app:tabMinWidth="120dp"
             app:tabMode="fixed"
-            android:elevation="2dp"
-            app:tabInlineLabel="true"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/text_title" />
 
@@ -37,51 +39,54 @@
             android:id="@+id/viewPager3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/viewpagertabOrder"
-            />
+            android:layout_below="@+id/viewpagertabOrder" />
 
     </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/no_route_check"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/no_route_selected_today"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:textSize="17sp"
-            android:textColor="@color/text_title">
+            android:gravity="center_horizontal"
+            android:text="@string/no_route_selected_today"
+            android:textColor="@color/text_title"
+            android:textSize="17sp">
 
         </TextView>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tryAgain"
             android:layout_width="100dp"
             android:layout_height="36dp"
-            android:layout_margin="4dp"
-            android:layout_gravity="center_horizontal"
             android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="4dp"
             android:background="@drawable/cardview_bg"
             android:backgroundTint="@color/color_gray"
             android:padding="2dp"
+            android:text="@string/refresh"
             android:textAllCaps="false"
             android:textColor="@color/text_title"
-            android:textStyle="bold"
             android:textSize="12sp"
-            android:text="@string/refresh" />
+            android:textStyle="bold" />
     </LinearLayout>
+
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBarOrder"
         style="@style/SpinKitView.Large.Circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:padding="8dp"
         android:visibility="visible"
-        android:layout_centerInParent="true"
         app:SpinKit_Color="@color/cnl_color_1" />
 </RelativeLayout>

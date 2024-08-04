@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/bodyLayout"
@@ -25,13 +25,13 @@
             android:drawablePadding="8dp"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:visibility="gone"
             android:maxWidth="250dp"
             android:maxLines="2"
             android:text=""
             android:textColor="@color/black"
             android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/orderListView"
@@ -39,9 +39,9 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/tvRouteName"
             android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="16dp"
-            android:layout_marginTop="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/single_order_delivery_status_view">
 
@@ -55,42 +55,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/no_order_found"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:textSize="17sp"
-            android:textColor="@color/text_title">
+            android:gravity="center_horizontal"
+            android:text="@string/no_order_found"
+            android:textColor="@color/text_title"
+            android:textSize="17sp">
 
         </TextView>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tryAgain"
             android:layout_width="100dp"
             android:layout_height="36dp"
-            android:layout_margin="4dp"
-            android:layout_gravity="center_horizontal"
             android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="4dp"
             android:background="@drawable/cardview_bg"
             android:backgroundTint="@color/color_gray"
             android:padding="2dp"
+            android:text="@string/refresh"
             android:textAllCaps="false"
             android:textColor="@color/text_title"
-            android:textStyle="bold"
             android:textSize="12sp"
-            android:text="@string/refresh" />
+            android:textStyle="bold" />
     </LinearLayout>
+
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar1"
         style="@style/SpinKitView.Large.ThreeBounce"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
         android:visibility="visible"
         app:SpinKit_Color="@color/cnl_color_1" />
 </RelativeLayout>
