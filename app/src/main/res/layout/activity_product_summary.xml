@@ -1,157 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_app"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        app:elevation="0dp">
+    android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:contentInsetRight="0dp"
-            app:contentInsetEnd="0dp"
-            android:background="@color/background_app">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-                <ImageButton
-                    android:id="@+id/btnBack"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_centerVertical="true"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/ic_back">
-
-                </ImageButton>
-                <TextView
-                    android:id="@+id/tvTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_centerVertical="true"
-                    android:textStyle="bold"
-                    android:textSize="17sp"
-                    android:visibility="visible"
-                    android:textColor="@color/text_title"
-                    android:text="@string/title_product_summary">
-
-                </TextView>
-
-            </RelativeLayout>
-
-        </androidx.appcompat.widget.Toolbar>
-
-
-    </com.google.android.material.appbar.AppBarLayout>
-    <!--<TextView
-        android:id="@+id/titleRoute"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
-        android:gravity="start"
-        android:textStyle="bold"
-        android:textSize="15sp"
-        android:textColor="@color/text_title"
-        android:text="@string/todays_route">
-    </TextView>-->
     <RelativeLayout
         android:id="@+id/spinnerLayoutRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/appbar"
-        android:padding="8dp"
-        android:layout_margin="8dp"
         android:layout_gravity="center_vertical"
-        android:visibility="gone"
-        android:background="@drawable/cardview_bg">
+        android:layout_margin="8dp"
+        android:background="@drawable/cardview_bg"
+        android:padding="8dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
         <com.barikoi.cnlapp.utils.MoreSpinner
             android:id="@+id/spinnerDistributorHouse"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:theme="@style/spinnerItemStyle"
-            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
-        </com.barikoi.cnlapp.utils.MoreSpinner>
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
     </RelativeLayout>
+
     <TextView
         android:id="@+id/titleDateRange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="4dp"
+        android:layout_marginRight="8dp"
         android:layout_marginBottom="4dp"
-        android:layout_below="@+id/spinnerLayoutRoute"
         android:gravity="start"
-        android:textStyle="bold"
-        android:textSize="15sp"
+        android:text="@string/date_range"
         android:textColor="@color/text_title"
-        android:text="@string/date_range">
-    </TextView>
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerLayoutRoute" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/dateRangeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/titleDateRange"
-        android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        app:cardCornerRadius="5dp"
         android:background="@null"
         android:backgroundTint="@color/white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:cardCornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleDateRange">
+
         <TextView
             android:id="@+id/tvDateRange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="8dp"
-            android:drawableLeft="@drawable/ic_date_range"
+            android:drawableStart="@drawable/ic_date_range"
             android:drawablePadding="4dp"
             android:gravity="start"
             android:text=""
             android:textColor="@color/text_title_2"
-            android:textSize="14sp">
+            android:textSize="14sp" />
 
-        </TextView>
     </androidx.cardview.widget.CardView>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/productList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dateRangeLayout"
-        android:layout_marginBottom="40dp"
-        android:layout_margin="8dp"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/product_view_stock">
 
-    </androidx.recyclerview.widget.RecyclerView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvProductList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@+id/dateRangeLayout"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="40dp"
+        android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateRangeLayout"
+        tools:listitem="@layout/product_view_stock" />
+
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar"
         style="@style/SpinKitView.Large.Circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:padding="8dp"
         android:visibility="visible"
-        android:layout_centerInParent="true"
-        app:SpinKit_Color="@color/cnl_color_1" />
-</RelativeLayout>
+        app:SpinKit_Color="@color/cnl_color_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
