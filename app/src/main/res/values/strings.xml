@@ -34,7 +34,7 @@
     <string name="upload_photo">Upload Photo</string>
     <string name="todays_route">Today\'s Route</string>
     <string name="remarks_late_reason">Remarks/ Late Reason</string>
-    <string name="type_your_reason_here">Type your reason here...</string>
+    <string name="type_your_reason_here">Type your reason here…</string>
 
     <string name="most_frequent">Most Frequent</string>
     <string name="high_stock">High Stock</string>
@@ -123,9 +123,10 @@
     <string name="details">Details</string>
     <string name="start_ordering">Start Ordering</string>
     <string name="total">Total-</string>
-    <string name="last_order_date">Last order date- </string>
+    <string name="last_order_date">Last order date- %1$s</string>
     <string name="last_delivery_date">Last delivery date- </string>
     <string name="items">Items</string>
+    <string name="items_"> %1$s Items</string>
     <string name="ordered_at">Ordered at- </string>
 
     <string name="no_route_selected_today">Today\'s route not selected yet. \nSubmit your attendance for route selection.</string>
@@ -158,7 +159,7 @@
     <string name="update_order">Update Order</string>
     <string name="add_more_item">Add More Item</string>
     <string name="download_chalan">Download Chalan</string>
-    <string name="confirm_order_dialog">Are you sure want to confirm todays order?</string>
+    <string name="confirm_order_dialog">Are you sure want to confirm today\'s order?</string>
     <string name="update_order_dialog">Are you sure want to update this order?</string>
     <string name="order_summary">Order Summary</string>
     <string name="order_delivery_update">Order Delivery Update</string>
@@ -177,7 +178,7 @@
 
     <string name="total_bounce">Total Bounce</string>
     <string name="bounce_reason">Reason of Bounce</string>
-    <string name="product_return_reason">Product return reason...</string>
+    <string name="product_return_reason">Product return reason…</string>
 
     <string name="no_order_to_download_chalan">No order to download Chalan</string>
 
@@ -187,10 +188,10 @@
     <string name="lwsd">LWSD</string>
 
     <!--notice view-->
-    <string name="see_more">See More...</string>
-    <string name="see_less">See Less...</string>
+    <string name="see_more">See More…</string>
+    <string name="see_less">See Less…</string>
     <string name="add_notice">Add Notice</string>
-    <string name="type_notice_here">Type notice here...</string>
+    <string name="type_notice_here">Type notice here…</string>
 
     <!--create shop-->
     <string name="new_shop_creation">New Shop Creation</string>
@@ -217,8 +218,6 @@
 
     <!--imageCapture-->
     <string name="take_image">Take Image</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="km">%1$s km</string>
     <string name="not_available">Not Available</string>
 
@@ -234,12 +233,80 @@
     <string name="failure_not_found">Not found.</string>
     <string name="failure_too_many_request">Too many request.</string>
     <string name="failure_unauthorized_error">Unauthorized error.</string>
-
     <string name="failure_failed_to_cache">Failed to cache.</string>
+
+
     <string name="location">Location</string>
     <string name="outlet_s">%1$s Outlet(s)</string>
     <string name="select_date_range">Select date range</string>
     <string name="date_range_">%1$s - %2$s</string>
     <string name="logo">logo</string>
+    <string name="shop_image">Shop Image</string>
+    <string name="order_complete_image">Order Complete Image</string>
+    <string name="_1_box">1 Box</string>
+
+
+    <string name="category">Category</string>
+    <string name="total_outlet">Total Outlet</string>
+    <string name="order_done">Order Done</string>
+    <string name="order_value">Order Value</string>
+    <string name="total_order">Total</string>
+    <string name="select_a_date">SELECT A DATE</string>
+    <string name="request_timeout_check_your_internet_connection_or_contact_admin">Request timeout!! Check your internet connection or Contact Admin</string>
+    <string name="deli_done">Deli Done</string>
+    <string name="deli_value">Deli Value</string>
+    <string name="away_from">" away from "</string>
+    <string name="language">Language</string>
+    <string name="edit">Edit</string>
+    <string name="version">version %1$s</string>
+    <string name="bounce_item">Bounce Item</string>
+
+    <string name="min_order_value">Min Order Value: %1$s</string>
+    <string name="_0_0">0.0</string>
+    <string name="total_">Total %1$s</string>
+
+    <string name="jar_box">Jar/box</string>
+    <string name="territory_name">Territory Name</string>
+    <string name="shop_type">Shop Type</string>
+    <string name="distributor">distributor</string>
+    <string name="_0_item">0 Item</string>
+    <string name="order">Order</string>
+    <string name="location_not_found">Location not found.</string>
+    <string name="category_">"Category: %1$s"</string>
+    <string name="title_product_stock_request">Request</string>
+    <string name="request">Stock Request</string>
+    <string name="product_name">Product Name:</string>
+    <string name="quantity">Quantity:</string>
+    <string name="confirm_request">Confirm Request</string>
+    <string name="approved">Approved</string>
+    <string name="_0">0</string>
+    <string name="title_approval">Approval</string>
+    <string name="shohel_rana_is_requesting_you_for_product_request_approval"><b>Shohel Rana</b> is requesting you for <b>Product Request</b> approval</string>
+    <string name="upload_image_for_attendance">Upload image for attendance</string>
+    <string name="select_route_for_check_in">Select route for check in</string>
+    <string name="notifications">Notifications</string>
+    <string name="image">Image</string>
+    <string name="you_are">"You are "</string>
+    <string name="selected_image">Selected Image</string>
+    <string name="image_pic">Image Pic</string>
+    <string name="close">Close</string>
+    <string name="and_selecting_no_order">" and selecting No Order"</string>
+    <string name="capture_photo">Capture Photo</string>
+    <string name="meter">%1$s m</string>
+    <string name="no_products_selected_to_order">No products selected to order</string>
+    <string name="kindly_wait_for_distance_to_be_updated">Kindly wait for distance to be updated</string>
+    <string name="selected">"%1$s Selected"</string>
+    <string name="are_you_sure_you_want_to_sent_stock_request">Are you sure you want to send the stock request?</string>
+    <string name="notification_empty">Notification Empty!</string>
+    <string name="select_all">Select All</string>
+    <string name="clear">Clear</string>
+    <string name="decline">Decline</string>
+    <string name="approve">Approve</string>
+    <string name="remarks">Remarks</string>
+    <string name="product_stock_request">Product Stock Request</string>
+    <string name="name">Name</string>
+    <string name="db_house">DB House</string>
+    <string name="new_notice">New Notice</string>
+    <string name="send_stock_request">Send Stock Request</string>
 
 </resources>
