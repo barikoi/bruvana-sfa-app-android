@@ -18,6 +18,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.TradeOffers.Adapter.TradeOfferListAdapter
 import com.barikoi.cnlapp.TradeOffers.Model.ProductAll
 import com.barikoi.cnlapp.TradeOffers.Model.TradeProduct
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -26,7 +27,7 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import kotlinx.android.synthetic.main.activity_trade_offers.*
 import org.json.JSONObject
 
-class TradeOffersActivity : AppCompatActivity() {
+class TradeOffersActivity : BaseActivity() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
