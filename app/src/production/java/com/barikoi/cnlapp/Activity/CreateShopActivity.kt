@@ -147,7 +147,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
         imagepicker.taskId = "taskId"
         imagepicker.CAMERA = 4
-        imagepicker.setMainactivity(this@CreateShopActivity)
+        imagepicker.setMainActivity(this@CreateShopActivity)
         imagepicker.setCameraLauncher(startCamera)
 
         routesList = intent.getStringArrayListExtra("routes")
@@ -181,8 +181,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
 
         btnBack.setOnClickListener {
-            //setResult(55)
-            finish()
             onBackPressed()
         }
 
@@ -392,7 +390,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 } else {
                     imagePosition + 1
                 }
-                imagepicker.AddNewImage(
+                imagepicker.addNewImage(
                     result.data,
                     CAMERA,
                     imagePosition,

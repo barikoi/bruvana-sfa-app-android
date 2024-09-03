@@ -32,6 +32,7 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.utils.*
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -61,6 +62,7 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
+import io.sentry.protocol.App
 import kotlinx.android.synthetic.main.activity_create_shop.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -73,7 +75,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 
-class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
+class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListener {
     private var mapView: MapView? = null
     private var mMap: MapboxMap? = null
     lateinit var fab: FloatingActionButton
@@ -100,8 +102,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var selectedBuyer: Int? = -1
     private var inputVerified: Int? = 0
 
-    var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
-    var routesList: ArrayList<String>? = ArrayList()
+    private var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+    private var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,7 +125,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         gd.setStroke(2, resources.getColor(R.color.required_field))
 
         spinnerLayoutRoutes.setBackgroundDrawable(gd)
-        //imagepickerLayout.setBackgroundDrawable(gd)
         etShopName.setBackgroundDrawable(gd)
         spinnerLayoutType.setBackgroundDrawable(gd)
         spinnerLayoutCategory.setBackgroundDrawable(gd)
@@ -147,7 +148,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
         imagepicker.taskId = "taskId"
         imagepicker.CAMERA = 4
-        imagepicker.setMainactivity(this@CreateShopActivity)
+        imagepicker.setMainActivity(this@CreateShopActivity)
         imagepicker.setCameraLauncher(startCamera)
 
         routesList = intent.getStringArrayListExtra("routes")
@@ -270,7 +271,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun generateImages(imageArray: ArrayList<String>) {
 
-        if (!imageArray.isEmpty()) {
+        if (imageArray.isNotEmpty()) {
             imageViewScroll.visibility = View.VISIBLE
             val layout = findViewById<View>(R.id.imageViewLayout) as LinearLayout
             for (i in 0 until imageArray.size) {
@@ -280,7 +281,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 image.maxWidth = 200
                 val p = layout.layoutParams as ViewGroup.MarginLayoutParams
                 p.setMargins(8, 8, 4, 8)
-                Log.d("CreateShopActivity", imageArray.get(i))
+                Log.d("CreateShopActivity", imageArray[i])
                 image.layoutParams = p
                 Glide.with(applicationContext)
                     .load(imageArray.get(i))
@@ -309,9 +310,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         .load(imageArray.get(i))
                         .thumbnail(.2.toFloat())
                         .into(ivPreview)
-                    btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
-                    val pAttacher: PhotoViewAttacher
-                    pAttacher = PhotoViewAttacher(ivPreview)
+                    btnClose.setOnClickListener { nagDialog.dismiss() }
+                    val pAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
                     nagDialog.show()
                 }
@@ -321,9 +321,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun getImageFromDB() {
         appDatabase!!.imagesDao()!!.deleteAllImages()
-        var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
-        imageList =
-            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
+        val imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
         if (imageList!!.size > 0) {
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
@@ -360,65 +358,60 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
     }
 
-    var startCamera = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-        ActivityResultCallback<ActivityResult> { result ->
-            val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
-            if (result.getResultCode() == RESULT_CANCELED) {
-                if (filePath != null) {
-                    Log.d("Image", "Canceled: $filePath")
-                    imagepicker.deleteFileLocal(filePath)
+    private var startCamera = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+        if (result.resultCode == RESULT_CANCELED) {
+            if (filePath != null) {
+                Log.d("Image", "Canceled: $filePath")
+                imagepicker.deleteFileLocal(filePath)
+                editor!!.putString(ApiCall.IMAGE_PATH, "")
+                editor!!.apply()
+            }
+        }
+        if (result.resultCode == RESULT_OK) {
+            Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
+            var imagePosition = 0
+            var imageList: ArrayList<Images?>? = java.util.ArrayList()
+            imageList = appDatabase!!.imagesDao()!!
+                .getAllImageDB("Shop") as ArrayList<Images?>?
+            imageCounter.visibility = View.VISIBLE
+            imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
+
+            Log.d("Imagepos", "List: $imageList")
+            imagePosition = if (imageList.size > 0) {
+                imageList[imageList.size - 1]!!.position + 1
+            } else {
+                imagePosition + 1
+            }
+            imagepicker.addNewImage(
+                result.data,
+                CAMERA,
+                imagePosition,
+                "Shop",
+                prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+            )
+            try {
+                val placeImage = Images(
+                    null, imagePosition,
+                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
+                )
+                isImageAdded = true
+                if (imagePosition > 0) {
+                    Log.d("Imagepos", "insert")
+                    Executors.newSingleThreadExecutor().execute {
+                        appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                    }
                     editor!!.putString(ApiCall.IMAGE_PATH, "")
                     editor!!.apply()
                 }
+            } catch (e: java.lang.Exception) {
+                Log.e("imageUtils", "OnActivity result 2: $e")
+                Sentry.captureException(e)
             }
-            if (result.getResultCode() == RESULT_OK) {
-                Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
-                var imagePosition = 0
-                var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
-                imageList = appDatabase!!.imagesDao()!!
-                    .getAllImageDB("Shop") as java.util.ArrayList<Images?>?
-                imageCounter.visibility = View.VISIBLE
-                imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
-                /*if (imageList!!.size > 0){
-                    imageCounter.visibility = View.VISIBLE
-                    imageCounter.text = (imageList.size+1).toString() + " Photos Added"
-                }else{
-                    imageCounter.visibility = View.GONE
-                }*/
-                Log.d("Imagepos", "List: $imageList")
-                imagePosition = if (imageList!!.size > 0) {
-                    imageList[imageList.size - 1]!!.position + 1
-                } else {
-                    imagePosition + 1
-                }
-                imagepicker.AddNewImage(
-                    result.data,
-                    CAMERA,
-                    imagePosition,
-                    "Shop",
-                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
-                )
-                try {
-                    val placeImage = Images(
-                        null, imagePosition,
-                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
-                    )
-                    isImageAdded = true
-                    if (imagePosition > 0) {
-                        Log.d("Imagepos", "insert")
-                        Executors.newSingleThreadExecutor().execute {
-                            appDatabase!!.imagesDao()!!.insertAll(placeImage)
-                        }
-                        editor!!.putString(ApiCall.IMAGE_PATH, "")
-                        editor!!.apply()
-                    }
-                } catch (e: java.lang.Exception) {
-                    Log.e("imageUtils", "OnActivity result 2: $e")
-                    Sentry.captureException(e)
-                }
-            }
-        })
+        }
+    }
 
     fun getRoutes() {
         ApiServices.apiGET(
@@ -552,7 +545,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             })
     }
 
-    fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>) {
+    private fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>) {
         var storedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
         if (spinnerRoutes != null) {
             if (spinnerRoutes.adapter == null) {
@@ -598,13 +591,13 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         p3: Long
                     ) {
                         if (p0 != null) {
-                            if (storedRoute.length > 0) {
+                            if (storedRoute.isNotEmpty()) {
                                 if (spinnerRoutes.adapter.count > 0) {
                                     val pos =
                                         (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(
                                             storedRoute
                                         )
-                                    Log.e("RouteList", "selectedRoute pos " + pos)
+                                    Log.e("RouteList", "selectedRoute pos $pos")
                                     Log.e(
                                         "RouteList",
                                         "selectedRoute count " + spinnerRoutes.adapter.count
@@ -619,10 +612,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                 if (p2 > 0) {
                                     val view1: TextView = p0.getChildAt(0) as TextView
                                     view1.setTextColor(resources.getColor(R.color.black))
-                                    if (routeNameList[p2].first.length > 0) {
-                                        selectedRoute = routeNameList[p2].first
-                                    } else {
-                                        selectedRoute = ""
+                                    selectedRoute = routeNameList[p2].first.ifEmpty {
+                                        ""
                                     }
                                 } else {
                                     val view1: TextView = p0.getChildAt(0) as TextView
@@ -640,7 +631,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 }
 
             if (shops != null) {
-                if (shops!!.route_name.length > 0) {
+                if (shops!!.route_name.isNotEmpty()) {
                     val pos =
                         (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
                     if (pos > -1) {
@@ -652,10 +643,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
     }
 
-    fun getShopType() {
+    private fun getShopType() {
         ApiServices.apiGET(Api.get_shop_type, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 if (response != null) {
+                    AppLogger.log("ShopType:: $response")
                     try {
                         val typeList: ArrayList<String> = ArrayList()
                         val obj = JSONObject(response)
@@ -725,7 +717,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                     }
 
                                 if (shops != null) {
-                                    if (shops!!.shop_type.length > 0) {
+                                    if (shops!!.shop_type.isNotEmpty()) {
                                         val pos =
                                             (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(
                                                 shops!!.shop_type
@@ -764,7 +756,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         })
     }
 
-    fun getShopCategory() {
+    private fun getShopCategory() {
         ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 if (response != null) {
@@ -988,7 +980,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         })
     }
 
-    fun getBuyer() {
+    private fun getBuyer() {
         val buyerList: ArrayList<String> = ArrayList()
         buyerList.add(resources.getString(R.string.select_buyer))
         buyerList.add(resources.getString(R.string.yes))
