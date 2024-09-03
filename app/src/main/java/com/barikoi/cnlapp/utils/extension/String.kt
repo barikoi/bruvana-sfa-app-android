@@ -1,6 +1,10 @@
 package com.barikoi.cnlapp.utils.extension
 
+import android.annotation.SuppressLint
 import androidx.compose.ui.text.intl.Locale
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.Date
 
 
 fun String.englishToBanglaNumber(): String {
@@ -23,4 +27,12 @@ fun String.englishToBanglaNumber(): String {
         banglaNumber += banglaNumerals[digit.toString()] ?: digit // Use original digit if not found
     }
     return banglaNumber
+}
+
+@SuppressLint("SimpleDateFormat")
+fun String.convertDate(): String? {
+    val instant: Instant = Instant.parse(this)
+    val myDate = Date.from(instant)
+    val formatter = SimpleDateFormat("dd MMMM, yyyy HH:mm")
+    return formatter.format(myDate)
 }
