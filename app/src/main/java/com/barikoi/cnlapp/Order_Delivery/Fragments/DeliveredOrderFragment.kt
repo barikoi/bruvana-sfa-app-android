@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -17,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -39,13 +37,12 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.databinding.FragmentDeliveredOrderBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.activity_order_delivery_update.*
-import kotlinx.android.synthetic.main.fragment_delivered_order.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -55,10 +52,7 @@ import java.util.*
 
 class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var binding: FragmentDeliveredOrderBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,10 +66,20 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter.filter(s)
                 if (s!!.length == 0) {
-                    if (sr_id!!.length == 0){
-                        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED&include_filter_by_user_id=1", queue!!, token!!, mCallback2!!)
-                    }else{
-                        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&order_status=DELIVERED", queue!!, token!!, mCallback2!!)
+                    if (sr_id!!.length == 0) {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
+                            queue!!,
+                            token!!,
+                            mCallback2!!
+                        )
+                    } else {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=DELIVERED",
+                            queue!!,
+                            token!!,
+                            mCallback2!!
+                        )
                     }
                 }
 
@@ -91,23 +95,21 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_delivered_order, container, false)
-        recylerView = view.findViewById(R.id.orderListView)
-        progressBar = view.findViewById(R.id.progressBar_2)
-        return view
+    ): View {
+        binding = FragmentDeliveredOrderBinding.inflate(inflater, container, false)
+        return binding.root
     }
-    companion object{
+
+    companion object {
         var mCallback2: OrderListSuccessListener? = DeliveredOrderFragment()
         var recylerView: RecyclerView? = null
         var progressBar: ProgressBar? = null
         lateinit var ACTIVITY: OrderDeliveryUpdateActivity
-        var token : String? = null
-        var user_id : String? = null
-        var user_type : String? = null
-        var sr_id : String? = null
-        var territory_id : String? = null
+        var token: String? = null
+        var user_id: String? = null
+        var user_type: String? = null
+        var sr_id: String? = null
+        var territory_id: String? = null
         var route_id: String? = null
         private var prefs: SharedPreferences? = null
         private var editor: SharedPreferences.Editor? = null
@@ -118,29 +120,52 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         val orderList: ArrayList<OrderList> = ArrayList()
         lateinit var adapter: OrderDeliveryListAdapter
 
-        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, sr_id: String, territory_id: String, start: String, end: String) {
-            if (mCallback2!= null) {
-                if (sr_id.length == 0){
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=DELIVERED&include_filter_by_user_id=1", queue, token, mCallback2!!)
-                }else{
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+/*"&route_id="+route_id+*/"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=DELIVERED", queue, token, mCallback2!!)
+        fun checkforOrders(
+            queue: RequestQueue,
+            token: String,
+            user_id: String,
+            sr_id: String,
+            territory_id: String,
+            start: String,
+            end: String
+        ) {
+            if (mCallback2 != null) {
+                if (sr_id.length == 0) {
+                    getAllOrders(
+                        Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
+                        queue,
+                        token,
+                        mCallback2!!
+                    )
+                } else {
+                    getAllOrders(
+                        Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=DELIVERED",
+                        queue,
+                        token,
+                        mCallback2!!
+                    )
                 }
 
             }
 
         }
 
-        fun getAllOrders(url: String, queue: RequestQueue, token: String, callback: OrderListSuccessListener) {
+        fun getAllOrders(
+            url: String,
+            queue: RequestQueue,
+            token: String,
+            callback: OrderListSuccessListener
+        ) {
             ApiServices.apiGET(url, queue, token, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
-                        if (response != null){
+                        if (response != null) {
                             val obj = JSONObject(response)
                             val orderArray = obj.getJSONArray("orders")
                             callback.onSuccess(orderArray)
 
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
@@ -168,23 +193,23 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         progressBar!!.visibility = View.GONE
         orderList.clear()
         try {
-            if (array.length() > 0){
+            if (array.length() > 0) {
                 /*no_route_check.visibility = View.GONE
                 bodyLayout.visibility = View.VISIBLE*/
-                for (i in 0 until array.length()){
+                for (i in 0 until array.length()) {
                     val orderObj = array.getJSONObject(i)
-                    if (orderObj.getString("order_status").equals("DELIVERED", true)){
+                    if (orderObj.getString("order_status").equals("DELIVERED", true)) {
                         val brandArray = orderObj.getJSONArray("products")
                         //tvRouteName.setText(orderObj.getString("route_name"))
                         val productItems: ArrayList<Products> = ArrayList()
-                        if (brandArray.length() > 0){
-                            for (j in 0 until brandArray.length()){
+                        if (brandArray.length() > 0) {
+                            for (j in 0 until brandArray.length()) {
                                 val brandObj = brandArray.getJSONObject(j)
                                 var bounce = 0
-                                if (brandObj.has("bounced_quantity")){
+                                if (brandObj.has("bounced_quantity")) {
                                     bounce = brandObj.getInt("bounced_quantity")
                                 }
-                                if(brandObj.getInt("ordered_quantity") > 0) {
+                                if (brandObj.getInt("ordered_quantity") > 0) {
                                     productItems.add(
                                         Products(
                                             brandObj.getString("product_id"),
@@ -230,10 +255,10 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                         )
                     }
                 }
-            }else{
-                no_route_check.visibility = View.VISIBLE
-                bodyLayout.visibility = View.GONE
-                btn_tryAgain.setOnClickListener {
+            } else {
+                binding.noRouteCheck.visibility = View.VISIBLE
+                binding.bodyLayout.visibility = View.GONE
+                binding.btnTryAgain.setOnClickListener {
                     /*checkforOrders(
                         queue!!,
                         token!!,
@@ -250,13 +275,13 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             recylerView.apply {
                 if (user_type.equals("TO", true)) {
                     adapter = OrderDeliveryListAdapter(orderList, listener!!, "TO")
-                }else{
+                } else {
                     adapter = OrderDeliveryListAdapter(orderList, listener!!, "SO")
                 }
                 recylerView!!.adapter = adapter
                 adapter.notifyDataSetChanged()
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             ///Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
         }
@@ -271,6 +296,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
     override fun onDataSet(StartDate: Date, EndDate: Date) {
 
     }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
@@ -279,11 +305,11 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         token = prefs!!.getString(Api.TOKEN, "")
 
         user_type = prefs!!.getString(Api.USER_TYPE, "")
-        if (user_type.equals("TO", true)){
+        if (user_type.equals("TO", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
-        }else{
+        } else {
             sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
             user_id = prefs!!.getString(Api.USER_ID, "")
@@ -297,14 +323,12 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onEdit(order: OrderList) {
 
         //viewDialog(mContext!!, order)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun viewDialog(mContext: Context, order: OrderList){
+    fun viewDialog(mContext: Context, order: OrderList) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -318,8 +342,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
         var statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
-        var radio_group : RadioGroup? = RadioGroup(mContext)
-        val itemValue : ArrayList<String> = ArrayList()
+        var radio_group: RadioGroup? = RadioGroup(mContext)
+        val itemValue: ArrayList<String> = ArrayList()
         itemValue.add(mContext.resources.getString(R.string.pending))
         itemValue.add(mContext.resources.getString(R.string.delivered))
         itemValue.add(mContext.resources.getString(R.string.bounced))
@@ -329,7 +353,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             rbn.setText(itemValue.get(i))
             rbn.id = i
             rbn.setTextColor(mContext.resources.getColor(R.color.text_title))
-            rbn.buttonTintList = ColorStateList.valueOf(mContext.resources.getColor(R.color.cnl_color_1))
+            rbn.buttonTintList =
+                ColorStateList.valueOf(mContext.resources.getColor(R.color.cnl_color_1))
             radio_group.addView(rbn)
         }
         val checkedid = 1
@@ -345,13 +370,13 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(order.orderedAt))
-        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
+        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
         var grandTotal = 0.0
         var itemCount = 0
-        val brandsStatistics : ArrayList<ProductStatistics> = ArrayList()
-        if (order.brands_array.size> 0){
+        val brandsStatistics: ArrayList<ProductStatistics> = ArrayList()
+        if (order.brands_array.size > 0) {
             brandsStatistics.clear()
-            for (i in 0 until order.brands_array.size){
+            for (i in 0 until order.brands_array.size) {
                 brandsStatistics.add(
                     ProductStatistics(
                         order.brands_array[i].product_id,
@@ -371,9 +396,10 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                         order.brands_array[i].ordered_quantity,
                         order.brands_array[i].bounced_quantity,
                         order.brands_array[i].ordered_total_price
-                    ))
-                grandTotal = grandTotal+order.brands_array[i].ordered_total_price
-                itemCount = itemCount+order.brands_array[i].ordered_quantity
+                    )
+                )
+                grandTotal = grandTotal + order.brands_array[i].ordered_total_price
+                itemCount = itemCount + order.brands_array[i].ordered_quantity
             }
             val adapter = OutletProductAdapter(brandsStatistics)
             listView.adapter = adapter
@@ -381,28 +407,40 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         }
 
         tvGrandTotal!!.setText(dformat.format(grandTotal).toString())
-        tvItemCount!!.setText(itemCount.toString()+mContext.resources.getString(R.string.items))
+        tvItemCount!!.setText(itemCount.toString() + mContext.resources.getString(R.string.items))
 
         btnClose.setOnClickListener {
             dialog.dismiss()
         }
         btnSubmit.setOnClickListener {
-            ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog), SpannableStringBuilder(), object :
-                DialogListener {
-                override fun onConfirmed() {
-                    val status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
-                    if (order.orderStatus.equals(status, true)){
-                        Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT).show()
-                    }else{
-                        createOrder(order, status, tvGrandTotal!!.text.toString(), brandsStatistics, dialog)
+            ViewUtils.viewDialog(
+                mContext,
+                mContext.resources.getString(R.string.update_order_dialog),
+                SpannableStringBuilder(),
+                object :
+                    DialogListener {
+                    override fun onConfirmed() {
+                        val status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
+                        if (order.orderStatus.equals(status, true)) {
+                            Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            createOrder(
+                                order,
+                                status,
+                                tvGrandTotal!!.text.toString(),
+                                brandsStatistics,
+                                dialog
+                            )
+                        }
+
                     }
 
-                }
-                override fun onCanceled() {
+                    override fun onCanceled() {
 
-                }
+                    }
 
-            })
+                })
         }
         dialog.show()
         val window = dialog.window
@@ -413,8 +451,14 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
 
     }
 
-    private fun createOrder(order: OrderList, status: String, grandTotal: String,updatedProducts: ArrayList<ProductStatistics>, dialog: Dialog){
-        if (updatedProducts.size> 0){
+    private fun createOrder(
+        order: OrderList,
+        status: String,
+        grandTotal: String,
+        updatedProducts: ArrayList<ProductStatistics>,
+        dialog: Dialog
+    ) {
+        if (updatedProducts.size > 0) {
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             val orderObj = JSONObject()
@@ -425,14 +469,17 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             orderObj.put("grand_total", grandTotal)
             orderObj.put("order_status", status)
             val brandsArray = JSONArray()
-            for(i in 0 until updatedProducts!!.size){
+            for (i in 0 until updatedProducts!!.size) {
                 val brandObj = JSONObject()
                 if (updatedProducts!![i].quantity > 0) {
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product", updatedProducts[i].product_name)
                     brandObj.put("quantity", updatedProducts[i].quantity.toString())
                     brandObj.put("bounce", updatedProducts[i].bounced_quantity.toString())
-                    brandObj.put("discounted_unit_price", updatedProducts[i].discounted_unit_price.toString())
+                    brandObj.put(
+                        "discounted_unit_price",
+                        updatedProducts[i].discounted_unit_price.toString()
+                    )
                     brandObj.put("total_price", updatedProducts[i].total_price.toString())
                     brandObj.put("unit_name", updatedProducts[i].unit_name)
                 }
@@ -442,61 +489,67 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
-            if (obj1.length() >0){
-                Log.d("ConfirmOrder", "response: "+obj1)
+            if (obj1.length() > 0) {
+                Log.d("ConfirmOrder", "response: " + obj1)
                 submitOrder(obj1, dialog)
             }
         }
     }
+
     private fun submitOrder(orderObj: JSONObject, dialog: Dialog) {
-        ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, orderObj, object : ApiServiceListener{
-            override fun onResponseSuccess(response: String) {
+        ApiServices.apiJSONObjectPOST(
+            Api.update_saved_order,
+            queue!!,
+            token!!,
+            orderObj,
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
 
-            }
-
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                try {
-                    Log.d("ConfirmOrder", "response api: "+response)
-                    dialog.dismiss()
-                    appDatabase!!.orderListDao().deleteALL()
-                    appDatabase!!.saveOrderDao().deleteALL()
-                    val message = response.getString("message")
-                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
-                        override fun onConfirmed() {
-                            checkforOrders(
-                                queue!!,
-                                token!!,
-                                user_id!!,
-                                sr_id!!,
-                                territory_id!!,
-                                StartDate!!,
-                                EndDate!!
-                            )
-                        }
-
-                        override fun onCanceled() {
-                            TODO("Not yet implemented")
-                        }
-
-                    })
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            }
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    try {
+                        Log.d("ConfirmOrder", "response api: " + response)
+                        dialog.dismiss()
+                        appDatabase!!.orderListDao().deleteALL()
+                        appDatabase!!.saveOrderDao().deleteALL()
+                        val message = response.getString("message")
+                        ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                            override fun onConfirmed() {
+                                checkforOrders(
+                                    queue!!,
+                                    token!!,
+                                    user_id!!,
+                                    sr_id!!,
+                                    territory_id!!,
+                                    StartDate!!,
+                                    EndDate!!
+                                )
+                            }
 
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, mContext!!)
-            }
+                            override fun onCanceled() {
+                                TODO("Not yet implemented")
+                            }
 
-            override fun onException(e: Exception) {
-                TODO("Not yet implemented")
-            }
+                        })
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
 
-        })
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, mContext!!)
+                }
+
+                override fun onException(e: Exception) {
+                    TODO("Not yet implemented")
+                }
+
+            })
     }
 
 }
