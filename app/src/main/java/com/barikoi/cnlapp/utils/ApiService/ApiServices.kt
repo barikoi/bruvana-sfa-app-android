@@ -140,7 +140,7 @@ object ApiServices {
     }
 
     fun apiGET(url: String, queue: RequestQueue, token: String, mListener: ApiServiceListener){
-        val request = object : StringRequest(Request.Method.GET, url,
+        val request = object : StringRequest(Method.GET, url,
             {
                     response ->
                 try{
@@ -179,8 +179,8 @@ object ApiServices {
             mContext,
             HurlStack()
         )
-        val request = @RequiresApi(Build.VERSION_CODES.KITKAT)
-        object : InputStreamVolleyRequest(Request.Method.GET, url,
+        val request =
+        object : InputStreamVolleyRequest(Method.GET, url,
             {
                     response ->
                 try{
