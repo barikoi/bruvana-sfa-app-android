@@ -1,6 +1,5 @@
 package com.barikoi.cnlapp.Attendance.Fragment
 
-import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
@@ -91,8 +90,8 @@ class CreateAttendanceFragment : Fragment() {
 
         attendanceImagePicker.taskId = "taskId"
         attendanceImagePicker.CAMERA = 4
-        attendanceImagePicker.setMainactivity(requireActivity())
-        attendanceImagePicker.setFragmetnt(this)
+        attendanceImagePicker.setMainActivity(requireActivity())
+        attendanceImagePicker.setFragment(this)
         attendanceImagePicker.setCameraLauncher(startCamera)
 
 
@@ -125,8 +124,10 @@ class CreateAttendanceFragment : Fragment() {
                             selectedRoute = ""
                         }
                     } else {
+                        if (p0!!.getChildAt(0) == null)
+                            return
                         val view1: TextView =
-                            p0!!.getChildAt(0) as TextView
+                            p0.getChildAt(0) as TextView
                         view1.setTextColor(requireContext().resources.getColor(R.color.text_title_2))
                         routeId = null
                         selectedRoute = ""
@@ -712,7 +713,7 @@ class CreateAttendanceFragment : Fragment() {
                         val city = place.getString("city")
                         val area = place.getString("area")
 
-                        tvLocation.text = "$address, $area, $city"
+                        binding.tvLocation.text = "$address, $area, $city"
 
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -741,7 +742,7 @@ class CreateAttendanceFragment : Fragment() {
         StartActivityForResult()
     ) { result ->
         val filePath = sharePrefUtils.getString(ApiCall.IMAGE_PATH)
-        if (result.getResultCode() == RESULT_CANCELED) {
+        if (result.resultCode == RESULT_CANCELED) {
             if (filePath != null) {
                 Log.d("Image", "Canceled: $filePath")
                 attendanceImagePicker.deleteFileLocal(filePath)
@@ -749,9 +750,9 @@ class CreateAttendanceFragment : Fragment() {
             }
         }
         if (result.resultCode == RESULT_OK) {
-            Log.e("imageUtils", "OnActivity result code 1: " + Activity.RESULT_OK)
+            Log.e("imageUtils", "OnActivity result code 1: $RESULT_OK")
             var imagePosition = 0
-            var imageList: ArrayList<Images?>?
+            val imageList: ArrayList<Images?>?
             imageList =
                 appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
             Log.d("Imagepos", "List: $imageList")
@@ -760,7 +761,7 @@ class CreateAttendanceFragment : Fragment() {
             } else {
                 imagePosition + 1
             }
-            attendanceImagePicker.AddNewImage(
+            attendanceImagePicker.addNewImage(
                 result.data,
                 4,
                 imagePosition,
