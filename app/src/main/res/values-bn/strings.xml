@@ -302,4 +302,24 @@
     <string name="_0">০</string>
     <string name="are_you_sure_you_want_to_sent_stock_request">আপনি কি নিশ্চিত যে আপনি স্টক অনুরোধ পাঠাতে চান?</string>
 
+    <string name="notification_empty">বিজ্ঞপ্তি খালি!</string>
+    <string name="select_all">সব নির্বাচন করুন</string>
+    <string name="clear">পরিষ্কার</string>
+    <string name="decline">প্রত্যাখ্যান</string>
+    <string name="approve">অনুমোদন</string>
+    <string name="remarks">মন্তব্য</string>
+    <string name="product_stock_request">পণ্যের স্টক অনুরোধ</string>
+    <string name="name">নাম</string>
+    <string name="db_house">ডিবি হাউজ</string>
+    <string name="new_notice">নতুন নোটিশ</string>
+    <string name="send_stock_request">স্টক অনুরোধ পাঠান</string>
+
+    <string name="partial_approved">আংশিক অনুমোদিত</string>
+    <string name="declined">প্রত্যাখ্যাত</string>
+    <string name="approve_by">অনুমোদন করেছেন</string>
+    <string name="edit_profile">প্রোফাইল সম্পাদনা করুন</string>
+    <string name="profile_picture">প্রোফাইল ছবি</string>
+    <string name="das_das">-- --</string>
+    <string name="at">%1$s এ %2$s</string>
+
 </resources>

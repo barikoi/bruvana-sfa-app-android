@@ -309,4 +309,13 @@
     <string name="new_notice">New Notice</string>
     <string name="send_stock_request">Send Stock Request</string>
 
+    <string name="partial_approved">Partial Approved</string>
+    <string name="declined">Declined</string>
+    <string name="approve_by">Approve By</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="das_das">-- --</string>
+    <string name="at">%1$s at %2$s</string>
+
+
 </resources>
