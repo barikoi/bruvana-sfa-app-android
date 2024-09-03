@@ -44,7 +44,7 @@ android {
                         // on below line we are setting a
                         // name to our apk as GFG.apk
                     output ->
-                        def name = "cnl_satging_debug_" + getDateTime() + ".apk"
+                        def name = "cnl_staging_debug_" + getDateTime() + ".apk"
                         // on below line we are setting the
                         // outputFile Name to our apk file.
                         output.outputFileName = name
@@ -69,7 +69,7 @@ android {
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
-                    sentryDNS: "https://083cd267bd4761cd15762e1b0e75749a@sentry.barikoimaps.dev/24",
+                    sentryDNS: "https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14",
 //                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
 //                    onesignal_google_project_number: 'REMOTE'
 
@@ -82,10 +82,10 @@ android {
             resValue "string", "app_name", "https://0cd23f855cd65adc9cb1c418b8bd78d6@sentry.barikoimaps.dev/23"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
-            resValue "string", "url_base", "https://api.cnl.barikoimaps.dev/"
+            resValue "string", "url_base", "https://cnl.barikoimaps.dev:7090/"
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://0cd23f855cd65adc9cb1c418b8bd78d6@sentry.barikoimaps.dev/23",
+                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
 //                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
 //                    onesignal_google_project_number: 'REMOTE'
 
@@ -190,7 +190,7 @@ dependencies {
     /*barikoi trace-sdk*/
     implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
 
-    debugImplementation 'com.balsikandar.android:crashreporter:1.1.0'
+//    debugImplementation 'com.balsikandar.android:crashreporter:1.1.0'
 
     /*pusher websocket*/
     implementation 'com.pusher:pusher-java-client:2.4.4'
