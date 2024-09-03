@@ -53,6 +53,7 @@
             android:name=".approval.StockRequestApprovalActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
+
         <activity
             android:name=".request.StockRequestActivity"
             android:exported="false"
