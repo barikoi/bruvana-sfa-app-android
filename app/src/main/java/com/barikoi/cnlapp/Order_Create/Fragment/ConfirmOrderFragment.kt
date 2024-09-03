@@ -255,7 +255,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             obj1.put("orders", ordersArray)
 
             if (obj1.length() >0){
-                Log.d("ConfirmOrder", "response: "+obj1)
+                Log.d("ConfirmOrder", "response: $obj1")
                 submitOrder(obj1)
             }
         }
@@ -263,13 +263,11 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
     private fun submitOrder(orderObj: JSONObject) {
         ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, orderObj, object : ApiServiceListener{
-            override fun onResponseSuccess(response: String) {
-                TODO("Not yet implemented")
-            }
+            override fun onResponseSuccess(response: String) {}
 
             override fun onJSONResponseSuccess(response: JSONObject) {
                 try {
-                    Log.d("ConfirmOrder", "response api: "+response)
+                    Log.d("ConfirmOrder", "response api: $response")
                     appDatabase!!.orderListDao().deleteALL()
                     appDatabase!!.saveOrderDao().deleteALL()
                     val message = response.getString("message")
@@ -280,9 +278,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                             checkforOrders(queue!!, token!!, user_id!!, route_id!!/*, mCallback!!*/)
                         }
 
-                        override fun onCanceled() {
-                            TODO("Not yet implemented")
-                        }
+                        override fun onCanceled() {}
 
                     })
                 } catch (e: Exception) {
@@ -290,17 +286,13 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 }
             }
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
             }
 
-            override fun onException(e: Exception) {
-                TODO("Not yet implemented")
-            }
+            override fun onException(e: Exception) {}
 
         })
     }

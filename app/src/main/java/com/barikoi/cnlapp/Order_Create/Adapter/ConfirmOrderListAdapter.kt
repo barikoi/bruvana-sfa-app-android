@@ -29,15 +29,19 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEditOrderListener, var from: String): RecyclerView.Adapter<ConfirmOrderListAdapter.ViewHolder>(), Filterable {
+class ConfirmOrderListAdapter(
+    var mValues: List<OrderList>,
+    var mListener: OnEditOrderListener,
+    var from: String
+) : RecyclerView.Adapter<ConfirmOrderListAdapter.ViewHolder>(), Filterable {
     var orderList: List<OrderList> = mValues
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_confirm_order_view, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_confirm_order_view, parent, false)
         return ViewHolder(v)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val queue = RequestQueueSingleton.getInstance(holder.itemView.context).getRequestQueue()
         var dformat = DecimalFormat("#.##")
@@ -45,45 +49,56 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
         holder.shopName.text = orderList[position].outletName
         holder.subTotal.text = dformat.format(orderList[position].grandTotal.toDouble()).toString()
 
-        if (orderList[position].brands_array.size > 0){
+        if (orderList[position].brands_array.size > 0) {
             val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
         }
 
-        if (!orderList[position].orderedAt.equals("null")){
+        if (!orderList[position].orderedAt.equals("null")) {
             holder.orderAt.visibility = View.VISIBLE
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+            val df = SimpleDateFormat("dd LLL yy", Locale.getDefault())
             val orderDate = df.format(oldDate.parse(orderList[position].orderedAt))
             val builder = SpannableStringBuilder()
-            val str1 = SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
+            val str1 =
+                SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
             builder.append(str1)
             val str2 = SpannableString(orderDate)
             builder.append(str2)
             if (!orderList[position].distance.equals("null")) {
-                val str3 = SpannableString(" away from ")
+                val str3 = SpannableString(holder.itemView.context.getString(R.string.away_from))
                 val boldSpan3 = StyleSpan(Typeface.BOLD)
                 str3.setSpan(
                     boldSpan3, 0, str3.length, 0
                 )
                 builder.append(str3)
-                val suffix = if(orderList[position].distance.toDouble()/1000 <1){
-                    dformat.format(orderList[position].distance.toDouble())+"m"
-                }else{
-                    dformat.format(orderList[position].distance.toDouble()/1000)+"km"
+                val suffix = if (orderList[position].distance.toDouble() / 1000 < 1) {
+                    dformat.format(orderList[position].distance.toDouble()) + "m"
+                } else {
+                    dformat.format(orderList[position].distance.toDouble() / 1000) + "km"
                 }
                 val strDistance = SpannableString(suffix)
                 if (orderList[position].distance.toDouble() > 500) {
                     strDistance.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                holder.itemView.context,
+                                R.color.red
+                            )
+                        ),
                         0,
                         strDistance.length,
                         0
                     )
                 } else {
                     strDistance.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.cnl_color_2)),
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                holder.itemView.context,
+                                R.color.cnl_color_2
+                            )
+                        ),
                         0,
                         strDistance.length,
                         0
@@ -96,7 +111,7 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
                 builder.append(strDistance)
             }
             holder.orderAt.setText(builder)
-        }else{
+        } else {
             holder.orderAt.visibility = View.GONE
         }
 
@@ -108,14 +123,15 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
             mListener.onEdit(orderList[position])
         }
 
-        if (from.equals("summary")){
+        if (from.equals("summary")) {
             holder.editItem.visibility = View.GONE
             holder.downloadChalan.visibility = View.GONE
             holder.addMore.visibility = View.INVISIBLE
             if (!orderList[position].orderStatus.equals("null")) {
                 holder.statusLayout.visibility = View.VISIBLE
                 if (orderList[position].orderStatus.equals("PENDING")) {
-                    holder.tvOrderStatus.text = holder.itemView.resources.getString(R.string.pending)
+                    holder.tvOrderStatus.text =
+                        holder.itemView.resources.getString(R.string.pending)
                     holder.statusLayout.background.setTint(holder.itemView.resources.getColor(R.color.status_pending_stroke))
                     val gd = GradientDrawable()
                     gd.setColor(holder.itemView.resources.getColor(R.color.status_pending))
@@ -123,7 +139,8 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
                     gd.setStroke(2, holder.itemView.resources.getColor(R.color.white))
                     holder.tvOrderStatus.setBackgroundDrawable(gd)
                 } else if (orderList[position].orderStatus.equals("DELIVERED")) {
-                    holder.tvOrderStatus.text = holder.itemView.resources.getString(R.string.delivered)
+                    holder.tvOrderStatus.text =
+                        holder.itemView.resources.getString(R.string.delivered)
                     holder.statusLayout.background.setTint(holder.itemView.resources.getColor(R.color.status_delivered_stroke))
                     val gd = GradientDrawable()
                     gd.setColor(holder.itemView.resources.getColor(R.color.status_delivered))
@@ -135,28 +152,32 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
         }
 
         holder.downloadChalan.setOnClickListener {
-            ApiServices.apiGETInputStream(Api.get_chalan_download+"?order_no="+orderList[position].orderId, queue, holder.itemView.context, object : ApiServiceListener{
-                override fun onResponseSuccess(response: String) {
-                    TODO("Not yet implemented")
-                }
+            ApiServices.apiGETInputStream(
+                Api.get_chalan_download + "?order_no=" + orderList[position].orderId,
+                queue,
+                holder.itemView.context,
+                object : ApiServiceListener {
+                    override fun onResponseSuccess(response: String) {
+                        TODO("Not yet implemented")
+                    }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                    override fun onJSONResponseSuccess(response: JSONObject) {
+                        TODO("Not yet implemented")
+                    }
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                        TODO("Not yet implemented")
+                    }
 
-                override fun onResponseFailure(error: VolleyError) {
+                    override fun onResponseFailure(error: VolleyError) {
                         ViewUtils.getErrorResponse(error, holder.itemView.context)
-                }
+                    }
 
-                override fun onException(e: Exception) {
-                    e.printStackTrace()
-                }
+                    override fun onException(e: Exception) {
+                        e.printStackTrace()
+                    }
 
-            })
+                })
         }
     }
 
@@ -177,7 +198,9 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.outletName.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
+                        if (row.outletName.toLowerCase()
+                                .contains(charString.lowercase(Locale.getDefault()))
+                        ) {
                             filteredList.add(row)
                         }
                     }
@@ -221,6 +244,4 @@ class ConfirmOrderListAdapter(var mValues: List<OrderList>, var mListener: OnEdi
 
         }
     }
-
-
 }
