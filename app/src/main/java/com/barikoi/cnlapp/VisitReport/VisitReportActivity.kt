@@ -6,34 +6,36 @@ import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.databinding.ActivityVisitReportBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.AppLocale
+import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
 import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.formatDateToFullName
 import com.barikoi.cnlapp.utils.extension.formatFullMonthDateYear
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_visit_report.*
-import kotlinx.android.synthetic.main.fragment_map.view.isVerified
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class VisitReportActivity : AppCompatActivity() {
+class VisitReportActivity : BaseActivity() {
     private lateinit var binding: ActivityVisitReportBinding
 
     @Inject
@@ -43,7 +45,7 @@ class VisitReportActivity : AppCompatActivity() {
     var queue: RequestQueue? = null
     var startDate: String? = null
     var endDate: String? = null
-    var customDate: String? = null
+    private var customDate: String? = null
     val soList: ArrayList<SOList> = ArrayList()
 
 
@@ -151,7 +153,7 @@ class VisitReportActivity : AppCompatActivity() {
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
@@ -261,6 +263,7 @@ class VisitReportActivity : AppCompatActivity() {
             url,
             queue!!, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
+                    AppLogger.log("getVisitReports:: $response")
                     try {
                         binding.progressBar.visibility = View.GONE
                         val obj = JSONObject(response)
@@ -272,7 +275,7 @@ class VisitReportActivity : AppCompatActivity() {
                                 itemList.add(
                                     Pair(
                                         productObj.getString("range"),
-                                        productObj.getString("visited_count")
+                                        productObj.getString("visited_count").englishToBanglaNumber()
                                     )
                                 )
                             }
@@ -295,7 +298,6 @@ class VisitReportActivity : AppCompatActivity() {
                                             )
                                         )
                                     }
-
                                 }
                                 createTableOther(visitedList, tabLayout2)
                             }
@@ -324,11 +326,11 @@ class VisitReportActivity : AppCompatActivity() {
             })
     }
 
-    private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {
-        tab_Layout.isStretchAllColumns = true
-        tab_Layout.bringToFront()
-        tab_Layout.removeAllViews()
-        tab_Layout.visibility = View.VISIBLE
+    private fun createTable(data: ArrayList<Pair<String, String>>, tabLayout: TableLayout) {
+        tabLayout.isStretchAllColumns = true
+        tabLayout.bringToFront()
+        tabLayout.removeAllViews()
+        tabLayout.visibility = View.VISIBLE
 
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
@@ -351,13 +353,13 @@ class VisitReportActivity : AppCompatActivity() {
             val c2 = TextView(applicationContext)
             c2.gravity = Gravity.END
             c2.setTextColor(resources.getColor(R.color.text_title))
-            c2.text = data.get(i).second
+            c2.text = data[i].second
             c2.gravity = Gravity.CENTER
             c2.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
             tr.addView(c1)
             tr.addView(c2)
-            tab_Layout.addView(tr)
-            tab_Layout.background = resources.getDrawable(R.drawable.cardview_bg_stroke_2dp)
+            tabLayout.addView(tr)
+            tabLayout.background = resources.getDrawable(R.drawable.cardview_bg_stroke_2dp)
         }
     }
 
