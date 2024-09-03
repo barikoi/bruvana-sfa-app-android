@@ -73,16 +73,16 @@ class AttendanceFragment : Fragment() {
             fragments.add(HistoryFragment())
             fragments.add(SummaryFragment())
         }
-        viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        viewPager2!!.setAdapter(ViewPagerAdapter(childFragmentManager, lifecycle, fragments))
         // attaching tab mediator
         TabLayoutMediator(viewpagertab2!!, viewPager2!!,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        viewPager2!!.setCurrentItem(0);
+        viewPager2!!.currentItem = 0;
 
         viewPager2!!.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.getTabCount()) {
+        for (i in 0 until viewpagertab.tabCount) {
             val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as MarginLayoutParams
             p.setMargins(15, 15, 10, 15)
