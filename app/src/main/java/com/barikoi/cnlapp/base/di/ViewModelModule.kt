@@ -4,6 +4,10 @@ import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
 import com.barikoi.cnlapp.data.remote.api.SocketApiService
+import com.barikoi.cnlapp.data.remote.repository.AuthRepository
+import com.barikoi.cnlapp.data.remote.repository.AuthRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
+import com.barikoi.cnlapp.data.remote.repository.NotificationRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SocketRepository
@@ -28,4 +32,12 @@ object ViewModelModule {
     @Provides
     fun providesProductStockRepository(apiService: ApiService): ProductStockRepository =
         ProductStockRepositoryImpl(apiService)
+
+    @Provides
+    fun providesNotificationRepository(apiService: ApiService): NotificationRepository =
+        NotificationRepositoryImpl(apiService)
+
+    @Provides
+    fun providesAuthRepository(apiService: ApiService): AuthRepository =
+        AuthRepositoryImpl(apiService)
 }
