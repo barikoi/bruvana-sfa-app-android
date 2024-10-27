@@ -15,7 +15,7 @@ android {
         versionCode 20
         multiDexEnabled true
         flavorDimensions("default")
-        resConfigs "en", "bn"
+        resourceConfigurations += ['en', 'bn']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
@@ -134,6 +134,7 @@ android {
             }
         }
     }
+    namespace 'com.barikoi.cnlapp'
 }
 
 def getDateTime() {
