@@ -27,5 +27,6 @@ class Shops(
     val lastOrderDate: String,
     val isVerified: Int,
     val isOrdered: Int,
-    val isNoOrdered: Int
+    val isNoOrdered: Int,
+    val distance: Float
 ): Serializable
