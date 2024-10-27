@@ -398,6 +398,6 @@ class TodaysSummaryTOFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        setTodaysSummary()
+//        setTodaysSummary()
     }
 }
