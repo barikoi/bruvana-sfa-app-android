@@ -7,11 +7,7 @@
     android:background="@color/background_app"
     android:orientation="vertical"
     tools:context=".StatisticsHome.Fragment.SO.HomeFragment">
-    <!--<androidx.core.widget.NestedScrollView
-        android:id="@+id/bodyLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible">-->
+
     <LinearLayout
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
@@ -27,7 +23,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
@@ -36,13 +32,13 @@
                 android:textAllCaps="true"
                 android:textColor="@color/text_title"
                 android:textSize="20sp"
-                android:textStyle="bold"></TextView>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/dateRangeLayoutHome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
@@ -58,16 +54,14 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="8dp"
-                    android:drawableLeft="@drawable/ic_date_range"
+                    android:drawableStart="@drawable/ic_date_range"
                     android:drawablePadding="4dp"
                     android:gravity="start"
                     android:text=""
                     android:textColor="@color/text_title_2"
-                    android:textSize="14sp">
+                    android:textSize="14sp" />
 
-                </TextView>
             </LinearLayout>
-
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -80,11 +74,8 @@
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
             app:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/single_summary_view">
+            tools:listitem="@layout/single_summary_view" />
 
-        </androidx.recyclerview.widget.RecyclerView>
-        <!--summary, product, category-->
-        <!--delivery and bounce-->
         <RelativeLayout
             android:id="@+id/layoutSecond"
             android:layout_width="match_parent"
@@ -134,7 +125,7 @@
                 android:orientation="horizontal" />
 
         </RelativeLayout>
-        <!--delivery and bounce-->
+
         <RelativeLayout
             android:id="@+id/layoutThird"
             android:layout_width="match_parent"
@@ -171,7 +162,6 @@
 
         </RelativeLayout>
     </LinearLayout>
-    <!--</androidx.core.widget.NestedScrollView>-->
 
     <LinearLayout
         android:id="@+id/no_route_check"
@@ -189,15 +179,12 @@
             android:gravity="center_horizontal"
             android:text="@string/no_route_selected_today"
             android:textColor="@color/text_title"
-            android:textSize="17sp">
-
-        </TextView>
+            android:textSize="17sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tryAgain"
             android:layout_width="100dp"
             android:layout_height="36dp"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp"
             android:background="@drawable/cardview_bg"

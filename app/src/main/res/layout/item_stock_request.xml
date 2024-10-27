@@ -13,11 +13,12 @@
 
         <TextView
             android:id="@+id/tvTitle"
-            style="@style/TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/_8sdp"
             android:text="Jasmine XL"
+            android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/llStatus"
@@ -35,6 +36,20 @@
             app:layout_constraintEnd_toStartOf="@+id/llStatus"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+        <TextView
+            android:id="@+id/tvRequestTo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_15dp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:drawablePadding="@dimen/_8sdp"
+            android:text="Test User"
+            android:textColor="@color/mapbox_blue"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/llStatus"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDHName" />
 
         <RelativeLayout
             android:id="@+id/llStatus"
@@ -65,6 +80,7 @@
             android:id="@+id/tvQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_15dp"
             android:background="@drawable/cardview_bg"
             android:paddingStart="30dp"
             android:paddingTop="5dp"
@@ -74,6 +90,15 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvRequestTo" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_15dp"
+            android:text="12-12-2024"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/llStatus" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

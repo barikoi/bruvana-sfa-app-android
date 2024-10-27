@@ -40,8 +40,8 @@
                 android:gravity="start"
                 android:text="@string/capture_photo"
                 android:textColor="@color/black"
-                android:textStyle="bold" />
-
+                android:textStyle="bold"
+                android:visibility="visible" />
 
             <include
                 android:id="@+id/llImagePickerView"

@@ -60,7 +60,8 @@
                     android:background="@drawable/shape_oval"
                     android:backgroundTint="@color/red"
                     android:padding="@dimen/_3sdp"
-                    android:text="33"
+                    android:text=""
+                    android:visibility="gone"
                     android:textColor="@color/white"
                     android:textSize="8sp"
                     android:textStyle="bold" />

@@ -17,13 +17,14 @@
 
     <TextView
         android:id="@+id/tvProductName"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
         android:text="Jasmine XL"
         android:textColor="@color/black"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/etStockCount"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/cbSelect"
         app:layout_constraintTop_toTopOf="parent" />
