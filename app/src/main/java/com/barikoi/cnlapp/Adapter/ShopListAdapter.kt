@@ -13,14 +13,16 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import java.util.Locale
 
-class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener): RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),
+class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener) :
+    RecyclerView.Adapter<ShopListAdapter.ViewHolder>(),
     Filterable {
 
     var shopList: List<Shops> = mValues
     lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_shop_list, parent, false)
+        val v =
+            LayoutInflater.from(parent.context).inflate(R.layout.single_shop_list, parent, false)
         return ViewHolder(v)
     }
 
@@ -29,30 +31,22 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         holder.shopName.text = shopList[position].shop_name
         holder.address.text = shopList[position].address
         /*holder.shopState.text = shopList[position].state*/
-        if (shopList[position].state.equals("active", true)){
+        if (shopList[position].state.equals("active", true)) {
             holder.shopState.visibility = View.VISIBLE
-        }else{
+        } else {
             holder.shopState.visibility = View.GONE
         }
-        if (!shopList[position].shop_code.equals("null")) holder.shopCode.text = shopList[position].shop_code
-        if (!shopList[position].category.equals("null"))holder.shopCategory.text = "Category: "+shopList[position].category
-        else holder.shopCategory.text = "Category: "
+        if (!shopList[position].shop_code.equals("null")) holder.shopCode.text =
+            shopList[position].shop_code
+        if (!shopList[position].category.equals("null")) holder.shopCategory.text =
+            holder.itemView.context.getString(R.string.category_, shopList[position].category)
+        else holder.shopCategory.text = holder.itemView.context.getString(R.string.category_, "")
         holder.shopType.text = shopList[position].shop_type
-        //holder.distributorName.text = shopList[position].distributor_office
         holder.territoryName.text = shopList[position].territory_name
 
-        /*if (!shopList[position].imageUrl.isNullOrEmpty() && !shopList[position].imageUrl.equals("null")){
-            Glide.with(holder.itemView.context)
-                .load(shopList[position].imageUrl)
-                .error(R.drawable.shop)
-                .into(holder.imageShop)
-        }else{
-            //holder.imageProduct.visibility = View.INVISIBLE
-        }*/
-
-        if (shopList[position].isVerified == 0){
+        if (shopList[position].isVerified == 0) {
             holder.imageNewTag.visibility = View.VISIBLE
-        }else{
+        } else {
             holder.imageNewTag.visibility = View.GONE
         }
 
@@ -61,11 +55,6 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         }
 
     }
-    /*override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        Log.d("Product", "view holder: " + recyclerView.childCount)
-        this.mRecyclerView = recyclerView
-    }*/
 
     override fun getItemCount(): Int {
         return shopList.size
@@ -80,9 +69,9 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         internal val shopType: TextView
         internal val shopCategory: TextView
         internal val territoryName: TextView
-        internal val imageShop:ImageView
-        internal val imageNewTag:ImageView
-        internal val btnEdit:ImageView
+        internal val imageShop: ImageView
+        internal val imageNewTag: ImageView
+        internal val btnEdit: ImageView
 
         init {
             shopName = itemView.findViewById(R.id.shop_name)
@@ -113,11 +102,12 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.shop_name.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
+                        if (row.shop_name.toLowerCase()
+                                .contains(charString.lowercase(Locale.getDefault()))
+                        ) {
                             filteredList.add(row)
                         }
                     }
-                    //itemList = filteredList
                 }
                 val filterResults = FilterResults()
                 filterResults.values = filteredList
