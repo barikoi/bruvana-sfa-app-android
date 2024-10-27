@@ -13,7 +13,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -24,6 +23,7 @@ import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.ProductStock.Model.OrdersSO
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -61,7 +61,7 @@ import java.util.Date
 import java.util.Locale
 
 
-class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
+class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
     var token: String? = null
     var user_id: String? = null
     var sr_id: String? = null
@@ -89,12 +89,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         user_id = prefs!!.getString(Api.USER_ID, "")
-        /*sr_id = prefs!!.getString(Api.SR_CODE, "")
-        route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")*/
         employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
 
         listener = this
-        //setDateFilter()
         pd = ProgressDialog(this)
         pd!!.setMessage("Processing...")
         pd!!.setCancelable(false)
@@ -137,23 +134,24 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         StartDate = df.format(start)
         EndDate = df.format(end)
-        customDate = simpleFormat.format(start) + " - " + simpleFormat.format(end)
-        tvDateRange.setText(customDate)
+        customDate =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
+        tvDateRange.text = customDate
         getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
             dateRangeLayout.setEnabled(false)
-        })
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             pd!!.show()
@@ -167,10 +165,14 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
             EndDate = df.format(e_date)
             //spinnerMenu.setSelection(2)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                tvDateRange.text = simpleFormat.format(s_date)
                 customDate = simpleFormat.format(s_date)
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                tvDateRange.text = getString(
+                    R.string.date_range_,
+                    simpleFormat.format(s_date),
+                    simpleFormat.format(e_date)
+                )
                 customDate = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
             }
 
@@ -185,7 +187,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
     }
 
-    fun getOrderSummary(url: String) {
+    private fun getOrderSummary(url: String) {
         progressBar4.visibility = View.VISIBLE
         val dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, queue!!, token!!, object :
@@ -226,8 +228,7 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                         orderObj.getString("user_name"),
                                         orderObj.getString("productive_outlets"),
                                         orderObj.getString("total_outlets"),
-                                        dformat.format(orderObj.getDouble("total_bounced_amount"))
-                                            .toDouble(),
+                                        dformat.format(orderObj.getDouble("total_bounced_amount")),
                                         (if(orderObj.has("orders")) orderObj.getJSONArray("orders") else JSONArray())!!
                                     )
                                 )
@@ -258,13 +259,9 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
 
             }
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
+            override fun onJSONResponseSuccess(response: JSONObject) {}
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
@@ -333,13 +330,15 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                     orderList.visibility = View.GONE
                     pd!!.show()
                     Thread {
-                        this@OrderSummaryTOActivity.runOnUiThread(object : Runnable{
+                        this@OrderSummaryTOActivity.runOnUiThread(object : Runnable {
                             override fun run() {
                                 try {
                                     orderArray = sowithOrderList!!.get(i).ordersArray
                                     bodyLayoutScroll.visibility = View.VISIBLE
                                     collectionLayout.visibility = View.VISIBLE
-                                    order_collection_count.setText(sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(i).total_outlets)
+                                    order_collection_count.text = sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(
+                                        i
+                                    ).total_outlets
                                     total_bounce_count.setText(sowithOrderList!!.get(i).total_bounce.toString())
                                     getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -507,7 +506,10 @@ class OrderSummaryTOActivity : AppCompatActivity(), OnEditOrderListener {
                                     dformat.format(
                                         targetObj.getString("bounce_amount_percentage").toDouble()
                                     )
-                                if(!targetObj.isNull("delivered_value")) delivery_value = dformat.format(targetObj.getString("delivered_value").toDouble())
+                                if (!targetObj.isNull("delivered_value")) delivery_value =
+                                    dformat.format(
+                                        targetObj.getString("delivered_value").toDouble()
+                                    )
                             }
                         }
 

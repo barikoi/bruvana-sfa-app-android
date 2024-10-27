@@ -15,6 +15,7 @@ import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -38,7 +39,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
+class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
     var token: String? = null
     var user_id: String? = null
@@ -119,38 +120,37 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         StartDate = df.format(start)
         EndDate = df.format(end)
 
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        tvDateRange.text =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
 
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
             dateRangeLayout.setEnabled(false)
-        })
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
-                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.commit()*/
+                tvDateRange.text = simpleFormat.format(s_date)
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
-                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
-                editor!!.commit()*/
+                tvDateRange.text = getString(
+                    R.string.date_range_,
+                    simpleFormat.format(s_date),
+                    simpleFormat.format(e_date)
+                )
             }
             getAllOrders(
                 Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + df.format(
@@ -183,7 +183,7 @@ class OrderSummaryActivity : AppCompatActivity(), OnEditOrderListener {
                                 //productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
                                 val brandArray = orderObj.getJSONArray("products")
-                                tvRouteName.setText(orderObj.getString("route_name"))
+                                tvRouteName.text = orderObj.getString("route_name")
                                 val productItems: ArrayList<Products> = ArrayList()
                                 if (orderObj.getString("order_status").equals("DELIVERED", true)) {
                                     if (brandArray.length() > 0) {
