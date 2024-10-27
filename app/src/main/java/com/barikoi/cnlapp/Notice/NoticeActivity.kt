@@ -8,7 +8,6 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
@@ -16,6 +15,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -34,11 +34,11 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class NoticeActivity : AppCompatActivity() {
+class NoticeActivity : BaseActivity() {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
-    private var token : String?= ""
+    private var token: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +48,9 @@ class NoticeActivity : AppCompatActivity() {
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)){
+        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
             fab_create_notice.visibility = View.VISIBLE
-        }else{
+        } else {
             fab_create_notice.visibility = View.GONE
         }
         btnBack.setOnClickListener {
@@ -75,7 +75,7 @@ class NoticeActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         btnSubmit.setOnClickListener {
-            if (etNotice.text.trim().length > 0) {
+            if (etNotice.text.trim().isNotEmpty()) {
                 val obj1 = JSONObject()
                 val noticesArray = JSONArray()
                 val noticeObj = JSONObject()
@@ -89,8 +89,12 @@ class NoticeActivity : AppCompatActivity() {
                 noticesArray.put(noticeObj)
                 obj1.put("notices", noticesArray)
                 submitNotice(obj1, dialog)
-            }else{
-                Toast.makeText(applicationContext, "Type notice first to submit.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Type notice first to submit.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         dialog.show()
@@ -102,43 +106,51 @@ class NoticeActivity : AppCompatActivity() {
     }
 
     private fun submitNotice(objNotice: JSONObject, dialog: Dialog) {
-        ApiServices.apiJSONObjectPOST(Api.submit_notice, queue!!, token!!, objNotice, object : ApiServiceListener{
-            override fun onResponseSuccess(response: String) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                try {
-                    val message = response.getString("message")
-                    ViewUtils.viewDialogResponse(this@NoticeActivity, message, object : DialogListener {
-                        override fun onConfirmed() {
-                            setDateFilter()
-                            dialog.dismiss()
-                        }
-
-                        override fun onCanceled() {
-                            TODO("Not yet implemented")
-                        }
-
-                    })
-                } catch (e: Exception) {
-                    e.printStackTrace()
+        ApiServices.apiJSONObjectPOST(
+            Api.submit_notice,
+            queue!!,
+            token!!,
+            objNotice,
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    TODO("Not yet implemented")
                 }
-            }
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    try {
+                        val message = response.getString("message")
+                        ViewUtils.viewDialogResponse(
+                            this@NoticeActivity,
+                            message,
+                            object : DialogListener {
+                                override fun onConfirmed() {
+                                    setDateFilter()
+                                    dialog.dismiss()
+                                }
 
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, applicationContext)
-            }
+                                override fun onCanceled() {
+                                    TODO("Not yet implemented")
+                                }
 
-            override fun onException(e: Exception) {
-                TODO("Not yet implemented")
-            }
+                            })
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
 
-        })
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                }
+
+                override fun onException(e: Exception) {
+                    TODO("Not yet implemented")
+                }
+
+            })
     }
 
     private fun setDateFilter() {
@@ -148,40 +160,47 @@ class NoticeActivity : AppCompatActivity() {
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.setText(/*simpleFormat.format(start) + " - " + */simpleFormat.format(end))
+        tvDateRange.text = simpleFormat.format(end)
 
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
             dateRangeLayout.setEnabled(false)
-        })
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                tvDateRange.text = simpleFormat.format(s_date)
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                tvDateRange.text = getString(
+                    R.string.date_range_,
+                    simpleFormat.format(s_date),
+                    simpleFormat.format(e_date)
+                )
             }
-            getNoticeList(Api.get_notice+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
-
+            getNoticeList(
+                Api.get_notice + "?start_date=" + df.format(s_date) + "&end_date=" + df.format(
+                    e_date
+                )
+            )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
 
-        getNoticeList(Api.get_notice+"?start_date="+StartDate+"&end_date="+EndDate)
+        getNoticeList(Api.get_notice + "?start_date=" + StartDate + "&end_date=" + EndDate)
     }
 
     private fun getNoticeList(url: String) {
@@ -189,12 +208,12 @@ class NoticeActivity : AppCompatActivity() {
         ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    if (response != null){
+                    if (response != null) {
                         val itemList: ArrayList<Notice> = ArrayList()
                         val obj = JSONObject(response)
                         val noticeArray = obj.getJSONArray("notices")
-                        if (noticeArray.length() > 0){
-                            for (i in 0 until noticeArray.length()){
+                        if (noticeArray.length() > 0) {
+                            for (i in 0 until noticeArray.length()) {
                                 val noticeObj = noticeArray.getJSONObject(i)
                                 itemList.add(
                                     Notice(
@@ -216,7 +235,7 @@ class NoticeActivity : AppCompatActivity() {
 
 
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
