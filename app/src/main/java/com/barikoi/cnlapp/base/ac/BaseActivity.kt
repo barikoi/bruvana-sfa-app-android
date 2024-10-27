@@ -7,7 +7,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(
-            DefaultLocaleHelper.getInstance(newBase!!).onAttach()
+            newBase?.let { DefaultLocaleHelper.getInstance(it).onAttach() }
         )
     }
 }
