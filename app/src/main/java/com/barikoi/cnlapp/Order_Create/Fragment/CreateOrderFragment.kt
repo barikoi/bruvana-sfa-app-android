@@ -141,7 +141,7 @@ class CreateOrderFragment : Fragment(){
                     setCurrentFragment(SelectDokanFragment(), ACTIVITY)
                 } else if (position == 1) {
                     viewPager!!.setCurrentItem(1)
-                    ConfirmOrderFragment.checkforOrders(mQueue!!, token!!, userId!!, routeId!!)
+                    ConfirmOrderFragment.checkForOrders(mQueue!!, token!!, userId!!, routeId!!)
                 }
             }
         })

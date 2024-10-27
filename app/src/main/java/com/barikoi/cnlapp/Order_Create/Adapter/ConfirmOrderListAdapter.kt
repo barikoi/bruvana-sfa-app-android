@@ -2,7 +2,6 @@ package com.barikoi.cnlapp.Order_Create.Adapter
 
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -11,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
@@ -154,7 +152,6 @@ class ConfirmOrderListAdapter(
         holder.downloadChalan.setOnClickListener {
             ApiServices.apiGETInputStream(
                 Api.get_chalan_download + "?order_no=" + orderList[position].orderId,
-                queue,
                 holder.itemView.context,
                 object : ApiServiceListener {
                     override fun onResponseSuccess(response: String) {

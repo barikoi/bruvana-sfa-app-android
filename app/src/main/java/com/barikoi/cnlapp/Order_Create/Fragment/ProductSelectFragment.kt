@@ -1,14 +1,19 @@
 package com.barikoi.cnlapp.Order_Create.Fragment
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -19,11 +24,14 @@ import android.view.*
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.*
-import androidx.annotation.RequiresApi
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
@@ -39,38 +47,43 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.base.adapter.AdapterImagePickerView
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.callback.LocationFetch
+import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentProductSelectBinding
 import com.barikoi.cnlapp.utils.AppLogger
-import com.google.gson.Gson
+import com.barikoi.cnlapp.utils.Constants
+import com.barikoi.cnlapp.utils.SharePrefUtils
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_product_select.view.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class ProductSelectFragment : Fragment(), OnValueChangeListener {
-
     private lateinit var binding: FragmentProductSelectBinding
 
-    var recylerView: RecyclerView? = null
-    var shopTitle: TextView? = null
-    var sortTitle: TextView? = null
-    var sort_layout: LinearLayout? = null
-    private var totalItemCount: TextView? = null
-    var tvgrandTotal: TextView? = null
-    var saveOrder: AppCompatButton? = null
-    var noOrder: AppCompatButton? = null
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    private lateinit var adapterImage: AdapterImagePickerView
+
     var latitude: Double? = 0.0
     var longitude: Double? = 0.0
     var mContext: Context? = null
@@ -79,56 +92,50 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     var user_id: String? = null
     var sr_id: String? = null
     var selectedShop: Shops? = null
-    var selectedOrder: OrderList? = null
-    var totalAmount: String? = null
-    var grandTotalPrice: Double? = 0.0
-    var totalCount: Int? = 0
-    var shopName: String? = null
-    var outletMinOrder: String? = ""
+    private var selectedOrder: OrderList? = null
+    private var totalAmount: String? = null
+    private var grandTotalPrice: Double? = 0.0
+    private var totalCount: Int? = 0
+    private var shopName: String? = null
+    private var outletMinOrder: String? = ""
     var shopId: String? = null
     var routeId: String? = null
     var distanceValue: Double? = null
     var listener: OnValueChangeListener? = null
-    var et_search: AutoCompleteTextView? = null
     private var adapter: ProductListAdapter? = null
     var productsList: ArrayList<Products>? = ArrayList()
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
-    private var loading: ProgressBar? = null
     lateinit var ACTIVITY: MainActivity
     private var appDatabase: AppDatabase? = null
     private var addedProducts: ArrayList<Products>? = ArrayList()
-    var dformat = DecimalFormat("#.##")
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-    lateinit var mView: View
-    var startOrderTime: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private var dFormat = DecimalFormat("#.##")
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+    private var startOrderTime: String? = null
+    private var startOrderTimeA: Date? = null
 
 
-    }
+    private var imageFilePath: File? = null
+    private var imageFiles: MutableList<String> = mutableListOf()
+
+
+    val builder = SpannableStringBuilder()
+
+    private var orderTypeNew: String = "save_order"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_product_select, container, false)
+    ): View {
+        binding = FragmentProductSelectBinding.inflate(inflater, container, false)
 
-        shopTitle = mView.findViewById(R.id.selectedShop)
-        et_search = mView.findViewById(R.id.editTextSearchProduct)
-        recylerView = mView.findViewById(R.id.productlist)
-        totalItemCount = mView.findViewById(R.id.totalItemCount)
-        tvgrandTotal = mView.findViewById(R.id.totalAmount)
-        saveOrder = mView.findViewById(R.id.save_order)
-        noOrder = mView.findViewById(R.id.no_order)
-        loading = mView.findViewById(R.id.progressBar)
-        sortTitle = mView.findViewById(R.id.sortTitle)
-        sort_layout = mView.findViewById(R.id.sortingLayout)
+        adapterImage = AdapterImagePickerView {
+            imageFiles.removeAt(it)
+            adapterImage.updateImages(imageFiles)
+        }
 
-        sort_layout!!.setOnClickListener {
-            val popup = PopupMenu(mContext, sortTitle)
+        binding.sortingLayout.setOnClickListener {
+            val popup = PopupMenu(mContext, binding.sortTitle)
             popup.menuInflater.inflate(R.menu.sort_menu_product, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
@@ -140,11 +147,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
-                                recylerView!!.adapter = adapter
+                                binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
 
-                            sortTitle!!.setText(resources.getString(R.string.ztoa))
+                            binding.sortTitle.text = resources.getString(R.string.ztoa)
                         }
 
                         R.id.menu_atoz -> {
@@ -153,10 +160,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
-                                recylerView!!.adapter = adapter
+                                binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            sortTitle!!.setText(resources.getString(R.string.atoz))
+                            binding.sortTitle.text = resources.getString(R.string.atoz)
                         }
 
                         R.id.menu_mostfrequent -> {
@@ -165,11 +172,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
-                                recylerView!!.adapter = adapter
+                                binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
 
-                            sortTitle!!.setText(resources.getString(R.string.most_frequent))
+                            binding.sortTitle.text = resources.getString(R.string.most_frequent)
                         }
 
                         R.id.menu_lowstock -> {
@@ -178,10 +185,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
-                                recylerView!!.adapter = adapter
+                                binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            sortTitle!!.setText(resources.getString(R.string.low_stock))
+                            binding.sortTitle.setText(resources.getString(R.string.low_stock))
                         }
 
                         R.id.menu_highstock -> {
@@ -190,10 +197,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
-                                recylerView!!.adapter = adapter
+                                binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            sortTitle!!.setText(resources.getString(R.string.high_stock))
+                            binding.sortTitle.setText(resources.getString(R.string.high_stock))
                         }
                     }
                     return true
@@ -202,10 +209,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             popup.show()
         }
 
-        //adapter = ProductListAdapter(ArrayList(), listener!!)
-
-
-        et_search!!.addTextChangedListener(object : TextWatcher {
+        binding.editTextSearchProduct.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
@@ -217,19 +221,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
             }
 
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
+            override fun afterTextChanged(p0: Editable?) {}
 
         })
 
-        saveOrder!!.setOnClickListener {
+        binding.saveOrder.setOnClickListener {
             if (distanceValue != null) {
                 if (addedProducts!!.size > 0) {
-                    val builder = SpannableStringBuilder()
-                    val str1 = SpannableString("You are ")
+                    val str1 = SpannableString(getString(R.string.you_are))
                     builder.append(str1)
-                    val strDistance = SpannableString(mView.tvdistance.text)
+                    val strDistance = SpannableString(binding.tvdistance.text)
                     if (distanceValue != null) {
                         if (distanceValue!! > 100.0) {
                             strDistance.setSpan(
@@ -258,7 +259,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
                     }
                     builder.append(strDistance)
-                    val str2 = SpannableString(" away from ")
+                    val str2 = SpannableString(getString(R.string.away_from))
                     builder.append(str2)
                     val strShop = SpannableString(shopName)
                     strShop.setSpan(
@@ -274,6 +275,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     )
                     builder.append(strShop)
                     appDatabase!!.saveOrderDao().deleteALL()
+
+                    confirmDialog(
+                        builder,
+                        "save_order"
+                    )
+
+                    return@setOnClickListener
+
                     ViewUtils.viewDialog(
                         mContext!!,
                         "",
@@ -282,7 +291,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         object :
                             DialogListener {
                             override fun onConfirmed() {
-                                mView.progressBar.visibility = View.VISIBLE
+                                binding.progressBar.visibility = View.VISIBLE
                                 getLocation("save_order")
                             }
 
@@ -293,9 +302,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         })
                 } else {
                     val builder = SpannableStringBuilder()
-                    val str1 = SpannableString("You are ")
+                    val str1 = SpannableString(getString(R.string.you_are))
                     builder.append(str1)
-                    val strDistance = SpannableString(mView.tvdistance.text)
+                    val strDistance = SpannableString(binding.tvdistance.text)
                     if (distanceValue != null) {
                         if (distanceValue!! > 100.0) {
                             strDistance.setSpan(
@@ -324,7 +333,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
                     }
                     builder.append(strDistance)
-                    val str2 = SpannableString(" away from ")
+                    val str2 = SpannableString(getString(R.string.away_from))
                     builder.append(str2)
                     val strShop = SpannableString(shopName)
                     strShop.setSpan(
@@ -339,8 +348,13 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         0
                     )
                     builder.append(strShop)
-                    val str3 = SpannableString(" and No products selected to order")
+                    val str3 = SpannableString(getString(R.string.and_selecting_no_order))
                     builder.append(str3)
+//                    confirmDialog(
+//                        builder
+//                    )
+
+                    return@setOnClickListener
                     ViewUtils.viewDialog(
                         mContext!!,
                         "",
@@ -348,7 +362,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         object :
                             DialogListener {
                             override fun onConfirmed() {
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                             }
 
                             override fun onCanceled() {
@@ -366,11 +380,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             }
         }
 
-        noOrder!!.setOnClickListener {
+        binding.noOrder.setOnClickListener {
             val builder = SpannableStringBuilder()
-            val str1 = SpannableString("You are ")
+            val str1 = SpannableString(getString(R.string.you_are))
             builder.append(str1)
-            val strDistance = SpannableString(mView.tvdistance.text)
+            val strDistance = SpannableString(binding.tvdistance.text)
             if (distanceValue != null) {
                 if (distanceValue!! > 100.0) {
                     strDistance.setSpan(
@@ -399,7 +413,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
             }
             builder.append(strDistance)
-            val str2 = SpannableString(" away from ")
+            val str2 = SpannableString(getString(R.string.away_from))
             builder.append(str2)
             val strShop = SpannableString(shopName)
             strShop.setSpan(
@@ -409,14 +423,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 0
             )
             builder.append(strShop)
-            val str3 = SpannableString(" and selecting No Order")
+            val str3 = SpannableString(getString(R.string.and_selecting_no_order))
             builder.append(str3)
             appDatabase!!.saveOrderDao().deleteALL()
             if (distanceValue != null) {
+                confirmDialog(builder, "no_order")
+                return@setOnClickListener
+
                 ViewUtils.viewDialog(mContext!!, "", builder, object :
                     DialogListener {
                     override fun onConfirmed() {
-                        mView.progressBar.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
                         getLocation("no_order")
                     }
 
@@ -427,14 +444,141 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             } else {
                 Toast.makeText(
                     mContext!!,
-                    "Kindly wait for distance to be updated",
+                    getString(R.string.kindly_wait_for_distance_to_be_updated),
                     Toast.LENGTH_SHORT
                 ).show()
             }
 
         }
 
-        return mView
+        return binding.root
+    }
+
+
+    private var startCamera = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            AppLogger.log("startCameraNew:: $imageFilePath")
+            AppLogger.log("startCameraNew:: ${result.data}")
+
+            AppLogger.log("IMAGE_PICKER:: ${sharePrefUtils.getString(Constants.IMAGE_PICKER)}")
+
+            imageFiles.add(imageFilePath!!.path)
+            confirmDialog(
+                SpannableStringBuilder(sharePrefUtils.getString(Constants.IMAGE_PICKER)),
+                orderTypeNew
+            )
+        }
+    }
+
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun openCameraForApplicant() {
+        val pictureIntent = Intent(
+            MediaStore.ACTION_IMAGE_CAPTURE
+        )
+
+        if (pictureIntent.resolveActivity(requireActivity().packageManager) != null) {
+            try {
+                imageFilePath = createImageFile()
+            } catch (e: IOException) {
+                AppLogger.log("openCamera:: $e")
+            }
+            if (imageFilePath != null) {
+                val photoURI: Uri = FileProvider.getUriForFile(
+                    requireActivity(),
+                    "${requireActivity().packageName}.fileprovider",
+                    imageFilePath!!
+                )
+                AppLogger.log("openCamera:: $photoURI")
+                pictureIntent.putExtra(
+                    MediaStore.EXTRA_OUTPUT,
+                    photoURI
+                )
+                startCamera.launch(pictureIntent)
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val timeStamp =
+            SimpleDateFormat(
+                "yyyyMMdd_HHmmss",
+                Locale.getDefault()
+            ).format(Date())
+        val imageFileName = "IMG_" + timeStamp + "_"
+        val storageDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+            imageFileName,  /* prefix */
+            ".jpg",  /* suffix */
+            storageDir /* directory */
+        )
+        return image
+    }
+
+    private fun confirmDialog(
+        styleString: SpannableStringBuilder,
+        orderType: String
+    ) {
+        orderTypeNew = orderType
+        val dialogBinding = DialogConfirmOrderBinding.inflate(LayoutInflater.from(mContext))
+
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogBinding.root)
+
+        if (imageFiles.isEmpty()) {
+            dialogBinding.llImagePickerView.rvImage.visibility = View.GONE
+        } else {
+            dialogBinding.llImagePickerView.rvImage.visibility = View.VISIBLE
+        }
+
+        dialogBinding.llImagePickerView.ivPicImage.setOnClickListener {
+            sharePrefUtils.saveString(Constants.IMAGE_PICKER, styleString.toString())
+            dialog.dismiss()
+            openCameraForApplicant()
+        }
+
+
+        val layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
+
+        dialogBinding.llImagePickerView.rvImage.adapter = adapterImage
+        dialogBinding.llImagePickerView.rvImage.layoutManager = layoutManager
+        adapterImage.updateImages(imageFiles)
+
+        dialogBinding.tvMessage.setText(styleString, TextView.BufferType.SPANNABLE)
+
+
+        dialogBinding.btnConfirm.setOnClickListener {
+            builder.clear()
+            dialog.dismiss()
+            getLocation(orderType)
+        }
+        dialogBinding.btnNo.setOnClickListener {
+            builder.clear()
+            dialog.dismiss()
+            getLocation("reversegeo")
+        }
+
+        if (distanceValue!! > 100) {
+
+            dialogBinding.tvCaptureImage.isVisible = true
+            dialogBinding.llImagePickerView.llMain.isVisible = true
+        } else {
+            dialogBinding.tvCaptureImage.isVisible = false
+            dialogBinding.llImagePickerView.llMain.isVisible = false
+        }
+
+        dialog.show()
+        val window = dialog.window
+        window!!.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -466,11 +610,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
 
                     if (itemCountt == 1 || itemCountt == 0) {
-                        totalItemCount!!.setText(itemCountt.toString() + "Item")
+                        binding.totalItemCount.text =
+                            getString(R.string.items_, itemCountt.toString())
                     } else {
-                        totalItemCount!!.setText(itemCountt.toString() + "Items")
+                        binding.totalItemCount.text =
+                            getString(R.string.items_, itemCountt.toString())
                     }
-                    tvgrandTotal!!.setText("Total " + dformat.format(selectedOrder!!.grandTotal.toDouble()))
+                    binding.totalAmount.text = getString(
+                        R.string.total_,
+                        dFormat.format(selectedOrder!!.grandTotal.toDouble())
+                    )
                     appDatabase!!.saveOrderDao().insertAll(
                         SaveOrder(
                             null,
@@ -484,11 +633,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         }
 
-        shopTitle!!.text = shopName
-        mView.minOV.text = "Min Order Value: " + outletMinOrder
+        binding.selectedShop.text = shopName
+        binding.minOV.text = getString(R.string.min_order_value, outletMinOrder)
 
-        mView.imgRefresh.setOnClickListener {
-            rotateAnimation(mView.imgRefresh, 0f, 380f)
+        binding.imgRefresh.setOnClickListener {
+            rotateAnimation(binding.imgRefresh, 0f, 380f)
             getLocation("reversegeo")
         }
 
@@ -498,7 +647,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 queue!!,
                 token!!,
                 object : ApiServiceListener {
-                    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
                     override fun onResponseSuccess(response: String) {
                         getPreviousOrders(response)
                     }
@@ -529,16 +677,16 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         if (selectedOrder != null) {
-            mView.no_order.visibility = View.GONE
-            mView.save_order.visibility = View.GONE
-            mView.update_order.visibility = View.VISIBLE
+            binding.noOrder.visibility = View.GONE
+            binding.saveOrder.visibility = View.GONE
+            binding.updateOrder.visibility = View.VISIBLE
         } else {
-            mView.no_order.visibility = View.VISIBLE
-            mView.save_order.visibility = View.VISIBLE
-            mView.update_order.visibility = View.GONE
+            binding.noOrder.visibility = View.VISIBLE
+            binding.saveOrder.visibility = View.VISIBLE
+            binding.updateOrder.visibility = View.GONE
         }
 
-        mView.update_order.setOnClickListener {
+        binding.updateOrder.setOnClickListener {
             appDatabase!!.saveOrderDao().deleteALL()
             val builder = SpannableStringBuilder()
             val str1 = SpannableString("Are you sure want to update ")
@@ -559,7 +707,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 object :
                     DialogListener {
                     override fun onConfirmed() {
-                        mView.progressBar.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
                         getLocation("update_order")
                     }
 
@@ -572,20 +720,18 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         getAllProducts()
     }
 
-    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
+    private fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
         // Create an animation instance
         val an: Animation = RotateAnimation(
             fromDegrees, toDegrees, (v.width / 2).toFloat(),
             (v.height / 2).toFloat()
         )
         an.setDuration(500)
-        an.setFillAfter(true)
+        an.fillAfter = true
         an.repeatMode = Animation.RESTART
-        //v.clearAnimation();
         v.startAnimation(an)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun getPreviousOrders(response: String) {
         var lastOrderDate = ""
         var lastDeliveryDate = ""
@@ -655,75 +801,94 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     private fun getDistance(
-        currentlatitude: Double,
-        currentlongitude: Double,
-        shoplatitude: Double,
-        shoplongitude: Double,
+        currentLatitude: Double,
+        currentLongitude: Double,
+        shopLatitude: Double,
+        shopLongitude: Double,
         profile: String
     ) {
-        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shoplongitude + "," + shoplatitude + "/" + currentlongitude + "," + currentlatitude + "?profile=" + profile,
+
+        val distance = Constants.getDistance(
+            currentLatitude,
+            currentLongitude,
+            shopLatitude,
+            shopLongitude
+        )
+        distanceValue = distance.toDouble()
+
+        if (distance > 100) {
+            if (distance > 1000) {
+                val distanceKM = distance / 1000
+                binding.tvdistance.text =
+                    getString(R.string.km, DecimalFormat("#.##").format(distanceKM))
+            } else {
+                binding.tvdistance.text =
+                    getString(R.string.meter, DecimalFormat("#.##").format(distance))
+            }
+
+            binding.tvdistance.setTextColor(
+                ContextCompat.getColor(
+                    mContext!!,
+                    R.color.status_bounced
+                )
+            )
+        } else {
+            binding.tvdistance.setTextColor(
+                ContextCompat.getColor(
+                    mContext!!,
+                    R.color.cnl_color_2
+                )
+            )
+
+            binding.tvdistance.text =
+                getString(R.string.meter, DecimalFormat("#.##").format(distance))
+        }
+
+        binding.buttonLayout.visibility = View.VISIBLE
+
+        return
+
+
+        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shopLongitude + "," + shopLatitude + "/" + currentLongitude + "," + currentLatitude + "?profile=" + profile,
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
+                        AppLogger.log("response: $response")
                         val data = JSONObject(response)
+
                         val dist = data.getString("Distance")
                         val dformat = DecimalFormat("#.##")
                         val dis2 = dist.substring(0, dist.indexOf(' ')).toDouble()
-                        val distance = dformat.format(dis2)
 
                         distanceValue = dformat.format(dis2 * 1000).toDouble()
 
                         if (dis2 < 1) {
-                            val distMeter = dformat.format(dis2 * 1000).toDouble()
+                            val distMeter = dFormat.format(dis2 * 1000).toDouble()
                             if (distMeter > 100.0) {
-                                mView.tvdistance.text = distMeter.toString() + "m"
-                                mView.tvdistance.setTextColor(
+                                binding.tvdistance.text =
+                                    getString(R.string.meter, distMeter.toString())
+                                binding.tvdistance.setTextColor(
                                     ContextCompat.getColor(
                                         mContext!!,
                                         R.color.status_bounced
                                     )
                                 )
                             } else {
-                                mView.tvdistance.setTextColor(
+                                binding.tvdistance.setTextColor(
                                     ContextCompat.getColor(
                                         mContext!!,
                                         R.color.cnl_color_2
                                     )
                                 )
-                                mView.tvdistance.text = distMeter.toString() + "m"
+                                binding.tvdistance.text =
+                                    getString(R.string.meter, distMeter.toString())
                             }
                         } else {
-                            mView.tvdistance.text = distance + "km"
+                            binding.tvdistance.text =
+                                getString(R.string.km, dFormat.format(dis2).toString())
                         }
 
-                        mView.buttonLayout.visibility = View.VISIBLE
-
-                        //raw distance calculation
-                        /*val locationA = Location("point A")
-                        locationA.latitude = currentlatitude
-                        locationA.longitude = currentlongitude
-                        val locationB = Location("point B")
-                        locationB.latitude = shoplatitude
-                        locationB.longitude = shoplongitude
-                        val distanceRaw: Double = dformat.format(locationA.distanceTo(locationB).toDouble()).toDouble()
-                        Log.d("Distance", "Raw distance: "+distanceRaw)
-                        val distKm = dformat.format(distanceRaw/1000).toDouble()
-                        if (distKm < 1) {
-                            val distMeter = dformat.format(distanceRaw).toDouble()
-                            if (distMeter > 100.0) {
-                                tvdistanceRaw.text = distMeter.toString() + "m"
-                            } else {
-                                tvdistanceRaw.setTextColor(
-                                    ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.cnl_color_2
-                                    )
-                                )
-                                tvdistanceRaw.text = distMeter.toString() + "m"
-                            }
-                        } else {
-                            tvdistanceRaw.text = distKm.toString() + "km"
-                        }*/
+                        binding.buttonLayout.visibility = View.VISIBLE
 
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -740,17 +905,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    if (error != null && error.networkResponse != null) {
+                    if (error.networkResponse != null) {
                         try {
                             val s = String(error.networkResponse.data)
                             Log.d("Routes", "message: $s")
                             val data = JSONObject(s)
                             if (data.has("status") && data.getString("status").equals("400")) {
                                 getDistance(
-                                    currentlatitude,
-                                    currentlongitude,
-                                    shoplatitude,
-                                    shoplongitude,
+                                    currentLatitude,
+                                    currentLongitude,
+                                    shopLatitude,
+                                    shopLongitude,
                                     "car"
                                 )
                             }
@@ -785,7 +950,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
                         val city = place.getString("city")
                         val area = place.getString("area")
-                        mView.tvLocation.text = address + ", " + area + ", " + city
+                        binding.tvLocation.text = address + ", " + area + ", " + city
                     } catch (e: JSONException) {
                         e.printStackTrace()
                         Sentry.captureException(e)
@@ -886,7 +1051,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                             override fun onJSONResponseSuccess(response: JSONObject) {
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                                 val message = response.getString("message")
                                 //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
 
@@ -913,12 +1078,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
 
                             override fun onResponseFailure(error: VolleyError) {
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                                 ViewUtils.getErrorResponse(error, mContext!!)
                             }
 
                             override fun onException(e: Exception) {
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                             }
 
                         })
@@ -928,7 +1093,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         "No products selected to order",
                         object : DialogListener {
                             override fun onConfirmed() {
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                             }
 
                             override fun onCanceled() {
@@ -947,10 +1112,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             var orderedQuantity = 0
             var orderedAmount = 0.0
             val today = dateFormat.format(Calendar.getInstance().time)
-            val cal = Calendar.getInstance()
-            cal.time = Calendar.getInstance().time
-            cal.add(Calendar.DATE, 1)
-            val nextDay = dateFormat.format(cal.time)
+
+            AppLogger.log("START TIME: $today")
+            AppLogger.log("END TIME: $startOrderTime")
+
+            val a = Calendar.getInstance().time.time.minus(startOrderTimeA?.time!!)
+            AppLogger.log("TIME DIFF:: $a")
 
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
@@ -961,7 +1128,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("ordered_at", today)
             if (startOrderTime != null) orderObj.put("order_start_time", startOrderTime)
             orderObj.put("order_end_time", today)
-            if (mView.tvdistance.text.toString().length > 0) orderObj.put(
+            if (binding.tvdistance.text.toString().isNotEmpty()) orderObj.put(
                 "distance_from_outlets",
                 distanceValue.toString()
             )
@@ -1019,8 +1186,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
+            AppLogger.log("ConfirmOrder:: $obj1")
+
             if (obj1.length() > 0) {
-                Log.d("ConfirmOrder", "response: " + obj1)
+                Log.d("ConfirmOrder", "response: $obj1")
                 if (orderedQuantity > 0) {
                     ApiServices.apiJSONObjectPOST(
                         Api.confirm_order,
@@ -1028,13 +1197,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         token!!,
                         obj1,
                         object : ApiServiceListener {
-                            override fun onResponseSuccess(response: String) {
-                                TODO("Not yet implemented")
-                            }
+                            override fun onResponseSuccess(response: String) {}
 
                             override fun onJSONResponseSuccess(response: JSONObject) {
                                 val message = response.getString("message")
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                                 //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
                                 appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
                                 appDatabase!!.orderListDao().deleteByShop(shopId!!)
@@ -1050,9 +1217,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                             )
                                         }
 
-                                        override fun onCanceled() {
-                                            TODO("Not yet implemented")
-                                        }
+                                        override fun onCanceled() {}
 
                                     })
                             }
@@ -1064,7 +1229,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             override fun onResponseFailure(error: VolleyError) {
                                 try {
                                     ViewUtils.getErrorResponse(error, mContext!!)
-                                    mView.progressBar.visibility = View.GONE
+                                    binding.progressBar.visibility = View.GONE
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
@@ -1072,27 +1237,22 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             override fun onException(e: Exception) {
                                 try {
-                                    mView.progressBar.visibility = View.GONE
+                                    binding.progressBar.visibility = View.GONE
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
-
                             }
-
                         })
                 } else {
                     ViewUtils.viewDialogResponse(
                         mContext!!,
-                        "No products selected to order",
+                        getString(R.string.no_products_selected_to_order),
                         object : DialogListener {
                             override fun onConfirmed() {
-                                mView.progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                             }
 
-                            override fun onCanceled() {
-
-                            }
-
+                            override fun onCanceled() {}
                         })
                 }
 
@@ -1101,23 +1261,34 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     private fun submitNoOrder(location: Location) {
+        val today = dateFormat.format(Calendar.getInstance().time)
+        AppLogger.log("START TIME: $today")
+        AppLogger.log("END TIME: $startOrderTime")
+
+        val a = Calendar.getInstance().time.time.minus(startOrderTimeA?.time!!)
+        AppLogger.log("TIME DIFF:: $a")
+
         val obj1 = JSONObject()
         val ordersArray = JSONArray()
         val orderObj = JSONObject()
         orderObj.put("outlet_id", shopId)
         orderObj.put("user_id", user_id)
         orderObj.put("employee_id", sr_id)
-        if (distanceValue.toString().length > 0) orderObj.put(
+        if (distanceValue.toString().isNotEmpty()) orderObj.put(
             "distance_from_outlets",
             distanceValue.toString()
         )
+
+        if (startOrderTime != null) orderObj.put("order_start_time", startOrderTime)
+        orderObj.put("order_end_time", today)
+
         orderObj.put("longitude", location.longitude.toString())
         orderObj.put("latitude", location.latitude.toString())
         ordersArray.put(orderObj)
         obj1.put("orders", ordersArray)
 
         if (obj1.length() > 0) {
-            Log.d("ConfirmOrder", "response: " + obj1)
+            Log.d("ConfirmOrder", "response: $obj1")
             ApiServices.apiJSONObjectPOST(
                 Api.no_order,
                 queue!!,
@@ -1130,8 +1301,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                     override fun onJSONResponseSuccess(response: JSONObject) {
                         val message = response.getString("message")
-                        //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                        mView.progressBar.visibility = View.GONE
+                        binding.progressBar.visibility = View.GONE
 
                         ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                             override fun onConfirmed() {
@@ -1155,12 +1325,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
 
                     override fun onResponseFailure(error: VolleyError) {
-                        mView.progressBar.visibility = View.GONE
+                        binding.progressBar.visibility = View.GONE
                         ViewUtils.getErrorResponse(error, mContext!!)
                     }
 
                     override fun onException(e: Exception) {
-                        mView.progressBar.visibility = View.GONE
+                        binding.progressBar.visibility = View.GONE
                     }
 
                 })
@@ -1168,14 +1338,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     private fun getAllProducts() {
-        loading!!.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
         val url =
             Api.all_product_list + "?with_stock=1&user_id=" + user_id + "&is_active=1"/*+ "&route_id=" + routeId*/
         val request = StringRequest(
             Request.Method.GET, url,
             { response ->
                 try {
-                    loading!!.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
 
                     val data = JSONObject(response)
                     if (data.has("products") && !data.isNull("products")) {
@@ -1292,9 +1462,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             if (productsList!!.size > 0) {
                                 productsList!!.sortByDescending { it.stock_available }
-                                sortTitle!!.setText(resources.getString(R.string.high_stock))
+                                binding.sortTitle.setText(resources.getString(R.string.high_stock))
                                 adapter = ProductListAdapter(productsList!!, listener!!)
-                                recylerView!!.adapter = adapter
+                                binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
                         }
@@ -1306,7 +1476,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 }
             },
             { error ->
-                loading!!.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 if (error is TimeoutError) {
                     //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
                     Toast.makeText(
@@ -1350,7 +1520,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         queue!!.add(request)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun viewDialog(
         mContext: Context,
         outlet_name: String,
@@ -1386,27 +1555,30 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         val productItems: ArrayList<ProductStatistics> = ArrayList()
         var dformat = DecimalFormat("#.##")
-        outletName.setText(outlet_name)
+        outletName.text = outlet_name
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         if (lastOrderDate.length > 0 && !lastOrderDate.equals("null")) {
             val orderDate = df.format(oldDate.parse(lastOrderDate))
-            tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
+            tvLastOrderDate.text =
+                mContext.resources.getString(R.string.last_order_date, orderDate)
         }
         if (lastDelivery.length > 0 && !lastDelivery.equals("null")) {
             val deliveryDate = df.format(oldDate.parse(lastDelivery))
-            tvLastDeliveryDate.setText(mContext.resources.getString(R.string.last_delivery_date) + deliveryDate)
+            tvLastDeliveryDate.text =
+                mContext.resources.getString(R.string.last_delivery_date) + deliveryDate
         }
         if (!outletCategory.equals("null")) {
-            tvoutletCategory.setText(outletCategory)
+            tvoutletCategory.text = outletCategory
         }
         if (!minimum_order.equals("null")) {
-            tvminOrderValue.text = "Min Order Value: " + minimum_order
+            tvminOrderValue.text = getString(R.string.min_order_value, minimum_order)
         } else {
-            tvminOrderValue.text = "Min Order Value: N/A"
+            tvminOrderValue.text = getString(R.string.min_order_value, "N/A")
         }
 
         startOrder.setOnClickListener {
+            startOrderTimeA = Calendar.getInstance().time
             startOrderTime = dateFormat.format(Calendar.getInstance().time)
             getLocation("reversegeo")
             dialog.dismiss()
@@ -1452,11 +1624,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                tvItemCount.setText(
-                                    productItems.size.toString() + mContext.resources.getString(
-                                        R.string.items
-                                    )
-                                )
+                                tvItemCount.text = productItems.size.toString() + mContext.resources
+                                    .getString(R.string.items)
 
                                 var grandTotal = 0.0
                                 if (productItems.size > 0) {
@@ -1469,12 +1638,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 listView.adapter = adapter
                                 adapter.notifyDataSetChanged()
 
-                                tvGrandTotal.setText(dformat.format(grandTotal).toString())
+                                tvGrandTotal.text = dformat.format(grandTotal).toString()
                             }
 
                             R.id.menu_bounced_product -> {
                                 productItems.clear()
-                                filterTitle.setText(mContext.resources.getString(R.string.bounced))
+                                filterTitle.text = mContext.resources.getString(R.string.bounced)
                                 if (brands_array.length() > 0) {
                                     for (j in 0 until brands_array.length()) {
                                         val brandObj = brands_array.getJSONObject(j)
@@ -1503,11 +1672,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                tvItemCount.setText(
-                                    productItems.size.toString() + mContext.resources.getString(
-                                        R.string.items
-                                    )
-                                )
+                                tvItemCount.text = productItems.size.toString() + mContext.resources
+                                    .getString(R.string.items)
 
                                 var grandTotal = 0.0
                                 if (productItems.size > 0) {
@@ -1520,7 +1686,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 listView.adapter = adapter
                                 adapter.notifyDataSetChanged()
 
-                                tvGrandTotal.setText(dformat.format(grandTotal).toString())
+                                tvGrandTotal.text = dformat.format(grandTotal).toString()
                             }
                         }
                         return true
@@ -1531,7 +1697,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 popup.show()
             }
             productItems.clear()
-            filterTitle.setText(mContext.resources.getString(R.string.delivered))
+            filterTitle.text = mContext.resources.getString(R.string.delivered)
             if (brands_array.length() > 0) {
                 for (j in 0 until brands_array.length()) {
                     val brandObj = brands_array.getJSONObject(j)
@@ -1560,7 +1726,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
                 }
             }
-            tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+            tvItemCount.text = productItems.size.toString() + mContext.resources
+                .getString(R.string.items)
 
             var grandTotal = 0.0
             if (productItems.size > 0) {
@@ -1573,7 +1740,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             listView.adapter = adapter
             adapter.notifyDataSetChanged()
 
-            tvGrandTotal.setText(dformat.format(grandTotal).toString())
+            tvGrandTotal.text = dformat.format(grandTotal).toString()
         } else {
             filterLayout.visibility = View.GONE
 
@@ -1632,7 +1799,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
                 }
             }
-            tvItemCount.setText(productItems.size.toString() + mContext.resources.getString(R.string.items))
+            tvItemCount.text =
+                productItems.size.toString() + mContext.resources.getString(R.string.items)
 
             var grandTotal = 0.0
             if (productItems.size > 0) {
@@ -1645,7 +1813,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             listView.adapter = adapter
             adapter.notifyDataSetChanged()
 
-            tvGrandTotal.setText(dformat.format(grandTotal).toString())
+            tvGrandTotal.text = dformat.format(grandTotal).toString()
         }
 
         btnClose.setOnClickListener {
@@ -1717,9 +1885,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         itemCount = prodList!![0].itemsCount
         grandTotal = prodList[0].totalPrice
         if (itemCount == 1 || itemCount == 0) {
-            totalItemCount!!.setText(itemCount.toString() + "Item")
+            binding.totalItemCount.text = getString(R.string.items_, itemCount.toString())
         } else {
-            totalItemCount!!.setText(itemCount.toString() + "Items")
+            binding.totalItemCount.text = getString(R.string.items_, itemCount.toString())
         }
         try {
             Log.d("Product", "addedProducts size: " + addedProducts!!.size)
@@ -1727,7 +1895,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val exists = addedProducts?.find {
                 it.product_id == products.product_id
             }
-            Log.d("Product", "addedProducts size: " + exists)
+            Log.d("Product", "addedProducts size: $exists")
             if (exists != null) {
                 addedProducts!!.remove(exists)
                 addedProducts!!.add(
@@ -1782,8 +1950,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             Log.d("Product", "exception 2: " + e.message + " " + position)
             e.printStackTrace()
         }
-        tvgrandTotal!!.setText("Total " + dformat.format(grandTotal).toString())
-        totalAmount = dformat.format(grandTotal).toString()
+        binding.totalAmount.text = getString(R.string.total_, dFormat.format(grandTotal).toString())
+        totalAmount = dFormat.format(grandTotal).toString()
         grandTotalPrice = grandTotal
         totalCount = itemCount
 
