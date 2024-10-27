@@ -1,6 +1,9 @@
 package com.barikoi.cnlapp.utils
 
+import android.location.Location
+
 object Constants {
+    const val REQUEST_TYPE = "REQUEST_TYPE"
     const val STATUS_DECLINED = "REJECTED"
     const val STATUS_PENDING = "PENDING"
     const val STATUS_APPROVED = "APPROVED"
@@ -41,4 +44,16 @@ object Constants {
 
     //    const val MOBILE_REGEX = "^(?:(?:\\+|00)88|01)?\\d{11}\$"
     const val MOBILE_REGEX = "^(?:\\+?88|0088)?01[15-9]\\d{8}\$"
+
+    fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startPoint = Location("locationA")
+        startPoint.latitude = lat1
+        startPoint.longitude = lon1
+
+        val endPoint = Location("locationB")
+        endPoint.latitude = lat2
+        endPoint.longitude = lon2
+
+        return startPoint.distanceTo(endPoint)
+    }
 }

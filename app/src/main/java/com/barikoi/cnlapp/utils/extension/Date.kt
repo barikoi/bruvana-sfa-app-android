@@ -1,6 +1,10 @@
 package com.barikoi.cnlapp.utils.extension
 
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -33,4 +37,20 @@ fun Date.formatFullMonthDateYear(): String {
 fun Date.formatDateToFullName(): String {
     val df = SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.getDefault())
     return df.format(this)
+}
+
+fun String.formatHumanReadableDate(): String {
+    val inst = OffsetDateTime.ofInstant(
+        Instant.parse(this),
+        ZoneId.systemDefault()
+    )
+    return  DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a").format(inst)
+}
+
+fun String.formatHumanReadableTime(): String {
+    val inst = OffsetDateTime.ofInstant(
+        Instant.parse(this),
+        ZoneId.systemDefault()
+    )
+    return  DateTimeFormatter.ofPattern("hh:mm a").format(inst)
 }
