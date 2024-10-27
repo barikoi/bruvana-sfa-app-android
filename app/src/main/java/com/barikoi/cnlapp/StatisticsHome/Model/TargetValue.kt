@@ -2,8 +2,10 @@ package com.barikoi.cnlapp.StatisticsHome.Model
 
 import java.io.Serializable
 
-class TargetValue(
+data class TargetValue(
     val title: String,
     var target: String,
-    var completed: String
-):Serializable
+    var targetValue: Double,
+    var completed: String,
+    var completedValue: Double,
+) : Serializable

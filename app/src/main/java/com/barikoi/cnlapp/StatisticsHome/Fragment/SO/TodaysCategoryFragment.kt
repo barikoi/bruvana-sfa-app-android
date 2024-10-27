@@ -23,6 +23,7 @@ import com.barikoi.cnlapp.StatisticsHome.Model.Categories
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_last_week_category.*
@@ -86,10 +87,10 @@ class TodaysCategoryFragment : Fragment() {
                         if (categoryArray.length() > 0){
                             itemList.add(
                                 Categories(
-                                "Category",
-                                "Total Outlet",
-                                "Order Done",
-                                "Order Value"
+                                getString(R.string.category),
+                                getString(R.string.total_outlet),
+                                getString(R.string.order_done),
+                                getString(R.string.order_value)
                             )
                             )
                             for (i in 0 until categoryArray.length()){
@@ -114,7 +115,7 @@ class TodaysCategoryFragment : Fragment() {
                                         )
                                         itemList.add(
                                             Categories(
-                                                "Total",
+                                                getString(R.string.total_order),
                                                 sumOutletCount,
                                                 sumOrderDone,
                                                 sumOrderValue
@@ -165,11 +166,11 @@ class TodaysCategoryFragment : Fragment() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun createTable(data: ArrayList<Categories>) {
+        AppLogger.log("DATA:: ${data.get(0)}")
         tabLayout.isStretchAllColumns = true
         tabLayout.bringToFront()
-        val colorsTxt: Array<String> = mContext!!.getResources().getStringArray(R.array.colors)
+        val colorsTxt: Array<String> = mContext!!.resources.getStringArray(R.array.colors)
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
             val trborder = TableRow(mContext)
@@ -193,9 +194,6 @@ class TodaysCategoryFragment : Fragment() {
             c4.gravity = Gravity.CENTER
             c4.setTextColor(resources.getColor(R.color.text_title))
             c4.setText(data.get(i).order_value)
-            /*if (i==0 || i == data.size-1) {
-                image.visibility = View.INVISIBLE
-            }*/
             tr.addView(image)
             tr.addView(c1)
             tr.addView(c2)
@@ -204,9 +202,7 @@ class TodaysCategoryFragment : Fragment() {
             tabLayout.addView(tr)
             if (i==0 || i == data.size-1) {
                 image.visibility = View.INVISIBLE
-                //tabLayout.addView(trborder)
             }
-
         }
     }
 

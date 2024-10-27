@@ -37,10 +37,10 @@ class LastWeekCategoryFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var token : String? = null
-    var srId: String ? = ""
-    var userId: String ? = ""
-    var routeId: String ? = ""
+    var token: String? = null
+    var srId: String? = ""
+    var userId: String? = ""
+    var routeId: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +48,7 @@ class LastWeekCategoryFragment : Fragment() {
 
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,39 +70,48 @@ class LastWeekCategoryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryCategory(Api.get_last_week_category+"?user_id="+userId+"&route_id="+routeId+"&last_week_category=1")
+        getSummaryCategory(Api.get_last_week_category + "?user_id=" + userId + "&route_id=" + routeId + "&last_week_category=1")
     }
 
     private fun getSummaryCategory(url: String) {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
-            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onResponseSuccess(response: String) {
                 try {
                     progressBar.visibility = View.GONE
-                    if (response != null){
+                    if (response != null) {
                         var dformat = DecimalFormat("#.##")
                         val itemList: ArrayList<Categories> = ArrayList()
                         val obj = JSONObject(response)
                         val categoryArray = obj.getJSONArray("outlet_categories")
-                        if (categoryArray.length() > 0){
-                            itemList.add(Categories(
-                                "Category",
-                                "Total Outlet",
-                                "Deli Done",
-                                "Deli Value"
-                            ))
-                            for (i in 0 until categoryArray.length()){
+                        if (categoryArray.length() > 0) {
+                            itemList.add(
+                                Categories(
+                                    getString(R.string.category),
+                                    getString(R.string.total_outlet),
+                                    getString(R.string.deli_done),
+                                    getString(R.string.deli_value)
+                                )
+                            )
+                            for (i in 0 until categoryArray.length()) {
                                 val productObj = categoryArray.getJSONObject(i)
-                                if (!productObj.getString("outlet_category").equals("") && !productObj.getString("outlet_category").equals("null")) {
+                                if (!productObj.getString("outlet_category")
+                                        .equals("") && !productObj.getString("outlet_category")
+                                        .equals("null")
+                                ) {
                                     val outletCatName = productObj.getString("outlet_category")
                                     val outletCount = productObj.getString("total_outlet")
                                     val orderDone = productObj.getString("outlet_count_delivered")
-                                    val orderValue =  dformat.format(productObj.getString("delivery_value").toDouble())
+                                    val orderValue = dformat.format(
+                                        productObj.getString("delivery_value").toDouble()
+                                    )
                                     val sumOutletCount = productObj.getString("sum_total_outlet")
-                                    val sumOrderDone = productObj.getString("sum_outlet_count_delivered")
-                                    val sumOrderValue =  dformat.format(productObj.getString("sum_delivery_value").toDouble())
+                                    val sumOrderDone =
+                                        productObj.getString("sum_outlet_count_delivered")
+                                    val sumOrderValue = dformat.format(
+                                        productObj.getString("sum_delivery_value").toDouble()
+                                    )
 
-                                    if (i == categoryArray.length() -1) {
+                                    if (i == categoryArray.length() - 1) {
                                         itemList.add(
                                             Categories(
                                                 outletCatName,
@@ -112,13 +122,13 @@ class LastWeekCategoryFragment : Fragment() {
                                         )
                                         itemList.add(
                                             Categories(
-                                                "Total",
+                                                getString(R.string.total),
                                                 sumOutletCount,
                                                 sumOrderDone,
                                                 sumOrderValue
                                             )
                                         )
-                                    }else{
+                                    } else {
                                         itemList.add(
                                             Categories(
                                                 outletCatName,
@@ -135,7 +145,7 @@ class LastWeekCategoryFragment : Fragment() {
 
 
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
                     progressBar.visibility = View.GONE
                 }
@@ -189,7 +199,7 @@ class LastWeekCategoryFragment : Fragment() {
             c4.gravity = Gravity.CENTER
             c4.setTextColor(resources.getColor(R.color.text_title))
             c4.setText(data.get(i).order_value)
-            if (i==0 || i == data.size-1) {
+            if (i == 0 || i == data.size - 1) {
                 image.visibility = View.INVISIBLE
             }
             tr.addView(image)
