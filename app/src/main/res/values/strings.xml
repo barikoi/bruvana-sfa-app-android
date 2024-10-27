@@ -316,6 +316,9 @@
     <string name="profile_picture">Profile Picture</string>
     <string name="das_das">-- --</string>
     <string name="at">%1$s at %2$s</string>
+    <string name="no_data_found">No data found.</string>
+    <string name="please_select_product">Please select product</string>
 
+    <string name="_99">99+</string>
 
 </resources>

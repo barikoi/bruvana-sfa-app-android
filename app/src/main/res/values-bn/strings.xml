@@ -322,4 +322,8 @@
     <string name="das_das">-- --</string>
     <string name="at">%1$s এ %2$s</string>
 
+    <string name="no_data_found">কোনো তথ্য পাওয়া যায়নি।</string>
+    <string name="please_select_product">দয়া করে পণ্য নির্বাচন করুন</string>
+    <string name="_99">৯৯+</string>
+
 </resources>
