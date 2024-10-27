@@ -1,124 +1,189 @@
 package com.barikoi.cnlapp.Activity
 
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
-import com.android.volley.*
-import com.android.volley.toolbox.StringRequest
+import androidx.activity.viewModels
+import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
 import com.barikoi.barikoitrace.models.BarikoiTraceError
 import com.barikoi.barikoitrace.models.BarikoiTraceUser
-import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.BuildConfig.FLAVOR
+import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.databinding.ActivityLoginBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
-import io.sentry.Sentry
+import com.barikoi.cnlapp.utils.Constants
+import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.hideKeyboard
+import com.barikoi.cnlapp.utils.extension.setHapticClickListener
+import com.barikoi.cnlapp.utils.extension.toast
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.protocol.User
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.UnsupportedEncodingException
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class LoginActivity : AppCompatActivity() {
+@Suppress("DEPRECATION")
+@AndroidEntryPoint
+class LoginActivity : BaseActivity() {
+    private lateinit var binding: ActivityLoginBinding
 
-    //var etPhoneNumber: EditText? = null
-    var etSRCode: EditText? = null
-    var etPassword: EditText? = null
-    var signin_link: TextView? = null
-    var resetpass: TextView? = null
-    var login: Button? = null
-    var skip: Button? = null
-    private var loginSuccess: Boolean? = false
-    var pd: ProgressDialog? = null
-    private var player_id: String? = null
-    private var queue: RequestQueue? = null
-    private var token: String? = null
+    private val viewModel: LoginViewModel by viewModels()
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+    private lateinit var pd: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-        init()
-    }
 
-    private fun init() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(
-            applicationContext
-        )
-        etSRCode = findViewById<View>(R.id.input_sr_code) as EditText
-        etPassword = findViewById<View>(R.id.input_password) as EditText
-        queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        login = findViewById<View>(R.id.btn_login) as Button
-        login?.setOnClickListener { login() }
-    }
-
-    private fun login() {
-        if (!validate()) {
-            return
-        }
-        val employee_id = etSRCode!!.text.toString().replace(" ", "");
-        val password = etPassword!!.text.toString()
         pd = ProgressDialog(this)
-        pd!!.setMessage("Authenticating...")
-        pd!!.show()
-        val queue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
-        val request: StringRequest = object : StringRequest(
-            Method.POST, Api.loginurl,
-            Response.Listener { response ->
-                try {
-                    AppLogger.log("LOGIN DATA:: $response")
-                    val responsedata = JSONObject(response)
-                    if (responsedata.has("token")) {
-                        token = responsedata.getString("token")
-                        val userObj = responsedata.getJSONObject("user")
-                        val prefs = PreferenceManager.getDefaultSharedPreferences(
-                            applicationContext
-                        )
-                        val editor = prefs.edit()
-                        editor.putString(Api.EMAIL, userObj.getString("email"))
-                        editor.putString(Api.NAME, userObj.getString("user_name"))
-                        editor.putString(Api.USER_ID, userObj.getString("id"))
-                        editor.putString(Api.USER_TYPE, userObj.getString("designation"))
-                        editor.putString(Api.PHONE, userObj.getString("phone"))
-                        editor.putString(Api.TERRITORY_ID, userObj.getString("territory_id"))
-                        editor.putString(Api.EMPLOYEE_ID, userObj.getString("employee_id"))
-                        editor.putString(Api.TOKEN, token)
-                        if (userObj.has("group_name") && !userObj.isNull("group_name")) {
-                            editor.putString(Api.TRACE_GROUP_NAME, userObj.getString("group_name"))
-                        }
-                        if (userObj.has("group_id") && !userObj.isNull("group_id")) {
-                            editor.putString(Api.TRACE_GROUP_ID, userObj.getString("group_id"))
-                        }
-                        editor.commit()
+        pd.setMessage("Authenticating...")
 
-                        var email = ""
-                        if (userObj.has("email") && !userObj.isNull("email")) {
-                            email = userObj.getString("email")
+        startLoginObserve()
+
+        binding.btnLogin.setHapticClickListener {
+            hideKeyboard()
+            val userId = binding.etSRCode.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+            if (userId.isEmpty() || password.isEmpty()) {
+                toast("Please enter SR Code and Password")
+                return@setHapticClickListener
+            }
+            viewModel.login(userId, password)
+        }
+
+        binding.etSRCode.doOnTextChanged { text, _, _, _ ->
+            viewModel.userIdStateFlow.value = text.toString()
+        }
+
+        binding.etPassword.doOnTextChanged { text, _, _, _ ->
+            viewModel.passwordStateFlow.value = text.toString()
+        }
+
+        lifecycleScope.launch {
+            viewModel.isLoginInfoValid.collectLatest {
+                binding.btnLogin.isEnabled = it
+            }
+        }
+
+//        if (FLAVOR == "staging") {
+//            binding.etSRCode.setText("111888888")
+//            binding.etPassword.setText("12345678")
+//        }
+    }
+
+    private fun startLoginObserve() {
+        lifecycleScope.launch {
+            viewModel.loginResponse.observe(this@LoginActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startLoginObserve::Empty")
+                        pd.dismiss()
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startLoginObserve::Error DATA${it.data}")
+                        AppLogger.log("startLoginObserve::Error ${it.error}")
+                        pd.dismiss()
+
+                        if (it.data != null) {
+                            toast(it.data.message)
+                            return@observe
                         }
-                        val phone =
-                            if (userObj.getString("phone").length == 10) "0${userObj.getString("phone")}" else userObj.getString(
-                                "phone"
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startLoginObserve::Loading")
+                        pd.show()
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startLoginObserve:: Success ${it.data}")
+                        pd.dismiss()
+
+                        if (it.data?.message == "Password Incorrect") {
+                            toast(it.data.message)
+                            return@observe
+                        }
+
+                        it.data?.let { data ->
+                            sharePrefUtils.saveString(Api.TOKEN, data.token)
+
+                            sharePrefUtils.saveString(Api.EMAIL, data.user.email ?: "")
+                            sharePrefUtils.saveString(Api.NAME, data.user.userName)
+                            sharePrefUtils.saveString(Api.USER_ID, data.user.id.toString())
+
+                            sharePrefUtils.saveString(
+                                Api.USER_TYPE,
+                                data.user.designation!!
                             )
 
-                        // TODO: CANT SAVE THE LOG
+                            sharePrefUtils.saveString(Api.PHONE, data.user.phone)
+
+                            sharePrefUtils.saveString(
+                                Constants.DB_HOUSE_ID,
+                                data.user.dbHouseId.toString()
+                            )
+                            sharePrefUtils.saveString(
+                                Constants.AREA_ID,
+                                data.user.areaId.toString()
+                            )
+                            sharePrefUtils.saveString(
+                                Constants.TERRITORY_ID,
+                                data.user.territoryId.toString()
+                            )
+                            sharePrefUtils.saveString(
+                                Constants.REGION_ID,
+                                data.user.regionId.toString()
+                            )
+                            sharePrefUtils.saveString(
+                                Constants.NATION_ID,
+                                data.user.nationId.toString()
+                            )
+
+                            sharePrefUtils.saveString(
+                                Api.EMPLOYEE_ID,
+                                data.user.employeeId
+                            )
+                            sharePrefUtils.saveString(
+                                Api.TRACE_GROUP_NAME,
+                                data.user.groupName ?: ""
+                            )
+
+                            sharePrefUtils.saveString(
+                                Api.TRACE_GROUP_ID,
+                                data.user.groupId ?: ""
+                            )
+
+                        }
+
+                        val phone =
+                            if (it.data?.user?.phone?.length == 10) "0${it.data.user.phone}" else it.data?.user?.phone
+
                         BarikoiTrace.setOrCreateUser(
-                            userObj.getString("user_name"),
-                            email,
+                            it.data?.user?.userName,
+                            it.data?.user?.email,
                             phone,
                             object : BarikoiTraceUserCallback {
                                 override fun onFailure(barikoiError: BarikoiTraceError) {
@@ -133,152 +198,26 @@ class LoginActivity : AppCompatActivity() {
                                 }
                             })
 
-                        SentryAndroid.init(this) { options: SentryAndroidOptions ->
+                        SentryAndroid.init(this@LoginActivity) { options: SentryAndroidOptions ->
                             // Add a callback that will be used before the event is sent to Sentry.
                             // With this callback, you can modify the event or, when returning null, also discard the event.
                             options.beforeSend =
                                 SentryOptions.BeforeSendCallback { event: SentryEvent, hint: Any? ->
                                     val userSentry = User()
-                                    userSentry.id = userObj.getString("employee_id")
-                                    userSentry.email = employee_id
-                                    userSentry.username = userObj.getString("user_name")
+                                    userSentry.id = it.data?.user?.employeeId
+                                    userSentry.email = it.data?.user?.employeeId
+                                    userSentry.username = it.data?.user?.userName
                                     event.user = userSentry
                                     event
                                 }
                         }
 
-                        pd!!.dismiss()
-                        routeToAppropriatePage(2)
-                    } else if (responsedata.has("message")) {
-                        pd!!.dismiss()
-                        showDialog(responsedata.getString("message"))
-                    }
-                } catch (e: JSONException) {
-                    pd!!.dismiss()
-                    Sentry.captureException(e)
-                } catch (e: Exception) {
-                    pd!!.dismiss()
-                    Sentry.captureException(e)
-                }
-            },
-            Response.ErrorListener { error ->
-                pd!!.dismiss()
-                Toast.makeText(this, "ERROR: $error", Toast.LENGTH_LONG).show()
-                if (error is NoConnectionError) {
-                    showDialog("Login failed,check your internet connection and try again")
-                }
-                if (error?.networkResponse != null) {
-                    try {
-                        val s = String(error.networkResponse.data)
-                        Log.d("Verify", "message: $s")
-                        val data = JSONObject(s)
-                        Log.d("Verify", "message: " + data.getString("message"))
-                        showDialog("" + data.getString("message"))
-                        throw Exception(data.getString("message"))
-                    } catch (e: UnsupportedEncodingException) {
-                        e.printStackTrace()
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                        Sentry.captureException(e)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Sentry.captureException(e)
+                        toast("Login Successful")
+
+                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        finish()
                     }
                 }
-            }
-        ) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val parameters: MutableMap<String, String> = HashMap()
-                parameters["Accept"] = "application/json"
-                return parameters
-            }
-
-            @Throws(AuthFailureError::class)
-            override fun getParams(): Map<String, String>? {
-                val parameters: MutableMap<String, String> = HashMap()
-                //parameters.put("id", id.getText().toString());
-                Log.d("MainActivity", "login email: $employee_id")
-                //parameters.put("device_ID",player_id);
-                parameters["employee_id"] = employee_id
-                parameters["password"] = password
-                return parameters
-            }
-        }
-        request.retryPolicy = DefaultRetryPolicy(
-            30 * 1000, 0,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-        queue.add(request)
-    }
-
-    fun showDialog(message: String) {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage(message)
-            .setCancelable(false)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
-                dialog.cancel()
-            })
-        val alert = builder.create()
-        alert.show()
-
-    }
-
-    override fun onBackPressed() {
-        // disable going back to the MainActivity
-        moveTaskToBack(true)
-    }
-
-    fun onLoginFailed() {
-        showDialog("Login failed,check if SR Code and password is correct")
-
-    }
-
-    private fun validate(): Boolean {
-        var valid = true
-        /*val phoneNumber = etPhoneNumber!!.text.toString()
-        if (phoneNumber.isEmpty()) {
-            etPhoneNumber!!.error = "Enter a valid phone number"
-            valid = false
-        } else {
-            etPhoneNumber!!.requestFocus()
-            etPhoneNumber!!.error = null
-        }*/
-
-        val email = etSRCode!!.text.toString().replace(" ", "");
-        if (email.isEmpty()) {
-            etSRCode!!.setError("Enter a valid SR code")
-            valid = false
-        } else {
-            etSRCode!!.setError(null)
-        }
-        if (etPassword!!.text.toString().length < 6) {
-            etPassword!!.error = "Enter a valid password (minimum 6 characters)"
-            valid = false
-        } else {
-            etPassword!!.error = null
-        }
-        return valid
-    }
-
-    private fun routeToAppropriatePage(routeopt: Int) {
-        // Example routing
-        when (routeopt) {
-            0 -> {
-                /*val i = Intent(this, SignupActivity::class.java)
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                startActivity(i)
-                finish()*/
-            }
-
-            1 -> {
-                val intent = intent
-                startActivity(intent)
-            }
-
-            2 -> {
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
-                finish()
             }
         }
     }

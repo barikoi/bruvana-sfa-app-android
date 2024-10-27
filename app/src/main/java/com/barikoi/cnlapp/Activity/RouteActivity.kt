@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.android.volley.NetworkResponse
@@ -19,6 +18,7 @@ import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.Fragment.RouteFragment
 import com.barikoi.cnlapp.Fragment.ShopListFragment
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.databinding.ActivityRouteBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
@@ -35,7 +35,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class RouteActivity : AppCompatActivity() {
+class RouteActivity : BaseActivity() {
     private lateinit var binding: ActivityRouteBinding
 
     private val viewModel: RouteViewModel by viewModels()
@@ -71,7 +71,6 @@ class RouteActivity : AppCompatActivity() {
         }
 
         mQueue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
-
 
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
