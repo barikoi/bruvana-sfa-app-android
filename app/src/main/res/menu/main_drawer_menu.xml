@@ -63,7 +63,6 @@
     <group
         android:id="@+id/nav_request_approval"
         android:enabled="true">
-
         <item
             android:id="@+id/menu_request_approval"
             android:title="@string/title_approval"
