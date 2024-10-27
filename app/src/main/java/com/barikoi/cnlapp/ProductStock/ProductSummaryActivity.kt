@@ -1,264 +1,247 @@
 package com.barikoi.cnlapp.ProductStock
 
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
-import com.android.volley.NetworkResponse
-import com.android.volley.RequestQueue
-import com.android.volley.VolleyError
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.barikoi.cnlapp.ProductStock.vm.ProductSummeryViewModel
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.remote.models.DbHouse
+import com.barikoi.cnlapp.databinding.ActivityProductSummaryBinding
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.utils.ApiService.ApiServices
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
-import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.Api.TERRITORY_ID
+import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_product_summary.*
-import org.json.JSONObject
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import javax.inject.Inject
 
-class ProductSummaryActivity : AppCompatActivity() {
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    var queue: RequestQueue? = null
-    var token : String? = null
-    var territoryId : String? = ""
-    var userId: String ? = ""
-    var routeId: String ? = ""
-    var territorySuffix : String? = ""
-    var selectedTerritoryId : String? = null
-    val dhList: ArrayList<Pair<String, String>> = ArrayList()
+@AndroidEntryPoint
+class ProductSummaryActivity : BaseActivity() {
+    private lateinit var binding: ActivityProductSummaryBinding
+
+    private val viewModel: ProductSummeryViewModel by viewModels()
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    var selectedTerritoryId: String? = null
+
+    private lateinit var adapter: ProductStockAdapter
+    private var dbHouses: List<DbHouse> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_product_summary)
 
-        queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
-        prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        editor = prefs!!.edit()
-        token = prefs!!.getString(Api.TOKEN, "")
-        territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
-        userId = prefs!!.getString(Api.USER_ID, "")
-        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        binding = ActivityProductSummaryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        btnBack.setOnClickListener {
-            onBackPressed()
-            finish()
+        binding.toolbar.tvTitle.text = getString(R.string.title_product_summary)
+        binding.toolbar.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
-        if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)){
-            spinnerLayoutRoute.visibility = View.VISIBLE
-            getDHList()
-            spinnerDistributorHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+
+        setDateFilter()
+
+        starDHObserve()
+        starProductStockObserve()
+
+        adapter = ProductStockAdapter(true,
+            sharePrefUtils.getString(Api.USER_TYPE) == "TO",
+            {},
+            {},
+            {},
+            { _, _ ->
+
+            })
+
+        binding.rcvProductList.layoutManager = LinearLayoutManager(this)
+        binding.rcvProductList.adapter = adapter
+
+        binding.spinnerDistributorHouse.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
                 @RequiresApi(Build.VERSION_CODES.N)
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    if (spinnerDistributorHouse.adapter.count >0) {
-                        selectedTerritoryId = dhList.get(p2).second
-                        territorySuffix = "&db_house_id="+selectedTerritoryId
-                        setDateFilter()
+                    if (binding.spinnerDistributorHouse.adapter.count > 0) {
+                        selectedTerritoryId = dbHouses[p2].id.toString()
+
+                        viewModel.getProductStock(
+                            "${getDate().first} 00:00:00",
+                            "${getDate().second} 23:59:59",
+                            "1",
+                            "1",
+                            selectedTerritoryId,
+                            null
+                        )
                     }
                 }
 
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                }
-
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
 
-        }else{
-            territorySuffix = "&user_id="+userId/*+"&route_id="+routeId*/
-            spinnerLayoutRoute.visibility = View.GONE
-            setDateFilter()
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+            binding.spinnerLayoutRoute.visibility = View.VISIBLE
+            viewModel.getDHList(sharePrefUtils.getString(TERRITORY_ID)!!)
+        } else {
+            binding.spinnerLayoutRoute.visibility = View.GONE
+            viewModel.getProductStock(
+                "${getDate().first} 00:00:00",
+                "${getDate().second} 23:59:59",
+                null,
+                "1",
+                null,
+                sharePrefUtils.getString(Api.USER_ID)
+            )
         }
+    }
+
+    private fun getDate(): Pair<String, String> {
+        val c = Calendar.getInstance()
+        c.set(Calendar.DAY_OF_MONTH, 1)
+        val end = Calendar.getInstance().time
+        val start = c.time
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+
+        binding.tvDateRange.text =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
+
+        return Pair(df.format(start), df.format(end))
     }
 
 
     private fun setDateFilter() {
-        val c = Calendar.getInstance()
-        //c.add(Calendar.DAY_OF_WEEK, -7)
-        c.set(Calendar.DAY_OF_MONTH, 1);
-        val end = Calendar.getInstance().time
-        val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
-        val StartDate = df.format(start)
-        val EndDate = df.format(end)
-
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
-
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
-        })
+            binding.dateRangeLayout.setEnabled(false)
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
-            val s_date = Date(selection.first!!)
-            val e_date = Date(selection.second!!)
-            if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
-                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.commit()*/
+            binding.dateRangeLayout.setEnabled(true)
+            val sDate = Date(selection.first!!)
+            val eDate = Date(selection.second!!)
+            if (sDate.compareTo(eDate) == 0) {
+                binding.tvDateRange.text = simpleFormat.format(sDate)
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
-                /*editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
-                editor!!.commit()*/
+                binding.tvDateRange.text = getString(
+                    R.string.date_range_,
+                    simpleFormat.format(sDate),
+                    simpleFormat.format(eDate)
+                )
             }
-            getProductSummary(Api.all_product_list+"?start_date="+df.format(s_date)+" 00:00:00"+"&end_date="+df.format(e_date)+" 23:59:59"+"&with_order=1"+territorySuffix)
+
+            viewModel.getProductStock(
+                df.format(sDate) + " 00:00:00",
+                df.format(eDate) + " 23:59:59",
+                null,
+                "1",
+                null,
+                selectedTerritoryId
+            )
 
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
-
-        getProductSummary(Api.all_product_list+"?start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&with_order=1"+territorySuffix)
+        materialDatePicker.addOnNegativeButtonClickListener {
+            binding.dateRangeLayout.setEnabled(
+                true
+            )
+        }
     }
 
-    private fun getProductSummary(url: String) {
-        progressBar.visibility= View.VISIBLE
-        productList.visibility = View.GONE
-        ApiServices.apiGET(url, queue!!, "", object : ApiServiceListener {
-            override fun onResponseSuccess(response: String) {
-                try {
-                    if (response != null){
-                        progressBar.visibility= View.GONE
-                        productList.visibility = View.VISIBLE
-                        val itemList: ArrayList<ProductStock> = ArrayList()
-                        val obj = JSONObject(response)
-                        val productsArray = obj.getJSONArray("products")
-                        if (productsArray.length() > 0){
-                            for (i in 0 until productsArray.length()){
-                                var imageUrl = "null"
-                                val productObj = productsArray.getJSONObject(i)
-                                if (productObj.has("images") && !productObj.isNull("images")){
-                                    val imageArray = productObj.getJSONArray("images")
-                                    if (imageArray.length() > 0){
-                                        val imageobj = imageArray.getJSONObject(0)
-                                        if (imageobj.has("image_url")){
-                                            imageUrl = imageobj.getString("image_url")
-                                        }
-                                    }
-                                }
-                                itemList.add(
-                                    ProductStock(
-                                        productObj.getString("id"),
-                                        productObj.getString("product_name"),
-                                        imageUrl,
-                                        resources.getString(R.string.sold_in)+" "+productObj.getString("productive_routes")+" "+resources.getString(R.string.route),
-                                        productObj.getString("delivered_quantity"),
-                                        productObj.getString("unit_name")
-                                    )
-                                )
-                            }
-                        }
-
-                        itemList.sortByDescending {
-                            it.per_unit_quantity
-                        }
-
-                        val adapter = ProductStockAdapter(itemList)
-                        productList.adapter = adapter
-                        adapter!!.notifyDataSetChanged()
-
-
+    private fun starDHObserve() {
+        lifecycleScope.launch {
+            viewModel.dbHousesResponse.observe(this@ProductSummaryActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("starDHObserve::Empty")
                     }
-                }catch (e: Exception){
-                    e.printStackTrace()
-                    progressBar.visibility= View.GONE
-                    productList.visibility = View.GONE
-                }
-            }
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
+                    is ApiState.Error -> {
+                        AppLogger.log("starDHObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+                    is ApiState.Loading -> {
+                        AppLogger.log("starDHObserve::Loading")
+                    }
 
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, applicationContext)
-                progressBar.visibility= View.GONE
-                productList.visibility = View.GONE
-            }
+                    is ApiState.Success -> {
+                        AppLogger.log("starDHObserve:: Success ${it.data}")
 
-            override fun onException(e: Exception) {
-                Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                progressBar.visibility= View.GONE
-                productList.visibility = View.GONE
-            }
+                        if (it.data?.dbHouses == null) {
+                            toast("DB House List is empty")
+                            return@observe
+                        }
+                        dbHouses = it.data.dbHouses
 
-        })
-    }
-
-    private fun getDHList() {
-        ApiServices.apiGET(
-            Api.get_dh_list+"?territory_id="+territoryId,
-            queue!!, token!!, object : ApiServiceListener {
-                override fun onResponseSuccess(response: String) {
-                    viewDHList(response)
-                }
-
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, applicationContext)
-                }
-
-                override fun onException(e: Exception) {
-                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                }
-
-            })
-    }
-
-    private fun viewDHList(response: String) {
-        try {
-            if (response != null){
-                dhList.clear()
-                val obj = JSONObject(response)
-                val dhArray = obj.getJSONArray("db_houses")
-                val dhNameList: ArrayList<String> = ArrayList()
-                if (dhArray.length() >0){
-                    for (i in 0 until dhArray.length()) {
-                        val dhObj = dhArray.getJSONObject(i)
-                        dhList.add(
-                            Pair(dhObj.getString("db_house_name"), dhObj.getString("id"))
+                        val dhNameList = it.data.dbHouses.map { dh -> dh.dbHouseName }
+                        val adapter = ArrayAdapter(
+                            applicationContext,
+                            android.R.layout.simple_spinner_item, dhNameList
                         )
-                        dhNameList.add(dhObj.getString("db_house_name"))
-
+                        binding.spinnerDistributorHouse.adapter = adapter
                     }
                 }
-                val adapter = ArrayAdapter(
-                    applicationContext,
-                    android.R.layout.simple_spinner_item, dhNameList
-                )
-                spinnerDistributorHouse.adapter = adapter
             }
-        }catch (e:Exception){
-            e.printStackTrace()
+        }
+    }
+
+    private fun starProductStockObserve() {
+        lifecycleScope.launch {
+            viewModel.productStockResponse.observe(this@ProductSummaryActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("starProductStockObserve::Empty")
+                        binding.progressBar.isVisible = false
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("starProductStockObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        binding.progressBar.isVisible = true
+                        AppLogger.log("starProductStockObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("starProductStockObserve:: Success ${it.data}")
+
+
+                        adapter.updateProducts(it.data?.products!!)
+                    }
+                }
+            }
         }
     }
 }
