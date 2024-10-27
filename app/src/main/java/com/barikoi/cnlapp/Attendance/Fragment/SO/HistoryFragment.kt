@@ -24,6 +24,7 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.fragment_history.dateRangeLayout
 import kotlinx.android.synthetic.main.fragment_history.historyListView
+import kotlinx.android.synthetic.main.fragment_history.progressBar
 import kotlinx.android.synthetic.main.fragment_history.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -39,9 +40,9 @@ class HistoryFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var user_id : String? = null
-    var token : String? = null
-    var historyList : ArrayList<HistoryList> = ArrayList()
+    var user_id: String? = null
+    var token: String? = null
+    var historyList: ArrayList<HistoryList> = ArrayList()
     var adapter: HistoryListAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,20 +76,21 @@ class HistoryFragment : Fragment() {
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        tvDateRange.text =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
 
-        getAttendance(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate)
+        getAttendance(Api.get_attendance + "?start_date=" + StartDate + "&end_date=" + EndDate)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
@@ -102,27 +104,40 @@ class HistoryFragment : Fragment() {
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                tvDateRange.text = getString(
+                    R.string.date_range_,
+                    simpleFormat.format(s_date),
+                    simpleFormat.format(e_date)
+                )
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
             }
 
-            getAttendance(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
+            getAttendance(
+                Api.get_attendance + "?start_date=" + df.format(s_date) + "&end_date=" + df.format(
+                    e_date
+                )
+            )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
     }
-    fun getAttendance(url: String){
+
+    private fun getAttendance(url: String) {
+        progressBar.visibility = View.VISIBLE
+
         ApiServices.apiGET(
             url,
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
+
+                    progressBar.visibility = View.GONE
                     getHistoryList(response)
                 }
 
@@ -135,22 +150,25 @@ class HistoryFragment : Fragment() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
+
+                    progressBar.visibility = View.GONE
                     ViewUtils.getErrorResponse(error, mContext!!)
                 }
 
                 override fun onException(e: Exception) {
+                    progressBar.visibility = View.GONE
                     Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
                 }
-
             })
     }
-    fun getHistoryList(response: String){
+
+    fun getHistoryList(response: String) {
         try {
-            if (response != null){
+            if (response != null) {
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
                 historyList.clear()
-                if (attedanceArray.length() >0){
+                if (attedanceArray.length() > 0) {
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
                         var latitude = 0.0
@@ -161,11 +179,11 @@ class HistoryFragment : Fragment() {
                                 attendanceObj.getDouble("latitude")
                             if (!attendanceObj.getString("longitude").equals("null")) longitude =
                                 attendanceObj.getDouble("longitude")
-                            if (attendanceObj.has("images") && !attendanceObj.isNull("images")){
+                            if (attendanceObj.has("images") && !attendanceObj.isNull("images")) {
                                 val imageArray = attendanceObj.getJSONArray("images")
-                                if (imageArray.length() > 0){
+                                if (imageArray.length() > 0) {
                                     val imageobj = imageArray.getJSONObject(0)
-                                    if (imageobj.has("image_url")){
+                                    if (imageobj.has("image_url")) {
                                         imageUrl = imageobj.getString("image_url")
                                     }
                                 }
@@ -198,7 +216,7 @@ class HistoryFragment : Fragment() {
                 historyListView.adapter = adapter
                 adapter!!.notifyDataSetChanged()
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

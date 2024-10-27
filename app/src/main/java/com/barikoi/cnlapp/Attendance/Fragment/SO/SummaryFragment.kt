@@ -41,9 +41,9 @@ class SummaryFragment : Fragment() {
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var user_id : String? = null
-    var token : String? = null
-    var reasonList : ArrayList<Pair<String, String>> = ArrayList()
+    var user_id: String? = null
+    var token: String? = null
+    var reasonList: ArrayList<Pair<String, String>> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +63,7 @@ class SummaryFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_summary, container, false)
     }
+
     private fun init() {
         setDateFilter()
     }
@@ -73,20 +74,22 @@ class SummaryFragment : Fragment() {
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
+        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        tvDateRange.text =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
+
         editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
 
-        getSummaryList(Api.get_attendance+"?start_date="+StartDate+"&end_date="+EndDate)
+        getSummaryList(Api.get_attendance + "?start_date=" + StartDate + "&end_date=" + EndDate)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
@@ -100,18 +103,28 @@ class SummaryFragment : Fragment() {
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+
+                tvDateRange.text =
+                    getString(
+                        R.string.date_range_,
+                        simpleFormat.format(s_date),
+                        simpleFormat.format(e_date)
+                    )
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
             }
 
-            getSummaryList(Api.get_attendance+"?start_date="+df.format(s_date)+"&end_date="+df.format(e_date))
+            getSummaryList(
+                Api.get_attendance + "?start_date=" + df.format(s_date) + "&end_date=" + df.format(
+                    e_date
+                )
+            )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
@@ -144,25 +157,31 @@ class SummaryFragment : Fragment() {
             })
     }
 
-    fun getHistoryList(response: String){
+    fun getHistoryList(response: String) {
         try {
-            if (response != null){
+            if (response != null) {
                 val obj = JSONObject(response)
                 val attedanceArray = obj.getJSONArray("attendances")
                 var absent = 0
                 var present = 0
-                var late= 0
+                var late = 0
                 reasonList.clear()
-                if (attedanceArray.length() >0){
+                if (attedanceArray.length() > 0) {
                     for (i in 0 until attedanceArray.length()) {
                         val attendanceObj = attedanceArray.getJSONObject(i)
-                        if (!attendanceObj.getString("remarks").equals("null") && attendanceObj.getString("remarks").length > 0){
-                            reasonList.add(Pair(attendanceObj.getString("checkin_time"),
-                                attendanceObj.getString("remarks")))
+                        if (!attendanceObj.getString("remarks")
+                                .equals("null") && attendanceObj.getString("remarks").length > 0
+                        ) {
+                            reasonList.add(
+                                Pair(
+                                    attendanceObj.getString("checkin_time"),
+                                    attendanceObj.getString("remarks")
+                                )
+                            )
                         }
 
                         if (attendanceObj.getInt("is_late") == 1) late += 1
-                        if (attendanceObj.getInt("is_absent") == 1) absent +=1
+                        if (attendanceObj.getInt("is_absent") == 1) absent += 1
                     }
 
                     present = attedanceArray.length() - absent
@@ -187,7 +206,7 @@ class SummaryFragment : Fragment() {
                 lateCount.setText(late.toString())
                 absentCount.setText(absent.toString())
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

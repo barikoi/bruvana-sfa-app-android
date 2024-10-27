@@ -13,56 +13,55 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
+class HistoryListAdapter(private val histories: List<HistoryList>) :
+    RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_attendance_history, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_attendance_history, parent, false)
         return ViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-        val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.ENGLISH)
-        val _sdfWatchDate = SimpleDateFormat("dd", Locale.ENGLISH)
-        val _sdfWatchtime = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
+        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.getDefault())
+        val _sdfWatchDate = SimpleDateFormat("dd", Locale.getDefault())
+        val _sdfWatchtime = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
         val mItem = histories[position]
-        if (!mItem.enterTime.isNullOrEmpty() && !mItem.enterTime.equals("null")){
-            holder.textViewMonth.setText(_sdfWatchMonth.format(oldDate.parse(mItem.enterTime)))
-            holder.textViewDate.setText(_sdfWatchDate.format(oldDate.parse(mItem.enterTime)))
-            holder.inTime.setText(_sdfWatchtime.format(oldDate.parse(mItem.enterTime)))
-        }else{
-            holder.inTime.setText("--:--")
+        if (mItem.enterTime.isNotEmpty() && !mItem.enterTime.equals("null")) {
+            holder.textViewMonth.text = _sdfWatchMonth.format(oldDate.parse(mItem.enterTime))
+            holder.textViewDate.text = _sdfWatchDate.format(oldDate.parse(mItem.enterTime))
+            holder.inTime.text = _sdfWatchtime.format(oldDate.parse(mItem.enterTime))
+        } else {
+            holder.inTime.text = "--:--"
         }
 
-        if (!mItem.exitTime.isNullOrEmpty() && !mItem.exitTime.equals("null")){
-            holder.outTime.setText(_sdfWatchtime.format(oldDate.parse(mItem.exitTime)))
-        }else{
-            holder.outTime.setText("--:--")
+        if (mItem.exitTime.isNotEmpty() && !mItem.exitTime.equals("null")) {
+            holder.outTime.text = _sdfWatchtime.format(oldDate.parse(mItem.exitTime))
+        } else {
+            holder.outTime.text = "--:--"
         }
 
-        if (!mItem.routeName.isNullOrEmpty() && !mItem.routeName.equals("null")){
-            holder.marketName.setText(holder.itemView.resources.getString(R.string.market)+" "+mItem.routeName)
-        }else{
+        if (mItem.routeName.isNotEmpty() && !mItem.routeName.equals("null")) {
+            holder.marketName.text = holder.itemView.resources.getString(R.string.market) + " " + mItem.routeName
+        } else {
             holder.marketName.visibility = View.GONE
         }
 
-        if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
-            /*val newurl = URL(Api.base_url+java.net.URLEncoder.encode(mItem.imageLink, "UTF-8"))
-            val bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream())
-            holder.imageUser.setImageBitmap(bitmap)*/
+        if (mItem.imageLink.isNotEmpty() && !mItem.imageLink.equals("null")) {
             Glide.with(holder.itemView.context)
                 .load(mItem.imageLink)
                 .into(holder.imageUser)
-        }else{
+        } else {
             holder.imageUser.visibility = View.GONE
         }
 
 
-        if (!mItem.checkInAddress.isNullOrEmpty() && !mItem.checkInAddress.equals("null")){
-            holder.inAddress.setText(mItem.checkInAddress)
-        }else{
-            holder.inAddress.setText("")
+        if (mItem.checkInAddress.isNotEmpty() && !mItem.checkInAddress.equals("null")) {
+            holder.inAddress.text = mItem.checkInAddress
+        } else {
+            holder.inAddress.text = ""
         }
     }
 
@@ -79,6 +78,7 @@ class HistoryListAdapter (val histories: List<HistoryList>) : RecyclerView.Adapt
         internal val inAddress: TextView
         internal val outAddress: TextView
         internal val imageUser: ImageView
+
         init {
             textViewMonth = itemView.findViewById(R.id.tvMonth)
             textViewDate = itemView.findViewById(R.id.tvDate)
