@@ -41,6 +41,7 @@ import com.barikoi.cnlapp.databinding.FragmentDeliveredOrderBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import org.json.JSONArray
@@ -51,7 +52,6 @@ import java.util.*
 
 
 class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
-
     private lateinit var binding: FragmentDeliveredOrderBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                adapter.filter.filter(s)
+                adapterDelivery.filter.filter(s)
                 if (s!!.length == 0) {
                     if (sr_id!!.length == 0) {
                         getAllOrders(
@@ -102,9 +102,6 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
 
     companion object {
         var mCallback2: OrderListSuccessListener? = DeliveredOrderFragment()
-        var recylerView: RecyclerView? = null
-        var progressBar: ProgressBar? = null
-        lateinit var ACTIVITY: OrderDeliveryUpdateActivity
         var token: String? = null
         var user_id: String? = null
         var user_type: String? = null
@@ -113,12 +110,11 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         var route_id: String? = null
         private var prefs: SharedPreferences? = null
         private var editor: SharedPreferences.Editor? = null
-        var mContext: Context? = null
         var queue: RequestQueue? = null
         var appDatabase: AppDatabase? = null
         private var listener: OnEditOrderListener? = null
         val orderList: ArrayList<OrderList> = ArrayList()
-        lateinit var adapter: OrderDeliveryListAdapter
+        lateinit var adapterDelivery: OrderDeliveryListAdapter
 
         fun checkforOrders(
             queue: RequestQueue,
@@ -158,13 +154,13 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         ) {
             ApiServices.apiGET(url, queue, token, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
+                    AppLogger.log("getAllOrders onResponseSuccess: $response")
                     try {
-                        if (response != null) {
-                            val obj = JSONObject(response)
-                            val orderArray = obj.getJSONArray("orders")
-                            callback.onSuccess(orderArray)
 
-                        }
+                        val obj = JSONObject(response)
+                        val orderArray = obj.getJSONArray("orders")
+                        callback.onSuccess(orderArray)
+
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -190,7 +186,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
     }
 
     override fun onSuccess(array: JSONArray) {
-        progressBar!!.visibility = View.GONE
+        binding.progressBar2.visibility = View.GONE
         orderList.clear()
         try {
             if (array.length() > 0) {
@@ -272,14 +268,14 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                 it.orderId
             }
 
-            recylerView.apply {
+            binding.orderListView.apply {
                 if (user_type.equals("TO", true)) {
-                    adapter = OrderDeliveryListAdapter(orderList, listener!!, "TO")
+                    adapterDelivery = OrderDeliveryListAdapter(orderList, listener!!, "TO")
                 } else {
-                    adapter = OrderDeliveryListAdapter(orderList, listener!!, "SO")
+                    adapterDelivery = OrderDeliveryListAdapter(orderList, listener!!, "SO")
                 }
-                recylerView!!.adapter = adapter
-                adapter.notifyDataSetChanged()
+                binding.orderListView.adapter = adapterDelivery
+                adapterDelivery.notifyDataSetChanged()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -289,8 +285,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
     }
 
     override fun onFailure(error: VolleyError) {
-        progressBar!!.visibility = View.GONE
-        ViewUtils.getErrorResponse(error, mContext!!)
+        binding.progressBar2.visibility = View.GONE
+        ViewUtils.getErrorResponse(error, requireContext())
     }
 
     override fun onDataSet(StartDate: Date, EndDate: Date) {
@@ -316,9 +312,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         }
         territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
         appDatabase = AppDatabase.getInstance(context)
-        mContext = context
         listener = this
-        ACTIVITY = context as OrderDeliveryUpdateActivity
         mCallback2 = this
 
     }
@@ -341,8 +335,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
-        var statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
-        var radio_group: RadioGroup? = RadioGroup(mContext)
+        val statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
+        val radio_group: RadioGroup? = RadioGroup(mContext)
         val itemValue: ArrayList<String> = ArrayList()
         itemValue.add(mContext.resources.getString(R.string.pending))
         itemValue.add(mContext.resources.getString(R.string.delivered))
@@ -365,12 +359,12 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             isChecked = checkedId
         })
 
-        var dformat = DecimalFormat("#.##")
-        outletName.setText(order.outletName)
+        val dformat = DecimalFormat("#.##")
+        outletName.text = order.outletName
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(order.orderedAt))
-        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
+        tvLastOrderDate.text = mContext.resources.getString(R.string.last_order_date) + orderDate
         var grandTotal = 0.0
         var itemCount = 0
         val brandsStatistics: ArrayList<ProductStatistics> = ArrayList()
@@ -428,7 +422,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                             createOrder(
                                 order,
                                 status,
-                                tvGrandTotal!!.text.toString(),
+                                tvGrandTotal.text.toString(),
                                 brandsStatistics,
                                 dialog
                             )
@@ -469,9 +463,9 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             orderObj.put("grand_total", grandTotal)
             orderObj.put("order_status", status)
             val brandsArray = JSONArray()
-            for (i in 0 until updatedProducts!!.size) {
+            for (i in 0 until updatedProducts.size) {
                 val brandObj = JSONObject()
-                if (updatedProducts!![i].quantity > 0) {
+                if (updatedProducts[i].quantity > 0) {
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product", updatedProducts[i].product_name)
                     brandObj.put("quantity", updatedProducts[i].quantity.toString())
@@ -514,7 +508,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                         appDatabase!!.orderListDao().deleteALL()
                         appDatabase!!.saveOrderDao().deleteALL()
                         val message = response.getString("message")
-                        ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                        ViewUtils.viewDialogResponse(requireContext(), message, object : DialogListener {
                             override fun onConfirmed() {
                                 checkforOrders(
                                     queue!!,
@@ -542,7 +536,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
+                    ViewUtils.getErrorResponse(error, requireContext())
                 }
 
                 override fun onException(e: Exception) {

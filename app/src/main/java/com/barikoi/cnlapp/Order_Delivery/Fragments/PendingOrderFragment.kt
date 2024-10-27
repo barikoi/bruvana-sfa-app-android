@@ -44,6 +44,7 @@ import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_pending_order.*
@@ -60,18 +61,18 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     var progressBar: ProgressBar? = null
     private var tvItemCount: TextView? = null
     private var tvGrandTotal: TextView? = null
-    private var totalItemCount : Int? =  0
-    private var grandTotalPrice : Double? = 0.0
+    private var totalItemCount: Int? = 0
+    private var grandTotalPrice: Double? = 0.0
     var totalOrderedPrice: String? = null
     var totalOrderedQuantity: String? = null
     lateinit var ACTIVITY: OrderDeliveryUpdateActivity
-    var token : String? = null
-    var user_id : String? = null
-    var user_type : String? = null
-    var sr_id : String? = null
+    var token: String? = null
+    var user_id: String? = null
+    var user_type: String? = null
+    var sr_id: String? = null
     var route_id: String? = null
-    var territory_id : String? = null
-    var selected_outlet : String? = null
+    var territory_id: String? = null
+    var selected_outlet: String? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -84,10 +85,6 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     var updatedProducts: ArrayList<ProductStatistics>? = ArrayList()
     var orderedProducts: ArrayList<Products>? = ArrayList()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
@@ -100,10 +97,20 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter.filter(s)
                 if (s!!.length == 0) {
-                    if (sr_id!!.length == 0){
-                        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING&include_filter_by_user_id=1", queue!!, token!!, mCallback!!)
-                    }else{
-                        getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+StartDate+" 00:00:00"+"&end_date="+EndDate+" 23:59:59"+"&order_status=PENDING", queue!!, token!!, mCallback!!)
+                    if (sr_id!!.length == 0) {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
+                            queue!!,
+                            token!!,
+                            mCallback!!
+                        )
+                    } else {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING",
+                            queue!!,
+                            token!!,
+                            mCallback!!
+                        )
                     }
                 }
 
@@ -128,31 +135,54 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
 
 
-    companion object{
+    companion object {
         var mCallback: OrderListSuccessListener? = PendingOrderFragment()
-        fun checkforOrders(queue: RequestQueue, token: String, user_id: String, sr_id: String, territory_id: String, start: String, end: String) {
-            if (mCallback!= null) {
-                if (sr_id.length == 0){
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&territory_id="+territory_id+"&order_status=PENDING&include_filter_by_user_id=1", queue, token, mCallback!!)
-                }else{
-                    getAllOrders(Api.get_saved_order+"?user_id="+user_id+"&start_date="+start+" 00:00:00"+"&end_date="+end+" 23:59:59"+"&order_status=PENDING", queue, token, mCallback!!)
+        fun checkforOrders(
+            queue: RequestQueue,
+            token: String,
+            user_id: String,
+            sr_id: String,
+            territory_id: String,
+            start: String,
+            end: String
+        ) {
+            if (mCallback != null) {
+                if (sr_id.length == 0) {
+                    getAllOrders(
+                        Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
+                        queue,
+                        token,
+                        mCallback!!
+                    )
+                } else {
+                    getAllOrders(
+                        Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=PENDING",
+                        queue,
+                        token,
+                        mCallback!!
+                    )
                 }
 
             }
 
         }
 
-        fun getAllOrders(url: String, queue: RequestQueue, token: String, callback: OrderListSuccessListener) {
+        fun getAllOrders(
+            url: String,
+            queue: RequestQueue,
+            token: String,
+            callback: OrderListSuccessListener
+        ) {
             ApiServices.apiGET(url, queue, token, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
-                        if (response != null){
+                        if (response != null) {
                             val obj = JSONObject(response)
                             val orderArray = obj.getJSONArray("orders")
                             callback.onSuccess(orderArray)
 
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         //progressBar.visibility = View.GONE
                         e.printStackTrace()
                     }
@@ -171,7 +201,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 }
 
                 override fun onException(e: Exception) {
-                    Log.d("Order", "exception: "+e.message)
+                    Log.d("Order", "exception: " + e.message)
                 }
 
             })
@@ -182,21 +212,21 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         progressBar!!.visibility = View.GONE
         orderList.clear()
         try {
-            if (array.length() > 0){
+            if (array.length() > 0) {
                 no_route_check.visibility = View.GONE
                 bodyLayout.visibility = View.VISIBLE
-                for (i in 0 until array.length()){
+                for (i in 0 until array.length()) {
                     val orderObj = array.getJSONObject(i)
-                    if (orderObj.getString("order_status").equals("PENDING", true)){
+                    if (orderObj.getString("order_status").equals("PENDING", true)) {
                         val brandArray = orderObj.getJSONArray("products")
                         //tvRouteName.setText(orderObj.getString("route_name"))
                         val productItems: ArrayList<Products> = ArrayList()
 
-                        if (brandArray.length() > 0){
-                            for (j in 0 until brandArray.length()){
+                        if (brandArray.length() > 0) {
+                            for (j in 0 until brandArray.length()) {
                                 val brandObj = brandArray.getJSONObject(j)
                                 var bounce = 0
-                                if (brandObj.has("bounced_quantity")){
+                                if (brandObj.has("bounced_quantity")) {
                                     bounce = brandObj.getInt("bounced_quantity")
                                 }
                                 if (brandObj.getInt("ordered_quantity") > 0) {
@@ -245,7 +275,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         )
                     }
                 }
-            }else{
+            } else {
                 no_route_check.visibility = View.VISIBLE
                 bodyLayout.visibility = View.GONE
 
@@ -266,13 +296,13 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             recylerView.apply {
                 if (user_type.equals("TO", true)) {
                     adapter = OrderDeliveryListAdapter(orderList, listener!!, "TO")
-                }else{
+                } else {
                     adapter = OrderDeliveryListAdapter(orderList, listener!!, "SO")
                 }
                 recylerView!!.adapter = adapter
                 adapter.notifyDataSetChanged()
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             //Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
         }
@@ -295,11 +325,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         user_type = prefs!!.getString(Api.USER_TYPE, "")
-        if (user_type.equals("TO", true)){
+        if (user_type.equals("TO", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
-        }else{
+        } else {
             sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
             user_id = prefs!!.getString(Api.USER_ID, "")
@@ -321,7 +351,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun viewDialog(mContext: Context, order: OrderList){
+    fun viewDialog(mContext: Context, order: OrderList) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -335,8 +365,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
         val statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
-        val radio_group : RadioGroup? = RadioGroup(mContext)
-        val itemValue : ArrayList<String> = ArrayList()
+        val radio_group: RadioGroup? = RadioGroup(mContext)
+        val itemValue: ArrayList<String> = ArrayList()
         itemValue.add(mContext.resources.getString(R.string.pending))
         itemValue.add(mContext.resources.getString(R.string.delivered))
         itemValue.add(mContext.resources.getString(R.string.bounced))
@@ -346,7 +376,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             rbn.setText(itemValue.get(i))
             rbn.id = i
             rbn.setTextColor(mContext.resources.getColor(R.color.text_title))
-            rbn.buttonTintList = ColorStateList.valueOf(mContext.resources.getColor(R.color.cnl_color_1))
+            rbn.buttonTintList =
+                ColorStateList.valueOf(mContext.resources.getColor(R.color.cnl_color_1))
             radio_group.addView(rbn)
         }
         val checkedid = 0
@@ -362,15 +393,15 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(order.orderedAt))
-        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
+        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date) + orderDate)
 
         var grandTotal = 0.0
         var itemCount = 0
-        val brandsStatistics : ArrayList<ProductStatistics> = ArrayList()
-        if (order.brands_array.size> 0){
+        val brandsStatistics: ArrayList<ProductStatistics> = ArrayList()
+        if (order.brands_array.size > 0) {
             brandsStatistics.clear()
             updatedProducts!!.clear()
-            for (i in 0 until order.brands_array.size){
+            for (i in 0 until order.brands_array.size) {
                 brandsStatistics.add(
                     ProductStatistics(
                         order.brands_array[i].product_id,
@@ -391,9 +422,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         0,
                         /*order.brands_array[i].bounced_quantity,*/
                         order.brands_array[i].ordered_total_price
-                ))
-                grandTotal = grandTotal+order.brands_array[i].ordered_total_price
-                itemCount = itemCount+order.brands_array[i].ordered_quantity
+                    )
+                )
+                grandTotal = grandTotal + order.brands_array[i].ordered_total_price
+                itemCount = itemCount + order.brands_array[i].ordered_quantity
             }
             selected_outlet = order.outletId
             totalItemCount = itemCount
@@ -409,63 +441,73 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     grandTotal
                 )
             )
-            val adapter = OutletProductDeliveryAdapter(brandsStatistics, valuelistener!!, order.outletId, order.orderStatus)
+            val adapter = OutletProductDeliveryAdapter(
+                brandsStatistics,
+                valuelistener!!,
+                order.outletId,
+                order.orderStatus
+            )
             listView.adapter = adapter
             adapter.notifyDataSetChanged()
         }
 
         tvGrandTotal!!.setText(dformat.format(grandTotal).toString())
-        tvItemCount!!.setText(itemCount.toString()+mContext.resources.getString(R.string.items))
+        tvItemCount!!.setText(itemCount.toString() + mContext.resources.getString(R.string.items))
 
         btnClose.setOnClickListener {
             dialog.dismiss()
         }
 
         btnSubmit.setOnClickListener {
-            ViewUtils.viewDialog(mContext, mContext.resources.getString(R.string.update_order_dialog),
-                SpannableStringBuilder(), object :
-                DialogListener {
-                override fun onConfirmed() {
-                    var status = ""
-                    if (isChecked == 2){
-                        status = "CANCELLED"
-                        //updatedProducts!!.addAll(brandsStatistics)
-                        for (i in 0 until updatedProducts!!.size){
-                            updatedProducts!![i].bounced_quantity = updatedProducts!![i].ordered_quantity
-                            updatedProducts!![i].quantity = 0
+            ViewUtils.viewDialog(mContext,
+                mContext.resources.getString(R.string.update_order_dialog),
+                SpannableStringBuilder(),
+                object :
+                    DialogListener {
+                    override fun onConfirmed() {
+                        var status = ""
+                        if (isChecked == 2) {
+                            status = "CANCELLED"
+                            //updatedProducts!!.addAll(brandsStatistics)
+                            for (i in 0 until updatedProducts!!.size) {
+                                updatedProducts!![i].bounced_quantity =
+                                    updatedProducts!![i].ordered_quantity
+                                updatedProducts!![i].quantity = 0
+                            }
+                        } else {
+                            status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
                         }
-                    }else{
-                        status = itemValue.get(isChecked).uppercase(Locale.ENGLISH)
+
+                        if (order.orderStatus.equals(status, true)) {
+                            Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            if (updatedProducts!!.size > 0) {
+                                createOrder(
+                                    order,
+                                    status,
+                                    tvGrandTotal!!.text.toString(),
+                                    updatedProducts!!,
+                                    dialog
+                                )
+                            } else {
+                                createOrder(
+                                    order,
+                                    status,
+                                    tvGrandTotal!!.text.toString(),
+                                    brandsStatistics,
+                                    dialog
+                                )
+                            }
+                        }
+
                     }
 
-                    if (order.orderStatus.equals(status, true)){
-                        Toast.makeText(mContext, "Order status not changed", Toast.LENGTH_SHORT).show()
-                    }else{
-                        if (updatedProducts!!.size >0) {
-                            createOrder(
-                                order,
-                                status,
-                                tvGrandTotal!!.text.toString(),
-                                updatedProducts!!,
-                                dialog
-                            )
-                        }else{
-                            createOrder(
-                                order,
-                                status,
-                                tvGrandTotal!!.text.toString(),
-                                brandsStatistics,
-                                dialog
-                            )
-                        }
+                    override fun onCanceled() {
+
                     }
 
-                }
-                override fun onCanceled() {
-
-                }
-
-            })
+                })
         }
         dialog.show()
         val window = dialog.window
@@ -476,8 +518,14 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     }
 
-    private fun createOrder(order: OrderList, status: String, grandTotal: String,updatedProducts: ArrayList<ProductStatistics>, dialog: Dialog){
-        if (updatedProducts.size> 0){
+    private fun createOrder(
+        order: OrderList,
+        status: String,
+        grandTotal: String,
+        updatedProducts: ArrayList<ProductStatistics>,
+        dialog: Dialog
+    ) {
+        if (updatedProducts.size > 0) {
             var deliveredQuantity = 0
             var deliveredAmount = 0.0
             var bouncedQuantity = 0
@@ -503,11 +551,13 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             orderObj.put("total_ordered_quantity", order.totalQuantity)
             orderObj.put("order_status", status)
             val brandsArray = JSONArray()
-            for(i in 0 until updatedProducts!!.size){
+            for (i in 0 until updatedProducts!!.size) {
                 val brandObj = JSONObject()
-                if (updatedProducts[i].quantity > 0 ) {
-                    val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
-                    val deliverAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
+                if (updatedProducts[i].quantity > 0) {
+                    val bounceAmount =
+                        updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
+                    val deliverAmount =
+                        updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product_code", updatedProducts[i].product_code)
                     brandObj.put("product_name", updatedProducts[i].product_name)
@@ -516,7 +566,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("unit_name", updatedProducts[i].unit_name)
                     brandObj.put("unit_code", updatedProducts[i].unit_code)
                     brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
-                    brandObj.put("discounted_unit_price", updatedProducts[i].discounted_unit_price.toString())
+                    brandObj.put(
+                        "discounted_unit_price",
+                        updatedProducts[i].discounted_unit_price.toString()
+                    )
                     brandObj.put("category_id", updatedProducts[i].category_id)
                     brandObj.put("category_name", updatedProducts[i].category_name)
                     brandObj.put("category_code", updatedProducts[i].category_code)
@@ -531,10 +584,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     deliveredAmount = deliveredAmount + deliverAmount
                     bouncedQuantity = bouncedQuantity + updatedProducts[i].bounced_quantity
                     bouncedAmount = bouncedAmount + bounceAmount
-                }
-                else if(updatedProducts[i].quantity == 0 && updatedProducts[i].bounced_quantity > 0){
-                    val bounceAmount = updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
-                    val deliverAmount = updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
+                } else if (updatedProducts[i].quantity == 0 && updatedProducts[i].bounced_quantity > 0) {
+                    val bounceAmount =
+                        updatedProducts[i].bounced_quantity * updatedProducts[i].discounted_unit_price
+                    val deliverAmount =
+                        updatedProducts[i].quantity * updatedProducts[i].discounted_unit_price
                     brandObj.put("product_id", updatedProducts[i].product_id)
                     brandObj.put("product_code", updatedProducts[i].product_code)
                     brandObj.put("product_name", updatedProducts[i].product_name)
@@ -543,7 +597,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     brandObj.put("unit_name", updatedProducts[i].unit_name)
                     brandObj.put("unit_code", updatedProducts[i].unit_code)
                     brandObj.put("unit_price", updatedProducts[i].unit_price.toString())
-                    brandObj.put("discounted_unit_price", updatedProducts[i].discounted_unit_price.toString())
+                    brandObj.put(
+                        "discounted_unit_price",
+                        updatedProducts[i].discounted_unit_price.toString()
+                    )
                     brandObj.put("category_id", updatedProducts[i].category_id)
                     brandObj.put("category_name", updatedProducts[i].category_name)
                     brandObj.put("category_code", updatedProducts[i].category_code)
@@ -569,74 +626,91 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             ordersArray.put(orderObj)
             obj1.put("orders", ordersArray)
 
-            if (obj1.length() >0){
+            if (obj1.length() > 0) {
                 if (brandsArray.length() > 0) {
                     Log.d("ConfirmOrder", "response: " + obj1)
-                    if (status.equals("DELIVERED", true)){
-                    if (deliveredQuantity > 0) {
+                    if (status.equals("DELIVERED", true)) {
+                        if (deliveredQuantity > 0) {
+                            submitOrder(obj1, dialog)
+                        } else {
+                            ViewUtils.viewDialogResponse(
+                                mContext!!,
+                                "Kindly change the status to BOUNCED option to continue",
+                                object : DialogListener {
+                                    override fun onConfirmed() {
+
+                                    }
+
+                                    override fun onCanceled() {
+
+                                    }
+
+                                })
+                        }
+                    } else {
                         submitOrder(obj1, dialog)
-                    }else{
-                        ViewUtils.viewDialogResponse(mContext!!, "Kindly change the status to BOUNCED option to continue", object : DialogListener{
-                            override fun onConfirmed() {
-
-                            }
-
-                            override fun onCanceled() {
-
-                            }
-
-                        })
                     }
-                    }else{
-                        submitOrder(obj1, dialog)
-                    }
-                }else{
+                } else {
                     Toast.makeText(mContext, "No products on this order", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
+
     private fun submitOrder(orderObj: JSONObject, dialog: Dialog) {
-        ApiServices.apiJSONObjectPOST(Api.update_saved_order, queue!!, token!!, orderObj, object : ApiServiceListener{
-            override fun onResponseSuccess(response: String) {
+        ApiServices.apiJSONObjectPOST(
+            Api.update_saved_order,
+            queue!!,
+            token!!,
+            orderObj,
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
 
-            }
-
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                try {
-                    Log.d("ConfirmOrder", "response api: "+response)
-                    dialog.dismiss()
-                    appDatabase!!.orderListDao().deleteALL()
-                    appDatabase!!.saveOrderDao().deleteALL()
-                    val message = response.getString("message")
-                    ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
-                        override fun onConfirmed() {
-                            checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
-                        }
-
-                        override fun onCanceled() {
-                            TODO("Not yet implemented")
-                        }
-
-                    })
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            }
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                    try {
+                        Log.d("ConfirmOrder", "response api: " + response)
+                        dialog.dismiss()
+                        appDatabase!!.orderListDao().deleteALL()
+                        appDatabase!!.saveOrderDao().deleteALL()
+                        val message = response.getString("message")
+                        ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
+                            override fun onConfirmed() {
+                                checkforOrders(
+                                    queue!!,
+                                    token!!,
+                                    user_id!!,
+                                    sr_id!!,
+                                    territory_id!!,
+                                    StartDate!!,
+                                    EndDate!!
+                                )
+                            }
 
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, mContext!!)
-            }
+                            override fun onCanceled() {
+                                TODO("Not yet implemented")
+                            }
 
-            override fun onException(e: Exception) {
-                TODO("Not yet implemented")
-            }
+                        })
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
 
-        })
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, mContext!!)
+                }
+
+                override fun onException(e: Exception) {
+                    TODO("Not yet implemented")
+                }
+
+            })
     }
 
     override fun onValueChanged(products: Any, position: Int) {
@@ -645,18 +719,18 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val prodList = appDatabase!!.updateOrderDao().getOrdersDB(selected_outlet!!)
         val itemCount = prodList!![0].itemsCount
         val grandTotal = prodList[0].totalPrice
-        if (itemCount == 1 || itemCount == 0){
-            tvItemCount!!.setText(itemCount.toString()+"Item")
-        }else{
-            tvItemCount!!.setText(itemCount.toString()+"Items")
+        if (itemCount == 1 || itemCount == 0) {
+            tvItemCount!!.setText(itemCount.toString() + "Item")
+        } else {
+            tvItemCount!!.setText(itemCount.toString() + "Items")
         }
-        try{
-            Log.d("Product", "addedProducts size: "+updatedProducts!!.size)
+        try {
+            Log.d("Product", "addedProducts size: " + updatedProducts!!.size)
             val exists = updatedProducts?.find {
                 it.product_id == products.product_id
             }
-            Log.d("Product", "addedProducts size: "+exists)
-            if (exists != null){
+            Log.d("Product", "addedProducts size: " + exists)
+            if (exists != null) {
                 updatedProducts!!.remove(exists)
                 updatedProducts!!.add(
                     ProductStatistics(
@@ -668,10 +742,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         products.unit_price, products.discounted_unit_price,
                         products.ordered_price,
                         products.ordered_quantity, products.quantity,
-                        products.bounced_quantity, products.total_price)
+                        products.bounced_quantity, products.total_price
+                    )
                 )
 
-            }else{
+            } else {
                 updatedProducts!!.add(
                     ProductStatistics(
                         products.product_id, products.product_name,
@@ -686,8 +761,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     )
                 )
             }
-        }catch (e: Exception){
-            Log.d("Product", "exception 2: "+e.message+" "+position)
+        } catch (e: Exception) {
+            Log.d("Product", "exception 2: " + e.message + " " + position)
             e.printStackTrace()
         }
         tvGrandTotal!!.setText(dformat.format(grandTotal).toString())

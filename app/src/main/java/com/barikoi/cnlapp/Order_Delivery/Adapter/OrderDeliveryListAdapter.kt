@@ -32,7 +32,6 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
         return ViewHolder(v)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = orderList[position]
         var dformat = DecimalFormat("#.##")
