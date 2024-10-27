@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 34
-        versionCode 13
+        versionCode 20
         multiDexEnabled true
         flavorDimensions("default")
         resConfigs "en", "bn"
@@ -64,9 +64,11 @@ android {
         production {
             applicationId "com.barikoi.cnlapp"
             dimension "default"
-            versionName "1.2.7.2"
+            versionName "1.2.7.7"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
+            buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
+            buildConfigField 'String', 'sentryDNS', '"https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
                     sentryDNS: "https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14",
@@ -79,10 +81,12 @@ android {
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
             versionName "1.2.8_1"
-            resValue "string", "app_name", "https://0cd23f855cd65adc9cb1c418b8bd78d6@sentry.barikoimaps.dev/23"
+            resValue "string", "app_name", "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             resValue "string", "app_name", "CNL Staging SFA"
             //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "https://cnl.barikoimaps.dev:7090/"
+            resValue "String", "url_base", '"https://cnl.barikoimaps.dev:7090/"'
+            buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
                     sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
@@ -188,7 +192,8 @@ dependencies {
     implementation 'com.google.android.play:app-update:2.1.0'
 
     /*barikoi trace-sdk*/
-    implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
+//    implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
+    implementation 'com.github.barikoi:Barikoitrace-android-sdk:39f69bcd69'
 
 //    debugImplementation 'com.balsikandar.android:crashreporter:1.1.0'
 
