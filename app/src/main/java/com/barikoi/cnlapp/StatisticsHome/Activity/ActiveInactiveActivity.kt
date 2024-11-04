@@ -10,14 +10,12 @@ import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.ActiveInactiveAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ActiveInactiveSO
+import com.barikoi.cnlapp.databinding.ActivityActiveInactiveBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.activity_active_inactive.btnBack
-import kotlinx.android.synthetic.main.activity_active_inactive.soList
-import kotlinx.android.synthetic.main.activity_active_inactive.tvTitle
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -25,15 +23,20 @@ import java.util.Calendar
 import java.util.Locale
 
 class ActiveInactiveActivity : AppCompatActivity() {
-    var token : String? = null
-    var user_id : String? = null
+    private lateinit var binding: ActivityActiveInactiveBinding
+
+    var token: String? = null
+    var user_id: String? = null
     var employeeId: String? = ""
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_active_inactive)
+
+        binding = ActivityActiveInactiveBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
@@ -41,55 +44,58 @@ class ActiveInactiveActivity : AppCompatActivity() {
         user_id = prefs!!.getString(Api.USER_ID, "")
         employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
 
-        btnBack.setOnClickListener {
-            onBackPressed()
+        binding.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
             finish()
         }
 
         val status = intent.getStringExtra("so_status")
-        if (status.equals("active", true)){
-            tvTitle.setText(resources.getString(R.string.active_so_list))
-        }else if (status.equals("inactive", true)){
-            tvTitle.setText(resources.getString(R.string.inactive_so_list))
+        if (status.equals("active", true)) {
+            binding.tvTitle.setText(resources.getString(R.string.active_so_list))
+        } else if (status.equals("inactive", true)) {
+            binding.tvTitle.setText(resources.getString(R.string.inactive_so_list))
         }
 
         getListSO(status)
     }
 
     private fun getListSO(status: String?) {
-        val itemList : ArrayList<ActiveInactiveSO> = ArrayList()
+        val itemList: ArrayList<ActiveInactiveSO> = ArrayList()
         val today = Calendar.getInstance().time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
-            Api.get_attendance+"?start_date="+df.format(today)+"&end_date="+df.format(today)+"&with_active_inactive_so=1", queue!!, token!!, object : ApiServiceListener{
+            Api.get_attendance + "?start_date=" + df.format(today) + "&end_date=" + df.format(today) + "&with_active_inactive_so=1",
+            queue!!,
+            token!!,
+            object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
-                        if (response != null){
+                        if (response != null) {
                             val obj = JSONObject(response)
-                            var attendanceArray : JSONArray? = null
-                            if (status.equals("active", true)){
+                            var attendanceArray: JSONArray? = null
+                            if (status.equals("active", true)) {
                                 attendanceArray = obj.getJSONArray("active")
-                            }else if (status.equals("inactive", true)){
+                            } else if (status.equals("inactive", true)) {
                                 attendanceArray = obj.getJSONArray("inactive")
                             }
                             itemList.clear()
-                            if (attendanceArray!!.length() > 0){
-                                for (i in 0 until attendanceArray!!.length()){
-                                    var latitude: Double= 0.0
-                                    var longitude: Double= 0.0
+                            if (attendanceArray!!.length() > 0) {
+                                for (i in 0 until attendanceArray!!.length()) {
+                                    var latitude: Double = 0.0
+                                    var longitude: Double = 0.0
                                     var imageUrl = "null"
                                     val attendanceobj = attendanceArray.getJSONObject(i)
-                                    if (!attendanceobj.isNull("latitude")){
+                                    if (!attendanceobj.isNull("latitude")) {
                                         latitude = attendanceobj.getDouble("latitude")
                                     }
-                                    if (!attendanceobj.isNull("longitude")){
+                                    if (!attendanceobj.isNull("longitude")) {
                                         longitude = attendanceobj.getDouble("longitude")
                                     }
-                                    if (attendanceobj.has("images") && !attendanceobj.isNull("images")){
+                                    if (attendanceobj.has("images") && !attendanceobj.isNull("images")) {
                                         val imageArray = attendanceobj.getJSONArray("images")
-                                        if (imageArray.length() > 0){
+                                        if (imageArray.length() > 0) {
                                             val imageobj = imageArray.getJSONObject(0)
-                                            if (imageobj.has("image_url")){
+                                            if (imageobj.has("image_url")) {
                                                 imageUrl = imageobj.getString("image_url")
                                             }
                                         }
@@ -103,19 +109,19 @@ class ActiveInactiveActivity : AppCompatActivity() {
                                             latitude,
                                             longitude,
                                             imageUrl
-                                    )
+                                        )
                                     )
                                 }
 
                             }
 
                             val adapter = ActiveInactiveAdapter(itemList)
-                            soList.adapter = adapter
+                            binding.soList.adapter = adapter
                             adapter!!.notifyDataSetChanged()
 
 
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
 

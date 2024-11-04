@@ -1,134 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="56dp"
-    android:paddingLeft="24dp"
-    android:paddingRight="24dp"
     android:background="@color/white"
-    tools:layout_editor_absoluteY="8dp"
-    tools:layout_editor_absoluteX="8dp">
+    android:orientation="vertical"
+    android:paddingLeft="24dp"
+    android:paddingTop="56dp"
+    android:paddingRight="24dp"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp">
 
-<!--    <ImageView -->
-<!--        android:src="@drawable/descotypologo"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="72dp"-->
-<!--        android:layout_marginBottom="24dp"-->
-<!--        android:layout_gravity="center_horizontal" />-->
-    <LinearLayout
-        android:id="@+id/linearLayout5"
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/logo"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvAppName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginBottom="8dp"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
-        <ImageView
-            android:src="@drawable/cnl_logo"
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="8dp"
-            android:scaleType="fitXY" />
+        android:text="@string/splash_title"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
 
-        <!--<TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Desco"
-            android:textSize="50sp"
-            android:layout_gravity="bottom"
-            android:gravity="center_horizontal"
-            android:textColor="@color/black"
-            android:textStyle="bold">
-        </TextView>-->
-        <!--<TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Field Tracker"
-            android:textSize="20dp"
-            android:gravity="bottom"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/black">
-        </TextView>-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/splash_title"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/black">
-        </TextView>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="30dp"
-            android:text="@string/login"
-            android:textSize="24sp"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/black">
-        </TextView>
+    <TextView
+        android:id="@+id/tvLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_horizontal"
+        android:text="@string/login"
+        android:textAllCaps="true"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAppName" />
 
-
-    </LinearLayout>
 
     <!-- Email Label -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/llSRCode"
+        style="@style/TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/TextInputLayout"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvLogin">
 
         <EditText
-            android:id="@+id/input_sr_code"
+            android:id="@+id/etSRCode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/black"
+            android:autofillHints="username"
             android:backgroundTint="@color/white"
-            android:hint="@string/ss_id" />
+            android:hint="@string/ss_id"
+            android:importantForAutofill="no"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Email Label -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/llPassword"
+        style="@style/TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/TextInputLayout"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llSRCode"
         app:passwordToggleEnabled="true">
 
         <EditText
-            android:id="@+id/input_password"
+            android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:textColor="@color/black"
+            android:autofillHints="password"
             android:backgroundTint="@color/white"
-            android:hint="@string/password" />
+            android:hint="@string/password"
+            android:importantForAutofill="no"
+            android:inputType="textPassword"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_login"
-        android:layout_width="fill_parent"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/cardview_bg"
-        android:backgroundTint="@color/cnl_color_1"
-        android:padding="12dp"
-        android:textColor="@color/white"
+        android:maxWidth="300dp"
+        android:text="@string/login"
         android:textStyle="bold"
-        android:text="@string/login" />
+        app:cornerRadius="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llPassword" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

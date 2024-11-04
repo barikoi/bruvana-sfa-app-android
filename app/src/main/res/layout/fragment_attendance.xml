@@ -45,7 +45,5 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
         </RelativeLayout>
-
     </RelativeLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

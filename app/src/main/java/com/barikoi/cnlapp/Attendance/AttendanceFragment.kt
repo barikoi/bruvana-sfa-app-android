@@ -19,22 +19,23 @@ import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.TO.HistoryTOFragment
 import com.barikoi.cnlapp.Attendance.Fragment.TO.SummaryTOFragment
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentAttendanceBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_attendance.viewpagertab
 
 class AttendanceFragment : Fragment() {
+    private lateinit var binding: FragmentAttendanceBinding
 
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var token : String? = null
-    var user_type : String? = null
+    var token: String? = null
+    var user_type: String? = null
 
-    companion object{
+    companion object {
         var viewPager2: ViewPager2? = null
         var viewpagertab2: TabLayout? = null
     }
@@ -48,6 +49,8 @@ class AttendanceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewPager2 = view.findViewById(R.id.viewPager)
+        viewpagertab2 = view.findViewById(R.id.viewpagertab)
         init()
     }
 
@@ -55,35 +58,37 @@ class AttendanceFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_attendance, container, false)
-        viewPager2 = view.findViewById(R.id.viewPager)
-        viewpagertab2 = view.findViewById(R.id.viewpagertab)
-        return view
+
+        binding = FragmentAttendanceBinding.inflate(inflater, container, false)
+        return  binding.root
     }
 
     private fun init() {
-        val titles = arrayOf(resources.getString(R.string.attendance), resources.getString(R.string.history), resources.getString(R.string.summary))
+        val titles = arrayOf(
+            resources.getString(R.string.attendance),
+            resources.getString(R.string.history),
+            resources.getString(R.string.summary)
+        )
         val fragments = ArrayList<Fragment>()
         fragments.add(CreateAttendanceFragment())
         if (user_type.equals("TO", true)) {
             fragments.add(HistoryTOFragment())
             fragments.add(SummaryTOFragment())
-        }else{
+        } else {
             fragments.add(HistoryFragment())
             fragments.add(SummaryFragment())
         }
-        viewPager2!!.setAdapter(ViewPagerAdapter(parentFragmentManager, lifecycle, fragments))
+        viewPager2!!.setAdapter(ViewPagerAdapter(childFragmentManager, lifecycle, fragments))
         // attaching tab mediator
         TabLayoutMediator(viewpagertab2!!, viewPager2!!,
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = titles[position]
             }).attach()
-        viewPager2!!.setCurrentItem(0);
+        viewPager2!!.currentItem = 0;
 
         viewPager2!!.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.getTabCount()) {
-            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+        for (i in 0 until binding.viewpagertab.tabCount) {
+            val tab = (binding.viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as MarginLayoutParams
             p.setMargins(15, 15, 10, 15)
             tab.requestLayout()

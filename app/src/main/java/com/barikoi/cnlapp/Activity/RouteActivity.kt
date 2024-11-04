@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.android.volley.NetworkResponse
@@ -19,6 +18,7 @@ import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.Fragment.RouteFragment
 import com.barikoi.cnlapp.Fragment.ShopListFragment
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.databinding.ActivityRouteBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
@@ -29,13 +29,12 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_route.*
 import org.json.JSONObject
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class RouteActivity : AppCompatActivity() {
+class RouteActivity : BaseActivity() {
     private lateinit var binding: ActivityRouteBinding
 
     private val viewModel: RouteViewModel by viewModels()
@@ -71,7 +70,6 @@ class RouteActivity : AppCompatActivity() {
         }
 
         mQueue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
-
 
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -133,7 +131,7 @@ class RouteActivity : AppCompatActivity() {
         binding.spinnerSO2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO2.adapter.count > 0) {
+                if (binding.spinnerSO2.adapter.count > 0) {
                     selectedSo = p2
                     userId = soList[p2].id
                     srCode = soList[p2].employeeId
@@ -157,7 +155,7 @@ class RouteActivity : AppCompatActivity() {
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     //setDateFilter()
                 }
 
@@ -171,12 +169,12 @@ class RouteActivity : AppCompatActivity() {
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
                     Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                    progressBar.visibility = View.GONE
+                    binding. progressBar.visibility = View.GONE
                 }
             })
     }
@@ -218,7 +216,7 @@ class RouteActivity : AppCompatActivity() {
                 applicationContext,
                 android.R.layout.simple_spinner_item, soNameList
             )
-            spinnerSO2.adapter = adapter
+            binding.spinnerSO2.adapter = adapter
         } catch (e: Exception) {
             e.printStackTrace()
         }

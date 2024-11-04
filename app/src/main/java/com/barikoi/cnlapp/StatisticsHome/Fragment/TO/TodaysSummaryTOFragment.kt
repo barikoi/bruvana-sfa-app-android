@@ -19,21 +19,15 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentSummaryTOBinding
+import com.barikoi.cnlapp.databinding.FragmentTodaysSummaryBinding
+import com.barikoi.cnlapp.databinding.FragmentTodaysSummaryTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.bpcCount
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.lpcCount
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.ovCount
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.progressBarHome
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.summaryLayout
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.tabLayout2
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.tabLayoutTarget
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.targetLayout
-import kotlinx.android.synthetic.main.fragment_todays_summary_t_o.tryAgain
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -42,6 +36,8 @@ import java.util.Locale
 
 
 class TodaysSummaryTOFragment : Fragment() {
+    private lateinit var binding: FragmentTodaysSummaryTOBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -62,23 +58,23 @@ class TodaysSummaryTOFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_todays_summary_t_o, container, false)
+        binding = FragmentTodaysSummaryTOBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTodaysSummary()
 
-        tryAgain.setOnClickListener {
+        binding.tryAgain.setOnClickListener {
             setTodaysSummary()
         }
     }
 
     private fun setTodaysSummary() {
         try{
-            progressBarHome.visibility = View.VISIBLE
-            summaryLayout.visibility = View.GONE
+            binding.progressBarHome.visibility = View.VISIBLE
+            binding.summaryLayout.visibility = View.GONE
             val dformat = DecimalFormat("#.##")
             val c = Calendar.getInstance()
             c.add(Calendar.DAY_OF_WEEK, -7)
@@ -94,9 +90,9 @@ class TodaysSummaryTOFragment : Fragment() {
                 override fun onResponseSuccess(response: String) {
                     try {
                         if (response != null){
-                            progressBarHome.visibility = View.GONE
-                            summaryLayout.visibility = View.VISIBLE
-                            tryAgain.visibility = View.GONE
+                            binding.progressBarHome.visibility = View.GONE
+                            binding.summaryLayout.visibility = View.VISIBLE
+                            binding.tryAgain.visibility = View.GONE
                             val obj = JSONObject(response)
                             val toArray = obj.getJSONArray("so_list")
                             val toObj = toArray.getJSONObject(0)
@@ -118,17 +114,17 @@ class TodaysSummaryTOFragment : Fragment() {
                                     )
                                 }
                             }
-                            if (!toObj.getString("order_amount").equals("null")) ovCount.setText(dformat.format(toObj.getString("order_amount").toDouble()))
-                            if (!toObj.getString("sku_per_memo").equals("null")) bpcCount.setText(dformat.format(toObj.getString("sku_per_memo").toDouble()))
-                            if (!toObj.getString("number_of_memo").equals("null")) lpcCount.setText(dformat.format(toObj.getString("number_of_memo").toDouble()))
-                            createTableClickable(itemList, tabLayout2)
+                            if (!toObj.getString("order_amount").equals("null")) binding.ovCount.setText(dformat.format(toObj.getString("order_amount").toDouble()))
+                            if (!toObj.getString("sku_per_memo").equals("null")) binding.bpcCount.setText(dformat.format(toObj.getString("sku_per_memo").toDouble()))
+                            if (!toObj.getString("number_of_memo").equals("null")) binding.lpcCount.setText(dformat.format(toObj.getString("number_of_memo").toDouble()))
+                            createTableClickable(itemList, binding.tabLayout2)
 
                         }
                     }catch (e: Exception){
                         e.printStackTrace()
-                        progressBarHome.visibility = View.GONE
-                        summaryLayout.visibility = View.GONE
-                        tryAgain.visibility = View.VISIBLE
+                        binding.progressBarHome.visibility = View.GONE
+                        binding.summaryLayout.visibility = View.GONE
+                        binding.tryAgain.visibility = View.VISIBLE
                     }
 
                 }
@@ -144,9 +140,9 @@ class TodaysSummaryTOFragment : Fragment() {
                 override fun onResponseFailure(error: VolleyError) {
                     try{
                         ViewUtils.getErrorResponse(error, mContext!!)
-                        progressBarHome.visibility = View.GONE
-                        summaryLayout.visibility = View.GONE
-                        tryAgain.visibility = View.VISIBLE
+                        binding.progressBarHome.visibility = View.GONE
+                        binding.summaryLayout.visibility = View.GONE
+                        binding. tryAgain.visibility = View.VISIBLE
                     }catch (e:Exception){
                         e.printStackTrace()
                     }
@@ -154,9 +150,9 @@ class TodaysSummaryTOFragment : Fragment() {
 
                 override fun onException(e: Exception) {
                     try{
-                        progressBarHome.visibility = View.GONE
-                        summaryLayout.visibility = View.GONE
-                        tryAgain.visibility = View.VISIBLE
+                        binding. progressBarHome.visibility = View.GONE
+                        binding. summaryLayout.visibility = View.GONE
+                        binding.tryAgain.visibility = View.VISIBLE
                     }catch (e:Exception){
                         e.printStackTrace()
                     }
@@ -209,8 +205,8 @@ class TodaysSummaryTOFragment : Fragment() {
         tab_Layout.isStretchAllColumns = true
         tab_Layout.bringToFront()
         tab_Layout.removeAllViews()
-        tabLayoutTarget.removeAllViews()
-        targetLayout.visibility = View.GONE
+        binding.tabLayoutTarget.removeAllViews()
+        binding.targetLayout.visibility = View.GONE
         if (data.size > 0) {
             for (i in 0 until data.size) {
                 val tr = TableRow(mContext)
@@ -256,16 +252,14 @@ class TodaysSummaryTOFragment : Fragment() {
                     try {
                         soId = data[i].first.second
                         getSummaryTargets(Api.get_summary + "?today_summary=1&today_for_so=1&user_id=" + data[i].first.second)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
-                            for (t in 0 until tab_Layout.childCount) {
-                                if (tab_Layout.getChildAt(t).tag == it.tag) {
-                                    tab_Layout.getChildAt(t)
-                                        .setBackgroundColor(resources.getColor(R.color.light_yellow))
-                                } else {
-                                    tab_Layout.getChildAt(t)
-                                        .setBackgroundColor(resources.getColor(R.color.white))
-                                }
+                        Log.d("OrderSummary", "row count: " + tab_Layout.childCount)
+                        for (t in 0 until tab_Layout.childCount) {
+                            if (tab_Layout.getChildAt(t).tag == it.tag) {
+                                tab_Layout.getChildAt(t)
+                                    .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                            } else {
+                                tab_Layout.getChildAt(t)
+                                    .setBackgroundColor(resources.getColor(R.color.white))
                             }
                         }
 
@@ -295,8 +289,8 @@ class TodaysSummaryTOFragment : Fragment() {
                     if (response != null) {
                         val obj = JSONObject(response)
                         val completedArray = obj.getJSONArray("today_summary")
-                        progressBarHome.visibility = View.GONE
-                        targetLayout.visibility = View.VISIBLE
+                        binding.progressBarHome.visibility = View.GONE
+                        binding.targetLayout.visibility = View.VISIBLE
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
@@ -344,11 +338,11 @@ class TodaysSummaryTOFragment : Fragment() {
                         itemList.add(Pair(resources.getString(R.string.visit_500m), visit_covered))
                         itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
 
-                        createTable(itemList, tabLayoutTarget)
+                        createTable(itemList, binding.tabLayoutTarget)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    progressBarHome.visibility = View.GONE
+                    binding.progressBarHome.visibility = View.GONE
                     //getAllOrders(orderArray!!)
                     pd!!.dismiss()
                 }
@@ -365,13 +359,13 @@ class TodaysSummaryTOFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBarHome.visibility = View.GONE
+                binding.progressBarHome.visibility = View.GONE
                 //getAllOrders(orderArray!!)
                 pd!!.dismiss()
             }
 
             override fun onException(e: Exception) {
-                progressBarHome.visibility = View.GONE
+                binding.progressBarHome.visibility = View.GONE
                 //getAllOrders(orderArray!!)
                 pd!!.dismiss()
             }
@@ -398,6 +392,6 @@ class TodaysSummaryTOFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        setTodaysSummary()
+//        setTodaysSummary()
     }
 }

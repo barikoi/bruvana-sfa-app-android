@@ -1,11 +1,18 @@
 package com.barikoi.cnlapp.utils.extension
 
 import android.app.Activity
+import android.content.Context
+import android.os.Build
+import android.os.SystemClock
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import java.util.Locale
+
 
 fun View.rotateViewAnimation(fromDegrees: Float, toDegrees: Float) {
     val an: Animation = RotateAnimation(
@@ -24,4 +31,44 @@ fun Fragment.toast(message: String) {
 
 fun Activity.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+
+fun View.setHapticClickListener(f: () -> Unit) {
+    var lastTimeClicked: Long = 0
+    this.setOnClickListener {
+        performTapHaptic()
+        if (SystemClock.elapsedRealtime() - lastTimeClicked > 500) {
+            lastTimeClicked = SystemClock.elapsedRealtime()
+            f()
+        }
+    }
+}
+
+fun View.performTapHaptic() = this.performHapticFeedback(
+    HapticFeedbackConstants.VIRTUAL_KEY,
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING else HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+)
+
+fun Fragment.hideKeyboard() {
+    view?.let { activity?.hideKeyboard(it) }
+}
+
+fun Activity.hideKeyboard() {
+    hideKeyboard(currentFocus ?: View(this))
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+object AppLocale {
+    fun getCurrentLocale(context: Context): Locale {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]
+        } else {
+            context.resources.configuration.locale
+        }
+    }
 }

@@ -9,25 +9,27 @@ import com.barikoi.cnlapp.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ReasonListAdapter(val reasons: List<Pair<String, String>>) : RecyclerView.Adapter<ReasonListAdapter.ViewHolder>() {
+class ReasonListAdapter(private val reasons: List<Pair<String, String>>) :
+    RecyclerView.Adapter<ReasonListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_attendance_reason_view, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_attendance_reason_view, parent, false)
         return ViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-        val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.ENGLISH)
-        val _sdfWatchDate = SimpleDateFormat("dd", Locale.ENGLISH)
-        if (!reasons[position].first.isNullOrEmpty() && !reasons[position].first.equals("null")){
-            holder.textViewMonth.setText(_sdfWatchMonth.format(oldDate.parse(reasons[position].first)))
-            holder.textViewDate.setText(_sdfWatchDate.format(oldDate.parse(reasons[position].first)))
+        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.getDefault())
+        val _sdfWatchDate = SimpleDateFormat("dd", Locale.getDefault())
+        if (reasons[position].first.isNotEmpty() && !reasons[position].first.equals("null")) {
+            holder.textViewMonth.text = _sdfWatchMonth.format(oldDate.parse(reasons[position].first))
+            holder.textViewDate.text = _sdfWatchDate.format(oldDate.parse(reasons[position].first))
         }
-        if (!reasons[position].second.equals("null")){
-            holder.tvReason.setText(reasons[position].second)
+        if (!reasons[position].second.equals("null")) {
+            holder.tvReason.text = reasons[position].second
         }
     }
 

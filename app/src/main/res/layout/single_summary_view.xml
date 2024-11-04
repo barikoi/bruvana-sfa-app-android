@@ -1,54 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="start"
     android:layout_marginRight="8dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
     android:background="@drawable/rounded_corner_lightgray"
     android:backgroundTint="@color/card_blue"
-    android:orientation="vertical">
+    android:gravity="start"
+    android:orientation="vertical"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
             android:gravity="center"
             android:text="asdasda"
-            android:textStyle="bold"
             android:textColor="@color/text_title"
             android:textSize="14sp"
-            android:layout_alignParentLeft="true">
+            android:textStyle="bold">
 
         </TextView>
+
         <TextView
             android:id="@+id/targetedAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tvTitle"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
+            android:layout_toRightOf="@+id/tvTitle"
             android:gravity="end"
             android:text="asda"
-            android:textStyle="bold"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:layout_alignParentRight="true">
+            android:textStyle="bold">
 
         </TextView>
     </RelativeLayout>
@@ -57,30 +59,29 @@
         android:id="@+id/completeAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="asdasdsa"
-        android:textStyle="bold"
         android:textColor="@color/progress_track"
-        android:textSize="30sp">
-    </TextView>
+        android:textSize="30sp"
+        android:textStyle="bold"/>
+
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progressBar"
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_marginEnd="8dp"
+        android:layout_height="match_parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:indeterminate="false"
-        app:trackColor="@color/progress_track"
-        app:trackThickness="8dp"
-        app:trackCornerRadius="10dp"
         android:progress="0"
         app:indicatorColor="@color/white"
-        />
+        app:trackColor="@color/progress_track"
+        app:trackCornerRadius="10dp"
+        app:trackThickness="8dp" />
 
 
-    </LinearLayout>
+</LinearLayout>

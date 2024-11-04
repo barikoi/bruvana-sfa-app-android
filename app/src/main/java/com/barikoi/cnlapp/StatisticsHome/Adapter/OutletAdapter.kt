@@ -23,41 +23,43 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String) : RecyclerView.Adapter<OutletAdapter.ViewHolder>() {
+class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice: String) :
+    RecyclerView.Adapter<OutletAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OutletAdapter.ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_outlet_statistics, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_outlet_statistics, parent, false)
         return ViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: OutletAdapter.ViewHolder, position: Int) {
         val item = outlets[position]
         holder.divider.visibility = View.VISIBLE
-        if (!item.category.equals("null", true) && item.category.length> 0){
+        if (!item.category.equals("null", true) && item.category.length > 0) {
             holder.tvCategory.visibility = View.VISIBLE
             holder.tvCategory.setText(item.category.get(0).toString().uppercase(Locale.ENGLISH))
-        }else{
+        } else {
             holder.tvCategory.visibility = View.GONE
         }
 
         holder.shopName.setText(item.shop_name)
-        if (!item.lastOrderDate.equals("null")){
+        if (!item.lastOrderDate.equals("null")) {
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(item.lastOrderDate))
-            holder.lastOrderDate.setText(holder.itemView.context.resources.getString(R.string.last_order_date)+orderDate)
+            holder.lastOrderDate.setText(holder.itemView.context.resources.getString(R.string.last_order_date) + orderDate)
         }
-        if (fromChoice.equals("bounce")){
-            holder.btnDetails.setText("Bounce Item")
-        }else{
-            holder.btnDetails.setText("Details")
+        if (fromChoice.equals("bounce")) {
+            holder.btnDetails.text = holder.itemView.context.getString(R.string.bounce_item)
+        } else {
+            holder.btnDetails.text = holder.itemView.context.getString(R.string.details)
         }
 
-        if (!item.shop_image.isNullOrEmpty() && !item.shop_image.equals("null")){
+        if (!item.shop_image.isNullOrEmpty() && !item.shop_image.equals("null")) {
             Glide.with(holder.itemView.context)
                 .load(item.shop_image)
                 .error(R.drawable.shop)
                 .into(holder.imageShop)
-        }else{
+        } else {
             //holder.imageProduct.visibility = View.INVISIBLE
         }
 
@@ -68,7 +70,12 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
 
     }
 
-    fun viewDialog(mContext: Context, outlet_name: String, lastOrder: String, listItem: ArrayList<ProductStatistics>){
+    private fun viewDialog(
+        mContext: Context,
+        outlet_name: String,
+        lastOrder: String,
+        listItem: ArrayList<ProductStatistics>
+    ) {
         val dialog = Dialog(mContext)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -83,18 +90,18 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
         val tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
         val tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
         var dformat = DecimalFormat("#.##")
-        outletName.setText(outlet_name)
+        outletName.text = outlet_name
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         val orderDate = df.format(oldDate.parse(lastOrder))
-        tvLastOrderDate.setText(mContext.resources.getString(R.string.last_order_date)+ orderDate)
+        tvLastOrderDate.text = mContext.resources.getString(R.string.last_order_date, orderDate)
 
         var itemCount = 0
         var grandTotal = 0.0
-        if (listItem.size> 0){
-            for (i in 0 until listItem.size){
-                grandTotal = grandTotal+listItem[i].total_price
-                itemCount = itemCount+listItem[i].quantity
+        if (listItem.size > 0) {
+            for (i in 0 until listItem.size) {
+                grandTotal = grandTotal + listItem[i].total_price
+                itemCount = itemCount + listItem[i].quantity
             }
 
             val adapter = OutletProductAdapter(listItem)
@@ -102,8 +109,8 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
             adapter.notifyDataSetChanged()
         }
 
-        tvGrandTotal.setText(dformat.format(grandTotal).toString())
-        tvItemCount.setText(itemCount.toString()+mContext.resources.getString(R.string.items))
+        tvGrandTotal.text = dformat.format(grandTotal).toString()
+        tvItemCount.text = itemCount.toString() + mContext.resources.getString(R.string.items)
 
         btnClose.setOnClickListener {
             dialog.dismiss()
@@ -120,11 +127,12 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice : String
     override fun getItemCount(): Int {
         return outlets.size
     }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val tvCategory: TextView
         internal val shopName: TextView
         internal val lastOrderDate: TextView
-        internal val imageShop:ImageView
+        internal val imageShop: ImageView
         internal val divider: View
         internal val btnDetails: AppCompatButton
 

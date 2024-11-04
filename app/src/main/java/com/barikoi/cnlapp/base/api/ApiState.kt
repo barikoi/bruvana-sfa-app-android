@@ -7,5 +7,5 @@ sealed class ApiState<T>(
     class Success<T>(data: T) : ApiState<T>(data)
     class Loading<T>(data: T? = null) : ApiState<T>(data)
     class Empty<T>(data: T? = null) : ApiState<T>(data)
-    class Error<T>(throwable: Failure, data: T? = null) : ApiState<T>(data, throwable)
+    class Error<T>(throwable: Failure, errorResponse: T? = null) : ApiState<T>(errorResponse, throwable)
 }

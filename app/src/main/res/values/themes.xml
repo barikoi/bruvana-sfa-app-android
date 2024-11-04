@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.CNLApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimary">@color/cnl_color_1</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -11,23 +11,23 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="fontFamily">@font/ceraprofontfamily</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
     <style name="Theme.CNLApp.NoActionBar.Material" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/white</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor" >@color/white</item>
+        <item name="colorPrimary">@color/cnl_color_1</item>
+        <item name="colorPrimaryDark">@color/cnl_color_1</item>
+        <item name="colorAccent">@color/cnl_color_1</item>
         <item name="editTextColor">@color/white</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <!--<item name="fontFamily">@font/montserratfamily</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>-->
         <item name="colorSurface">@color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
-        <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
+        <item name="android:windowTranslucentNavigation" >false</item>
         <item name="fontFamily">@font/ceraprofontfamily</item>
         <!--<item name="android:listPreferredItemHeightSmall">20dp</item>-->
         <!--<item name="popupMenuBackground">@drawable/rounded_corner_lightgray</item>-->
@@ -38,17 +38,17 @@
     <style name="Theme.CNLApp.NoActionBar.Material.Dialog" parent="Theme.MaterialComponents.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/white</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor" >@color/white</item>
+        <item name="colorPrimary">@color/cnl_color_1</item>
+        <item name="colorPrimaryDark">@color/cnl_color_1</item>
+        <item name="colorAccent">@color/cnl_color_1</item>
         <item name="editTextColor">@color/white</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <!--<item name="fontFamily">@font/montserratfamily</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>-->
         <item name="colorSurface">@color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
-        <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
+        <item name="android:windowTranslucentNavigation" >false</item>
         <item name="fontFamily">@font/ceraprofontfamily</item>
         <!--<item name="android:listPreferredItemHeightSmall">20dp</item>-->
         <!--<item name="popupMenuBackground">@drawable/rounded_corner_lightgray</item>-->
@@ -112,8 +112,8 @@
     </style>
 
     <style name="Theme.CNLApp.NoActionBar.nostatusbar" parent="Theme.CNLApp.NoActionBar.Material">
-        <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">false</item>
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/white</item>
+        <item name="android:windowTranslucentNavigation" >false</item>
+        <item name="android:statusBarColor" >@color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
         <item name="fontFamily">@font/ceraprofontfamily</item>
     </style>

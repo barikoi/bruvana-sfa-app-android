@@ -51,7 +51,6 @@ import javax.inject.Inject
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
 class CreateAttendanceFragment : Fragment() {
-
     private lateinit var binding: FragmentCreateAttendanceBinding
 
     @Inject
@@ -87,14 +86,13 @@ class CreateAttendanceFragment : Fragment() {
     }
 
     private fun init() {
-        tvDate.text = Date().formatDateToFullName()
+        binding.tvDate.text = Date().formatDateToFullName()
 
         attendanceImagePicker.taskId = "taskId"
         attendanceImagePicker.CAMERA = 4
-        attendanceImagePicker.setMainactivity(requireActivity())
-        attendanceImagePicker.setFragmetnt(this)
+        attendanceImagePicker.setMainActivity(requireActivity())
+        attendanceImagePicker.setFragment(this)
         attendanceImagePicker.setCameraLauncher(startCamera)
-
 
         getImageFromDB()
 
@@ -109,7 +107,6 @@ class CreateAttendanceFragment : Fragment() {
                     Api.USER_ID
                 )
             )
-
 
             spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -156,7 +153,7 @@ class CreateAttendanceFragment : Fragment() {
                 } else {
                     Toast.makeText(
                         requireContext(),
-                        "Upload image for attendance",
+                        getString(R.string.upload_image_for_attendance),
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -169,18 +166,16 @@ class CreateAttendanceFragment : Fragment() {
                     if (!isImageAdded) {
                         Toast.makeText(
                             requireContext(),
-                            "Upload image for attendance",
+                            getString(R.string.upload_image_for_attendance),
                             Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        ).show()
                     }
                     if (selectedRoute.isEmpty()) {
                         Toast.makeText(
                             requireContext(),
-                            "Select route for check in",
+                            getString(R.string.select_route_for_check_in),
                             Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        ).show()
                     }
                 }
             }
@@ -559,7 +554,6 @@ class CreateAttendanceFragment : Fragment() {
             Request.Method.GET, url,
             { response ->
                 try {
-                    //loading!!.visibility = View.GONE
                     val data = JSONObject(response)
                     if (data.has("routes") && !data.isNull("routes")) {
                         val routesList = ArrayList<String>()
@@ -712,7 +706,7 @@ class CreateAttendanceFragment : Fragment() {
                         val city = place.getString("city")
                         val area = place.getString("area")
 
-                        tvLocation.text = "$address, $area, $city"
+                        binding.tvLocation.text = "$address, $area, $city"
 
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -741,7 +735,7 @@ class CreateAttendanceFragment : Fragment() {
         StartActivityForResult()
     ) { result ->
         val filePath = sharePrefUtils.getString(ApiCall.IMAGE_PATH)
-        if (result.getResultCode() == RESULT_CANCELED) {
+        if (result.resultCode == RESULT_CANCELED) {
             if (filePath != null) {
                 Log.d("Image", "Canceled: $filePath")
                 attendanceImagePicker.deleteFileLocal(filePath)
@@ -760,7 +754,7 @@ class CreateAttendanceFragment : Fragment() {
             } else {
                 imagePosition + 1
             }
-            attendanceImagePicker.AddNewImage(
+            attendanceImagePicker.addNewImage(
                 result.data,
                 4,
                 imagePosition,

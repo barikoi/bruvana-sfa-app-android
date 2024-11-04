@@ -9,15 +9,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.location.Location
 import android.location.LocationManager
-import android.os.Build
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.Window
-import android.widget.*
-import androidx.annotation.RequiresApi
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
@@ -34,7 +33,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import io.sentry.Sentry
 import org.json.JSONException
@@ -43,16 +41,14 @@ import java.io.UnsupportedEncodingException
 
 object ViewUtils {
 
-    fun showGPSDisabledAlertToUser(mContext: Context) {
-        val alertDialogBuilder = AlertDialog.Builder(
-            mContext!!
-        )
+    private fun showGPSDisabledAlertToUser(mContext: Context) {
+        val alertDialogBuilder = AlertDialog.Builder(mContext)
         alertDialogBuilder.setTitle("GPS Disabled")
         alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
             .setCancelable(false)
             .setPositiveButton(
                 "Goto Settings Page To Enable GPS"
-            ) { dialog, id ->
+            ) { _, _ ->
                 val callGPSSettingIntent = Intent(
                     Settings.ACTION_LOCATION_SOURCE_SETTINGS
                 )
@@ -60,7 +56,7 @@ object ViewUtils {
             }
         alertDialogBuilder.setNegativeButton(
             "Cancel"
-        ) { dialog, id -> dialog.cancel() }
+        ) { dialog, _ -> dialog.cancel() }
         val alert = alertDialogBuilder.create()
         alert.show()
     }
@@ -76,12 +72,12 @@ object ViewUtils {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_dialog)
-        val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
+        val tvMessage: TextView = dialog.findViewById(R.id.tvMessage)
         val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
         val btnNo = dialog.findViewById<AppCompatButton>(R.id.btn_no)
 
-        if (message.length > 0) {
-            tvMessage.setText(message)
+        if (message.isNotEmpty()) {
+            tvMessage.text = message
         } else {
             tvMessage.setText(styleString, TextView.BufferType.SPANNABLE)
         }
@@ -110,11 +106,11 @@ object ViewUtils {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_dialog)
-        val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
+        val tvMessage: TextView = dialog.findViewById(R.id.tvMessage)
         val btnConfirm = dialog.findViewById<AppCompatButton>(R.id.btn_confirm)
         val btnNo = dialog.findViewById<AppCompatButton>(R.id.btn_no)
 
-        tvMessage.setText(message)
+        tvMessage.text = message
 
         btnConfirm.setOnClickListener {
             listener.onConfirmed()
@@ -136,14 +132,13 @@ object ViewUtils {
 
     fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener) {
         val dialog = Dialog(mContext)
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_dialog_response)
-        val tvMessage = dialog.findViewById(R.id.tvMessage) as TextView
+        val tvMessage: TextView = dialog.findViewById(R.id.tvMessage)
         val btnOk = dialog.findViewById<AppCompatButton>(R.id.btn_ok)
-        tvMessage.setText(message)
+        tvMessage.text = message
 
         btnOk.setOnClickListener {
             listener.onConfirmed()
@@ -161,34 +156,29 @@ object ViewUtils {
 
     fun getErrorResponse(error: VolleyError, mContext: Context) {
         if (error is TimeoutError) {
-            //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
             Toast.makeText(
                 mContext,
-                "Request timeout!! Check your internet connection or Contact Admin",
+                mContext.getString(R.string.request_timeout_check_your_internet_connection_or_contact_admin),
                 Toast.LENGTH_LONG
             ).show()
         }
         if (error is NoConnectionError) {
-            //mListerner.onFailure("Turn on your internet connection and Try again")
             Toast.makeText(
                 mContext,
                 "Turn on your internet connection and Try again",
                 Toast.LENGTH_LONG
             ).show()
         }
-        if (error != null && error.networkResponse != null) {
+        if (error.networkResponse != null) {
             try {
                 val s = String(error.networkResponse.data)
                 Log.d("Routes", "message: $s")
                 val data = JSONObject(s)
-                //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                //mListerner.onFailure(data.getString("message"))
                 Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
             } catch (e: UnsupportedEncodingException) {
                 Sentry.captureException(e)
                 e.printStackTrace()
             } catch (e: JSONException) {
-                //mListerner.onFailure(e.message)
                 Sentry.captureException(e)
                 Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
                 e.printStackTrace()
@@ -197,11 +187,11 @@ object ViewUtils {
     }
 
     fun getLocation(mContext: Context, activity: Activity, mListener: LocationFetch) {
-        var mFusedLocationClient: FusedLocationProviderClient? = null
+        val mFusedLocationClient: FusedLocationProviderClient?
         val locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext)
-            Log.e("location", "fused location: " + mFusedLocationClient.toString())
+            Log.e("location", "fused location: $mFusedLocationClient")
             if (ActivityCompat.checkSelfPermission(
                     mContext,
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -228,31 +218,27 @@ object ViewUtils {
                     override fun isCancellationRequested(): Boolean {
                         return false
                     }
-                }).addOnSuccessListener(object : OnSuccessListener<Location?> {
-                @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-                override fun onSuccess(location: Location?) {
-                    if (!location.toString().equals("null")) {
-                        if (!location!!.latitude.isNaN()) {
-                            if (!location.isFromMockProvider) {
-                                mListener.onFetchSuccess(location)
-                            } else {
-                                mListener.onFailure()
-                                Toast.makeText(
-                                    mContext,
-                                    "Disable mock location",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                }).addOnSuccessListener { location ->
+                if (!location.toString().equals("null")) {
+                    if (!location!!.latitude.isNaN()) {
+                        if (!location.isFromMockProvider) {
+                            mListener.onFetchSuccess(location)
+                        } else {
+                            mListener.onFailure()
+                            Toast.makeText(
+                                mContext,
+                                "Disable mock location",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        mListener.onFailure()
-                        Toast.makeText(
-                            mContext, "Location not available \$location", Toast.LENGTH_SHORT
-                        ).show()
                     }
+                } else {
+                    mListener.onFailure()
+                    Toast.makeText(
+                        mContext, "Location not available \$location", Toast.LENGTH_SHORT
+                    ).show()
                 }
-
-            })
+            }
         } else {
             mListener.onFailure()
             showGPSDisabledAlertToUser(activity)
@@ -260,31 +246,29 @@ object ViewUtils {
     }
 
     fun startTracking(activity: Activity, mContext: Context) {
-        //to start the location tracking
         if (BarikoiTrace.isBatteryOptimizationEnabled()) {
             AppLogger.log("BarikoiTrace " + " is batteryOptimized: " + BarikoiTrace.isBatteryOptimizationEnabled())
             BarikoiTrace.requestDisableBatteryOptimization(mContext)
         }
         if (BarikoiTrace.isLocationTracking()) {
-            AppLogger.log("BarikoiTrace "+ "is tracking 3: " + BarikoiTrace.isLocationTracking())
+            AppLogger.log("BarikoiTrace " + "is tracking 3: " + BarikoiTrace.isLocationTracking())
             Toast.makeText(
                 mContext,
                 "Service already running!! no need to start again",
                 Toast.LENGTH_SHORT
             ).show()
         } else if (!BarikoiTrace.isLocationPermissionsGranted()) {
-            AppLogger.log("BarikoiTrace "+ "is Location: " + BarikoiTrace.isLocationPermissionsGranted())
+            AppLogger.log("BarikoiTrace " + "is Location: " + BarikoiTrace.isLocationPermissionsGranted())
             BarikoiTrace.requestLocationPermissions(activity)
         } else if (!BarikoiTrace.isLocationSettingsOn()) {
-            AppLogger.log("BarikoiTrace "+"is location settings on: " + BarikoiTrace.isLocationSettingsOn())
+            AppLogger.log("BarikoiTrace " + "is location settings on: " + BarikoiTrace.isLocationSettingsOn())
             BarikoiTrace.requestLocationServices(activity)
         } else {
-            //start tracking using preferable tracking mode with updateInterval in seconds and distanceFilter in meters
             BarikoiTrace.startTracking(TraceMode.Builder().setUpdateInterval(10).build())
-            AppLogger.log("BarikoiTrace "+ "is tracking 2: " + BarikoiTrace.isLocationTracking())
+            AppLogger.log("BarikoiTrace " + "is tracking 2: " + BarikoiTrace.isLocationTracking())
             if (BarikoiTrace.isLocationTracking()) {
                 Toast.makeText(mContext, "Service started!!", Toast.LENGTH_SHORT).show()
-              AppLogger.log("BarikoiTrace"+ "is tracking")
+                AppLogger.log("BarikoiTrace" + "is tracking")
             }
         }
     }

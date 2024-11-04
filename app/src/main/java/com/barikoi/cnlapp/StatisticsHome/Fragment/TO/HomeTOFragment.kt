@@ -27,31 +27,17 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
+import com.barikoi.cnlapp.databinding.FragmentHomeTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_home_t_o.activeCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.activeLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.bodyLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.btn_tryAgain
-import kotlinx.android.synthetic.main.fragment_home_t_o.dateRangeLayoutHome
-import kotlinx.android.synthetic.main.fragment_home_t_o.inactiveCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.inactiveLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.lastweeksummary
-import kotlinx.android.synthetic.main.fragment_home_t_o.layoutFourth
-import kotlinx.android.synthetic.main.fragment_home_t_o.layoutSecond
-import kotlinx.android.synthetic.main.fragment_home_t_o.liveStockUpdate
-import kotlinx.android.synthetic.main.fragment_home_t_o.no_route_check
-import kotlinx.android.synthetic.main.fragment_home_t_o.tabLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.targetListView
-import kotlinx.android.synthetic.main.fragment_home_t_o.tvDateRange
-import kotlinx.android.synthetic.main.fragment_home_t_o.viewPager
-import kotlinx.android.synthetic.main.fragment_home_t_o.viewpagertab
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -61,13 +47,15 @@ import java.util.Locale
 
 
 class HomeTOFragment : Fragment() {
+    private lateinit var binding: FragmentHomeTOBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
     var token: String? = ""
-    var territoryId: String? = ""
-    var employeeId: String? = ""
+    private var territoryId: String? = ""
+    private var employeeId: String? = ""
     var userId: String? = ""
     var progressBar: ProgressBar? = null
 
@@ -79,23 +67,21 @@ class HomeTOFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_home_t_o, container, false)
-        progressBar = view.findViewById(R.id.progressBarHomeTO)
-        return view
+        binding = FragmentHomeTOBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //checkforAttendanceToday()
+        progressBar = view.findViewById(R.id.progressBarHomeTO)
 
         init()
 
-        liveStockUpdate.setOnClickListener {
+        binding.liveStockUpdate.setOnClickListener {
             startActivity(Intent(requireActivity(), ProductStockUpdateActivity::class.java))
         }
 
-        lastweeksummary.setOnClickListener {
+        binding.lastweeksummary.setOnClickListener {
             startActivity(
                 Intent(
                     requireActivity(),
@@ -115,43 +101,41 @@ class HomeTOFragment : Fragment() {
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
-                        if (response != null) {
-                            val obj = JSONObject(response)
-                            val attedanceArray = obj.getJSONArray("attendances")
-                            if (attedanceArray.length() > 0) {
-                                no_route_check.visibility = View.GONE
-                                bodyLayout.visibility = View.VISIBLE
-                                val attendanceObj = attedanceArray.getJSONObject(0)
-                                /*if (!attendanceObj.getString("route_id").equals("null")) {
-                                    attendanceObj.getInt("route_id")
-                                    attendanceObj.getString("route_name")
-                                    editor!!.putString(
-                                        Api.SELECTED_ROUTE_ID,
-                                        attendanceObj.getInt("route_id").toString()
-                                    )
-                                        .putString(
-                                            Api.SELECTED_ROUTE_NAME,
-                                            attendanceObj.getString("route_name")
-                                        ).commit()
-                                    //MainActivity.routeName_selected!!.setText(attendanceObj.getString("route_name"))
-                                    //routeId =  attendanceObj.getInt("route_id").toString()
-                                    init()
-                                }else{
-                                    no_route_check.visibility = View.VISIBLE
-                                    bodyLayout.visibility = View.GONE
-
-                                    btn_tryAgain.setOnClickListener {
-                                        checkforAttendanceToday()
-                                    }
-                                }*/
+                        val obj = JSONObject(response)
+                        val attedanceArray = obj.getJSONArray("attendances")
+                        if (attedanceArray.length() > 0) {
+                            binding.noRouteCheck.visibility = View.GONE
+                            binding.bodyLayout.visibility = View.VISIBLE
+                            val attendanceObj = attedanceArray.getJSONObject(0)
+                            /*if (!attendanceObj.getString("route_id").equals("null")) {
+                                attendanceObj.getInt("route_id")
+                                attendanceObj.getString("route_name")
+                                editor!!.putString(
+                                    Api.SELECTED_ROUTE_ID,
+                                    attendanceObj.getInt("route_id").toString()
+                                )
+                                    .putString(
+                                        Api.SELECTED_ROUTE_NAME,
+                                        attendanceObj.getString("route_name")
+                                    ).commit()
+                                //MainActivity.routeName_selected!!.setText(attendanceObj.getString("route_name"))
+                                //routeId =  attendanceObj.getInt("route_id").toString()
                                 init()
-                            } else {
+                            }else{
                                 no_route_check.visibility = View.VISIBLE
                                 bodyLayout.visibility = View.GONE
 
                                 btn_tryAgain.setOnClickListener {
                                     checkforAttendanceToday()
                                 }
+                            }*/
+                            init()
+                        } else {
+                            binding.noRouteCheck.visibility = View.VISIBLE
+                            binding. bodyLayout.visibility = View.GONE
+
+                            binding.btnTryAgain.setOnClickListener {
+                                checkforAttendanceToday()
                             }
                         }
                     } catch (e: Exception) {
@@ -185,33 +169,34 @@ class HomeTOFragment : Fragment() {
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("LLL dd", Locale.ENGLISH)
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
+        binding.tvDateRange.text =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText("SELECT A DATE")
+        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayoutHome.setOnClickListener(View.OnClickListener {
+        binding.dateRangeLayoutHome.setOnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayoutHome.setEnabled(false)
-        })
+            binding.dateRangeLayoutHome.setEnabled(false)
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayoutHome.setEnabled(true)
+            binding.dateRangeLayoutHome.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                binding.tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                binding.tvDateRange.text = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
@@ -224,7 +209,7 @@ class HomeTOFragment : Fragment() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayoutHome.setEnabled(true) }
 
         getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&with_to_stats=1&territory_id=" + territoryId + "&user_id=" + userId)
 
@@ -232,83 +217,170 @@ class HomeTOFragment : Fragment() {
 
     private fun getSummaryTargets(url: String) {
         var total_target = "--:--"
+        var totalTargetValue = 0.0
         var total_target_completed = "--:--"
+        var totalTargetCompletedValue = 0.0
+
         var lpc = "--:--"
+        var lpcValue = 0.0
         var lpc_completed = "--:--"
+        var lpcCompletedValue = 0.0
+
         var bpc = "--:--"
+        var bpcValue = 0.0
         var bpc_completed = "--:--"
+        var bpcCompletedValue = 0.0
+
         var aiv = "--:--"
+        var aivValue = 0.0
         var aiv_completed = "--:--"
+        var aivCompletedValue = 0.0
+
         var ads = "--:--"
+        var adsValue = 0.0
         var ads_completed = "--:--"
+        var adsCompletedValue = 0.0
+
         var rds = "--:--"
+        var rdsValue = 0.0
         var rds_completed = "--:--"
-        var visit_completed = "--:--"
+        var rdsCompletedValue = 0.0
+
         var visited = "--:--"
-        var bounce_completed = "--:--"
+        var visitedValue = 0.0
+        var visit_completed = "--:--"
+        var visitCompletedValue = 0.0
+
         var bounced = "--:--"
-        var dformat = DecimalFormat("#.##")
+        var bouncedValue = 0.0
+        var bounce_completed = "--:--"
+        var bounceCompletedValue = 0.0
+
+        val dformat = DecimalFormat("#.##")
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
+                    AppLogger.log("getSummaryTargets:: $response")
                     if (response != null) {
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
-                        no_route_check.visibility = View.GONE
-                        bodyLayout.visibility = View.VISIBLE
+                        binding.noRouteCheck.visibility = View.GONE
+                        binding.bodyLayout.visibility = View.VISIBLE
                         if (targetsArray.length() > 0) {
                             for (i in 0 until targetsArray.length()) {
                                 val targetObj = targetsArray.getJSONObject(i)
-                                if (!targetObj.isNull("target_amount")) total_target =
-                                    dformat.format(targetObj.getString("target_amount").toDouble())
-                                if (!targetObj.isNull("target_ads")) ads =
-                                    dformat.format(targetObj.getString("target_ads").toDouble())
-                                if (!targetObj.isNull("target_rds")) rds =
-                                    dformat.format(targetObj.getString("target_rds").toDouble())
-                                if (!targetObj.isNull("target_sku_per_memo")) bpc = dformat.format(
-                                    targetObj.getString("target_sku_per_memo").toDouble()
-                                )
-                                if (!targetObj.isNull("target_number_of_memo")) lpc =
-                                    dformat.format(
+                                if (!targetObj.isNull("target_amount")) {
+                                    total_target = dformat.format(
+                                        targetObj.getString("target_amount").toDouble()
+                                    )
+                                    totalTargetValue =
+                                        targetObj.getString("target_amount").toDouble()
+                                }
+                                if (!targetObj.isNull("target_ads")) {
+                                    ads =
+                                        dformat.format(targetObj.getString("target_ads").toDouble())
+                                    adsValue = targetObj.getString("target_ads").toDouble()
+                                }
+                                if (!targetObj.isNull("target_rds")) {
+                                    rds =
+                                        dformat.format(targetObj.getString("target_rds").toDouble())
+                                    rdsValue = targetObj.getString("target_rds").toDouble()
+                                }
+                                if (!targetObj.isNull("target_sku_per_memo")) {
+                                    bpc = dformat.format(
+                                        targetObj.getString("target_sku_per_memo").toDouble()
+                                    )
+                                    bpcValue =
+                                        targetObj.getString("target_sku_per_memo").toDouble()
+                                }
+                                if (!targetObj.isNull("target_number_of_memo")) {
+                                    lpc =
+                                        dformat.format(
+                                            targetObj.getString("target_number_of_memo").toDouble()
+                                        )
+                                    lpcValue =
                                         targetObj.getString("target_number_of_memo").toDouble()
-                                    )
-                                if (!targetObj.isNull("target_number_of_visits")) visited =
-                                    dformat.format(
+                                }
+                                if (!targetObj.isNull("target_number_of_visits")) {
+                                    visited =
+                                        dformat.format(
+                                            targetObj.getString("target_number_of_visits")
+                                                .toDouble()
+                                        )
+                                    visitedValue =
                                         targetObj.getString("target_number_of_visits").toDouble()
-                                    )
-                                if (!targetObj.isNull("target_aiv")) aiv =
-                                    dformat.format(targetObj.getString("target_aiv").toDouble())
-                                if (!targetObj.isNull("threshold_bounce_percentage")) bounced =
-                                    dformat.format(
+                                }
+                                if (!targetObj.isNull("target_aiv")) {
+                                    aiv =
+                                        dformat.format(targetObj.getString("target_aiv").toDouble())
+                                    aivValue = targetObj.getString("target_aiv").toDouble()
+                                }
+                                if (!targetObj.isNull("threshold_bounce_percentage")) {
+                                    bounced =
+                                        dformat.format(
+                                            targetObj.getString("threshold_bounce_percentage")
+                                                .toDouble()
+                                        )
+
+                                    bouncedValue =
                                         targetObj.getString("threshold_bounce_percentage")
                                             .toDouble()
-                                    )
+                                }
                             }
                         }
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
-                                if (!targetObj.isNull("revenue")) total_target_completed =
-                                    dformat.format(targetObj.getString("revenue").toDouble())
-                                if (!targetObj.isNull("ads")) ads_completed =
-                                    dformat.format(targetObj.getString("ads").toDouble())
-                                if (!targetObj.isNull("rds")) rds_completed =
-                                    dformat.format(targetObj.getString("rds").toDouble())
-                                if (!targetObj.isNull("sku_per_memo")) bpc_completed =
-                                    dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if (!targetObj.isNull("revenue")) {
+                                    total_target_completed =
+                                        dformat.format(targetObj.getString("revenue").toDouble())
+                                    totalTargetCompletedValue =
+                                        targetObj.getString("revenue").toDouble()
+                                }
+                                if (!targetObj.isNull("ads")) {
+                                    ads_completed =
+                                        dformat.format(targetObj.getString("ads").toDouble())
+                                    adsCompletedValue = targetObj.getString("ads").toDouble()
+                                }
+                                if (!targetObj.isNull("rds")) {
+                                    rds_completed =
+                                        dformat.format(targetObj.getString("rds").toDouble())
+                                    rdsCompletedValue = targetObj.getString("rds").toDouble()
+                                }
+                                if (!targetObj.isNull("sku_per_memo")) {
+                                    bpc_completed =
+                                        dformat.format(
+                                            targetObj.getString("sku_per_memo").toDouble()
+                                        )
+                                    bpcCompletedValue =
+                                        targetObj.getString("sku_per_memo").toDouble()
+                                }
                                 if (!targetObj.isNull("number_of_memo")) lpc_completed =
                                     dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                if (!targetObj.isNull("number_of_visits")) visit_completed =
-                                    dformat.format(
+                                lpcCompletedValue = targetObj.getString("number_of_memo").toDouble()
+                                if (!targetObj.isNull("number_of_visits")) {
+                                    visit_completed =
+                                        dformat.format(
+                                            targetObj.getString("number_of_visits").toDouble()
+                                        )
+                                    visitCompletedValue =
                                         targetObj.getString("number_of_visits").toDouble()
-                                    )
-                                if (!targetObj.isNull("aiv")) aiv_completed =
-                                    dformat.format(targetObj.getString("aiv").toDouble())
-                                if (!targetObj.isNull("bounce_amount_percentage")) bounce_completed =
-                                    dformat.format(
+                                }
+                                if (!targetObj.isNull("aiv")) {
+                                    aiv_completed =
+                                        dformat.format(targetObj.getString("aiv").toDouble())
+                                    aivCompletedValue = targetObj.getString("aiv").toDouble()
+                                }
+                                if (!targetObj.isNull("bounce_amount_percentage")) {
+                                    bounce_completed =
+                                        dformat.format(
+                                            targetObj.getString("bounce_amount_percentage")
+                                                .toDouble()
+                                        )
+                                    bounceCompletedValue =
                                         targetObj.getString("bounce_amount_percentage").toDouble()
-                                    )
+                                }
                             }
                         }
 
@@ -317,61 +389,79 @@ class HomeTOFragment : Fragment() {
                             TargetValue(
                                 resources.getString(R.string.total_target),
                                 total_target,
-                                total_target_completed
+                                totalTargetValue,
+                                total_target_completed,
+                                totalTargetCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.ads),
                                 ads,
-                                ads_completed
+                                adsValue,
+                                ads_completed,
+                                adsCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.rds),
                                 rds,
-                                rds_completed
+                                rdsValue,
+                                rds_completed,
+                                rdsCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.sku_per_memo),
                                 bpc,
-                                bpc_completed
+                                bpcValue,
+                                bpc_completed,
+                                bpcCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.number_of_memo),
                                 lpc,
-                                lpc_completed
+                                lpcValue,
+                                lpc_completed,
+                                lpcCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.visit_ratio),
                                 visited,
-                                visit_completed
+                                visitedValue,
+                                visit_completed,
+                                visitCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.aiv),
                                 aiv,
-                                aiv_completed
+                                aivValue,
+                                aiv_completed,
+                                aivCompletedValue
                             )
                         )
                         itemList.add(
                             TargetValue(
                                 resources.getString(R.string.bounce) + " (%)",
                                 bounced,
-                                bounce_completed
+                                bouncedValue,
+                                bounce_completed,
+                                bounceCompletedValue
                             )
                         )
 
+                        AppLogger.log("Target:: $itemList")
+
                         val adapter = TargetAdapter(itemList, "TO")
-                        targetListView.adapter = adapter
+                        binding.targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setActiveInactiveView()
                         //setLiveStockView()
@@ -407,17 +497,17 @@ class HomeTOFragment : Fragment() {
     }
 
     private fun setActiveInactiveView() {
-        layoutSecond.visibility = View.VISIBLE
+        binding.layoutSecond.visibility = View.VISIBLE
         val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 16f
         gd.setStroke(3, mContext!!.resources.getColor(R.color.cnl_color_2))
-        activeLayout.setBackgroundDrawable(gd)
+        binding.activeLayout.setBackgroundDrawable(gd)
         val gd2 = GradientDrawable()
         gd2.setColor(mContext!!.resources.getColor(R.color.white))
         gd2.cornerRadius = 16f
         gd2.setStroke(3, mContext!!.resources.getColor(R.color.cnl_color_1))
-        inactiveLayout.setBackgroundDrawable(gd2)
+        binding.inactiveLayout.setBackgroundDrawable(gd2)
 
         val today = Calendar.getInstance().time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
@@ -433,10 +523,10 @@ class HomeTOFragment : Fragment() {
                             //val attendanceArray = obj.getJSONArray("active")
                             val activeSO = obj.getJSONArray("active").length()
                             val inactiveSO = obj.getJSONArray("inactive").length()
-                            activeCount.setText(activeSO.toString())
-                            inactiveCount.setText(inactiveSO.toString())
+                            binding.activeCount.text = activeSO.toString().englishToBanglaNumber()
+                            binding.inactiveCount.text = inactiveSO.toString().englishToBanglaNumber()
                             if (obj.getJSONArray("active").length() > 0) {
-                                activeLayout.setOnClickListener {
+                                binding.activeLayout.setOnClickListener {
                                     startActivity(
                                         Intent(
                                             requireActivity(),
@@ -446,7 +536,7 @@ class HomeTOFragment : Fragment() {
                                 }
                             }
                             if (obj.getJSONArray("inactive").length() > 0) {
-                                inactiveLayout.setOnClickListener {
+                                binding.inactiveLayout.setOnClickListener {
                                     startActivity(
                                         Intent(
                                             requireActivity(),
@@ -511,7 +601,7 @@ class HomeTOFragment : Fragment() {
                                 itemList.sortBy {
                                     it.second
                                 }
-                                createTable(itemList, tabLayout)
+                                createTable(itemList, binding.tabLayout)
                             }
 
                         }
@@ -535,7 +625,7 @@ class HomeTOFragment : Fragment() {
     }
 
     private fun setSummary() {
-        layoutFourth.visibility = View.VISIBLE
+        binding. layoutFourth.visibility = View.VISIBLE
         progressBar!!.visibility = View.GONE
         val titles = arrayOf(
             resources.getString(R.string.today_summary),
@@ -544,23 +634,23 @@ class HomeTOFragment : Fragment() {
         val fragments = ArrayList<Fragment>()
         fragments.add(TodaysSummaryTOFragment())
         fragments.add(LastWeekSummaryTOFragment())
-        viewPager.adapter = ViewPagerAdapter(parentFragmentManager, lifecycle, fragments)
+        binding.viewPager.adapter = ViewPagerAdapter(parentFragmentManager, lifecycle, fragments)
         // attaching tab mediator
         TabLayoutMediator(
-            viewpagertab, viewPager
+            binding.viewpagertab, binding.viewPager
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text = titles[position]
         }.attach()
-        viewPager.currentItem = 0
+        binding.viewPager.currentItem = 0
 
         //viewPager.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.getTabCount()) {
-            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+        for (i in 0 until binding.viewpagertab.getTabCount()) {
+            val tab = (binding.viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(12, 12, 8, 12)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
+        Log.d("Fragment", "viewpager current Item: " + binding.viewPager.getCurrentItem())
     }
 
     private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {

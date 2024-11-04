@@ -39,12 +39,12 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.databinding.FragmentBouncedOrderBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_bounced_order.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -52,6 +52,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
+    private lateinit var binding: FragmentBouncedOrderBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +60,10 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        recylerView = view.findViewById(R.id.orderListView)
+        progressBar = view.findViewById(R.id.progressBar3)
+
         checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
@@ -89,10 +94,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_bounced_order, container, false)
-        recylerView = view.findViewById(R.id.orderListView)
-        progressBar = view.findViewById(R.id.progressBar3)
-        return view
+        binding = FragmentBouncedOrderBinding.inflate(inflater, container, false)
+        return  binding.root
     }
 
     companion object{
@@ -266,10 +269,10 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     }
                 }
             }else{
-                no_route_check.visibility = View.VISIBLE
-                bodyLayout.visibility = View.GONE
+                binding.noRouteCheck.visibility = View.VISIBLE
+                binding.bodyLayout.visibility = View.GONE
 
-                btn_tryAgain.setOnClickListener {
+                binding.btnTryAgain.setOnClickListener {
                     /*checkforOrders(
                         queue!!,
                         token!!,

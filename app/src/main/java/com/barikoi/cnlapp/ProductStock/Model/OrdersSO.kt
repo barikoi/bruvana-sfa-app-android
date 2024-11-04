@@ -8,6 +8,6 @@ class OrdersSO(
     var so_name: String,
     var order_collected: String,
     var total_outlets: String,
-    var total_bounce: Double,
+    var total_bounce: String,
     var ordersArray: JSONArray
 ):Serializable

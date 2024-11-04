@@ -47,7 +47,7 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         mAppUpdateManager = AppUpdateManagerFactory.create(this)
 
         BarikoiTrace.initialize(applicationContext, Api.APIKEY)
@@ -160,14 +160,12 @@ class SplashActivity : AppCompatActivity() {
         when (routeOpt) {
             0 -> {
                 /*val i = Intent(this, SignUpActivity::class.java)
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(i)
                 finish()*/
             }
 
             1 -> {
                 val i = Intent(this, LoginActivity::class.java)
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(i)
                 finish()
             }

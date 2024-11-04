@@ -102,8 +102,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     private lateinit var pusher: Pusher
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentMapBinding.inflate(layoutInflater, container, false)
 
@@ -145,26 +144,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
-        binding.spinnerRoutes.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
+        binding.spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
+                parent: AdapterView<*>, view: View, position: Int, id: Long
             ) {
                 routeID = routeNewList[position].id.toString()
 
                 if (!binding.isTrace.isChecked) {
                     if (isVerified.isChecked) {
                         viewModel.getOutletList(
-                            routeNewList[position].id.toString(),
-                            "1",
-                            selectedCategory
+                            routeNewList[position].id.toString(), "1", selectedCategory
                         )
                     } else {
                         viewModel.getOutletList(
-                            routeNewList[position].id.toString(),
-                            "0",
-                            selectedCategory
+                            routeNewList[position].id.toString(), "0", selectedCategory
                         )
                     }
                 }
@@ -175,43 +168,41 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         categoryList = arrayListOf("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
         val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item, categoryList
+            requireContext(), android.R.layout.simple_spinner_item, categoryList
         )
         binding.spinnerCategory.adapter = adapter
 
-        binding.spinnerCategory.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                if (routeID.isEmpty()) {
-                    return
-                }
-                if (binding.isTrace.isChecked) {
-                    return
+        binding.spinnerCategory.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>, view: View, position: Int, id: Long
+                ) {
+                    if (routeID.isEmpty()) {
+                        return
+                    }
+                    if (binding.isTrace.isChecked) {
+                        return
+                    }
+
+                    if (position == 0) {
+                        selectedCategory = ""
+                        if (binding.isVerified.isChecked) {
+                            viewModel.getOutletList(routeID, "1", selectedCategory)
+                        } else {
+                            viewModel.getOutletList(routeID, "0", selectedCategory)
+                        }
+                    } else {
+                        selectedCategory = categoryList[position]
+                        if (binding.isVerified.isChecked) {
+                            viewModel.getOutletList(routeID, "1", selectedCategory)
+                        } else {
+                            viewModel.getOutletList(routeID, "0", selectedCategory)
+                        }
+                    }
                 }
 
-                if (position == 0) {
-                    selectedCategory = ""
-                    if (binding.isVerified.isChecked) {
-                        viewModel.getOutletList(routeID, "1", selectedCategory)
-                    } else {
-                        viewModel.getOutletList(routeID, "0", selectedCategory)
-                    }
-                } else {
-                    selectedCategory = categoryList[position]
-                    if (binding.isVerified.isChecked) {
-                        viewModel.getOutletList(routeID, "1", selectedCategory)
-                    } else {
-                        viewModel.getOutletList(routeID, "0", selectedCategory)
-                    }
-                }
+                override fun onNothingSelected(parent: AdapterView<*>) {}
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
 
         binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
@@ -221,14 +212,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 }
                 subscribeSocket()
             } else {
-                if (this::pusher.isInitialized)
-                    pusher.disconnect()
+                if (this::pusher.isInitialized) pusher.disconnect()
 
                 if (routeID.isNotEmpty()) {
                     viewModel.getOutletList(
-                        routeID,
-                        if (binding.isVerified.isChecked) "1" else "0",
-                        selectedCategory
+                        routeID, if (binding.isVerified.isChecked) "1" else "0", selectedCategory
                     )
                 }
             }
@@ -281,8 +269,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         if (!soNameList.isNullOrEmpty()) {
                             AppLogger.log("SIZE: ${soNameList.size}")
                             val adapter = ArrayAdapter(
-                                requireContext(),
-                                android.R.layout.simple_spinner_item, soNameList
+                                requireContext(), android.R.layout.simple_spinner_item, soNameList
                             )
                             binding.spinnerSO.adapter = adapter
                         } else {
@@ -485,9 +472,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             }
 
             override fun onError(
-                message: String,
-                code: String,
-                e: Exception
+                message: String, code: String, e: Exception
             ) {
                 toast("Live location not working. Please try again latter.")
                 AppLogger.log("PUSHER:: There was a problem connecting! code ($code), message ($message), exception($e)")
@@ -500,8 +485,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             sharePrefUtils.getString(Api.TRACE_GROUP_NAME)!!.lowercase(Locale.US).replace(" ", "_")
 
         AppLogger.log("LIVE GROUP NAME:: $groupName")
-        pusher.subscribePrivate(
-            "private-care_nutrition_39752",
+        pusher.subscribePrivate("private-care_nutrition_39752",
             object : PrivateChannelEventListener {
                 override fun onSubscriptionSucceeded(channelName: String) {
                     AppLogger.log("PUSHER:: Subscribed! $channelName")
@@ -515,56 +499,46 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 override fun onEvent(event: PusherEvent?) {
                     AppLogger.log("PUSHER:: onEvent Received event with data: $event")
                 }
-            })
-            .bind(
-                "care_nutrition_group_event_$groupName",
-                object : PrivateChannelEventListener {
-                    override fun onEvent(event: PusherEvent?) {
+            }).bind("care_nutrition_group_event_$groupName", object : PrivateChannelEventListener {
+                override fun onEvent(event: PusherEvent?) {
 
-                        val liveUserResponse =
-                            Gson().fromJson(event?.data, SocketEventResponse::class.java)
+                    val liveUserResponse =
+                        Gson().fromJson(event?.data, SocketEventResponse::class.java)
 
-                        AppLogger.log("PUSHER:: DATA: ${event?.data}")
+                    AppLogger.log("PUSHER:: DATA: ${event?.data}")
 
-                        requireActivity().runOnUiThread {
-                            if (selectedSo?.phone == liveUserResponse.liveUser.phone) {
-                                plotTraceUser(
-                                    liveUserResponse.liveUser.name,
-                                    liveUserResponse.liveUser.updatedAt,
-                                    liveUserResponse.liveUser.latitude.toDouble(),
-                                    liveUserResponse.liveUser.longitude.toDouble(),
-                                    getLiveMarkerIcon(liveUserResponse.liveUser.activeStatus)
-                                )
-                            }
+                    requireActivity().runOnUiThread {
+                        if (selectedSo?.phone == liveUserResponse.liveUser.phone) {
+                            plotTraceUser(
+                                liveUserResponse.liveUser.name,
+                                liveUserResponse.liveUser.updatedAt,
+                                liveUserResponse.liveUser.latitude.toDouble(),
+                                liveUserResponse.liveUser.longitude.toDouble(),
+                                getLiveMarkerIcon(liveUserResponse.liveUser.activeStatus)
+                            )
                         }
                     }
+                }
 
-                    override fun onSubscriptionSucceeded(channelName: String?) {
-                        AppLogger.log("PUSHER:: onSubscriptionSucceeded: $channelName")
-                    }
+                override fun onSubscriptionSucceeded(channelName: String?) {
+                    AppLogger.log("PUSHER:: onSubscriptionSucceeded: $channelName")
+                }
 
-                    override fun onAuthenticationFailure(
-                        message: String?,
-                        e: Exception?
-                    ) {
-                        Sentry.captureException(e?.cause!!)
-                        AppLogger.log("PUSHER:: onAuthenticationFailure bind: $message")
-                    }
-                })
+                override fun onAuthenticationFailure(
+                    message: String?, e: Exception?
+                ) {
+                    Sentry.captureException(e?.cause!!)
+                    AppLogger.log("PUSHER:: onAuthenticationFailure bind: $message")
+                }
+            })
     }
 
     private fun plotTraceUser(
-        userName: String,
-        time: String,
-        lat: Double,
-        lon: Double,
-        icon: Icon
+        userName: String, time: String, lat: Double, lon: Double, icon: Icon
     ) {
         mMap.clear()
         mMap.addMarker(
-            MarkerOptions().position(LatLng(lat, lon))
-                .icon(icon)
-                .title("$userName | $time")
+            MarkerOptions().position(LatLng(lat, lon)).icon(icon).title("$userName | $time")
         )
         val zoom = if (mMap.cameraPosition.zoom > 17.0) mMap.cameraPosition.zoom else 17.0
 
@@ -574,21 +548,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private fun getLiveMarkerIcon(isActive: Int): Icon {
         return if (isActive == 1) {
-            IconFactory.getInstance(requireContext())
-                .fromResource(R.drawable.trace_active)
+            IconFactory.getInstance(requireContext()).fromResource(R.drawable.trace_active)
         } else {
-            IconFactory.getInstance(requireContext())
-                .fromResource(R.drawable.trace_inactive)
+            IconFactory.getInstance(requireContext()).fromResource(R.drawable.trace_inactive)
         }
     }
 
     private fun getMarkerIcon(): Icon {
         return if (isVerified.isChecked) {
-            IconFactory.getInstance(requireContext())
-                .fromResource(R.drawable.map_marker_green)
+            IconFactory.getInstance(requireContext()).fromResource(R.drawable.map_marker_green)
         } else {
-            IconFactory.getInstance(requireContext())
-                .fromResource(R.drawable.map_marker_red)
+            IconFactory.getInstance(requireContext()).fromResource(R.drawable.map_marker_red)
         }
     }
 
@@ -596,19 +566,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val shopName: String = p.outletName
         val m = mMap.addMarker(
             MarkerOptions().position(LatLng(p.latitude.toDouble(), p.longitude.toDouble()))
-                .icon(icon)
-                .title(p.outletCategory + ", " + shopName)
+                .icon(icon).title(p.outletCategory + ", " + shopName)
         )
 
-        if (!binding.isTrace.isChecked)
-            mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        p.latitude.toDouble(),
-                        p.longitude.toDouble()
-                    ), 12.0
-                )
+        if (!binding.isTrace.isChecked) mMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    p.latitude.toDouble(), p.longitude.toDouble()
+                ), 12.0
             )
+        )
     }
 
     private fun enableLocation() {
@@ -630,8 +597,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
             // Activate with options
             locationComponent.activateLocationComponent(
-                LocationComponentActivationOptions.builder(requireContext(), loadedMapStyle)
-                    .build()
+                LocationComponentActivationOptions.builder(requireContext(), loadedMapStyle).build()
             )
             // Enable to make component visible
             locationComponent.isLocationComponentEnabled = true
@@ -648,7 +614,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                     LocationEngineCallback<LocationEngineResult?> {
 
                     override fun onSuccess(result: LocationEngineResult?) {
-                        val lastLocation: Location = result!!.lastLocation!!
+                        if (result == null || result.lastLocation == null) {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.location_not_found),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return
+                        }
+                        val lastLocation: Location = result.lastLocation!!
                         if (!lastLocation.equals("null")) {
                             //setCameraPosition(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 17.0);
                         } else {
@@ -659,9 +633,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     override fun onFailure(exception: java.lang.Exception) {
                         Toast.makeText(
-                            requireContext(),
-                            exception.message,
-                            Toast.LENGTH_SHORT
+                            requireContext(), exception.message, Toast.LENGTH_SHORT
                         ).show()
                     }
                 })
@@ -703,8 +675,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         mMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
-                    location.latitude,
-                    location.longitude
+                    location.latitude, location.longitude
                 ), zoom!!
             )
         )
@@ -718,9 +689,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 enableLocationComponent(style)
             } else {
                 Toast.makeText(
-                    requireContext(),
-                    "Permission not granted",
-                    Toast.LENGTH_LONG
+                    requireContext(), "Permission not granted", Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -736,8 +705,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         AppLogger.log("LIFE CYCLE:: onStop")
         super.onStop()
         binding.mapView.onStop()
-        if (this::pusher.isInitialized)
-            pusher.disconnect()
+        if (this::pusher.isInitialized) pusher.disconnect()
 
     }
 
@@ -745,8 +713,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         AppLogger.log("LIFE CYCLE:: onDestroy")
         super.onDestroy()
         binding.mapView.onDestroy()
-        if (this::pusher.isInitialized)
-            pusher.disconnect()
+        if (this::pusher.isInitialized) pusher.disconnect()
     }
 
     override fun onLowMemory() {

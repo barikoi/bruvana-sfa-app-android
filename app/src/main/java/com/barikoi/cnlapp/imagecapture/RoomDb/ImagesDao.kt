@@ -11,17 +11,11 @@ interface ImagesDao {
     @Query("SELECT * FROM Images WHERE Position =:pos AND FileType =:type")
     fun getImageDBPos(pos: Int?, type: String): List<Images>?
 
-    /*@Query("SELECT * FROM Images WHERE ShopDbId =:id")
-    fun getImageDB(id: Int?): List<Images>?
-
-    @Query("SELECT * FROM Images WHERE ShopId =:id")
-    fun getImageDBShopId(id: String?): List<Images>?*/
-
     @Query("SELECT * FROM Images WHERE FileType =:type")
     fun getAllImageDB(type: String): List<Images?>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg images: Images?)
+    fun insertAll(vararg images: Images)
 
     @Query("UPDATE Images SET  Position =:position WHERE FilePath=:file_path AND FileType =:type")
     fun updatePosition(file_path: String?, position: Int?, type: String)
@@ -29,9 +23,6 @@ interface ImagesDao {
     @Query("DELETE FROM Images WHERE Position = :pos AND FileType =:type")
     fun deleteImage(pos: Int?, type: String)
 
-    /*@Query("DELETE FROM Images WHERE ShopDbId = :id")
-    fun deleteImageByShopId(id: Int?)
-*/
     @Query("DELETE FROM Images")
     fun deleteAllImages()
 }

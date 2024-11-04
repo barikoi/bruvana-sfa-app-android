@@ -14,21 +14,20 @@ import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.databinding.FragmentLastWeekBounceBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_last_week_bounce.bounceLayout
-import kotlinx.android.synthetic.main.fragment_last_week_bounce.listView
-import kotlinx.android.synthetic.main.fragment_last_week_bounce.progressBar
 import org.json.JSONObject
 
 class LastWeekBounceFragment : Fragment() {
+    private lateinit var binding: FragmentLastWeekBounceBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -63,7 +62,7 @@ class LastWeekBounceFragment : Fragment() {
                 try {
                     if (response != null) {
                         itemList.clear()
-                        progressBar.visibility = View.GONE
+                        binding.progressBar.visibility = View.GONE
                         val obj = JSONObject(response)
                         val outletssArray = obj.getJSONArray("outlets")
                         if (outletssArray.length() > 0) {
@@ -72,11 +71,11 @@ class LastWeekBounceFragment : Fragment() {
                                 val outletObj = outletssArray.getJSONObject(i)
                                 val ordersArray = outletObj.getJSONArray("orders")
                                 var imageUrl = "null"
-                                if (outletObj.has("images") && !outletObj.isNull("images")){
+                                if (outletObj.has("images") && !outletObj.isNull("images")) {
                                     val imageArray = outletObj.getJSONArray("images")
-                                    if (imageArray.length() > 0){
+                                    if (imageArray.length() > 0) {
                                         val imageobj = imageArray.getJSONObject(0)
-                                        if (imageobj.has("image_url")){
+                                        if (imageobj.has("image_url")) {
                                             imageUrl = imageobj.getString("image_url")
                                         }
                                     }
@@ -84,7 +83,9 @@ class LastWeekBounceFragment : Fragment() {
                                 if (ordersArray.length() > 0) {
                                     for (j in 0 until ordersArray.length()) {
                                         val orderObj = ordersArray.getJSONObject(j)
-                                        if (orderObj.getString("order_status").equals("DELIVERED", true)){
+                                        if (orderObj.getString("order_status")
+                                                .equals("DELIVERED", true)
+                                        ) {
                                             val brandArray = orderObj.getJSONArray("products")
                                             if (brandArray.length() > 0) {
                                                 for (k in 0 until brandArray.length()) {
@@ -114,8 +115,7 @@ class LastWeekBounceFragment : Fragment() {
                                                     }
                                                 }
                                             }
-                                        }
-                                        else if (orderObj.getString("order_status")
+                                        } else if (orderObj.getString("order_status")
                                                 .equals("CANCELLED", true)
                                         ) {
                                             val brandArray = orderObj.getJSONArray("products")
@@ -148,46 +148,47 @@ class LastWeekBounceFragment : Fragment() {
                                                 }
                                             }
                                         }
-                                            if (productList.size > 0) {
-                                                itemList.add(
-                                                    OutletStatistics(
-                                                        outletObj.getString("id"),
-                                                        outletObj.getString("outlet_name"),
-                                                        outletObj.getString("outlet_code"),
-                                                        imageUrl,
-                                                        outletObj.getString("outlet_category"),
-                                                        orderObj.getString("ordered_at"),
-                                                        productList
-                                                    )
+                                        if (productList.size > 0) {
+                                            itemList.add(
+                                                OutletStatistics(
+                                                    outletObj.getString("id"),
+                                                    outletObj.getString("outlet_name"),
+                                                    outletObj.getString("outlet_code"),
+                                                    imageUrl,
+                                                    outletObj.getString("outlet_category"),
+                                                    orderObj.getString("ordered_at"),
+                                                    productList
                                                 )
-                                            }
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
 
                         if (itemList.size > 0) {
-                            listView.visibility = View.VISIBLE
+                            binding.listView.visibility = View.VISIBLE
                             val adapter = OutletAdapter(itemList, "bounce")
-                            listView.adapter = adapter
+                            binding.listView.adapter = adapter
                             adapter.notifyDataSetChanged()
-                        }else{
+                        } else {
                             val valueTV = TextView(mContext)
                             valueTV.text = "No Order on the list"
                             valueTV.textSize = 20f
                             valueTV.gravity = Gravity.CENTER
-                            valueTV.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                            listView.visibility = View.GONE
-                            bounceLayout.addView(valueTV)
+                            valueTV.layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            binding.listView.visibility = View.GONE
+                            binding.bounceLayout.addView(valueTV)
                         }
-
-
 
 
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
             }
@@ -202,11 +203,11 @@ class LastWeekBounceFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
         })
@@ -218,8 +219,8 @@ class LastWeekBounceFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_last_week_bounce, container, false)
+        binding = FragmentLastWeekBounceBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onAttach(context: Context) {

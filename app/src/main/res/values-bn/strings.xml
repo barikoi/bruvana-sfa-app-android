@@ -1,0 +1,329 @@
+<resources>
+    <!--<string name="app_name">CNL App</string>-->
+    <string name="splash_title">Care Nutrition Limited</string>
+
+    <!--bottom_nav-->
+    <string name="title_home">হোম</string>
+    <string name="title_route">রুট</string>
+    <string name="title_attendance">উপস্থিতি</string>
+    <string name="title_order">অর্ডার</string>
+    <string name="title_chat">চ্যাট</string>
+    <!--drawer_menu-->
+    <string name="title_shop_route">দোকান এবং রুটের তালিকা</string>
+    <string name="order_delivery_update">অর্ডার ডেলিভারি আপডেট</string>
+    <string name="title_order_summary">অর্ডার সারাংশ</string>
+    <string name="title_notice">নোটিশ</string>
+    <string name="title_visit_report">ভ্রমণ রিপোর্ট</string>
+    <string name="title_trade_offers">ট্রেড অফার</string>
+    <string name="title_product_summary">প্রোডাক্ট অনুযায়ী সারাংশ</string>
+    <string name="title_product_stock_update">প্রোডাক্ট অনুযায়ী স্টক আপডেট</string>
+    <string name="title_incentive">প্রণোদনা</string>
+
+    <!--home-->
+    <string name="welcome">স্বাগতম</string>
+    <string name="rank">পদমর্যাদা</string>
+    <string name="st">st</string>
+    <string name="nd">nd</string>
+    <string name="rd">rd</string>
+    <string name="th">th</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="mapbox_access_token" translatable="false">pk.test</string>
+
+    <string name="current_location">বর্তমান অবস্থান</string>
+    <string name="upload_photo">ছবি আপলোড</string>
+    <string name="todays_route">আজকের রুট</string>
+    <string name="remarks_late_reason">মন্তব্য/ বিলম্বের কারণ</string>
+    <string name="type_your_reason_here">এখানে আপনার কারণ টাইপ করুন…</string>
+
+    <string name="most_frequent">Most Frequent</string>
+    <string name="high_stock">বেশি মজুত</string>
+    <string name="low_stock">কম মজুত</string>
+    <string name="atoz">A to Z</string>
+    <string name="ztoa">Z to A</string>
+
+    <string name="stock_out">মজুত শেষ</string>
+    <string name="product_stock_out">এই পণ্যের মজুত শেষ</string>
+
+    <string name="sr_code">এসআর কোড</string>
+    <string name="ss_id">এস এস আইডি</string>
+    <string name="password">পাসওয়ার্ড</string>
+    <string name="login">লগইন</string>
+    <string name="logout">লগউট</string>
+    <string name="sure_log_out">আপনি লগ আউট করতে চান?</string>
+
+    <string name="confirm">নিশ্চিত করুন</string>
+    <string name="order_confirm">অর্ডার নিশ্চিত করুন</string>
+    <string name="yes">হ্যাঁ</string>
+    <string name="no">না</string>
+    <string name="ok">ওকে</string>
+    <string name="cancel">বাতিল</string>
+    <string name="submit">জমা দিন</string>
+    <string name="update">আপডেট</string>
+    <string name="check">চেক</string>
+    <string name="check_in">চেক ইন</string>
+    <string name="check_out">চেক আউট</string>
+    <string name="checked_out">চেক আউট হয়েছে</string>
+    <string name="are_you_sure_want_to_check_out">আপনি কি নিশ্চিত চেক আউট করতে চান?</string>
+    <string name="try_again">আবার চেষ্টা করুন</string>
+    <string name="refresh">রিফ্রেশ</string>
+
+    <string name="route_plan">রুট প্ল্যান</string>
+    <string name="verified">ভেরিফাই হয়েছে</string>
+    <string name="see_location">লোকেশন দেখুন</string>
+
+    <string name="route_code">রুট কোড</string>
+    <string name="shop_count">দোকান সংখ্যা</string>
+
+    <string name="active_so_list">সক্রিয় এসও তালিকা</string>
+    <string name="inactive_so_list">নিষ্ক্রিয় এসও তালিকা</string>
+
+    <!--attendance history-->
+    <string name="market">মার্কেটঃ </string>
+    <string name="in">ইন</string>
+    <string name="out">আউট</string>
+    <string name="date_range">ডেট রেঞ্জ</string>
+    <string name="attendance">উপস্থিতি</string>
+    <string name="history">হিস্ট্রি</string>
+    <string name="last_updated_time">শেষ আপডেট সময়</string>
+    <string name="last_location">শেষ অবস্থান</string>
+
+    <!--attendance summary-->
+    <string name="present">উপস্থিত</string>
+    <string name="absent">অনুপস্থিত</string>
+    <string name="late">দেরী</string>
+
+    <!--Home View-->
+    <string name="today_summary">আজকের সারাংশ</string>
+    <string name="last_week_summary">গত সপ্তাহের সারাংশ</string>
+    <string name="today_report">আজকের রিপোর্ট</string>
+    <string name="last_week_report">গত সপ্তাহের রিপোর্ট</string>
+    <string name="last_week_product">গত সপ্তাহের প্রোডাক্ট</string>
+    <string name="low_stock_product">স্বল্প জমা প্রোডাক্ট</string>
+    <string name="today_category">আজকের ক্যাটাগরি</string>
+    <string name="last_week_category">গত সপ্তাহের ক্যাটাগরি</string>
+    <string name="last_week_delivery">গত সপ্তাহের ডেলিভারি</string>
+    <string name="bounce_list">গত সপ্তাহের বাউন্স</string>
+    <string name="custom">কাস্টম</string>
+
+    <string name="summary">সারসংক্ষেপ</string>
+    <string name="total_order_value">মোট অর্ডার মূল্য</string>
+    <string name="sku_per_memo">এসকেইউ প্রতি মেমো</string>
+    <string name="visit_ratio">পরিদর্শনের সংখ্যা</string>
+    <string name="number_of_memo">মেমোর সংখ্যা</string>
+    <string name="visit_500m">পরিদর্শন (০–১০০মি)</string>
+    <string name="aiv">এ আই ভি</string>
+    <string name="ads">এ ডি এস</string>
+    <string name="rds">আর ডি এস</string>
+    <string name="bounce">বাউন্স</string>
+    <string name="delivery_value">ডেলিভারি মূল্য</string>
+    <string name="total_delivery_value">মোট ডেলিভারি মূল্য</string>
+    <string name="total_target">মোট টার্গেট</string>
+    <string name="total_target_achieved">মোট লক্ষ্য অর্জিত</string>
+    <string name="details">বিস্তারিত</string>
+    <string name="start_ordering">অর্ডার করা শুরু করুন</string>
+    <string name="total">মোট-</string>
+    <string name="last_order_date">সর্বশেষ অর্ডারের তারিখ - %1$s</string>
+    <string name="last_delivery_date">সর্বশেষ ডেলিভারির তারিখ - </string>
+    <string name="items">আইটেমস</string>
+    <string name="items_"> %1$s আইটেমস</string>
+    <string name="ordered_at">অর্ডার দেয়া হয়েছে - </string>
+
+    <string name="no_route_selected_today">আজকের রুট এখনও নির্বাচন করা হয়নি। \nরুট নির্বাচনের জন্য আপনার উপস্থিতি জমা দিন।</string>
+    <string name="no_order_found">আজ কোনো অর্ডার পাওয়া যায়নি</string>
+    <string name="coming_soon">শীঘ্রই আসছে!!!</string>
+    <string name="no_so_found">কোনও এসও পাওয়া যায়নি</string>
+
+    <string name="active">সক্রিয়</string>
+    <string name="inactive">নিষ্ক্রিয়</string>
+    <string name="live_stock_update"><a href="http://www.bla.com">লাইভ স্টক আপডেট</a></string>
+    <string name="summary_link"><a href="http://www.bla.com">সারসংক্ষেপ</a></string>
+    <string name="ov">ওভিঃ</string>
+    <string name="bpc">এসপিএমঃ</string>
+    <string name="lpc">এনএমঃ</string>
+
+    <!--Create Order-->
+    <string name="order_collection">অর্ডার সংগ্রহ</string>
+    <string name="select_dokan">ডোকান নির্বাচন করুন</string>
+    <string name="confirm_order">অর্ডার নিশ্চিত করুন</string>
+    <string name="select">নির্বাচন করুন</string>
+    <string name="sort_by">অনুসারে সাজান</string>
+    <string name="filter">ফিল্টার</string>
+    <string name="search_shop">দোকান অনুসন্ধান করুন</string>
+    <string name="select_route">রুট নির্বাচন করুন</string>
+    <string name="create_shop">নতুন দোকান তৈরি</string>
+    <string name="previous_order">পূর্ববর্তী অর্ডার</string>
+    <string name="search_product">পণ্যের নামের মাধ্যমে অনুসন্ধান করুন</string>
+    <string name="no_order">কোনো অর্ডার নেই</string>
+    <string name="save_order">অর্ডার সংরক্ষণ করুন</string>
+    <string name="update_order">অর্ডার আপডেট করুন</string>
+    <string name="add_more_item">আরও আইটেম যোগ করুন</string>
+    <string name="download_chalan">চালান ডাউনলোড করুন</string>
+    <string name="confirm_order_dialog">আপনি কি নিশ্চিত যে আজকের অর্ডারটি নিশ্চিত করতে চান?</string>
+    <string name="update_order_dialog">আপনি কি নিশ্চিত যে এই অর্ডারটি আপডেট করতে চান?</string>
+    <string name="order_summary">অর্ডার সারসংক্ষেপ</string>
+    <string name="shops_ordered_this_month">দোকান এই মাসে অর্ডার করেছে</string>
+    <string name="sold_in">বিক্রি করা হয়েছে</string>
+    <string name="route">রুট</string>
+    <string name="product_list">পণ্যের তালিকা</string>
+
+    <string name="route_list">রুট লিস্ট</string>
+    <string name="shop_list">দোকান লিস্ট</string>
+
+    <string name="pending">অনিষ্পন্ন</string>
+    <string name="delivered">ডেলিভারি হয়েছে</string>
+    <string name="bounced">প্রত্যাখ্যাত</string>
+
+    <string name="total_bounce">মোট বাউন্স</string>
+    <string name="bounce_reason">বাউন্সের কারণ</string>
+    <string name="product_return_reason">পণ্য ফেরতের কারণ…</string>
+
+    <string name="no_order_to_download_chalan">চালান ডাউনলোড করার জন্য কোনো অর্ডার নেই</string>
+
+    <string name="order_selection">অর্ডার নির্বাচন</string>
+    <string name="report_selection">রিপোর্ট নির্বাচন</string>
+    <string name="today">আজ</string>
+    <string name="lwsd">গত সপ্তাহের একই দিন</string>
+
+    <!--notice view-->
+    <string name="see_more">আরও দেখুন…</string>
+    <string name="see_less">কম দেখুন…</string>
+    <string name="add_notice">নোটিশ যোগ করুন</string>
+    <string name="type_notice_here">এখানে নোটিশ টাইপ করুন…</string>
+
+    <!--create shop-->
+    <string name="new_shop_creation">নতুন দোকান তৈরি</string>
+    <string name="update_shop_information">আপডেট দোকানের তথ্য</string>
+    <string name="verify_shop">আপনি কি দোকান যাচাই করতে চান?</string>
+    <string name="adjust_shop_location">দোকানের অবস্থান সামঞ্জস্য করুন</string>
+    <string name="adjust_shop_location_link"><a href="http://www.bla.com">দোকানের অবস্থান</a></string>
+    <string name="select_location">স্থান নির্বাচন করুন</string>
+    <string name="select_shop_type">দোকানের টাইপ</string>
+    <string name="shop_name">দোকানের নাম</string>
+    <string name="select_category_of_outlet">আউটলেটের ক্যাটাগরি</string>
+    <string name="select_market_opportunity">বাজারের যোগান</string>
+    <string name="select_buyer">ক্রেতা</string>
+    <string name="address">ঠিকানা</string>
+    <string name="owner_name">মালিকের নাম</string>
+    <string name="contact_number">যোগাযোগের নম্বর</string>
+    <string name="latitude">অক্ষাংশ</string>
+    <string name="longitude">দ্রাঘিমাংশ</string>
+    <string name="need_more_zoom">আপনার দোকানের অবস্থানে আরও ভাল ভিউ পেতে আরও জুম করতে হবে!</string>
+    <string name="this_field_is_required">ঘরটি অবশ্যই পূরণ করতে হবে</string>
+
+    <string name="list_tab_1">রুট লিস্ট</string>
+    <string name="list_tab_2">দোকান লিস্ট</string>
+
+    <!--imageCapture-->
+    <string name="take_image">ছবি তুলুন</string>
+    <string name="km">%1$s কিঃমিঃ</string>
+    <string name="not_available">পাওয়া যায় নাই</string>
+
+    //Network Error
+    <string name="failure_bad_request">খারাপ অনুরোধ।</string>
+    <string name="failure_can_not_connect_to_the_server">সার্ভারের সাথে সংযোগ করা যাচ্ছে না।</string>
+    <string name="failure_forbidden_request">নিষিদ্ধ অনুরোধ।</string>
+    <string name="failure_internal_server_error">অভ্যন্তরীণ সার্ভার ত্রুটি।</string>
+    <string name="failure_method_not_allowed">পদ্ধতি অনুমোদিত নয়।</string>
+    <string name="failure_no_internet_available">ইন্টারনেট উপলব্ধ নয়।</string>
+    <string name="failure_not_exist_in_cache">ক্যাশে বিদ্যমান নয়।</string>
+    <string name="failure_not_found">খুঁজে পাওয়া যায়নি।</string>
+    <string name="failure_too_many_request">অতিরিক্ত অনুরোধ।</string>
+    <string name="failure_unauthorized_error">অননুমোদিত ত্রুটি।</string>
+    <string name="failure_failed_to_cache">ক্যাশে ব্যর্থ হয়েছে।</string>
+
+    <string name="location">অবস্থান</string>
+    <string name="outlet_s">%1$s আউটলেট(সমূহ)</string>
+    <string name="select_date_range">তারিখ পরিসীমা নির্বাচন করুন</string>
+    <string name="date_range_">%1$s - %2$s</string>
+    <string name="logo">লোগো</string>
+    <string name="shop_image">দোকানের ছবি</string>
+    <string name="order_complete_image">অর্ডার সম্পন্ন ছবির</string>
+    <string name="_1_box">১ বাক্স</string>
+
+
+    <string name="category">ক্যাটাগরি</string>
+    <string name="total_outlet">মোট আউটলেট</string>
+    <string name="order_done">অর্ডার সম্পন্ন</string>
+    <string name="order_value">অর্ডার মূল্য</string>
+    <string name="total_order">মোট</string>
+    <string name="select_a_date">তারিখ নির্বাচন করুন</string>
+    <string name="request_timeout_check_your_internet_connection_or_contact_admin">আপনার ইন্টারনেট সংযোগ চেক করুন বা অ্যাডমিনের সাথে যোগাযোগ করুন</string>
+    <string name="deli_done">ডেলি সম্পন্ন</string>
+    <string name="deli_value">ডেলি মূল্য</string>
+    <string name="away_from">" দূরে "</string>
+    <string name="language">ভাষা</string>
+    <string name="edit">এডিট</string>
+    <string name="version">সংস্করণ %1$s</string>
+
+    <string name="min_order_value">ন্যূনতম অর্ডার মূল্য: %1$s</string>
+    <string name="_0_0">০.০</string>
+    <string name="total_">মোট %1$s</string>
+    <string name="bounce_item">বাউন্স আইটেম</string>
+
+    <string name="jar_box">জার/বক্স</string>
+    <string name="territory_name">অঞ্চলের নাম</string>
+    <string name="shop_type">দোকানের ধরন</string>
+    <string name="distributor">বিতরণকারী</string>
+    <string name="_0_item">০ আইটেম</string>
+    <string name="order">অর্ডার</string>
+    <string name="location_not_found">অবস্থান পাওয়া যায়নি।</string>
+    <string name="category_">"ক্যাটাগরি: %1$s"</string>
+    <string name="title_product_stock_request">অনুরোধ</string>
+
+    <string name="title_approval">অনুমোদন</string>
+    <string name="upload_image_for_attendance">উপস্থিতির জন্য ছবি আপলোড করুন</string>
+    <string name="select_route_for_check_in">চেক-ইনের জন্য রুট নির্বাচন করুন</string>
+    <string name="you_are">"আপনি "</string>
+    <string name="meter">%1$s মিঃ</string>
+
+    <string name="capture_photo">ছবি তুলুন</string>
+    <string name="and_selecting_no_order">" থেকে এবং কোন অর্ডার নাই"</string>
+
+    <string name="no_products_selected_to_order">অর্ডারের জন্য কোনো পণ্য নির্বাচিত হয়নি</string>
+    <string name="kindly_wait_for_distance_to_be_updated">দূরত্ব আপডেট হওয়ার জন্য অনুগ্রহ করে অপেক্ষা করুন</string>
+    <string name="selected">"%1$s নির্বাচিত"</string>
+
+    <string name="selected_image">নির্বাচিত চিত্র</string>
+    <string name="image_pic">চিত্র ছবি</string>
+    <string name="close">বন্ধ</string>
+
+    <string name="notifications">বিজ্ঞপ্তি</string>
+    <string name="image">চিত্র</string>
+
+    <string name="shohel_rana_is_requesting_you_for_product_request_approval"><b>সোহেল রানা</b> আপনাকে <b>পণ্য অনুরোধ</b> অনুমোদনের জন্য অনুরোধ করছেন</string>
+
+    <string name="request">স্টক অনুরোধ</string>
+    <string name="product_name">পণ্যের নাম:</string>
+    <string name="quantity">পরিমাণ:</string>
+    <string name="confirm_request">অনুরোধ নিশ্চিত করুন</string>
+    <string name="approved">অনুমোদিত</string>
+    <string name="_0">০</string>
+    <string name="are_you_sure_you_want_to_sent_stock_request">আপনি কি নিশ্চিত যে আপনি স্টক অনুরোধ পাঠাতে চান?</string>
+
+    <string name="notification_empty">বিজ্ঞপ্তি খালি!</string>
+    <string name="select_all">সব নির্বাচন করুন</string>
+    <string name="clear">পরিষ্কার</string>
+    <string name="decline">প্রত্যাখ্যান</string>
+    <string name="approve">অনুমোদন</string>
+    <string name="remarks">মন্তব্য</string>
+    <string name="product_stock_request">পণ্যের স্টক অনুরোধ</string>
+    <string name="name">নাম</string>
+    <string name="db_house">ডিবি হাউজ</string>
+    <string name="new_notice">নতুন নোটিশ</string>
+    <string name="send_stock_request">স্টক অনুরোধ পাঠান</string>
+
+    <string name="partial_approved">আংশিক অনুমোদিত</string>
+    <string name="declined">প্রত্যাখ্যাত</string>
+    <string name="approve_by">অনুমোদন করেছেন</string>
+    <string name="edit_profile">প্রোফাইল সম্পাদনা করুন</string>
+    <string name="profile_picture">প্রোফাইল ছবি</string>
+    <string name="das_das">-- --</string>
+    <string name="at">%1$s এ %2$s</string>
+
+    <string name="no_data_found">কোনো তথ্য পাওয়া যায়নি।</string>
+    <string name="please_select_product">দয়া করে পণ্য নির্বাচন করুন</string>
+    <string name="_99">৯৯+</string>
+
+</resources>

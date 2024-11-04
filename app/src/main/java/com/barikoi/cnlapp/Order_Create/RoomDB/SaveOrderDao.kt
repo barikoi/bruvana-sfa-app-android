@@ -15,7 +15,7 @@ interface SaveOrderDao {
     fun getAllOrders(): List<SaveOrder>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg orders: SaveOrder?)
+    fun insertAll(vararg orders: SaveOrder)
 
     @Query("DELETE FROM SaveOrder WHERE OutletId =:shopId")
     fun deleteByShop(shopId: String)

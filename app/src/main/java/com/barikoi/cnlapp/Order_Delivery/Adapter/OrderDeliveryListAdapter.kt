@@ -11,14 +11,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
-import kotlinx.android.synthetic.main.fragment_product_select.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,7 +30,6 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
         return ViewHolder(v)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = orderList[position]
         var dformat = DecimalFormat("#.##")

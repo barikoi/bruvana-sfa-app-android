@@ -26,6 +26,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -35,6 +36,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.imagecapture.Model.ImageList
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
+import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
 import java.io.File
 import java.io.IOException
@@ -42,7 +44,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ImageCapture(context: Context?, attrs: AttributeSet?) :
-    LinearLayout(context, attrs){
+    LinearLayout(context, attrs) {
     private val GALLERY = 3
     var CAMERA = 4
     private val mContext: ImageCapture
@@ -67,7 +69,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     private var imageRecyclerAdapter: ImageRecyclerAdapter? = null
     private val mRecyclerView: RecyclerView
     private val imageItems: ArrayList<ImageList> = ArrayList<ImageList>()
-    private var startCAMERA : ActivityResultLauncher<Intent>? = null
+    private var startCAMERA: ActivityResultLauncher<Intent>? = null
 
     /**
      * SHows an AlertDialog whether to pick the image from gallery or take from camera
@@ -93,7 +95,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     /**
      * Opens the gallery to pick an image
      */
-    fun takeImageFromGallery() {
+    private fun takeImageFromGallery() {
         val galleryIntent = Intent(
             Intent.ACTION_PICK,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -104,7 +106,7 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     /**
      * Opens the camera to take a picture
      */
-    fun takePicture() {
+    private fun takePicture() {
         try {
             layoutImagePick.visibility = GONE
             layoutImageAdd.visibility = VISIBLE
@@ -134,56 +136,64 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                 }
                 //activity.startActivityForResult(takePictureIntent, CAMERA);
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Sentry.captureException(e)
         }
 
     }
 
-    fun takePictureFragment() {
+    private fun takePictureFragment() {
         try {
-        layoutImagePick.visibility = GONE
-        layoutImageAdd.visibility = VISIBLE
-        layoutImageScroller.visibility = VISIBLE
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(fragment!!.requireActivity().packageManager) != null) {
-            var photoFile: File? = null
-            try {
-                taskId = taskId
-                Log.d("ImagePicker", "TaskId 2: $taskId")
-                photoFile = createImageFile(taskId)
-            } catch (ex: IOException) {
-                // Error occurred while creating the File
-                Log.e("fileException", ex.message!!)
-            } catch (ex: Exception) {
-                Sentry.captureException(ex)
+            layoutImagePick.visibility = GONE
+            layoutImageAdd.visibility = VISIBLE
+            layoutImageScroller.visibility = VISIBLE
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(fragment!!.requireActivity().packageManager) != null) {
+                var photoFile: File? = null
+                try {
+                    taskId = taskId
+                    Log.d("ImagePicker", "TaskId 2: $taskId")
+                    photoFile = createImageFile(taskId)
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    Log.e("fileException", ex.message!!)
+                } catch (ex: Exception) {
+                    Sentry.captureException(ex)
+                }
+                // Continue only if the File was successfully created
+                if (photoFile != null) {
+                    photoURI = FileProvider.getUriForFile(
+                        fragment!!.requireContext(),
+                        context.packageName + ".fileprovider",
+                        photoFile
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    //fragment!!.startActivityForResult(takePictureIntent, CAMERA)
+                    getCameraLauncher().launch(takePictureIntent)
+                }
             }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(
-                    fragment!!.requireContext(),
-                    context.packageName + ".fileprovider",
-                    photoFile
-                )
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                //fragment!!.startActivityForResult(takePictureIntent, CAMERA)
-                getCameraLauncher().launch(takePictureIntent)
-            }
-        }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Sentry.captureException(e)
         }
     }
 
-    fun AddNewImage(imageReturnedIntent: Intent?, source: Int, position: Int, type: String, image_path: String) {
+    fun addNewImage(
+        imageReturnedIntent: Intent?,
+        source: Int,
+        position: Int,
+        type: String,
+        image_path: String
+    ) {
         var bitmap: Bitmap? = null
         try {
             bitmap = getRotateImage(image_path)
             //Sentry.captureMessage("Add Image Clicked pos: "+position+" "+bitmap)
-            val lt = ImageList(bitmap, prefs.getString(ApiCall.IMAGE_PATH, "")!!, position,
-                type, prefs.getString(ApiCall.IMAGE_PATH, "")!!)
+            val lt = ImageList(
+                bitmap, prefs.getString(ApiCall.IMAGE_PATH, "")!!, position,
+                type, prefs.getString(ApiCall.IMAGE_PATH, "")!!
+            )
             imageItems.add(lt)
             imageRecyclerAdapter = ImageRecyclerAdapter(imageItems, taskId!!)
             mRecyclerView.adapter = imageRecyclerAdapter
@@ -196,8 +206,9 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
             Sentry.captureException(e)
         }
     }
-    fun removeImages(){
-        for (i in 0 until imageRecyclerAdapter!!.itemCount){
+
+    fun removeImages() {
+        for (i in 0 until imageRecyclerAdapter!!.itemCount) {
             imageRecyclerAdapter!!.removeAt(0)
         }
 
@@ -206,7 +217,13 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         layoutImageScroller.visibility = GONE
     }
 
-    fun setLocalImage(bitmap: Bitmap?, path: String?, position: Int, filename: String?, type: String) {
+    fun setLocalImage(
+        bitmap: Bitmap?,
+        path: String?,
+        position: Int,
+        filename: String?,
+        type: String
+    ) {
         layoutImagePick.visibility = GONE
         layoutImageAdd.visibility = VISIBLE
         layoutImageScroller.visibility = VISIBLE
@@ -361,16 +378,18 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     val imageCount: Int
         get() = fmap.size
 
-    fun setMainactivity(mainactivity: Activity?) {
+    fun setMainActivity(mainactivity: Activity?) {
         activity = mainactivity
     }
 
-    fun setFragmetnt(fragmnt: Fragment) {
+    fun setFragment(fragmnt: Fragment) {
         fragment = fragmnt
     }
+
     fun getCameraLauncher(): ActivityResultLauncher<Intent> {
         return startCAMERA!!
     }
+
     fun setCameraLauncher(startCam: ActivityResultLauncher<Intent>) {
         startCAMERA = startCam
     }
@@ -393,23 +412,29 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         }
     }
 
-    fun checksCameraPermission() {
+    private fun checksCameraPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Log.d("MyApp", "SDK >= 23")
             if (activity!!.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("MyApp", "Request permission")
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, Manifest.permission.CAMERA)) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(
+                        activity!!,
+                        Manifest.permission.CAMERA
+                    )
+                ) {
                     AlertDialog.Builder(activity)
                         .setMessage("Barikoi needs permission to take photos from your camera")
-                        .setPositiveButton(R.string.ok,
-                            DialogInterface.OnClickListener { dialog, which ->
-                                ActivityCompat.requestPermissions(
-                                    activity!!, arrayOf(Manifest.permission.CAMERA),
-                                    PERMISSION_CAMERA
-                                )
-                            })
-                        .setNegativeButton(R.string.cancel,
-                            DialogInterface.OnClickListener { dialog, which -> })
+                        .setPositiveButton(
+                            R.string.ok
+                        ) { _, _ ->
+                            ActivityCompat.requestPermissions(
+                                activity!!, arrayOf(Manifest.permission.CAMERA),
+                                PERMISSION_CAMERA
+                            )
+                        }
+                        .setNegativeButton(
+                            R.string.cancel
+                        ) { _, _ -> }
                         .create()
                         .show()
                 } else {
@@ -419,28 +444,44 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                     )
                 }
             } else {
-                Log.d("MyApp", "SDK = "+Build.VERSION.SDK_INT)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                    if (fragment != null){
+                Log.d("MyApp", "SDK = " + Build.VERSION.SDK_INT)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (fragment != null) {
                         takePictureFragment()
-                    }else{
+                    } else {
                         takePicture();
                     }
-                }else{
-                    if (activity!!.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                } else {
+                    AppLogger.log("ImageCapture:: checkSelfPermission")
+                    AppLogger.log(
+                        "ImageCapture Per:: ${
+                            ContextCompat.checkSelfPermission(
+                                activity!!, Manifest.permission.READ_EXTERNAL_STORAGE
+                            )
+                        }"
+                    )
+                    AppLogger.log("ImageCapture:: ${activity!!.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED}")
+                    if (ContextCompat.checkSelfPermission(
+                            activity!!,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
                         ActivityCompat.requestPermissions(
-                            activity!!, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                            0)
-                    }else{
-                        if (activity!!.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
+                        )
+                    } else {
+
+                        AppLogger.log("ImageCapture:: checkSelfPermission2")
+                        if (activity!!.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(
                                 activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                                 MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
                             )
-                        }else{
-                            if (fragment != null){
+                        } else {
+                            if (fragment != null) {
                                 takePictureFragment()
-                            }else{
+                            } else {
                                 takePicture();
                             }
                         }
@@ -453,9 +494,9 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         } else {
             Log.d("MyApp", "Android < 6.0")
             Log.d("MyApp", "Permission granted: taking pic")
-            if (fragment != null){
+            if (fragment != null) {
                 takePictureFragment()
-            }else{
+            } else {
                 takePicture();
             }
 
@@ -522,11 +563,14 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
         )*/
         var baseFolder = ""
         if (fragment != null) {
-            baseFolder = fragment!!.requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
-        }else{
-            baseFolder = activity!!.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
+            baseFolder = fragment!!.requireContext()
+                .getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
+        } else {
+            baseFolder =
+                activity!!.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!.absolutePath
         }
-        val image = File(baseFolder +File.separator+"CNL Documents"+File.separator+"CNL_$timeStamp.jpg")
+        val image =
+            File(baseFolder + File.separator + "CNL Documents" + File.separator + "CNL_$timeStamp.jpg")
         Log.d("ImagePicker", "Image: $image")
         image.parentFile.mkdirs()
         mCurrentPhotoPath = image.absolutePath

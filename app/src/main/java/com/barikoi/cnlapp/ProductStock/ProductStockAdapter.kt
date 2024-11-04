@@ -1,38 +1,130 @@
 package com.barikoi.cnlapp.ProductStock
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.data.remote.models.Product
+import com.barikoi.cnlapp.databinding.ProductViewStockBinding
+import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
+import com.barikoi.cnlapp.utils.extension.performTapHaptic
 import com.bumptech.glide.Glide
 
 
-class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adapter<ProductStockAdapter.ViewHolder>(){
+class ProductStockAdapter(
+    private val isSummaryActivity: Boolean?,
+    private val isTO: Boolean?,
+    private val onItemLongPressed: (Int) -> Unit,
+    private val onItemClick: (Int) -> Unit,
+    private val onCBClicked: (Int) -> Unit,
+    private val onTextChange: (String, Int) -> Unit
+) :
+    RecyclerView.Adapter<ProductStockAdapter.ViewHolder>() {
+
+    var products: List<Product> = emptyList()
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.product_view_stock, parent, false)
-        return ViewHolder(v)
+        return ViewHolder(
+            ProductViewStockBinding.bind(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.product_view_stock, parent, false)
+            )
+        )
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setIsRecyclable(false)
         val mItem = products[position]
 
-        holder.productName.text = mItem.product_name
-        holder.soldQuantity.text = mItem.sold_quantity
-        if (!mItem.unit_name.equals("null")) {
-            holder.perUnitSold.text = mItem.per_unit_quantity + " " + mItem.unit_name
-        }else{
-            holder.perUnitSold.text = mItem.per_unit_quantity + " "
+        holder.binding.productName.text = mItem.productName
+        if (isSummaryActivity == true) {
+            holder.binding.cbSelect.visibility = View.GONE
+            holder.binding.etPerUnitSold.visibility = View.GONE
+            holder.binding.tvPerUnitSold.visibility = View.VISIBLE
+
+            holder.binding.tvSoldQuantity.text =
+                "${holder.itemView.context.resources.getString(R.string.sold_in)} ${mItem.productiveRoutes} ${
+                    holder.itemView.context.resources.getString(
+                        R.string.route
+                    )
+                }"
+
+        } else if(isTO == true) {
+            holder.binding.cbSelect.visibility = View.GONE
+            holder.binding.etPerUnitSold.visibility = View.VISIBLE
+            holder.binding.tvPerUnitSold.visibility = View.GONE
+            holder.binding.tvSoldQuantity.text =
+                "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
+                    holder.itemView.context.getString(
+                        R.string.shops_ordered_this_month
+                    )
+                }"
+        } else {
+            holder.binding.cbSelect.visibility = View.VISIBLE
+            holder.binding.etPerUnitSold.visibility = View.VISIBLE
+            holder.binding.tvPerUnitSold.visibility = View.GONE
+            holder.binding.tvSoldQuantity.text =
+                "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
+                    holder.itemView.context.getString(
+                        R.string.shops_ordered_this_month
+                    )
+                }"
+        }
+        if (mItem.isSelect) {
+            holder.binding.etPerUnitSold.isEnabled = true
+            holder.binding.cbSelect.isChecked = true
+            holder.binding.llMain.background.setTint(
+                ContextCompat.getColor(
+                    holder.binding.imageProduct.context,
+                    R.color.card_selected_bg
+                )
+            )
+        } else {
+            holder.binding.llMain.background.setTint(
+                ContextCompat.getColor(
+                    holder.binding.imageProduct.context,
+                    R.color.white
+                )
+            )
+            holder.binding.etPerUnitSold.isEnabled = false
+            holder.binding.cbSelect.isChecked = false
         }
 
-        // create a ProgressDrawable object which we will show as placeholder
+        if (mItem.unitName.isNotEmpty()) {
+            if (products.any { it.isSelect }){
+                holder.binding.etPerUnitSold.setText(
+                    mItem.stockValue
+                )
+            }else {
+                holder.binding.etPerUnitSold.setText(
+                    mItem.currentAvailableStock.toString()
+                )
+            }
+
+
+            holder.binding.tvPerUnit.text = mItem.unitName
+            holder.binding.tvPerUnit.text = mItem.unitName
+            holder.binding.tvPerUnitSold.text = mItem.currentAvailableStock.toString()
+        } else {
+            AppLogger.log("unitName else")
+            holder.binding.etPerUnitSold.setText(
+                mItem.currentAvailableStock.toString().englishToBanglaNumber()
+            )
+
+            holder.binding.tvPerUnitSold.text = mItem.currentAvailableStock.toString()
+        }
+
         val drawable = CircularProgressDrawable(holder.itemView.context)
         drawable.setColorSchemeColors(
             holder.itemView.context.resources.getColor(R.color.cnl_color_1),
@@ -42,31 +134,52 @@ class ProductStockAdapter (val products: List<ProductStock>) : RecyclerView.Adap
         drawable.strokeWidth = 6f
         drawable.start()
 
-        if (!mItem.imageUrl.isNullOrEmpty() && !mItem.imageUrl.equals("null")){
+        if (mItem.images.isNotEmpty()) {
             Glide.with(holder.itemView.context)
-                .load(mItem.imageUrl)
+                .load(mItem.images[0])
                 .placeholder(drawable)
-                .into(holder.imageProduct)
-        }else{
-            holder.imageProduct.visibility = View.GONE
+                .into(holder.binding.imageProduct)
+        } else {
+            holder.binding.imageProduct.visibility = View.GONE
         }
-    }
 
-    override fun getItemCount(): Int {
-        return products.size
-    }
-
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val productName: TextView
-        internal val soldQuantity: TextView
-        internal val perUnitSold: TextView
-        internal val imageProduct: ImageView
-
-        init {
-            productName = itemView.findViewById(R.id.productName)
-            soldQuantity = itemView.findViewById(R.id.tvSoldQuantity)
-            imageProduct = itemView.findViewById(R.id.imageProduct)
-            perUnitSold = itemView.findViewById(R.id.tvPerUnitSold)
+        holder.binding.etPerUnitSold.doOnTextChanged { text, _, _, _ ->
+            if (text.toString().isNotEmpty() && text.toString().toInt() < 1000) {
+                onTextChange(text.toString(), position)
+            } else if (text.toString().isNotEmpty() && text.toString().toInt() > 999) {
+                Toast.makeText(
+                    holder.itemView.context,
+                    "Stock request must be less than 1000",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
+
+        holder.binding.root.setOnLongClickListener {
+            it.performTapHaptic()
+            onItemLongPressed(position)
+            true
+        }
+
+        holder.binding.cbSelect.setOnClickListener {
+            it.performTapHaptic()
+            onCBClicked(position)
+        }
+
+        holder.binding.root.setOnClickListener {
+            onItemClick(position)
+        }
+
     }
+
+    override fun getItemCount(): Int = products.size
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateProducts(products: List<Product>) {
+        this.products = products
+        notifyDataSetChanged()
+    }
+
+    inner class ViewHolder(val binding: ProductViewStockBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }
