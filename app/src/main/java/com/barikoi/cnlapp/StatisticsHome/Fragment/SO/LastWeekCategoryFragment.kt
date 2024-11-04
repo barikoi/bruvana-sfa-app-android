@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
@@ -20,12 +18,12 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.Categories
+import com.barikoi.cnlapp.databinding.FragmentLastWeekCategoryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_last_week_category.*
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -33,6 +31,8 @@ import java.util.*
 
 
 class LastWeekCategoryFragment : Fragment() {
+    private lateinit var binding: FragmentLastWeekCategoryBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -53,8 +53,8 @@ class LastWeekCategoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_last_week_category, container, false)
+        binding = FragmentLastWeekCategoryBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,7 +77,7 @@ class LastWeekCategoryFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     if (response != null) {
                         var dformat = DecimalFormat("#.##")
                         val itemList: ArrayList<Categories> = ArrayList()
@@ -147,7 +147,7 @@ class LastWeekCategoryFragment : Fragment() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
             }
@@ -162,21 +162,20 @@ class LastWeekCategoryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
         })
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun createTable(data: ArrayList<Categories>) {
-        tabLayout.isStretchAllColumns = true
-        tabLayout.bringToFront()
+        binding.tabLayout.isStretchAllColumns = true
+        binding.tabLayout.bringToFront()
         val colorsTxt: Array<String> = mContext!!.getResources().getStringArray(R.array.colors)
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
@@ -207,7 +206,7 @@ class LastWeekCategoryFragment : Fragment() {
             tr.addView(c2)
             tr.addView(c3)
             tr.addView(c4)
-            tabLayout.addView(tr)
+            binding.tabLayout.addView(tr)
 
         }
     }

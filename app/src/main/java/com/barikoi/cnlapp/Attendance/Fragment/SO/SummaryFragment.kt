@@ -15,18 +15,13 @@ import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentSummaryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.fragment_summary.absentCount
-import kotlinx.android.synthetic.main.fragment_summary.dateRangeLayout
-import kotlinx.android.synthetic.main.fragment_summary.lateCount
-import kotlinx.android.synthetic.main.fragment_summary.presentCount
-import kotlinx.android.synthetic.main.fragment_summary.summaryListView
-import kotlinx.android.synthetic.main.fragment_summary.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,6 +30,7 @@ import java.util.Locale
 
 
 class SummaryFragment : Fragment() {
+    private lateinit var binding: FragmentSummaryBinding
 
     lateinit var ACTIVITY: MainActivity
     private var prefs: SharedPreferences? = null
@@ -60,8 +56,8 @@ class SummaryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_summary, container, false)
+        binding = FragmentSummaryBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     private fun init() {
@@ -78,7 +74,7 @@ class SummaryFragment : Fragment() {
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.text =
+        binding.tvDateRange.text =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
 
         editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
@@ -93,23 +89,23 @@ class SummaryFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        binding. dateRangeLayout.setOnClickListener(View.OnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
+            binding. dateRangeLayout.setEnabled(false)
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = simpleFormat.format(s_date)
+                binding. tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
 
-                tvDateRange.text =
+                binding.tvDateRange.text =
                     getString(
                         R.string.date_range_,
                         simpleFormat.format(s_date),
@@ -127,7 +123,7 @@ class SummaryFragment : Fragment() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
     }
 
     private fun getSummaryList(url: String) {
@@ -199,12 +195,12 @@ class SummaryFragment : Fragment() {
                 }
 
                 val adapter = ReasonListAdapter(reasonList)
-                summaryListView.adapter = adapter
+                binding.summaryListView.adapter = adapter
                 adapter.notifyDataSetChanged()
 
-                presentCount.setText(present.toString())
-                lateCount.setText(late.toString())
-                absentCount.setText(absent.toString())
+                binding.presentCount.setText(present.toString())
+                binding.lateCount.setText(late.toString())
+                binding.absentCount.setText(absent.toString())
             }
         } catch (e: Exception) {
             e.printStackTrace()

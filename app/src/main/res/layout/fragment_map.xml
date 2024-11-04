@@ -108,13 +108,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:drawableLeft="@drawable/ic_shop_small"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text=""
                 android:textColor="@color/text_title"
                 android:textSize="17sp"
                 android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_shop_small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -125,12 +125,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:button="@null"
-                android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
-                android:drawableTint="@color/cnl_color_1"
+                android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
                 android:text="@string/see_location"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="visible"
+                app:drawableTint="@color/cnl_color_1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/isVerified"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -140,12 +140,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:button="@null"
-                android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
-                android:drawableTint="@color/cnl_color_1"
+                android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
                 android:text="@string/verified"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="visible"
+                app:drawableTint="@color/cnl_color_1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -190,11 +190,7 @@
         <com.mapbox.mapboxsdk.maps.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:mapbox_uiAttribution="false"
-            app:mapbox_uiAttributionMarginLeft="5dp"
-            app:mapbox_uiLogo="false"
-            mapbox:mapbox_cameraZoom="12" />
+            android:layout_height="match_parent" />
 
     </androidx.cardview.widget.CardView>
 

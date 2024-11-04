@@ -18,18 +18,17 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.databinding.FragmentLastWeekDeliveryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_last_week_delivery.deliveryLayout
-import kotlinx.android.synthetic.main.fragment_last_week_delivery.listView
-import kotlinx.android.synthetic.main.fragment_last_week_delivery.progressBar
 import org.json.JSONObject
 
 
 class LastWeekDeliveryFragment : Fragment() {
+    private lateinit var binding: FragmentLastWeekDeliveryBinding
 
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -63,7 +62,7 @@ class LastWeekDeliveryFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     if (response != null) {
                         itemList.clear()
                         val obj = JSONObject(response)
@@ -138,9 +137,9 @@ class LastWeekDeliveryFragment : Fragment() {
                         }
 
                         if (itemList.size > 0) {
-                            listView.visibility = View.VISIBLE
+                            binding.listView.visibility = View.VISIBLE
                             val adapter = OutletAdapter(itemList, "delivery")
-                            listView.adapter = adapter
+                            binding.listView.adapter = adapter
                             adapter.notifyDataSetChanged()
                         }else{
                             val valueTV = TextView(mContext)
@@ -148,14 +147,14 @@ class LastWeekDeliveryFragment : Fragment() {
                             valueTV.textSize = 20f
                             valueTV.gravity = Gravity.CENTER
                             valueTV.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                            listView.visibility = View.GONE
-                            deliveryLayout.addView(valueTV)
+                            binding.listView.visibility = View.GONE
+                            binding.deliveryLayout.addView(valueTV)
                         }
 
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
             }
@@ -170,11 +169,11 @@ class LastWeekDeliveryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
         })
@@ -185,8 +184,8 @@ class LastWeekDeliveryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_last_week_delivery, container, false)
+        binding = FragmentLastWeekDeliveryBinding.inflate(inflater, container, false)
+        return  binding.root
     }
 
     override fun onAttach(context: Context) {

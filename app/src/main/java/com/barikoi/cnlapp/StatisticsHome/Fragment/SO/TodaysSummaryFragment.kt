@@ -15,13 +15,12 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentTodaysSummaryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_todays_summary.view.progressBar
-import kotlinx.android.synthetic.main.fragment_todays_summary.view.tabLayoutToday
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -29,15 +28,16 @@ import java.util.Calendar
 import java.util.Locale
 
 class TodaysSummaryFragment : Fragment() {
+    private lateinit var binding: FragmentTodaysSummaryBinding
 
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
     var mQueue: RequestQueue? = null
-    var token : String? = null
-    var srId: String ? = ""
-    var userId: String ? = ""
-    var routeId: String ? = ""
+    var token: String? = null
+    var srId: String? = ""
+    var userId: String? = ""
+    var routeId: String? = ""
     lateinit var mView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +49,8 @@ class TodaysSummaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_todays_summary, container, false)
-        return mView
+        binding = FragmentTodaysSummaryBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,7 +66,7 @@ class TodaysSummaryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryTargets(Api.get_summary+"?today_summary=1&user_id="+userId+"&route_id="+routeId)
+        getSummaryTargets(Api.get_summary + "?today_summary=1&user_id=" + userId + "&route_id=" + routeId)
     }
 
     private fun getSummaryTargets(url: String) {
@@ -82,37 +82,77 @@ class TodaysSummaryFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    mView.progressBar.visibility = View.GONE
-                    if (response != null){
+                    binding.progressBar.visibility = View.GONE
+                    if (response != null) {
                         val obj = JSONObject(response)
                         val completedArray = obj.getJSONArray("today_summary")
-                        if (completedArray.length() > 0){
-                            for (i in 0 until completedArray.length()){
-                                val targetObj =completedArray.getJSONObject(i)
-                                if(!targetObj.isNull("revenue")) total_target_completed = dformat.format(targetObj.getString("revenue").toDouble())
-                                if(!targetObj.isNull("sku_per_memo")) bpc_completed = dformat.format(targetObj.getString("sku_per_memo").toDouble())
-                                if(!targetObj.isNull("number_of_memo")) lpc_completed = dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                if(!targetObj.isNull("aiv")) aiv_completed = dformat.format(targetObj.getString("aiv").toDouble())
-                                if(!targetObj.isNull("number_of_visits")) visit_ratio = dformat.format(targetObj.getString("number_of_visits").toDouble())
-                                if(!targetObj.isNull("distance_from_outlets")) visit_covered = dformat.format(targetObj.getString("distance_from_outlets").toDouble())
+                        if (completedArray.length() > 0) {
+                            for (i in 0 until completedArray.length()) {
+                                val targetObj = completedArray.getJSONObject(i)
+                                if (!targetObj.isNull("revenue")) total_target_completed =
+                                    dformat.format(targetObj.getString("revenue").toDouble())
+                                if (!targetObj.isNull("sku_per_memo")) bpc_completed =
+                                    dformat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if (!targetObj.isNull("number_of_memo")) lpc_completed =
+                                    dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                if (!targetObj.isNull("aiv")) aiv_completed =
+                                    dformat.format(targetObj.getString("aiv").toDouble())
+                                if (!targetObj.isNull("number_of_visits")) visit_ratio =
+                                    dformat.format(
+                                        targetObj.getString("number_of_visits").toDouble()
+                                    )
+                                if (!targetObj.isNull("distance_from_outlets")) visit_covered =
+                                    dformat.format(
+                                        targetObj.getString("distance_from_outlets").toDouble()
+                                    )
                             }
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
-                        itemList.add(Pair(mContext!!.resources.getString(R.string.total_order_value), total_target_completed))
-                        itemList.add(Pair(mContext!!.resources.getString(R.string.sku_per_memo), bpc_completed))
-                        itemList.add(Pair(mContext!!.resources.getString(R.string.visit_ratio), visit_ratio))
-                        itemList.add(Pair(mContext!!.resources.getString(R.string.visit_500m), visit_covered))
-                        itemList.add(Pair(mContext!!.resources.getString(R.string.number_of_memo), lpc_completed))
-                        itemList.add(Pair(mContext!!.resources.getString(R.string.aiv), aiv_completed))
+                        itemList.add(
+                            Pair(
+                                mContext!!.resources.getString(R.string.total_order_value),
+                                total_target_completed
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                mContext!!.resources.getString(R.string.sku_per_memo),
+                                bpc_completed
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                mContext!!.resources.getString(R.string.visit_ratio),
+                                visit_ratio
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                mContext!!.resources.getString(R.string.visit_500m),
+                                visit_covered
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                mContext!!.resources.getString(R.string.number_of_memo),
+                                lpc_completed
+                            )
+                        )
+                        itemList.add(
+                            Pair(
+                                mContext!!.resources.getString(R.string.aiv),
+                                aiv_completed
+                            )
+                        )
 
                         createTable(itemList)
 
 
                     }
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
-                    mView.progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
             }
@@ -127,11 +167,11 @@ class TodaysSummaryFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                mView.progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                mView.progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
         })
@@ -139,10 +179,9 @@ class TodaysSummaryFragment : Fragment() {
     }
 
 
-
     private fun createTable(data: ArrayList<Pair<String, String>>) {
-        mView.tabLayoutToday.isStretchAllColumns = true
-        mView.tabLayoutToday.bringToFront()
+        binding.tabLayoutToday.isStretchAllColumns = true
+        binding.tabLayoutToday.bringToFront()
         for (i in 0 until data.size) {
             val tr = TableRow(mContext)
             val c1 = TextView(mContext)
@@ -155,7 +194,7 @@ class TodaysSummaryFragment : Fragment() {
             c2.setText(data.get(i).second)
             tr.addView(c1)
             tr.addView(c2)
-            mView.tabLayoutToday.addView(tr)
+            binding.tabLayoutToday.addView(tr)
         }
     }
 

@@ -45,7 +45,7 @@
             android:layout_marginEnd="@dimen/_8sdp"
             android:drawablePadding="@dimen/_8sdp"
             android:text="Test User"
-            android:textColor="@color/mapbox_blue"
+            android:textColor="@color/blue_cnl"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/llStatus"
             app:layout_constraintStart_toStartOf="parent"

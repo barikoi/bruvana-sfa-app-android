@@ -16,16 +16,13 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.SO.HistoryListAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentHistoryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.fragment_history.dateRangeLayout
-import kotlinx.android.synthetic.main.fragment_history.historyListView
-import kotlinx.android.synthetic.main.fragment_history.progressBar
-import kotlinx.android.synthetic.main.fragment_history.tvDateRange
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -34,6 +31,7 @@ import java.util.Locale
 
 
 class HistoryFragment : Fragment() {
+    private lateinit var binding: FragmentHistoryBinding
 
     lateinit var ACTIVITY: MainActivity
     private var prefs: SharedPreferences? = null
@@ -58,7 +56,7 @@ class HistoryFragment : Fragment() {
         setDateFilter()
 
         adapter = HistoryListAdapter(historyList)
-        historyListView.adapter = adapter
+        binding.historyListView.adapter = adapter
         //adapter!!.notifyDataSetChanged()
     }
 
@@ -66,8 +64,8 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false)
+        binding = FragmentHistoryBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     fun setDateFilter() {
@@ -80,7 +78,7 @@ class HistoryFragment : Fragment() {
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.text =
+        binding.tvDateRange.text =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
@@ -94,22 +92,22 @@ class HistoryFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        binding.dateRangeLayout.setOnClickListener(View.OnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.setEnabled(false)
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = simpleFormat.format(s_date)
+                binding.tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.text = getString(
+                binding.tvDateRange.text = getString(
                     R.string.date_range_,
                     simpleFormat.format(s_date),
                     simpleFormat.format(e_date)
@@ -126,18 +124,18 @@ class HistoryFragment : Fragment() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
     }
 
     private fun getAttendance(url: String) {
-        progressBar.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
 
         ApiServices.apiGET(
             url,
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
 
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     getHistoryList(response)
                 }
 
@@ -151,12 +149,12 @@ class HistoryFragment : Fragment() {
 
                 override fun onResponseFailure(error: VolleyError) {
 
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     ViewUtils.getErrorResponse(error, mContext!!)
                 }
 
                 override fun onException(e: Exception) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
                 }
             })
@@ -213,7 +211,7 @@ class HistoryFragment : Fragment() {
                 }
 
                 adapter = HistoryListAdapter(historyList)
-                historyListView.adapter = adapter
+                binding.historyListView.adapter = adapter
                 adapter!!.notifyDataSetChanged()
             }
         } catch (e: Exception) {

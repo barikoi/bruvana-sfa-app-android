@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.Order_Create.Fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -16,20 +17,21 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
+import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
+import com.barikoi.cnlapp.callback.LocationFetch
+import com.barikoi.cnlapp.databinding.FragmentShopSelectBinding
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.gms.location.*
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_shop_select.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -37,34 +39,46 @@ import java.io.UnsupportedEncodingException
 
 @SuppressLint("NotifyDataSetChanged")
 class ShopSelectFragment : Fragment(), OnSelectListener {
-    var recyclerView: RecyclerView? = null
+    private lateinit var binding: FragmentShopSelectBinding
+
+    var mContext: Context? = null
     var queue: RequestQueue? = null
-    var spinner: MoreSpinner? = null
     var userId: String? = null
     var srId: String? = null
     var routeId: String? = null
     var token: String? = null
     var listener: OnSelectListener? = null
-    private var etSearch: AutoCompleteTextView? = null
     private var adapter: ShopSelectAdapter? = null
     var shopList: ArrayList<Shops>? = ArrayList()
     var filterList: ArrayList<Shops>? = ArrayList()
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+
     private val routesList = ArrayList<String>()
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
-    private var loading: ProgressBar? = null
-    private var appDatabase: AppDatabase? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var appDatabase: AppDatabase? = null
+    lateinit var ACTIVITY: MainActivity
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
+    private var mLocationCallback: LocationCallback? = null
+
+    var loc: Location? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sortingLayout.setOnClickListener {
-            val popup = PopupMenu(requireContext(), sortTitle)
+        ViewUtils.getLocation(requireContext(), requireActivity(), object : LocationFetch {
+            override fun onFetchSuccess(location: Location) {
+                loc = location
+            }
+
+            override fun onFailure() {
+                loc = null
+            }
+        })
+
+        binding.sortingLayout.setOnClickListener {
+            val popup = PopupMenu(mContext, binding.sortTitle)
             popup.menuInflater.inflate(R.menu.sort_menu_outlet, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
@@ -76,11 +90,11 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                             }
                             if (shopList!!.size > 0) {
                                 adapter = ShopSelectAdapter(shopList!!, listener!!)
-                                recyclerView!!.adapter = adapter
+                                binding.shoplist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
 
-                            sortTitle!!.setText(resources.getString(R.string.ztoa))
+                            binding.sortTitle.text = resources.getString(R.string.ztoa)
                         }
 
                         R.id.menu_atoz -> {
@@ -89,10 +103,10 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                             }
                             if (shopList!!.size > 0) {
                                 adapter = ShopSelectAdapter(shopList!!, listener!!)
-                                recyclerView!!.adapter = adapter
+                                binding.shoplist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            sortTitle!!.text = resources.getString(R.string.atoz)
+                            binding.sortTitle.text = resources.getString(R.string.atoz)
                         }
                     }
                     return true
@@ -101,17 +115,18 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             popup.show()
         }
 
-        filterLayout.setOnClickListener {
-            val popup = PopupMenu(requireContext(), filterTitle)
+        binding.filterLayout.setOnClickListener {
+            val popup = PopupMenu(mContext, binding.filterTitle)
             popup.menuInflater.inflate(R.menu.filter_menu_outlets, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
+                @SuppressLint("NotifyDataSetChanged")
                 @RequiresApi(Build.VERSION_CODES.N)
                 override fun onMenuItemClick(item: MenuItem): Boolean {
                     when (item.itemId) {
                         R.id.menu_All -> {
                             adapter = ShopSelectAdapter(shopList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -120,14 +135,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                             filterList!!.addAll(shopList!!)
                             try {
                                 filterList!!.removeIf {
-                                    !it.category[0].toString().equals("A", true)
+                                    !it.category.get(0).toString().equals("A", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
                             if (filterList!!.size > 0) {
                                 adapter = ShopSelectAdapter(filterList!!, listener!!)
-                                shoplist.adapter = adapter
+                                binding.shoplist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
                         }
@@ -138,13 +153,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
                             try {
                                 filterList!!.removeIf {
-                                    !it.category[0].toString().equals("B", true)
+                                    !it.category.get(0).toString().equals("B", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -153,13 +168,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                             filterList!!.addAll(shopList!!)
                             try {
                                 filterList!!.removeIf {
-                                    !it.category[0].toString().equals("C", true)
+                                    !it.category.get(0).toString().equals("C", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -174,7 +189,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -189,7 +204,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -204,7 +219,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -219,7 +234,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -234,7 +249,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -249,7 +264,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 e.printStackTrace()
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -260,7 +275,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 it.isNoOrdered != 1
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
 
@@ -271,14 +286,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 it.isOrdered != 1
                             }
                             adapter = ShopSelectAdapter(filterList!!, listener!!)
-                            shoplist.adapter = adapter
+                            binding.shoplist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
                         }
                     }
                     return true
                 }
-
-
             })
             popup.show()
         }
@@ -288,79 +301,80 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.fragment_shop_select, container, false)
-        recyclerView = view.findViewById(R.id.shoplist)
-        loading = view.findViewById(R.id.progressBar)
-        spinner = view.findViewById(R.id.spinnerRoutes)
-        etSearch = view.findViewById(R.id.editTextSearchShop)
-        adapter = ShopSelectAdapter(ArrayList<Shops>(), listener!!)
-        recyclerView!!.adapter = adapter
+        binding = FragmentShopSelectBinding.inflate(inflater, container, false)
+
+        adapter = ShopSelectAdapter(ArrayList(), listener!!)
+        binding.shoplist.adapter = adapter
 
         var selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME, "")
         if (routeNameList!!.size == 0) {
             getAllRoutes(Api.routes_withfilter + "?with_geometry=0&user_id=" + userId)
         } else {
-            if (spinner != null) {
-                if (spinner!!.adapter == null) {
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_spinner_item, routesList
-                    )
-                    spinner!!.adapter = adapter
-                }
-
+            if (binding.spinnerRoutes.adapter == null) {
+                val adapter = ArrayAdapter(
+                    mContext!!,
+                    android.R.layout.simple_spinner_item, routesList
+                )
+                binding.spinnerRoutes.adapter = adapter
             }
         }
-        spinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (selectedRoute!!.isNotEmpty()) {
-                    val pos = (spinner!!.adapter as ArrayAdapter<String>).getPosition(selectedRoute)
+                    val pos = (binding.spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(
+                        selectedRoute
+                    )
                     if (pos > -1) {
                         selectedRoute = ""
-                        spinner!!.setSelection(pos)
+                        binding.spinnerRoutes.setSelection(pos)
                         return
                     }
                 }
                 Log.d("RouteList", "position: $p2")
                 Log.d("RouteList", "size: " + routeNameList!!.size)
+                val routeId = routeNameList!![p2].first
 
-                val routeIDTmp = routeNameList!![p2].first
-                getShopListByRoute(Api.verified_shop_list + "?route_id=" + routeIDTmp + "&user_id=" + userId)
+                getShopListByRoute(Api.verified_shop_list + "?route_id=" + routeId + "&user_id=" + userId)
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
 
         }
 
-        etSearch!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        binding.editTextSearchShop.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            }
-
+            @SuppressLint("NotifyDataSetChanged")
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter!!.filter.filter(s)
                 if (s!!.isEmpty()) {
                     val shops: ArrayList<Shops> = ArrayList()
                     if (shopList!!.size > 0) {
                         for (i in 0 until shopList!!.size) {
-                            if (shopList!![i].route_name == routeNameList!![spinner!!.selectedItemPosition].second) {
+                            if (shopList!![i].route_name == routeNameList!![binding.spinnerRoutes.selectedItemPosition].second) {
                                 shops.add(shopList!![i])
                             }
-
                         }
                     }
-                    adapter = ShopSelectAdapter(shops, listener!!)
-                    recyclerView!!.adapter = adapter
+
+
+                    val distanceSorted = shops.sortedBy { it.distance }.sortedBy { it.isOrdered }
+                        .sortedBy { it.isNoOrdered }
+
+                    adapter = ShopSelectAdapter(distanceSorted, listener!!)
+                    binding.shoplist.adapter = adapter
                     adapter!!.notifyDataSetChanged()
                 }
 
             }
 
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+
+            }
 
         })
 
-        return view
+        return binding.root
     }
 
     private fun getAllRoutes(url: String) {
@@ -386,15 +400,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 )
                                 routesList.add(routeObj.getString("route_name"))
                             }
-                            if (spinner != null) {
-                                if (spinner!!.adapter == null) {
-                                    val adapter = ArrayAdapter(
-                                        requireContext(),
-                                        android.R.layout.simple_spinner_item, routesList
-                                    )
-                                    spinner!!.adapter = adapter
-                                }
 
+                            if (binding.spinnerRoutes.adapter == null) {
+                                val adapter = ArrayAdapter(
+                                    mContext!!,
+                                    android.R.layout.simple_spinner_item, routesList
+                                )
+                                binding.spinnerRoutes.adapter = adapter
                             }
                         }
 
@@ -405,18 +417,16 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 }
             },
             { error ->
-                //loading!!.visibility = View.GONE
                 if (error is TimeoutError) {
                     Toast.makeText(
-                        requireContext(),
+                        mContext,
                         "Request timeout!! Check your internet connection or Contact Admin",
                         Toast.LENGTH_LONG
                     ).show()
                 }
                 if (error is NoConnectionError) {
-                    //mListener.onFailure("Turn on your internet connection and Try again")
                     Toast.makeText(
-                        requireContext(),
+                        mContext,
                         "Turn on your internet connection and Try again",
                         Toast.LENGTH_LONG
                     ).show()
@@ -426,18 +436,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         val s = String(error.networkResponse.data)
                         Log.d("Routes", "message: $s")
                         val data = JSONObject(s)
-                        Toast.makeText(
-                            requireContext(),
-                            data.getString("message"),
-                            Toast.LENGTH_LONG
-                        )
+                        Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
                             .show()
                     } catch (e: UnsupportedEncodingException) {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     } catch (e: JSONException) {
                         Sentry.captureException(e)
-                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                        Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
                         e.printStackTrace()
                     }
                 }
@@ -447,17 +453,19 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     }
 
     private fun getShopListByRoute(url: String) {
-        loading!!.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
         val request = StringRequest(Request.Method.GET, url,
             { response ->
                 try {
-                    loading!!.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
+
                     val data = JSONObject(response)
                     if (data.has("outlets") && !data.isNull("outlets")) {
                         val outletsArray = data.getJSONArray("outlets")
                         if (outletsArray.length() > 0) {
                             shopList!!.clear()
                             if (outletsArray.length() > 0) {
+
                                 for (i in 0 until outletsArray.length()) {
                                     var imageUrl = "null"
                                     val outletObj = outletsArray.getJSONObject(i)
@@ -483,8 +491,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("market_opportunity"),
                                         outletObj.getString("phone_number"),
                                         outletObj.getInt("is_buyer"),
-                                        /*outletObj.getString("distributor_office"),
-                                        outletObj.getString("distributor_office_code"),*/
                                         imageUrl, ArrayList(), "",
                                         outletObj.getDouble("latitude"),
                                         outletObj.getDouble("longitude"),
@@ -493,27 +499,40 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getString("last_ordered_at"),
                                         outletObj.getInt("is_verified"),
                                         outletObj.getInt("ordered_today"),
-                                        outletObj.getInt("is_no_order")
+                                        outletObj.getInt("is_no_order"),
+                                        if (loc == null) getDistance(
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ) else getDistance(
+                                            loc!!.latitude,
+                                            loc!!.longitude,
+                                            outletObj.getDouble("latitude"),
+                                            outletObj.getDouble("longitude")
+                                        )
                                     )
 
                                     shopList!!.add(shops)
                                 }
 
                                 if (shopList!!.size > 0) {
-                                    adapter = ShopSelectAdapter(shopList!!, listener!!)
-                                    recyclerView!!.adapter = adapter
+
+                                    val distanceSorted = shopList!!.sortedBy { it.distance }
+                                        .sortedBy { it.isOrdered }
+                                        .sortedBy { it.isNoOrdered }
+
+                                    adapter = ShopSelectAdapter(distanceSorted, listener!!)
+                                    binding.shoplist.adapter = adapter
                                     adapter!!.notifyDataSetChanged()
                                 }
                             }
-                            if (spinner != null) {
-                                if (spinner!!.adapter == null) {
-                                    val adapter = ArrayAdapter(
-                                        requireContext(),
-                                        android.R.layout.simple_spinner_item, routeNameList!!
-                                    )
-                                    spinner!!.adapter = adapter
-                                }
-
+                            if (binding.spinnerRoutes.adapter == null) {
+                                val adapter = ArrayAdapter(
+                                    mContext!!,
+                                    android.R.layout.simple_spinner_item, routeNameList!!
+                                )
+                                binding.spinnerRoutes.adapter = adapter
                             }
                         }
 
@@ -524,17 +543,17 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                 }
             },
             { error ->
-                loading!!.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 if (error is TimeoutError) {
                     Toast.makeText(
-                        requireContext(),
+                        mContext,
                         "Request timeout!! Check your internet connection or Contact Admin",
                         Toast.LENGTH_LONG
                     ).show()
                 }
                 if (error is NoConnectionError) {
                     Toast.makeText(
-                        requireContext(),
+                        mContext,
                         "Turn on your internet connection and Try again",
                         Toast.LENGTH_LONG
                     ).show()
@@ -544,19 +563,14 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                         val s = String(error.networkResponse.data)
                         Log.d("Routes", "message: $s")
                         val data = JSONObject(s)
-                        Toast.makeText(
-                            requireContext(),
-                            data.getString("message"),
-                            Toast.LENGTH_LONG
-                        )
+                        Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
                             .show()
                     } catch (e: UnsupportedEncodingException) {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     } catch (e: JSONException) {
-                        //mListerner.onFailure(e.message)
                         Sentry.captureException(e)
-                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                        Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
                         e.printStackTrace()
                     }
                 }
@@ -568,36 +582,44 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         queue!!.add(request)
     }
 
+    private fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startPoint = Location("locationA")
+        startPoint.latitude = lat1
+        startPoint.longitude = lon1
+
+        val endPoint = Location("locationB")
+        endPoint.latitude = lat2
+        endPoint.longitude = lon2
+
+        return startPoint.distanceTo(endPoint)
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        queue = RequestQueueSingleton.getInstance(context).requestQueue
+        queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")
         srId = prefs!!.getString(Api.SR_CODE, "")
         routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        mContext = context
         listener = this
         appDatabase = AppDatabase.getInstance(context)
+        ACTIVITY = context as MainActivity
     }
 
     override fun onShopSelected(shop: Shops) {
         editor!!.putString(Api.SELECTED_SHOP_ID, shop.shop_id)
         editor!!.commit()
         appDatabase!!.saveOrderDao().deleteByShop(shop.shop_id)
-        etSearch!!.text!!.clear()
-        CreateOrderFragment.startFragmentWithValue(
-            "Shop",
-            shop,
-            ProductSelectFragment(),
-            requireActivity()
-        )
+        CreateOrderFragment.startFragmentWithValue("Shop", shop, ProductSelectFragment(), ACTIVITY)
     }
 
     override fun onResume() {
         super.onResume()
         Log.d("Order", "onResume Shop Select")
-        ConfirmOrderFragment.checkforOrders(queue!!, token!!, userId!!, routeId!!)
+        ConfirmOrderFragment.checkForOrders(queue!!, token!!, userId!!, routeId!!)
     }
 }

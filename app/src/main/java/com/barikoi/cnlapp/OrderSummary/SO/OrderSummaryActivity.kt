@@ -16,23 +16,13 @@ import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.databinding.ActivityOrderSummaryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_order_summary.bodyLayout
-import kotlinx.android.synthetic.main.activity_order_summary.btnBack
-import kotlinx.android.synthetic.main.activity_order_summary.btn_tryAgain
-import kotlinx.android.synthetic.main.activity_order_summary.dateRangeLayout
-import kotlinx.android.synthetic.main.activity_order_summary.editTextSearchShop
-import kotlinx.android.synthetic.main.activity_order_summary.no_route_check
-import kotlinx.android.synthetic.main.activity_order_summary.orderList
-import kotlinx.android.synthetic.main.activity_order_summary.progressBar
-import kotlinx.android.synthetic.main.activity_order_summary.progressBarOrder
-import kotlinx.android.synthetic.main.activity_order_summary.tvDateRange
-import kotlinx.android.synthetic.main.activity_order_summary.tvRouteName
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -40,6 +30,7 @@ import java.util.Date
 import java.util.Locale
 
 class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
+    private lateinit var binding: ActivityOrderSummaryBinding
 
     var token: String? = null
     var user_id: String? = null
@@ -55,7 +46,9 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_order_summary)
+
+        binding = ActivityOrderSummaryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -68,8 +61,8 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
         listener = this
         if (route_id!!.length > 0) {
             setDateFilter()
-            no_route_check.visibility = View.GONE
-            bodyLayout.visibility = View.VISIBLE
+            binding.noRouteCheck.visibility = View.GONE
+            binding.bodyLayout.visibility = View.VISIBLE
         } else {
             //setDateFilter()
             /*ViewUtils.viewDialogResponse(applicationContext, resources.getString(R.string.no_route_selected_today), object : DialogListener{
@@ -82,20 +75,19 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                 }
 
             })*/
-            progressBar.visibility = View.GONE
-            no_route_check.visibility = View.VISIBLE
-            bodyLayout.visibility = View.GONE
-            btn_tryAgain.setOnClickListener {
+            binding.progressBar.visibility = View.GONE
+            binding.noRouteCheck.visibility = View.VISIBLE
+            binding.bodyLayout.visibility = View.GONE
+            binding.btnTryAgain.setOnClickListener {
                 setDateFilter()
             }
         }
 
-        btnBack.setOnClickListener {
-            onBackPressed()
-            finish()
+        binding.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        editTextSearchShop.addTextChangedListener(object : TextWatcher {
+        binding.editTextSearchShop.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
@@ -124,7 +116,7 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
         StartDate = df.format(start)
         EndDate = df.format(end)
 
-        tvDateRange.text =
+        binding.tvDateRange.text =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
 
 
@@ -134,19 +126,19 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener {
+        binding. dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.setEnabled(false)
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = simpleFormat.format(s_date)
+                binding.tvDateRange.text = simpleFormat.format(s_date)
             } else {
-                tvDateRange.text = getString(
+                binding.tvDateRange.text = getString(
                     R.string.date_range_,
                     simpleFormat.format(s_date),
                     simpleFormat.format(e_date)
@@ -160,20 +152,20 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
 
         getAllOrders(Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING, DELIVERED")
     }
 
     private fun getAllOrders(url: String) {
-        progressBar.visibility = View.GONE
-        progressBarOrder.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        binding.progressBarOrder.visibility = View.VISIBLE
         ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     if (response != null) {
-                        progressBarOrder.visibility = View.GONE
+                        binding.progressBarOrder.visibility = View.GONE
                         val itemList: ArrayList<OrderList> = ArrayList()
 
                         val obj = JSONObject(response)
@@ -183,7 +175,7 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                                 //productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
                                 val brandArray = orderObj.getJSONArray("products")
-                                tvRouteName.text = orderObj.getString("route_name")
+                                binding.tvRouteName.text = orderObj.getString("route_name")
                                 val productItems: ArrayList<Products> = ArrayList()
                                 if (orderObj.getString("order_status").equals("DELIVERED", true)) {
                                     if (brandArray.length() > 0) {
@@ -291,13 +283,13 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                         }
 
                         adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
-                        orderList.adapter = adapter
+                        binding.orderList.adapter = adapter
                         adapter!!.notifyDataSetChanged()
 
 
                     }
                 } catch (e: Exception) {
-                    progressBarOrder.visibility = View.GONE
+                    binding.progressBarOrder.visibility = View.GONE
                     e.printStackTrace()
                 }
             }
@@ -311,12 +303,12 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
             }
 
             override fun onResponseFailure(error: VolleyError) {
-                progressBarOrder.visibility = View.GONE
+                binding.progressBarOrder.visibility = View.GONE
                 ViewUtils.getErrorResponse(error, applicationContext)
             }
 
             override fun onException(e: Exception) {
-                progressBarOrder.visibility = View.GONE
+                binding.progressBarOrder.visibility = View.GONE
             }
 
         })

@@ -26,17 +26,12 @@ import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
+import com.barikoi.cnlapp.databinding.FragmentConfirmOrderBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_confirm_order.bodyLayout
-import kotlinx.android.synthetic.main.fragment_confirm_order.btn_tryAgain
-import kotlinx.android.synthetic.main.fragment_confirm_order.no_route_check
-import kotlinx.android.synthetic.main.fragment_confirm_order.tvRouteName
-import kotlinx.android.synthetic.main.fragment_confirm_order.view.bodyLayout
-import kotlinx.android.synthetic.main.fragment_confirm_order.view.no_route_check
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -46,6 +41,7 @@ import java.util.Locale
 
 
 class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessListener {
+    private lateinit var binding: FragmentConfirmOrderBinding
 
     var recylerView: RecyclerView? = null
     var progressBar: ProgressBar? = null
@@ -73,6 +69,73 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        confirmOrder = mView!!.findViewById(R.id.btnConfirm)
+        downloadChalan = mView!!.findViewById(R.id.btndownloadChalan)
+        recylerView = mView!!.findViewById(R.id.orderListView)
+        progressBar = mView!!.findViewById(R.id.progressBar2)
+        confirmOrder!!.setOnClickListener {
+            ViewUtils.viewDialog(mContext!!,
+                mContext!!.resources.getString(R.string.confirm_order_dialog),
+                SpannableStringBuilder(),
+                object :
+                    DialogListener {
+                    override fun onConfirmed() {
+                        createOrder()
+                    }
+
+                    override fun onCanceled() {
+
+                    }
+
+                })
+        }
+
+        downloadChalan!!.setOnClickListener {
+            if (orderList.size > 0) {
+                var orderIDs = ""
+                for (i in 0 until orderList.size) {
+                    if (orderIDs.length == 0) {
+                        orderIDs = orderList[i].orderId
+                    } else {
+                        orderIDs = orderIDs + "," + orderList[i].orderId
+                    }
+                }
+                if (orderIDs.length > 0) {
+                    ApiServices.apiGETInputStream(
+                        Api.get_chalan_download + "?order_no=" + orderIDs,
+                        mContext!!,
+                        object : ApiServiceListener {
+                            override fun onResponseSuccess(response: String) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onJSONResponseSuccess(response: JSONObject) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onResponseFailure(error: VolleyError) {
+                                ViewUtils.getErrorResponse(error, mContext!!)
+                            }
+
+                            override fun onException(e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                        })
+                }
+            } else {
+                Toast.makeText(
+                    mContext,
+                    resources.getString(R.string.no_order_to_download_chalan),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 
         checkForOrders(queue!!, token!!, user_id!!, route_id!!)
 
@@ -145,76 +208,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_confirm_order, container, false)
-
-        confirmOrder = mView!!.findViewById(R.id.btnConfirm)
-        downloadChalan = mView!!.findViewById(R.id.btndownloadChalan)
-        recylerView = mView!!.findViewById(R.id.orderListView)
-        progressBar = mView!!.findViewById(R.id.progressBar2)
-        confirmOrder!!.setOnClickListener {
-            ViewUtils.viewDialog(mContext!!,
-                mContext!!.resources.getString(R.string.confirm_order_dialog),
-                SpannableStringBuilder(),
-                object :
-                    DialogListener {
-                    override fun onConfirmed() {
-                        createOrder()
-                    }
-
-                    override fun onCanceled() {
-
-                    }
-
-                })
-        }
-
-        downloadChalan!!.setOnClickListener {
-            if (orderList.size > 0) {
-                var orderIDs = ""
-                for (i in 0 until orderList.size) {
-                    if (orderIDs.length == 0) {
-                        orderIDs = orderList[i].orderId
-                    } else {
-                        orderIDs = orderIDs + "," + orderList[i].orderId
-                    }
-                }
-                if (orderIDs.length > 0) {
-                    ApiServices.apiGETInputStream(
-                        Api.get_chalan_download + "?order_no=" + orderIDs,
-                        mContext!!,
-                        object : ApiServiceListener {
-                            override fun onResponseSuccess(response: String) {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onJSONResponseSuccess(response: JSONObject) {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                                TODO("Not yet implemented")
-                            }
-
-                            override fun onResponseFailure(error: VolleyError) {
-                                ViewUtils.getErrorResponse(error, mContext!!)
-                            }
-
-                            override fun onException(e: Exception) {
-                                e.printStackTrace()
-                            }
-
-                        })
-                }
-            } else {
-                Toast.makeText(
-                    mContext,
-                    resources.getString(R.string.no_order_to_download_chalan),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        return mView
+        binding = FragmentConfirmOrderBinding.inflate(inflater, container, false)
+        return  binding.root
     }
 
     private fun createOrder() {
@@ -373,13 +368,13 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             progressBar!!.visibility = View.GONE
             orderList.clear()
             //viewpagertab!!.getTabAt(1)!!.badge!!.number = 3
-            no_route_check.visibility = View.GONE
-            bodyLayout.visibility = View.VISIBLE
+            binding.noRouteCheck.visibility = View.GONE
+            binding.bodyLayout.visibility = View.VISIBLE
             for (i in 0 until orderArray.length()) {
                 val orderObj = orderArray.getJSONObject(i)
                 if (orderObj.getString("order_status").equals("PENDING", true)) {
                     val brandArray = orderObj.getJSONArray("products")
-                    tvRouteName.setText(orderObj.getString("route_name"))
+                    binding.tvRouteName.setText(orderObj.getString("route_name"))
                     val productItems: ArrayList<Products> = ArrayList()
                     if (brandArray.length() > 0) {
                         for (j in 0 until brandArray.length()) {
@@ -435,12 +430,12 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 it.orderId
             }
         } else {
-            mView!!.no_route_check.visibility = View.VISIBLE
-            mView!!.bodyLayout.visibility = View.GONE
+            binding.noRouteCheck.visibility = View.VISIBLE
+            binding.bodyLayout.visibility = View.GONE
             badgeDrawable.setVisible(false)
             progressBar!!.visibility = View.GONE
             orderList.clear()
-            btn_tryAgain.setOnClickListener {
+            binding.btnTryAgain.setOnClickListener {
                 checkForOrders(queue!!, token!!, user_id!!, route_id!!/*, mCallback!!*/)
             }
 

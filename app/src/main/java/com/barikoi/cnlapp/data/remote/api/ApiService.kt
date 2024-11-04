@@ -1,9 +1,15 @@
 package com.barikoi.cnlapp.data.remote.api
 
+import com.barikoi.cnlapp.data.remote.models.ApprovalCountResponse
 import com.barikoi.cnlapp.data.remote.models.ApproveRequest
+import com.barikoi.cnlapp.data.remote.models.AuthUserResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
+import com.barikoi.cnlapp.data.remote.models.BaseResponse2
 import com.barikoi.cnlapp.data.remote.models.DbHousesResponse
+import com.barikoi.cnlapp.data.remote.models.LoginResponse
+import com.barikoi.cnlapp.data.remote.models.NotificationResponse
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
+import com.barikoi.cnlapp.data.remote.models.PendingResponse
 import com.barikoi.cnlapp.data.remote.models.ProductStockResponse
 import com.barikoi.cnlapp.data.remote.models.RequestStockResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
@@ -12,12 +18,40 @@ import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
+
+
+    @POST("api/v1/generate-bpo-otp")
+    suspend fun sendOtp(@Query("phone") mobile: String): Response<BaseResponse2>
+
+    @POST("api/v1/login")
+    suspend fun login(
+        @Query("employee_id") employeeId: String, @Query("password") password: String
+    ): Response<LoginResponse>
+
+    @GET("api/v1/auth/user")
+    suspend fun authUser(
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?,
+        @Query("app_version") appVersion: String,
+    ): Response<AuthUserResponse>
+
+    @POST("api/v1/logout")
+    suspend fun logout(): Response<BaseResponse2>
+
+
+    @POST("api/v1/verify-bpo-otp")
+    suspend fun verifyOTP(
+        @Query("phone") mobile: String, @Query("otp") otp: String
+    ): Response<BaseResponse>
+
 
     @GET("api/v1/routes")
     suspend fun getRoute(@Query("user_id") userId: String): Response<RouteResponse>
@@ -38,11 +72,19 @@ interface ApiService {
         @Query("outlet_category") outletCategory: String
     ): Response<OutletsResponse>
 
-    @GET("api/v1/user-requests")
-    suspend fun getRequests(@Query("type") type: String): Response<RequestStockResponse>
-
     @POST("api/v1/user-request")
     suspend fun sendStockRequest(@Body body: StockRequestModel): Response<BaseResponse>
+
+    @GET("api/v1/user-requests")
+    suspend fun getRequestStocksTO(
+        @Query("type") type: String, @Query("requested_to") userID: String
+    ): Response<RequestStockResponse>
+
+
+    @GET("api/v1/user-requests")
+    suspend fun getRequestStocksSO(
+        @Query("type") type: String, @Query("user_id") userID: String
+    ): Response<RequestStockResponse>
 
     @POST("api/v1/respond-user-request/{id}")
     suspend fun updateRequest(
@@ -50,16 +92,29 @@ interface ApiService {
         @Body approveRequest: ApproveRequest
     ): Response<BaseResponse>
 
+
+    @GET("api/v1/notifications/{id}")
+    suspend fun getNotifications(@Path("id") userId: String): Response<NotificationResponse>
+
+    @FormUrlEncoded
+    @POST("api/v1/notification/update")
+    suspend fun readNotification(@Field("notification_id") notificationId: String): Response<BaseResponse2>
+
+
     @POST("api/v1/respond-user-request/{id}")
     suspend fun updateRequest(
         @Path("id") id: String,
         @Body approveRequest: StockApprovalRequest?
     ): Response<BaseResponse>
+
     @GET("api/v1/db-houses")
     suspend fun getDHList(@Query("territory_id") territoryId: String): Response<DbHousesResponse>
 
     @GET("api/v1/db-houses")
     suspend fun sendStockRequest(@Query("territory_id") territoryId: String): Response<DbHousesResponse>
+
+    @GET("api/v1/to-pending-count")
+    suspend fun getApprovalCount(): Response<PendingResponse>
 
 //    Api.all_product_list + "?start_date=" + EndDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&with_stock=1&with_order=1" + territorySuffix
 //    db_house_id

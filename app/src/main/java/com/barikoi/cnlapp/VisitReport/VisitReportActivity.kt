@@ -21,14 +21,12 @@ import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
-import com.barikoi.cnlapp.utils.extension.AppLocale
 import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
 import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.formatDateToFullName
 import com.barikoi.cnlapp.utils.extension.formatFullMonthDateYear
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_visit_report.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -59,7 +57,7 @@ class VisitReportActivity : BaseActivity() {
 
         queue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
 
-        btnBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
@@ -67,7 +65,7 @@ class VisitReportActivity : BaseActivity() {
             binding.spinnerLayoutRoute.isVisible = true
             getSOList()
         } else {
-            spinnerLayoutRoute.isVisible = false
+            binding.spinnerLayoutRoute.isVisible = false
             srId = sharePrefUtils.getString(Api.USER_ID)
         }
 
@@ -119,7 +117,7 @@ class VisitReportActivity : BaseActivity() {
 
         }
 
-        setDateFilter(spinnerMenu.selectedItemPosition)
+        setDateFilter(binding.spinnerMenu.selectedItemPosition)
     }
 
     private fun setDateFilter(position: Int) {
@@ -157,21 +155,21 @@ class VisitReportActivity : BaseActivity() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.isEnabled = false
+            binding.dateRangeLayout.isEnabled = false
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             isCustomDate = true
             binding.spinnerMenu.setSelection(2)
-            dateRangeLayout.isEnabled = true
+            binding.dateRangeLayout.isEnabled = true
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             startDate = df.format(s_date)
             endDate = df.format(e_date)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = s_date.formatFullMonthDateYear()
+                binding.tvDateRange.text = s_date.formatFullMonthDateYear()
                 customDate = s_date.formatFullMonthDateYear()
             } else {
                 binding.tvDateRange.text = getString(
@@ -190,7 +188,7 @@ class VisitReportActivity : BaseActivity() {
             }
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.isEnabled = true }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.isEnabled = true }
 
     }
 
@@ -279,7 +277,7 @@ class VisitReportActivity : BaseActivity() {
                                     )
                                 )
                             }
-                            createTable(itemList, tabLayout)
+                            createTable(itemList, binding.tabLayout)
                         }
 
                         if (obj.has("total_visited_report") && !obj.isNull("total_visited_report")) {
@@ -299,7 +297,7 @@ class VisitReportActivity : BaseActivity() {
                                         )
                                     }
                                 }
-                                createTableOther(visitedList, tabLayout2)
+                                createTableOther(visitedList, binding.tabLayout2)
                             }
                         }
 

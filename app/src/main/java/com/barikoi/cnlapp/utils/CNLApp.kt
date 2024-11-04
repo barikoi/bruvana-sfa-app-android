@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class CNLApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        Mapbox.getInstance(this, null)
+        Mapbox.getInstance(this)
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             options.dsn = BuildConfig.sentryDNS
             options.isEnableAutoSessionTracking = true

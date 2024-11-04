@@ -16,13 +16,12 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentLastWeekProductBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_last_week_product.progressBar
-import kotlinx.android.synthetic.main.fragment_last_week_product.tabLayout
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -31,6 +30,8 @@ import java.util.Locale
 
 
 class LastWeekProductFragment : Fragment() {
+    private lateinit var binding: FragmentLastWeekProductBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -54,8 +55,8 @@ class LastWeekProductFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_last_week_product, container, false)
+        binding = FragmentLastWeekProductBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     private fun init() {
@@ -75,7 +76,7 @@ class LastWeekProductFragment : Fragment() {
         ApiServices.apiGET(url, mQueue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     if (response != null) {
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         val obj = JSONObject(response)
@@ -86,7 +87,9 @@ class LastWeekProductFragment : Fragment() {
                                 if (!productObj.isNull("delivered_amount")) {
                                     if (productObj.getDouble("delivered_amount") > 0.0) {
                                         val productName = productObj.getString("product_name")
-                                        val totalPrice = dformat.format(productObj.getString("delivered_amount").toDouble())
+                                        val totalPrice = dformat.format(
+                                            productObj.getString("delivered_amount").toDouble()
+                                        )
                                         itemList.add(Pair(productName, totalPrice))
                                     }
                                 }
@@ -99,7 +102,7 @@ class LastWeekProductFragment : Fragment() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
             }
@@ -114,11 +117,11 @@ class LastWeekProductFragment : Fragment() {
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                progressBar.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
         })
@@ -126,9 +129,9 @@ class LastWeekProductFragment : Fragment() {
     }
 
     private fun createTable(data: ArrayList<Pair<String, String>>) {
-        tabLayout.isStretchAllColumns = true
-        tabLayout.bringToFront()
-        if (data.size >0) {
+        binding.tabLayout.isStretchAllColumns = true
+        binding.tabLayout.bringToFront()
+        if (data.size > 0) {
             for (i in 0 until data.size) {
                 val tr = TableRow(mContext)
                 val c1 = TextView(mContext)
@@ -141,16 +144,19 @@ class LastWeekProductFragment : Fragment() {
                 c2.setText(data.get(i).second)
                 tr.addView(c1)
                 tr.addView(c2)
-                tabLayout.addView(tr)
+                binding.tabLayout.addView(tr)
             }
-        }else{
+        } else {
             val valueTV = TextView(mContext)
             valueTV.text = "No Products on the list"
             valueTV.textSize = 20f
             valueTV.gravity = Gravity.CENTER
-            valueTV.layoutParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+            valueTV.layoutParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            )
 
-            tabLayout.addView(valueTV)
+            binding.tabLayout.addView(valueTV)
         }
     }
 

@@ -16,17 +16,13 @@ import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.databinding.ActivityNoticeBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.activity_notice.btnBack
-import kotlinx.android.synthetic.main.activity_notice.dateRangeLayout
-import kotlinx.android.synthetic.main.activity_notice.fab_create_notice
-import kotlinx.android.synthetic.main.activity_notice.noticeList
-import kotlinx.android.synthetic.main.activity_notice.tvDateRange
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -35,6 +31,7 @@ import java.util.Date
 import java.util.Locale
 
 class NoticeActivity : BaseActivity() {
+    private lateinit var binding: ActivityNoticeBinding
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
@@ -49,15 +46,14 @@ class NoticeActivity : BaseActivity() {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         if (prefs!!.getString(Api.USER_TYPE, "").equals("TO", true)) {
-            fab_create_notice.visibility = View.VISIBLE
+            binding.fabCreateNotice.visibility = View.VISIBLE
         } else {
-            fab_create_notice.visibility = View.GONE
+            binding.fabCreateNotice.visibility = View.GONE
         }
-        btnBack.setOnClickListener {
-            onBackPressed()
-            finish()
+        binding.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
-        fab_create_notice.setOnClickListener {
+        binding.fabCreateNotice.setOnClickListener {
             createNoticePopUp()
         }
         setDateFilter()
@@ -164,7 +160,7 @@ class NoticeActivity : BaseActivity() {
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.text = simpleFormat.format(end)
+        binding.tvDateRange.text = simpleFormat.format(end)
 
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
@@ -173,19 +169,19 @@ class NoticeActivity : BaseActivity() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.setEnabled(false)
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = simpleFormat.format(s_date)
+                binding.tvDateRange.text = simpleFormat.format(s_date)
             } else {
-                tvDateRange.text = getString(
+                binding.tvDateRange.text = getString(
                     R.string.date_range_,
                     simpleFormat.format(s_date),
                     simpleFormat.format(e_date)
@@ -198,7 +194,11 @@ class NoticeActivity : BaseActivity() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener {
+            binding.dateRangeLayout.setEnabled(
+                true
+            )
+        }
 
         getNoticeList(Api.get_notice + "?start_date=" + StartDate + "&end_date=" + EndDate)
     }
@@ -230,7 +230,7 @@ class NoticeActivity : BaseActivity() {
 
 
                         val adapter = NoticeListAdapter(itemList)
-                        noticeList.adapter = adapter
+                        binding.noticeList.adapter = adapter
                         adapter!!.notifyDataSetChanged()
 
 

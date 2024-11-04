@@ -20,6 +20,7 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
 import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.databinding.FragmentSummaryTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -27,13 +28,13 @@ import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.bumptech.glide.Glide
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.fragment_summary_t_o.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class SummaryTOFragment : Fragment() {
+    private lateinit var binding: FragmentSummaryTOBinding
 
     lateinit var ACTIVITY: MainActivity
     private var prefs: SharedPreferences? = null
@@ -58,25 +59,25 @@ class SummaryTOFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         init()
 
-        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO.adapter.count > 0) {
+                if (binding.spinnerSO.adapter.count > 0) {
                     selected_so = p2
                     if (p2 > 0) {
-                        userLayout.visibility = View.VISIBLE
+                        binding.userLayout.visibility = View.VISIBLE
                         selected_so_id = soList[p2 - 1].id
                         if (!soList[p2 - 1].imageUrl.equals("null")) {
                             Glide.with(mContext!!)
                                 .load(soList[p2 - 1].imageUrl)
-                                .into(imageUser)
+                                .into(binding.imageUser)
                         } else {
-                            imageUser.visibility = View.GONE
+                            binding.imageUser.visibility = View.GONE
                         }
-                        userName.setText(soList[p2 - 1].name)
-                        userDesignation.setText(soList[p2 - 1].designation)
+                        binding.userName.setText(soList[p2 - 1].name)
+                        binding.userDesignation.setText(soList[p2 - 1].designation)
                     } else {
-                        userLayout.visibility = View.GONE
+                        binding.userLayout.visibility = View.GONE
                     }
                     if (p2 == 0) {
                         setDateFilter("&with_to=1")
@@ -97,8 +98,8 @@ class SummaryTOFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_summary_t_o, container, false)
+        binding = FragmentSummaryTOBinding.inflate(inflater, container, false)
+        return  binding.root
     }
 
     private fun init() {
@@ -173,7 +174,7 @@ class SummaryTOFragment : Fragment() {
                     mContext!!,
                     android.R.layout.simple_spinner_item, soNameList
                 )
-                spinnerSO.adapter = adapter
+                binding. spinnerSO.adapter = adapter
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -190,7 +191,7 @@ class SummaryTOFragment : Fragment() {
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        binding.tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
         editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
@@ -203,22 +204,22 @@ class SummaryTOFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener(View.OnClickListener {
+        binding.dateRangeLayout.setOnClickListener(View.OnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.setEnabled(false)
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.setText(simpleFormat.format(s_date))
+                binding. tvDateRange.setText(simpleFormat.format(s_date))
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
+                binding.tvDateRange.setText(simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date))
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
@@ -231,7 +232,7 @@ class SummaryTOFragment : Fragment() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
     }
 
     fun getAttendance(url: String) {
@@ -323,12 +324,12 @@ class SummaryTOFragment : Fragment() {
                 }
 
                 val adapter = ReasonListAdapter(reasonList)
-                summaryListTOView.adapter = adapter
+                binding.summaryListTOView.adapter = adapter
                 adapter.notifyDataSetChanged()
 
-                presentCount.setText(present.toString())
-                lateCount.setText(late.toString())
-                absentCount.setText(absent.toString())
+                binding.presentCount.setText(present.toString())
+                binding.lateCount.setText(late.toString())
+                binding.absentCount.setText(absent.toString())
             }
         } catch (e: Exception) {
             e.printStackTrace()

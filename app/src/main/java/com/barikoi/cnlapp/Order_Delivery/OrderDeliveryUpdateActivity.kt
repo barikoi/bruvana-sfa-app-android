@@ -25,6 +25,7 @@ import com.barikoi.cnlapp.Order_Delivery.Fragments.DeliveredOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.PendingOrderFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.databinding.ActivityOrderDeliveryUpdateBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -33,12 +34,12 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.activity_order_delivery_update.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderDeliveryUpdateActivity : BaseActivity() {
+    private lateinit var binding: ActivityOrderDeliveryUpdateBinding
 
     var token: String? = null
 
@@ -63,7 +64,10 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_order_delivery_update)
+
+        binding = ActivityOrderDeliveryUpdateBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         editor = prefs!!.edit()
@@ -79,25 +83,24 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
             sr_id = ""
             route_id = ""
             user_id = ""
-            spinnerLayoutRoute.visibility = View.VISIBLE
+            binding.spinnerLayoutRoute.visibility = View.VISIBLE
             getSOList()
         } else {
             user_id = prefs!!.getString(Api.USER_ID, "")
             sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
-            spinnerLayoutRoute.visibility = View.GONE
+            binding.spinnerLayoutRoute.visibility = View.GONE
             setDateFilter()
         }
-        btnBack.setOnClickListener {
-            onBackPressed()
-            finish()
+        binding.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
 
 
-        spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO.adapter.count > 0) {
+                if (binding.spinnerSO.adapter.count > 0) {
                     selected_so = p2
                     user_id = soList[p2].id
                     srCode = soList[p2].employeeId
@@ -124,27 +127,27 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
         fragments.add(DeliveredOrderFragment())
         fragments.add(BouncedOrderFragment())
 
-        viewPager.setAdapter(ViewPagerAdapter(supportFragmentManager, lifecycle, fragments))
+        binding.viewPager.setAdapter(ViewPagerAdapter(supportFragmentManager, lifecycle, fragments))
         TabLayoutMediator(
-            viewpagertab, viewPager
+            binding.viewpagertab, binding.viewPager
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text = titles[position]
         }.attach()
 
-        viewPager.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.tabCount) {
-            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+        binding.viewPager.setUserInputEnabled(false)
+        for (i in 0 until binding.viewpagertab.tabCount) {
+            val tab = (binding.viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(15, 15, 10, 15)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        Log.d("Fragment", "viewpager current Item: " + binding.viewPager.getCurrentItem())
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 Log.d("Fragment", "viewpager tab pos: $position")
                 if (position == 0) {
-                    viewPager.currentItem = 0
+                    binding.viewPager.currentItem = 0
                     PendingOrderFragment.checkforOrders(
                         queue!!,
                         token!!,
@@ -155,7 +158,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                         EndDate!!
                     )
                 } else if (position == 1) {
-                    viewPager.currentItem = 1
+                    binding.viewPager.currentItem = 1
                     DeliveredOrderFragment.checkforOrders(
                         queue!!,
                         token!!,
@@ -166,7 +169,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                         EndDate!!
                     )
                 } else if (position == 2) {
-                    viewPager.currentItem = 2
+                    binding.viewPager.currentItem = 2
                     BouncedOrderFragment.checkforOrders(
                         queue!!,
                         token!!,
@@ -193,7 +196,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
         StartDate = df.format(end)
         EndDate = df.format(end)
 
-        tvDateRange.text = simpleFormat.format(end)
+        binding.tvDateRange.text = simpleFormat.format(end)
 
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
@@ -202,22 +205,22 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayout.setOnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.setEnabled(false)
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = simpleFormat.format(s_date)
+                binding.tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ORDER, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ORDER, df.format(e_date))
                 editor!!.commit()
             } else {
-                tvDateRange.text = getString(
+                binding.tvDateRange.text = getString(
                     R.string.date_range_,
                     simpleFormat.format(s_date),
                     simpleFormat.format(e_date)
@@ -232,7 +235,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
 
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
         setTabLayoutView()
     }
 
@@ -292,7 +295,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                     applicationContext,
                     android.R.layout.simple_spinner_item, soNameList
                 )
-                spinnerSO.adapter = adapter
+                binding.spinnerSO.adapter = adapter
             }
         } catch (e: Exception) {
             e.printStackTrace()

@@ -27,6 +27,7 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
+import com.barikoi.cnlapp.databinding.FragmentHomeTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -37,23 +38,6 @@ import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_home_t_o.activeCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.activeLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.bodyLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.btn_tryAgain
-import kotlinx.android.synthetic.main.fragment_home_t_o.dateRangeLayoutHome
-import kotlinx.android.synthetic.main.fragment_home_t_o.inactiveCount
-import kotlinx.android.synthetic.main.fragment_home_t_o.inactiveLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.lastweeksummary
-import kotlinx.android.synthetic.main.fragment_home_t_o.layoutFourth
-import kotlinx.android.synthetic.main.fragment_home_t_o.layoutSecond
-import kotlinx.android.synthetic.main.fragment_home_t_o.liveStockUpdate
-import kotlinx.android.synthetic.main.fragment_home_t_o.no_route_check
-import kotlinx.android.synthetic.main.fragment_home_t_o.tabLayout
-import kotlinx.android.synthetic.main.fragment_home_t_o.targetListView
-import kotlinx.android.synthetic.main.fragment_home_t_o.tvDateRange
-import kotlinx.android.synthetic.main.fragment_home_t_o.viewPager
-import kotlinx.android.synthetic.main.fragment_home_t_o.viewpagertab
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -63,6 +47,8 @@ import java.util.Locale
 
 
 class HomeTOFragment : Fragment() {
+    private lateinit var binding: FragmentHomeTOBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -81,23 +67,21 @@ class HomeTOFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_home_t_o, container, false)
-        progressBar = view.findViewById(R.id.progressBarHomeTO)
-        return view
+        binding = FragmentHomeTOBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //checkforAttendanceToday()
+        progressBar = view.findViewById(R.id.progressBarHomeTO)
 
         init()
 
-        liveStockUpdate.setOnClickListener {
+        binding.liveStockUpdate.setOnClickListener {
             startActivity(Intent(requireActivity(), ProductStockUpdateActivity::class.java))
         }
 
-        lastweeksummary.setOnClickListener {
+        binding.lastweeksummary.setOnClickListener {
             startActivity(
                 Intent(
                     requireActivity(),
@@ -120,8 +104,8 @@ class HomeTOFragment : Fragment() {
                         val obj = JSONObject(response)
                         val attedanceArray = obj.getJSONArray("attendances")
                         if (attedanceArray.length() > 0) {
-                            no_route_check.visibility = View.GONE
-                            bodyLayout.visibility = View.VISIBLE
+                            binding.noRouteCheck.visibility = View.GONE
+                            binding.bodyLayout.visibility = View.VISIBLE
                             val attendanceObj = attedanceArray.getJSONObject(0)
                             /*if (!attendanceObj.getString("route_id").equals("null")) {
                                 attendanceObj.getInt("route_id")
@@ -147,10 +131,10 @@ class HomeTOFragment : Fragment() {
                             }*/
                             init()
                         } else {
-                            no_route_check.visibility = View.VISIBLE
-                            bodyLayout.visibility = View.GONE
+                            binding.noRouteCheck.visibility = View.VISIBLE
+                            binding. bodyLayout.visibility = View.GONE
 
-                            btn_tryAgain.setOnClickListener {
+                            binding.btnTryAgain.setOnClickListener {
                                 checkforAttendanceToday()
                             }
                         }
@@ -186,7 +170,7 @@ class HomeTOFragment : Fragment() {
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
-        tvDateRange.text =
+        binding.tvDateRange.text =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         val StartDate = df.format(start)
         val EndDate = df.format(end)
@@ -197,22 +181,22 @@ class HomeTOFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        dateRangeLayoutHome.setOnClickListener {
+        binding.dateRangeLayoutHome.setOnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            dateRangeLayoutHome.setEnabled(false)
+            binding.dateRangeLayoutHome.setEnabled(false)
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            dateRangeLayoutHome.setEnabled(true)
+            binding.dateRangeLayoutHome.setEnabled(true)
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                tvDateRange.text = simpleFormat.format(s_date)
+                binding.tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                tvDateRange.text = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
+                binding.tvDateRange.text = simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
@@ -225,7 +209,7 @@ class HomeTOFragment : Fragment() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { dateRangeLayoutHome.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayoutHome.setEnabled(true) }
 
         getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&with_to_stats=1&territory_id=" + territoryId + "&user_id=" + userId)
 
@@ -281,8 +265,8 @@ class HomeTOFragment : Fragment() {
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
-                        no_route_check.visibility = View.GONE
-                        bodyLayout.visibility = View.VISIBLE
+                        binding.noRouteCheck.visibility = View.GONE
+                        binding.bodyLayout.visibility = View.VISIBLE
                         if (targetsArray.length() > 0) {
                             for (i in 0 until targetsArray.length()) {
                                 val targetObj = targetsArray.getJSONObject(i)
@@ -477,7 +461,7 @@ class HomeTOFragment : Fragment() {
                         AppLogger.log("Target:: $itemList")
 
                         val adapter = TargetAdapter(itemList, "TO")
-                        targetListView.adapter = adapter
+                        binding.targetListView.adapter = adapter
                         adapter.notifyDataSetChanged()
                         setActiveInactiveView()
                         //setLiveStockView()
@@ -513,17 +497,17 @@ class HomeTOFragment : Fragment() {
     }
 
     private fun setActiveInactiveView() {
-        layoutSecond.visibility = View.VISIBLE
+        binding.layoutSecond.visibility = View.VISIBLE
         val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 16f
         gd.setStroke(3, mContext!!.resources.getColor(R.color.cnl_color_2))
-        activeLayout.setBackgroundDrawable(gd)
+        binding.activeLayout.setBackgroundDrawable(gd)
         val gd2 = GradientDrawable()
         gd2.setColor(mContext!!.resources.getColor(R.color.white))
         gd2.cornerRadius = 16f
         gd2.setStroke(3, mContext!!.resources.getColor(R.color.cnl_color_1))
-        inactiveLayout.setBackgroundDrawable(gd2)
+        binding.inactiveLayout.setBackgroundDrawable(gd2)
 
         val today = Calendar.getInstance().time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
@@ -539,10 +523,10 @@ class HomeTOFragment : Fragment() {
                             //val attendanceArray = obj.getJSONArray("active")
                             val activeSO = obj.getJSONArray("active").length()
                             val inactiveSO = obj.getJSONArray("inactive").length()
-                            activeCount.text = activeSO.toString().englishToBanglaNumber()
-                            inactiveCount.text = inactiveSO.toString().englishToBanglaNumber()
+                            binding.activeCount.text = activeSO.toString().englishToBanglaNumber()
+                            binding.inactiveCount.text = inactiveSO.toString().englishToBanglaNumber()
                             if (obj.getJSONArray("active").length() > 0) {
-                                activeLayout.setOnClickListener {
+                                binding.activeLayout.setOnClickListener {
                                     startActivity(
                                         Intent(
                                             requireActivity(),
@@ -552,7 +536,7 @@ class HomeTOFragment : Fragment() {
                                 }
                             }
                             if (obj.getJSONArray("inactive").length() > 0) {
-                                inactiveLayout.setOnClickListener {
+                                binding.inactiveLayout.setOnClickListener {
                                     startActivity(
                                         Intent(
                                             requireActivity(),
@@ -617,7 +601,7 @@ class HomeTOFragment : Fragment() {
                                 itemList.sortBy {
                                     it.second
                                 }
-                                createTable(itemList, tabLayout)
+                                createTable(itemList, binding.tabLayout)
                             }
 
                         }
@@ -641,7 +625,7 @@ class HomeTOFragment : Fragment() {
     }
 
     private fun setSummary() {
-        layoutFourth.visibility = View.VISIBLE
+        binding. layoutFourth.visibility = View.VISIBLE
         progressBar!!.visibility = View.GONE
         val titles = arrayOf(
             resources.getString(R.string.today_summary),
@@ -650,23 +634,23 @@ class HomeTOFragment : Fragment() {
         val fragments = ArrayList<Fragment>()
         fragments.add(TodaysSummaryTOFragment())
         fragments.add(LastWeekSummaryTOFragment())
-        viewPager.adapter = ViewPagerAdapter(parentFragmentManager, lifecycle, fragments)
+        binding.viewPager.adapter = ViewPagerAdapter(parentFragmentManager, lifecycle, fragments)
         // attaching tab mediator
         TabLayoutMediator(
-            viewpagertab, viewPager
+            binding.viewpagertab, binding.viewPager
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text = titles[position]
         }.attach()
-        viewPager.currentItem = 0
+        binding.viewPager.currentItem = 0
 
         //viewPager.setUserInputEnabled(false)
-        for (i in 0 until viewpagertab.getTabCount()) {
-            val tab = (viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
+        for (i in 0 until binding.viewpagertab.getTabCount()) {
+            val tab = (binding.viewpagertab.getChildAt(0) as ViewGroup).getChildAt(i)
             val p = tab.layoutParams as ViewGroup.MarginLayoutParams
             p.setMargins(12, 12, 8, 12)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + viewPager.getCurrentItem())
+        Log.d("Fragment", "viewpager current Item: " + binding.viewPager.getCurrentItem())
     }
 
     private fun createTable(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {

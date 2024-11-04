@@ -36,20 +36,20 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.gson.Gson
-import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineCallback
-import com.mapbox.android.core.location.LocationEngineRequest
-import com.mapbox.android.core.location.LocationEngineResult
-import com.mapbox.android.core.permissions.PermissionsListener
-import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.engine.LocationEngine
+import com.mapbox.mapboxsdk.location.engine.LocationEngineCallback
+import com.mapbox.mapboxsdk.location.engine.LocationEngineRequest
+import com.mapbox.mapboxsdk.location.engine.LocationEngineResult
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
+import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
+import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.maps.*
 import com.pusher.client.Pusher
 import com.pusher.client.PusherOptions
@@ -61,7 +61,6 @@ import com.pusher.client.connection.ConnectionStateChange
 import com.pusher.client.util.HttpChannelAuthorizer
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
@@ -70,6 +69,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
+    private lateinit var binding: FragmentMapBinding
 
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
@@ -79,7 +79,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private val viewModel: MapViewModel by viewModels()
 
-    private lateinit var binding: FragmentMapBinding
 
     private lateinit var mMap: MapboxMap
 
@@ -154,7 +153,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 routeID = routeNewList[position].id.toString()
 
                 if (!binding.isTrace.isChecked) {
-                    if (isVerified.isChecked) {
+                    if (binding.isVerified.isChecked) {
                         viewModel.getOutletList(
                             routeNewList[position].id.toString(),
                             "1",
@@ -583,7 +582,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     private fun getMarkerIcon(): Icon {
-        return if (isVerified.isChecked) {
+        return if (binding.isVerified.isChecked) {
             IconFactory.getInstance(requireContext())
                 .fromResource(R.drawable.map_marker_green)
         } else {
@@ -790,6 +789,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             AppLogger.log("MAP READY ROUTE CALL")
             sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
+
+        mapboxMap.setMinZoomPreference(12.0)
 
         binding.fab.setOnClickListener {
             /*if (locationEngine != null) {

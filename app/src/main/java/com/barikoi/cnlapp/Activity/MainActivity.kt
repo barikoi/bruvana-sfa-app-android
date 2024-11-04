@@ -70,14 +70,6 @@ import com.google.android.material.navigation.NavigationView
 import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.app_content_main.fab_order
-import kotlinx.android.synthetic.main.app_content_main.rankLayout
-import kotlinx.android.synthetic.main.app_content_main.rank_suffix
-import kotlinx.android.synthetic.main.app_content_main.routeNameSelected
-import kotlinx.android.synthetic.main.app_content_main.tvRank
-import kotlinx.android.synthetic.main.app_content_main.tvTitle
-import kotlinx.android.synthetic.main.app_content_main.tvUserName
-import kotlinx.android.synthetic.main.app_content_main.userLayout
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -173,8 +165,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val startDate = df.format(start)
         val endDate = df.format(end)
 
-        userLayout.visibility = View.VISIBLE
-        tvUserName.text = userName
+        binding.appContentMain.userLayout.visibility = View.VISIBLE
+        binding.appContentMain.tvUserName.text = userName
         if (sharePrefUtils.getString(Api.TRACE_TOKEN).equals("null") ||
             sharePrefUtils.getString(Api.TRACE_TOKEN).equals("")
         ) {
@@ -188,7 +180,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             Api.authUserCheck + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59&app_version=" + BuildConfig.VERSION_NAME
         )
         if (userType.equals("TO", true)) {
-            routeNameSelected.visibility = View.GONE
+            binding.appContentMain.routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)
         } else {
             setCurrentFragment(HomeFragment(), this@MainActivity)
@@ -244,18 +236,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
-            fab_order.visibility = View.GONE
+            binding.appContentMain.fabOrder.visibility = View.GONE
         } else {
-            fab_order.visibility = View.VISIBLE
+            binding.appContentMain.fabOrder.visibility = View.VISIBLE
         }
 
-        fab_order.setOnClickListener {
-            fab_order.background.setTint(resources.getColor(R.color.cnl_color_2))
-            fab_order.drawable.setTint(resources.getColor(R.color.white))
+        binding.appContentMain.fabOrder.setOnClickListener {
+            binding.appContentMain.fabOrder.background.setTint(resources.getColor(R.color.cnl_color_2))
+            binding.appContentMain.fabOrder.drawable.setTint(resources.getColor(R.color.white))
             navView!!.selectedItemId = R.id.navigation_order
-            userLayout.visibility = View.GONE
-            tvTitle.text = resources.getString(R.string.order_collection)
-            tvTitle.visibility = View.VISIBLE
+            binding.appContentMain.userLayout.visibility = View.GONE
+            binding.appContentMain.tvTitle.text = resources.getString(R.string.order_collection)
+            binding.appContentMain.tvTitle.visibility = View.VISIBLE
             setCurrentFragment(CreateOrderFragment(), this@MainActivity)
         }
 
@@ -269,15 +261,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
 
         navView!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            if (fab_order.isVisible) {
-                fab_order.background.setTint(resources.getColor(R.color.white))
-                fab_order.drawable.setTint(resources.getColor(R.color.fab_icon))
+            if (binding.appContentMain.fabOrder.isVisible) {
+                binding.appContentMain.fabOrder.background.setTint(resources.getColor(R.color.white))
+                binding.appContentMain.fabOrder.drawable.setTint(resources.getColor(R.color.fab_icon))
             }
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    tvTitle.text = ""
-                    tvTitle.visibility = View.GONE
-                    userLayout.visibility = View.VISIBLE
+                    binding.appContentMain.tvTitle.text = ""
+                    binding.appContentMain.tvTitle.visibility = View.GONE
+                    binding.appContentMain.userLayout.visibility = View.VISIBLE
                     if (userType.equals("TO", true)) {
                         setCurrentFragment(HomeTOFragment(), this@MainActivity)
                     } else {
@@ -287,9 +279,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
 
                 R.id.navigation_route -> {
-                    tvTitle!!.text = resources.getString(R.string.route_plan)
-                    userLayout.visibility = View.GONE
-                    tvTitle.visibility = View.VISIBLE
+                    binding.appContentMain.tvTitle.text = resources.getString(R.string.route_plan)
+                    binding.appContentMain.userLayout.visibility = View.GONE
+                    binding.appContentMain.tvTitle.visibility = View.VISIBLE
                     setCurrentFragment(MapFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
@@ -300,17 +292,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     return@OnNavigationItemSelectedListener true
                 }*/
                 R.id.navigation_chat -> {
-                    tvTitle!!.text = resources.getString(R.string.title_chat)
+                    binding.appContentMain.tvTitle.text = resources.getString(R.string.title_chat)
                     setCurrentFragment(ChatFragment(), this@MainActivity)
-                    userLayout.visibility = View.GONE
-                    tvTitle.visibility = View.VISIBLE
+                    binding.appContentMain.userLayout.visibility = View.GONE
+                    binding.appContentMain.tvTitle.visibility = View.VISIBLE
                     return@OnNavigationItemSelectedListener true
                 }
 
                 R.id.navigation_attendance -> {
-                    tvTitle.text = resources.getString(R.string.attendance)
-                    tvTitle.visibility = View.VISIBLE
-                    userLayout.visibility = View.GONE
+                    binding.appContentMain.tvTitle.text = resources.getString(R.string.attendance)
+                    binding.appContentMain.tvTitle.visibility = View.VISIBLE
+                    binding.appContentMain.userLayout.visibility = View.GONE
                     setCurrentFragment(AttendanceFragment(), this@MainActivity)
                     return@OnNavigationItemSelectedListener true
                 }
@@ -411,9 +403,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         if (obj.has("user")) {
                             val userObj = obj.getJSONObject("user")
                             if (userObj.has("so_ranking") && !userObj.isNull("so_ranking")) {
-                                rankLayout.visibility = View.VISIBLE
-                                tvRank.setText(userObj.getInt("so_ranking").toString())
-                                rank_suffix.setText(toOrdinal(userObj.getInt("so_ranking")))
+                                binding.appContentMain.rankLayout.visibility = View.VISIBLE
+                                binding.appContentMain.tvRank.text =
+                                    userObj.getInt("so_ranking").toString()
+                                binding.appContentMain.rankSuffix.text =
+                                    toOrdinal(userObj.getInt("so_ranking"))
                             } else {
                                 //rankLayout.visibility = View.VISIBLE
                                 //tvRank.setText("0")

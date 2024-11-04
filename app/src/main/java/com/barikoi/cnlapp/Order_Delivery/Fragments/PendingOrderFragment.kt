@@ -41,13 +41,13 @@ import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.databinding.FragmentPendingOrderBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
-import kotlinx.android.synthetic.main.fragment_pending_order.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -57,6 +57,8 @@ import java.util.*
 
 class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener,
     OnValueChangeListener {
+        private lateinit var binding: FragmentPendingOrderBinding
+
     var recylerView: RecyclerView? = null
     var progressBar: ProgressBar? = null
     private var tvItemCount: TextView? = null
@@ -87,6 +89,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        recylerView = view.findViewById(R.id.orderListView)
+        progressBar = view.findViewById(R.id.progressBar1)
+
         checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
@@ -128,10 +134,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_pending_order, container, false)
-        recylerView = view.findViewById(R.id.orderListView)
-        progressBar = view.findViewById(R.id.progressBar1)
-        return view
+        binding = FragmentPendingOrderBinding.inflate(inflater, container, false)
+        return  binding.root
     }
 
 
@@ -213,8 +217,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         orderList.clear()
         try {
             if (array.length() > 0) {
-                no_route_check.visibility = View.GONE
-                bodyLayout.visibility = View.VISIBLE
+                binding.noRouteCheck.visibility = View.GONE
+                binding.bodyLayout.visibility = View.VISIBLE
                 for (i in 0 until array.length()) {
                     val orderObj = array.getJSONObject(i)
                     if (orderObj.getString("order_status").equals("PENDING", true)) {
@@ -276,10 +280,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     }
                 }
             } else {
-                no_route_check.visibility = View.VISIBLE
-                bodyLayout.visibility = View.GONE
+                binding.noRouteCheck.visibility = View.VISIBLE
+                binding.bodyLayout.visibility = View.GONE
 
-                btn_tryAgain.setOnClickListener {
+                binding.btnTryAgain.setOnClickListener {
                     /*checkforOrders(
                         queue!!,
                         token!!,

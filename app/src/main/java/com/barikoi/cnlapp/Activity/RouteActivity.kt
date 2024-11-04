@@ -29,7 +29,6 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_route.*
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -132,7 +131,7 @@ class RouteActivity : BaseActivity() {
         binding.spinnerSO2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (spinnerSO2.adapter.count > 0) {
+                if (binding.spinnerSO2.adapter.count > 0) {
                     selectedSo = p2
                     userId = soList[p2].id
                     srCode = soList[p2].employeeId
@@ -156,7 +155,7 @@ class RouteActivity : BaseActivity() {
             mQueue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     //setDateFilter()
                 }
 
@@ -170,12 +169,12 @@ class RouteActivity : BaseActivity() {
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
                     Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                    progressBar.visibility = View.GONE
+                    binding. progressBar.visibility = View.GONE
                 }
             })
     }
@@ -217,7 +216,7 @@ class RouteActivity : BaseActivity() {
                 applicationContext,
                 android.R.layout.simple_spinner_item, soNameList
             )
-            spinnerSO2.adapter = adapter
+            binding.spinnerSO2.adapter = adapter
         } catch (e: Exception) {
             e.printStackTrace()
         }

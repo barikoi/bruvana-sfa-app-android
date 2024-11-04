@@ -34,10 +34,6 @@ import com.barikoi.cnlapp.utils.extension.rotateViewAnimation
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import kotlinx.android.synthetic.main.activity_create_shop.*
-import kotlinx.android.synthetic.main.fragment_create_attendance.*
-import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerLayoutRoute
-import kotlinx.android.synthetic.main.fragment_create_attendance.spinnerRoutes
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -50,7 +46,6 @@ import javax.inject.Inject
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
 class CreateAttendanceFragment : Fragment() {
-
     private lateinit var binding: FragmentCreateAttendanceBinding
 
     @Inject
@@ -86,23 +81,23 @@ class CreateAttendanceFragment : Fragment() {
     }
 
     private fun init() {
-        tvDate.text = Date().formatDateToFullName()
+        binding.tvDate.text = Date().formatDateToFullName()
 
-        attendanceImagePicker.taskId = "taskId"
-        attendanceImagePicker.CAMERA = 4
-        attendanceImagePicker.setMainActivity(requireActivity())
-        attendanceImagePicker.setFragment(this)
-        attendanceImagePicker.setCameraLauncher(startCamera)
+        binding.attendanceImagePicker.taskId = "taskId"
+        binding.attendanceImagePicker.CAMERA = 4
+        binding.attendanceImagePicker.setMainActivity(requireActivity())
+        binding.attendanceImagePicker.setFragment(this)
+        binding.attendanceImagePicker.setCameraLauncher(startCamera)
 
 
         getImageFromDB()
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
-            spinnerLayoutRoute.visibility = View.GONE
-            titleRoute.visibility = View.GONE
+            binding.spinnerLayoutRoute.visibility = View.GONE
+            binding.titleRoute.visibility = View.GONE
         } else {
-            spinnerLayoutRoute.visibility = View.VISIBLE
-            titleRoute.visibility = View.VISIBLE
+            binding.spinnerLayoutRoute.visibility = View.VISIBLE
+            binding.titleRoute.visibility = View.VISIBLE
             getAllRoutes(
                 Api.routes_withfilter + "?with_geometry=0&user_id=" + sharePrefUtils.getString(
                     Api.USER_ID
@@ -110,49 +105,50 @@ class CreateAttendanceFragment : Fragment() {
             )
 
 
-            spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    if (p2 > 0) {
-                        val view1: TextView =
-                            p0!!.getChildAt(0) as TextView
-                        view1.setTextColor(requireContext().resources.getColor(R.color.black))
-                        if (routeNameList!![p2].first.isNotEmpty()) {
-                            routeId = routeNameList!![p2].first.toInt()
-                            selectedRoute = routeNameList!![p2].second
+            binding.spinnerRoutes.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                        if (p2 > 0) {
+                            val view1: TextView =
+                                p0!!.getChildAt(0) as TextView
+                            view1.setTextColor(requireContext().resources.getColor(R.color.black))
+                            if (routeNameList!![p2].first.isNotEmpty()) {
+                                routeId = routeNameList!![p2].first.toInt()
+                                selectedRoute = routeNameList!![p2].second
+                            } else {
+                                routeId = null
+                                selectedRoute = ""
+                            }
                         } else {
+                            if (p0!!.getChildAt(0) == null)
+                                return
+                            val view1: TextView =
+                                p0.getChildAt(0) as TextView
+                            view1.setTextColor(requireContext().resources.getColor(R.color.text_title_2))
                             routeId = null
                             selectedRoute = ""
                         }
-                    } else {
-                        if (p0!!.getChildAt(0) == null)
-                            return
-                        val view1: TextView =
-                            p0.getChildAt(0) as TextView
-                        view1.setTextColor(requireContext().resources.getColor(R.color.text_title_2))
-                        routeId = null
-                        selectedRoute = ""
                     }
+
+                    override fun onNothingSelected(p0: AdapterView<*>?) {}
+
                 }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {}
-
-            }
         }
 
         getLocation("reversegeo")
-        imgRefresh.rotateViewAnimation(0f, 380f)
+        binding.imgRefresh.rotateViewAnimation(0f, 380f)
 
         checkAttendance()
 
-        imgRefresh.setOnClickListener {
-            imgRefresh.rotateViewAnimation(0f, 380f)
+        binding.imgRefresh.setOnClickListener {
+            binding.imgRefresh.rotateViewAnimation(0f, 380f)
             getLocation("reversegeo")
         }
 
-        btnCheckIn.setOnClickListener {
+        binding.btnCheckIn.setOnClickListener {
             if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
                 if (isImageAdded) {
-                    progressBar.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
                     getLocation("check_in")
                 } else {
                     Toast.makeText(
@@ -164,7 +160,7 @@ class CreateAttendanceFragment : Fragment() {
                 }
             } else {
                 if (selectedRoute.isNotEmpty() && isImageAdded) {
-                    progressBar.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
                     getLocation("check_in")
                 } else {
                     if (!isImageAdded) {
@@ -186,9 +182,9 @@ class CreateAttendanceFragment : Fragment() {
                 }
             }
         }
-        btnCheckOut.setOnClickListener {
+        binding.btnCheckOut.setOnClickListener {
             if (isImageAdded) {
-                progressBar.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
                 getLocation("check_out")
             } else {
                 Toast.makeText(requireContext(), "Upload image for check out", Toast.LENGTH_SHORT)
@@ -196,7 +192,7 @@ class CreateAttendanceFragment : Fragment() {
             }
         }
 
-        btnCheckedAlready.setOnClickListener {
+        binding.btnCheckedAlready.setOnClickListener {
             checkAttendance()
         }
     }
@@ -282,9 +278,9 @@ class CreateAttendanceFragment : Fragment() {
 
                 if (fileExist) {
                     try {
-                        val bitmap = attendanceImagePicker.getRotateImage(dbPhotoPath)
+                        val bitmap = binding.attendanceImagePicker.getRotateImage(dbPhotoPath)
                         isImageAdded = true
-                        attendanceImagePicker.setLocalImage(
+                        binding.attendanceImagePicker.setLocalImage(
                             bitmap,
                             dbPhotoPath,
                             imageList[p]!!.position,
@@ -336,8 +332,8 @@ class CreateAttendanceFragment : Fragment() {
         params["longitude"] = location.longitude.toString()
         if (routeId != null) params["route_id"] = routeId.toString()
 
-        if (editTextReason.text.toString().isNotEmpty())
-            params["remarks"] = editTextReason.text.toString()
+        if (binding.editTextReason.text.toString().isNotEmpty())
+            params["remarks"] = binding.editTextReason.text.toString()
 
         ApiServices.apiPOSTMultipart(
             Api.check_in,
@@ -351,7 +347,7 @@ class CreateAttendanceFragment : Fragment() {
                 override fun onJSONResponseSuccess(response: JSONObject) {}
 
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     val data = JSONObject(String(response.data))
                     val message = data.getString("message")
                     if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO", true)) {
@@ -406,7 +402,7 @@ class CreateAttendanceFragment : Fragment() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     val s = String(
                         error.networkResponse.data,
                         StandardCharsets.UTF_8
@@ -417,7 +413,7 @@ class CreateAttendanceFragment : Fragment() {
                 }
 
                 override fun onException(e: Exception) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
                 }
 
@@ -455,7 +451,7 @@ class CreateAttendanceFragment : Fragment() {
                 override fun onJSONResponseSuccess(response: JSONObject) {}
 
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     val data = JSONObject(String(response.data))
                     val message = data.getString("message")
 
@@ -513,7 +509,7 @@ class CreateAttendanceFragment : Fragment() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     val s = String(
                         error.networkResponse.data,
                         StandardCharsets.UTF_8
@@ -524,7 +520,7 @@ class CreateAttendanceFragment : Fragment() {
                 }
 
                 override fun onException(e: Exception) {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
                 }
 
@@ -584,61 +580,60 @@ class CreateAttendanceFragment : Fragment() {
                                 )
                                 routesList.add(routeObj.getString("route_name"))
                             }
-                            if (spinnerRoutes != null) {
-                                if (spinnerRoutes.adapter == null) {
-                                    val adapter = object : ArrayAdapter<String>(
-                                        requireContext(),
-                                        android.R.layout.simple_spinner_item, routesList
-                                    ) {
-                                        override fun isEnabled(position: Int): Boolean {
-                                            return position != 0
-                                        }
-
-                                        override fun getDropDownView(
-                                            position: Int,
-                                            convertView: View?,
-                                            parent: ViewGroup
-                                        ): View {
-                                            val view: TextView = super.getDropDownView(
-                                                position,
-                                                convertView,
-                                                parent
-                                            ) as TextView
-                                            //set the color of first item in the drop down list to gray
-                                            if (position == 0) {
-                                                view.setTextColor(
-                                                    requireContext().resources.getColor(
-                                                        R.color.text_title_2
-                                                    )
-                                                )
-                                                view.visibility = View.GONE
-                                            } else {
-                                                //here it is possible to define color for other items by
-                                                //view.setTextColor(Color.RED)
-                                                view.setTextColor(resources.getColor(R.color.black))
-                                            }
-                                            return view
-                                        }
-                                    }
-                                    spinnerRoutes.adapter = adapter
-                                }
-
-                                if (sharePrefUtils.getString(Api.SELECTED_ROUTE_ID)!!
-                                        .isNotEmpty()
+                            if (binding.spinnerRoutes.adapter == null) {
+                                val adapter = object : ArrayAdapter<String>(
+                                    requireContext(),
+                                    android.R.layout.simple_spinner_item, routesList
                                 ) {
-                                    val selectedRouteId =
-                                        sharePrefUtils.getString(Api.SELECTED_ROUTE_ID)
-                                    for (i in 0 until routeNameList!!.size) {
-                                        if (routeNameList!![i].first == selectedRouteId) {
-                                            spinnerRoutes.setSelection(i)
-                                            break
-                                        }
+                                    override fun isEnabled(position: Int): Boolean {
+                                        return position != 0
                                     }
-                                } else {
-                                    spinnerRoutes.setSelection(0)
-                                }
 
+                                    override fun getDropDownView(
+                                        position: Int,
+                                        convertView: View?,
+                                        parent: ViewGroup
+                                    ): View {
+                                        val view: TextView = super.getDropDownView(
+                                            position,
+                                            convertView,
+                                            parent
+                                        ) as TextView
+                                        //set the color of first item in the drop down list to gray
+                                        if (position == 0) {
+                                            view.setTextColor(
+                                                requireContext().resources.getColor(
+                                                    R.color.text_title_2
+                                                )
+                                            )
+                                            view.visibility = View.GONE
+                                        } else {
+                                            //here it is possible to define color for other items by
+                                            //view.setTextColor(Color.RED)
+                                            view.setTextColor(resources.getColor(R.color.black))
+                                        }
+                                        return view
+                                    }
+                                }
+                                binding.spinnerRoutes.adapter = adapter
                             }
+
+                            if (sharePrefUtils.getString(Api.SELECTED_ROUTE_ID)!!
+                                    .isNotEmpty()
+                            ) {
+                                val selectedRouteId =
+                                    sharePrefUtils.getString(Api.SELECTED_ROUTE_ID)
+                                for (i in 0 until routeNameList!!.size) {
+                                    if (routeNameList!![i].first == selectedRouteId) {
+                                        binding.spinnerRoutes.setSelection(i)
+                                        break
+                                    }
+                                }
+                            } else {
+                                binding.spinnerRoutes.setSelection(0)
+                            }
+
+
                         }
 
                     }
@@ -745,7 +740,7 @@ class CreateAttendanceFragment : Fragment() {
         if (result.resultCode == RESULT_CANCELED) {
             if (filePath != null) {
                 Log.d("Image", "Canceled: $filePath")
-                attendanceImagePicker.deleteFileLocal(filePath)
+                binding.attendanceImagePicker.deleteFileLocal(filePath)
                 sharePrefUtils.saveString(ApiCall.IMAGE_PATH, "")
             }
         }
@@ -761,7 +756,7 @@ class CreateAttendanceFragment : Fragment() {
             } else {
                 imagePosition + 1
             }
-            attendanceImagePicker.addNewImage(
+            binding.attendanceImagePicker.addNewImage(
                 result.data,
                 4,
                 imagePosition,
