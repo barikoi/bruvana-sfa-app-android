@@ -10,8 +10,8 @@ import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
-import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
-import com.barikoi.cnlapp.data.remote.repository.SocketRepository
+import com.barikoi.cnlapp.data.remote.models.TraceUserResponse
+import com.barikoi.cnlapp.data.remote.repository.TraceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val routeRepository: RouteRepository,
-    private val socketRepository: SocketRepository
+    private val traceRepository: TraceRepository
 ) : ViewModel() {
 
     private val _routeResponse = MutableLiveData<ApiState<RouteResponse>>()
@@ -39,12 +39,12 @@ class MapViewModel @Inject constructor(
     val socketGroupResponse: LiveData<ApiState<SocketGroupResponse>> = _socketGroupResponse
 
 
-    private val _socketUsersResponse = MutableLiveData<ApiState<SocketUserResponse>>()
-    val socketUsersResponse: LiveData<ApiState<SocketUserResponse>> = _socketUsersResponse
+    private val _socketUsersResponse = MutableLiveData<ApiState<TraceUserResponse>>()
+    val socketUsersResponse: LiveData<ApiState<TraceUserResponse>> = _socketUsersResponse
 
     fun getSocketGroups() {
         viewModelScope.launch {
-            socketRepository.getAllGroup().collectLatest {
+            traceRepository.getAllGroup().collectLatest {
                 _socketGroupResponse.postValue(it)
             }
         }
@@ -52,7 +52,7 @@ class MapViewModel @Inject constructor(
 
     fun getSocketUserByGroup(groupId: String) {
         viewModelScope.launch {
-            socketRepository.getAllUsersByGroupID(groupId).collectLatest {
+            traceRepository.getAllUsersByGroupID(groupId).collectLatest {
                 _socketUsersResponse.postValue(it)
             }
         }
