@@ -3,9 +3,10 @@ package com.barikoi.cnlapp.data.remote.repository
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
-import com.barikoi.cnlapp.data.remote.api.SocketApiService
+import com.barikoi.cnlapp.data.remote.api.TraceApiService
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
-import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
+import com.barikoi.cnlapp.data.remote.models.TraceUserResponse
+import com.barikoi.cnlapp.data.remote.models.request.TraceGroupBody
 import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow
@@ -16,17 +17,17 @@ import javax.inject.Inject
 interface SocketRepository {
 
     fun getAllGroup(): Flow<ApiState<SocketGroupResponse>>
-    fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketUserResponse>>
+    fun getAllUsersByGroupID(groupId: String): Flow<ApiState<TraceUserResponse>>
 
 }
 
-class SocketRepositoryImpl @Inject constructor(private val socketApiService: SocketApiService) :
+class SocketRepositoryImpl @Inject constructor(private val traceApiService: TraceApiService) :
     SocketRepository {
     override fun getAllGroup(): Flow<ApiState<SocketGroupResponse>> {
         return flow {
             try {
                 val response =
-                    socketApiService.getSocketGroups()
+                    traceApiService.getSocketGroups()
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {
@@ -53,11 +54,11 @@ class SocketRepositoryImpl @Inject constructor(private val socketApiService: Soc
         }
     }
 
-    override fun getAllUsersByGroupID(groupId: String): Flow<ApiState<SocketUserResponse>> {
+    override fun getAllUsersByGroupID(groupId: String): Flow<ApiState<TraceUserResponse>> {
         return flow {
             try {
                 val response =
-                    socketApiService.getSocketUsersByGroup(groupId)
+                    traceApiService.getSocketUsersByGroup(groupId)
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {
