@@ -66,7 +66,13 @@ android {
             versionName "1.2.7.7"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
+
+            buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
+            buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
+
             buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
             buildConfigField 'String', 'sentryDNS', '"https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
@@ -82,9 +88,13 @@ android {
             versionName "1.2.8_1"
             resValue "string", "app_name", "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             resValue "string", "app_name", "CNL Staging SFA"
-            //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "https://cnl.barikoimaps.dev:7090/"
             resValue "String", "url_base", '"https://cnl.barikoimaps.dev:7090/"'
+
+            buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
+            buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
+
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
             buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
@@ -193,7 +203,8 @@ dependencies {
 
     /*barikoi trace-sdk*/
 //    implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
-    implementation 'com.github.barikoi:Barikoitrace-android-sdk:39f69bcd69'
+//    implementation 'com.github.barikoi:Barikoitrace-android-sdk:39f69bcd69'
+    implementation 'com.github.barikoi:Barikoitrace-android-sdk:f6b8a7f1dd'
 
 //    debugImplementation 'com.balsikandar.android:crashreporter:1.1.0'
 
@@ -213,4 +224,7 @@ dependencies {
 
     implementation("com.onesignal:OneSignal:5.1.17")
     implementation 'com.github.esafirm:android-image-picker:3.1.0'
+    implementation('io.socket:socket.io-client:2.1.0') {
+        exclude group: 'org.json', module: 'json'
+    }
 }
