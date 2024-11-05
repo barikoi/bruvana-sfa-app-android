@@ -118,6 +118,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        startTraceLoginObserve()
+        startTraceAuthUserObserve()
+
         queue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
 
         token = sharePrefUtils.getString(Api.TOKEN)
@@ -167,18 +171,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         binding.appContentMain.userLayout.visibility = View.VISIBLE
         binding.appContentMain.tvUserName.text = userName
-        if (sharePrefUtils.getString(Api.TRACE_TOKEN).equals("null") ||
-            sharePrefUtils.getString(Api.TRACE_TOKEN).equals("")
-        ) {
-            traceLogin()
+
+        if (sharePrefUtils.getString(Api.TRACE_TOKEN).isNullOrEmpty()) {
+            viewModel.traceLogin(BuildConfig.TRACE_USER, BuildConfig.TRACE_PASS)
         } else {
-            sharePrefUtils.getString(Api.TRACE_TOKEN)?.let { traceAuthCheck(it) }
+            viewModel.traceAuthUser()
         }
-        traceLogin()
+
         getAuthUser(
             token,
             Api.authUserCheck + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59&app_version=" + BuildConfig.VERSION_NAME
         )
+
         if (userType.equals("TO", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)
@@ -310,6 +314,64 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             false
         })
 
+    }
+
+    private fun startTraceLoginObserve() {
+        lifecycleScope.launch {
+            viewModel.traceLoginResponse.observe(this@MainActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startTraceLoginObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startTraceLoginObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startTraceLoginObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startTraceLoginObserve:: Success ${it.data}")
+
+                        if (it.data != null) {
+                            sharePrefUtils.saveString(Api.TRACE_TOKEN, it.data.token)
+
+                            viewModel.traceAuthUser()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startTraceAuthUserObserve() {
+        lifecycleScope.launch {
+            viewModel.traceAuthUserResponse.observe(this@MainActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startTraceAuthUserObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startTraceAuthUserObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+
+                        viewModel.traceLogin(BuildConfig.TRACE_USER, BuildConfig.TRACE_PASS)
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startTraceAuthUserObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startTraceAuthUserObserve:: Success ${it.data}")
+                    }
+                }
+            }
+        }
     }
 
     private fun traceLogin() {
