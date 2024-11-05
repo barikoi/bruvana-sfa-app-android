@@ -5,7 +5,7 @@ import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.api.ApiService
-import com.barikoi.cnlapp.data.remote.api.SocketApiService
+import com.barikoi.cnlapp.data.remote.api.TraceApiService
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Constants.CNL_OK_CLIENT
 import com.barikoi.cnlapp.utils.Constants.TRACE_OK_CLIENT
@@ -36,8 +36,8 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideTraceApiInterface(@Named("TRACE_OK_CLIENT") retrofit: Retrofit): SocketApiService {
-        return retrofit.create(SocketApiService::class.java)
+    fun provideTraceApiInterface(@Named("TRACE_OK_CLIENT") retrofit: Retrofit): TraceApiService {
+        return retrofit.create(TraceApiService::class.java)
     }
 
     @Singleton
@@ -118,7 +118,7 @@ object NetworkModule {
         @ApplicationContext context: Context
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://backend.barikoi.com:8888/api/v1/")
+            .baseUrl(BuildConfig.TRACE_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
