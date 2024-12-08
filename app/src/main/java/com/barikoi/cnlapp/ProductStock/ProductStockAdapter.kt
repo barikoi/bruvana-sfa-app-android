@@ -47,11 +47,15 @@ class ProductStockAdapter(
         holder.setIsRecyclable(false)
         val mItem = products[position]
 
+        AppLogger.log("deliveredQuantity:: ${mItem.deliveredQuantity}")
+
         holder.binding.productName.text = mItem.productName
         if (isSummaryActivity == true) {
             holder.binding.cbSelect.visibility = View.GONE
             holder.binding.etPerUnitSold.visibility = View.GONE
             holder.binding.tvPerUnitSold.visibility = View.VISIBLE
+            holder.binding.tvPerUnitSold.text = mItem.deliveredQuantity.toString()
+            holder.binding.tvPerUnit.text = mItem.unitName
 
             holder.binding.tvSoldQuantity.text =
                 "${holder.itemView.context.resources.getString(R.string.sold_in)} ${mItem.productiveRoutes} ${
@@ -60,10 +64,12 @@ class ProductStockAdapter(
                     )
                 }"
 
-        } else if(isTO == true) {
+        } else if (isTO == true) {
             holder.binding.cbSelect.visibility = View.GONE
             holder.binding.etPerUnitSold.visibility = View.VISIBLE
             holder.binding.tvPerUnitSold.visibility = View.GONE
+            holder.binding.tvPerUnitSold.text = mItem.deliveredQuantity.toString()
+            holder.binding.tvPerUnit.text = mItem.unitName
             holder.binding.tvSoldQuantity.text =
                 "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
                     holder.itemView.context.getString(
@@ -72,8 +78,8 @@ class ProductStockAdapter(
                 }"
         } else {
             holder.binding.cbSelect.visibility = View.VISIBLE
-            holder.binding.etPerUnitSold.visibility = View.VISIBLE
             holder.binding.tvPerUnitSold.visibility = View.GONE
+            holder.binding.tvPerUnit.text = mItem.unitName
             holder.binding.tvSoldQuantity.text =
                 "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
                     holder.itemView.context.getString(
@@ -81,6 +87,18 @@ class ProductStockAdapter(
                     )
                 }"
         }
+
+        if (products.any { it.isSelect }) {
+            holder.binding.etPerUnitSold.setText(
+                mItem.stockValue
+            )
+        } else {
+            holder.binding.etPerUnitSold.setText(
+                mItem.currentAvailableStock.toString()
+            )
+        }
+
+
         if (mItem.isSelect) {
             holder.binding.etPerUnitSold.isEnabled = true
             holder.binding.cbSelect.isChecked = true
@@ -101,29 +119,6 @@ class ProductStockAdapter(
             holder.binding.cbSelect.isChecked = false
         }
 
-        if (mItem.unitName.isNotEmpty()) {
-            if (products.any { it.isSelect }){
-                holder.binding.etPerUnitSold.setText(
-                    mItem.stockValue
-                )
-            }else {
-                holder.binding.etPerUnitSold.setText(
-                    mItem.currentAvailableStock.toString()
-                )
-            }
-
-
-            holder.binding.tvPerUnit.text = mItem.unitName
-            holder.binding.tvPerUnit.text = mItem.unitName
-            holder.binding.tvPerUnitSold.text = mItem.currentAvailableStock.toString()
-        } else {
-            AppLogger.log("unitName else")
-            holder.binding.etPerUnitSold.setText(
-                mItem.currentAvailableStock.toString().englishToBanglaNumber()
-            )
-
-            holder.binding.tvPerUnitSold.text = mItem.currentAvailableStock.toString()
-        }
 
         val drawable = CircularProgressDrawable(holder.itemView.context)
         drawable.setColorSchemeColors(
@@ -136,7 +131,7 @@ class ProductStockAdapter(
 
         if (mItem.images.isNotEmpty()) {
             Glide.with(holder.itemView.context)
-                .load(mItem.images[0])
+                .load(mItem.images[0].imageUrl)
                 .placeholder(drawable)
                 .into(holder.binding.imageProduct)
         } else {
