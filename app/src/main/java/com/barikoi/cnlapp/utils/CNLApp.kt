@@ -1,10 +1,10 @@
 package com.barikoi.cnlapp.utils
 
 import android.app.Application
-import android.content.Context
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.utils.extension.NotificationOpenedHandler
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.mapbox.mapboxsdk.Mapbox
 import com.onesignal.OneSignal
 import com.onesignal.debug.LogLevel
@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 class CNLApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        AndroidThreeTen.init(this)
         Mapbox.getInstance(this)
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             options.dsn = BuildConfig.sentryDNS
