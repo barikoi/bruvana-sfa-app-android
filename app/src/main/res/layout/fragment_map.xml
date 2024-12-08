@@ -8,6 +8,7 @@
     android:background="@color/background_app"
     android:padding="10dp">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
@@ -17,6 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
 
         <RelativeLayout
             android:id="@+id/spinnerLayoutSO"
@@ -94,7 +96,9 @@
             </com.barikoi.cnlapp.utils.MoreSpinner>
         </RelativeLayout>
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/llCheckBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -112,7 +116,7 @@
                 android:gravity="center_vertical"
                 android:text=""
                 android:textColor="@color/text_title"
-                android:textSize="17sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 app:drawableStartCompat="@drawable/ic_shop_small"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -152,6 +156,20 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:progressTint="@color/blue_cnl"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/llCheckBox"
+            app:trackThickness="2dp" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -175,6 +193,7 @@
         app:pressedTranslationZ="12dp"
         tools:visibility="visible" />
 
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -194,19 +213,20 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.github.ybq.android.spinkit.SpinKitView
-        android:id="@+id/progressBar1"
-        style="@style/SpinKitView.Large.ThreeBounce"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"
-        app:SpinKit_Color="@color/cnl_color_1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+
+    <!--    <com.github.ybq.android.spinkit.SpinKitView-->
+    <!--        android:id="@+id/progressBar1"-->
+    <!--        style="@style/SpinKitView.Large.ThreeBounce"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:layout_marginTop="8dp"-->
+    <!--        android:visibility="visible"-->
+    <!--        app:SpinKit_Color="@color/cnl_color_1"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        tools:visibility="visible" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
