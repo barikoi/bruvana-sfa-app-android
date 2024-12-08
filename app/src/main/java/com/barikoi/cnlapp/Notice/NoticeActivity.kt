@@ -39,7 +39,9 @@ class NoticeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_notice)
+
+        binding = ActivityNoticeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
