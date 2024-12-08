@@ -52,7 +52,7 @@ data class GroupUser(
     @SerializedName("phone")
     val phone: String,
     @SerializedName("position_updated_at")
-    val positionUpdatedAt: String,
+    val positionUpdatedAt: String?,
     @SerializedName("reset_password_token")
     val resetPasswordToken: Any,
     @SerializedName("roles")
