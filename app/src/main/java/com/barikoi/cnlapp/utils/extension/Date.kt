@@ -1,12 +1,17 @@
 package com.barikoi.cnlapp.utils.extension
 
+import com.barikoi.cnlapp.utils.AppLogger
+import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 /**
  * @return Date format 2024-02-08
@@ -44,7 +49,7 @@ fun String.formatHumanReadableDate(): String {
         Instant.parse(this),
         ZoneId.systemDefault()
     )
-    return  DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a").format(inst)
+    return DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a").format(inst)
 }
 
 fun String.formatHumanReadableTime(): String {
@@ -52,5 +57,50 @@ fun String.formatHumanReadableTime(): String {
         Instant.parse(this),
         ZoneId.systemDefault()
     )
-    return  DateTimeFormatter.ofPattern("hh:mm a").format(inst)
+    return DateTimeFormatter.ofPattern("hh:mm a").format(inst)
+}
+
+
+fun compareDateTimes(date1: String, date2: String): String {
+    val dateTime1 = org.threeten.bp.OffsetDateTime.parse(date1)
+    val dateTime2 = org.threeten.bp.OffsetDateTime.parse(date2)
+
+    return when {
+        dateTime1.isBefore(dateTime2) -> "Date 1 is before Date 2"
+        dateTime1.isAfter(dateTime2) -> "Date 1 is after Date 2"
+        else -> "Date 1 is equal to Date 2"
+    }
+}
+
+fun getDifferenceInMinutes(date1: String): Long {
+    AppLogger.log("Date1:: $date1")
+    val currentDateTime = LocalDateTime.now().format(org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+
+    AppLogger.log("CurrentDateTime:: $currentDateTime")
+
+    val inputFormatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    val utcDateTime = org.threeten.bp.ZonedDateTime.parse(date1, org.threeten.bp.format.DateTimeFormatter.ISO_DATE_TIME )
+
+    val localDateTime = utcDateTime.withZoneSameInstant(org.threeten.bp.ZoneId.systemDefault())
+
+    val outputFormatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+
+    val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+
+    val dateTime1: Date = format.parse(localDateTime.format(outputFormatter)) ?: return 0
+    val dateTime2: Date = format.parse(currentDateTime) ?: return 0
+
+    val differenceInMillis = dateTime2.time - dateTime1.time
+    val aa  = TimeUnit.MILLISECONDS.toMinutes(differenceInMillis)
+    AppLogger.log("Time DIFF:: Current:: $dateTime2 LastUpdate:: $dateTime1 DIFF:: $aa")
+    return aa
+}
+
+fun String.isoToReadableDate(): String {
+    val inputFormatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+    val dateTime = LocalDateTime.parse(this, inputFormatter)
+    val outputFormatter = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+
+    AppLogger.log(":::: ${dateTime.format(outputFormatter)}")
+    return dateTime.format(outputFormatter)
 }
