@@ -57,7 +57,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var appDatabase: AppDatabase? = null
-    var mView: View? = null
     private var listener: OnEditOrderListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
     lateinit var adapter: ConfirmOrderListAdapter
@@ -67,13 +66,13 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     }
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onViewCreated(mView: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(mView, savedInstanceState)
 
-        confirmOrder = mView!!.findViewById(R.id.btnConfirm)
-        downloadChalan = mView!!.findViewById(R.id.btndownloadChalan)
-        recylerView = mView!!.findViewById(R.id.orderListView)
-        progressBar = mView!!.findViewById(R.id.progressBar2)
+        confirmOrder = mView.findViewById(R.id.btnConfirm)
+        downloadChalan = mView.findViewById(R.id.btndownloadChalan)
+        recylerView = mView.findViewById(R.id.orderListView)
+        progressBar = mView.findViewById(R.id.progressBar2)
         confirmOrder!!.setOnClickListener {
             ViewUtils.viewDialog(mContext!!,
                 mContext!!.resources.getString(R.string.confirm_order_dialog),
@@ -206,8 +205,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         binding = FragmentConfirmOrderBinding.inflate(inflater, container, false)
         return  binding.root
     }
