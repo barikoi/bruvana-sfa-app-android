@@ -5,23 +5,19 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
 import com.android.volley.Request
@@ -38,31 +34,44 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnEditShopListener
+import com.barikoi.cnlapp.databinding.FragmentShopListBinding
 import io.sentry.Sentry
-import kotlinx.android.synthetic.staging.fragment_shop_list.createShop
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 class ShopListFragment : Fragment(), OnEditShopListener {
+    private lateinit var binding: FragmentShopListBinding
+
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     private var adapter: ShopListAdapter? = null
     private var userId: String? = ""
     private var listener: OnEditShopListener? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
+        binding = FragmentShopListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         recylerView = view.findViewById(R.id.shoplist)
         spinner = view.findViewById(R.id.spinnerRoutes)
         progressBar2 = view.findViewById(R.id.progress_bar2)
         et_search = view.findViewById(R.id.etSearch)
         btncreateShop = view.findViewById(R.id.createShop)
-        adapter = ShopListAdapter(ArrayList(), listener!!)
+
+        adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
         selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
 
@@ -91,7 +100,9 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                //parent.lastVisiblePosition
+            }
         }
 
         et_search!!.addTextChangedListener(object : TextWatcher {
@@ -125,19 +136,14 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             }
 
         })
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
         gd.cornerRadius = 5f
         gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
-        createShop.setBackgroundDrawable(gd)
+        binding.createShop.setBackgroundDrawable(gd)
 
-        createShop.setOnClickListener {
+        binding.createShop.setOnClickListener {
             if (routesList!!.size > 0) {
                 startActivityResult.launch(
                     Intent(requireActivity(), CreateShopActivity::class.java)
@@ -154,7 +160,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            if (result.getResultCode() == 55) {
+            if (result.resultCode == 55) {
                 getShopList(RouteActivity.userId!!)
             }
         }
