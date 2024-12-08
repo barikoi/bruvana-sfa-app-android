@@ -70,6 +70,7 @@ import com.google.android.material.navigation.NavigationView
 import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -224,7 +225,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 DefaultLocaleHelper.getInstance(this).setCurrentLocale("bn")
             }
 
-            recreate()
+            if (navView!!.selectedItemId != R.id.navigation_order) {
+                recreate()
+            } else {
+                lifecycleScope.launch {
+                    delay(100)
+                    restartApp(this@MainActivity)
+                }
+            }
         }
 
         btnLogout.setOnClickListener {
@@ -314,6 +322,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             false
         })
 
+    }
+
+    fun restartApp(context: Context) {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+        (context as? Activity)?.finish()  // Finish the current activity if context is an activity
+        Runtime.getRuntime().exit(0)  // Kill the process to ensure a full restart
     }
 
     private fun startTraceLoginObserve() {
