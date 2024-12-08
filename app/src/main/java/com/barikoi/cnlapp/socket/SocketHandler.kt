@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.socket
 
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.utils.AppLogger
-import io.sentry.protocol.App
 import io.socket.client.IO
 import io.socket.client.Socket
 import java.net.URISyntaxException
@@ -45,12 +44,12 @@ object SocketHandler {
 
         if (mSocket.connected()) {
             AppLogger.log("SocketHandler:: SOCKET : $mSocket")
-        }else {
+        } else {
             AppLogger.log("SocketHandler:: SOCKET NOT CONNECTED")
         }
     }
 
-    fun onConnectError(){
+    fun onConnectError() {
         mSocket.on(Socket.EVENT_CONNECT_ERROR) { args ->
             AppLogger.log("SocketHandler:: Connection Error: ${args[0]}")
         }.on(Socket.EVENT_DISCONNECT) {
