@@ -10,4 +10,4 @@ class OrdersSO(
     var total_outlets: String,
     var total_bounce: String,
     var ordersArray: JSONArray
-):Serializable
+) : Serializable
