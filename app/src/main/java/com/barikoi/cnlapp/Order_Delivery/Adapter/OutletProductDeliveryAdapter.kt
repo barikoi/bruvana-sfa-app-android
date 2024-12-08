@@ -1,6 +1,5 @@
 package com.barikoi.cnlapp.Order_Delivery.Adapter
 
-import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -10,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
 import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder
@@ -18,18 +16,25 @@ import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
-class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mListener: OnValueChangeListener, var outletId: String, var from: String) : RecyclerView.Adapter<OutletProductDeliveryAdapter.ViewHolder>() {
+class OutletProductDeliveryAdapter(
+    val products: List<ProductStatistics>,
+    var mListener: OnValueChangeListener,
+    var outletId: String,
+    var from: String
+) : RecyclerView.Adapter<OutletProductDeliveryAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): OutletProductDeliveryAdapter.ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_product_view, parent, false)
+    ): ViewHolder {
+        val v =
+            LayoutInflater.from(parent.context).inflate(R.layout.single_product_view, parent, false)
         return ViewHolder(v)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onBindViewHolder(holder: OutletProductDeliveryAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = products[position]
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
         holder.productName.setText(item.product_name)
@@ -37,13 +42,13 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
         holder.perUnitPrice.setText(item.discounted_unit_price.toString())
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false
-        var dformat = DecimalFormat("#.##")
-        holder.subTotal.setText(dformat.format(item.total_price).toString())
+        var dformat = DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+        holder.subTotal.text = dformat.format(item.total_price).toString()
         if (item.quantity > 0) {
             if (from.equals("PENDING", true)) {
                 holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
             }
-        }else{
+        } else {
             holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
         }
         holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
@@ -54,10 +59,12 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (holder.productCount.text.toString().toInt() == 0 || holder.productCount.text.toString().toInt() < 0){
+                if (holder.productCount.text.toString()
+                        .toInt() == 0 || holder.productCount.text.toString().toInt() < 0
+                ) {
                     holder.btnMinus.isEnabled = false
                     holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
-                }else{
+                } else {
                     holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
                     holder.btnMinus.isEnabled = true
                 }
@@ -73,19 +80,22 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
             holder.productCount.setText(qtyValue.toString())
             val subtotal = item.discounted_unit_price * holder.productCount.text.toString().toInt()
             holder.subTotal.setText(dformat.format(subtotal).toString())
-            item.bounced_quantity = item.bounced_quantity+1
+            item.bounced_quantity = item.bounced_quantity + 1
             item.quantity = holder.productCount.text.toString().toInt()
             item.total_price = dformat.format(subtotal).toDouble()
             val prodList = appDatabase!!.updateOrderDao().getOrdersDB(outletId)
-            if (prodList!!.size > 0){
-                Log.d("Product", "item count minus: "+prodList[0].itemsCount+ " shopId: "+prodList[0].outletId)
+            if (prodList!!.size > 0) {
+                Log.d(
+                    "Product",
+                    "item count minus: " + prodList[0].itemsCount + " shopId: " + prodList[0].outletId
+                )
                 appDatabase.updateOrderDao().update(
                     outletId,
-                    prodList[0].itemsCount-1,
+                    prodList[0].itemsCount - 1,
                     item.bounced_quantity,
-                    prodList[0].totalPrice-item.discounted_unit_price
+                    prodList[0].totalPrice - item.discounted_unit_price
                 )
-            }else{
+            } else {
                 appDatabase.updateOrderDao().insertAll(
                     UpdateOrder(
                         null,
@@ -111,9 +121,10 @@ class OutletProductDeliveryAdapter(val products: List<ProductStatistics>, var mL
         internal val perUnitPrice: TextView
         internal val tvCount: EditText
         internal val subTotal: TextView
-        internal val btnMinus : ImageButton
-        internal val btnAdd : ImageButton
+        internal val btnMinus: ImageButton
+        internal val btnAdd: ImageButton
         internal val productCount: EditText
+
         init {
             productName = itemView.findViewById(R.id.productName)
             productType = itemView.findViewById(R.id.tvProductVariation)

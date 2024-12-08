@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -17,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -348,13 +346,11 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onEdit(order: OrderList) {
         appDatabase!!.updateOrderDao().deleteALL()
         viewDialog(mContext!!, order)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun viewDialog(mContext: Context, order: OrderList) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
@@ -374,10 +370,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         itemValue.add(mContext.resources.getString(R.string.pending))
         itemValue.add(mContext.resources.getString(R.string.delivered))
         itemValue.add(mContext.resources.getString(R.string.bounced))
-        radio_group!!.setOrientation(RadioGroup.HORIZONTAL)
+        radio_group!!.orientation = RadioGroup.HORIZONTAL
         for (i in itemValue.indices) {
             val rbn = RadioButton(mContext)
-            rbn.setText(itemValue.get(i))
+            rbn.text = itemValue[i]
             rbn.id = i
             rbn.setTextColor(mContext.resources.getColor(R.color.text_title))
             rbn.buttonTintList =
@@ -769,7 +765,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             Log.d("Product", "exception 2: " + e.message + " " + position)
             e.printStackTrace()
         }
-        tvGrandTotal!!.setText(dformat.format(grandTotal).toString())
+        tvGrandTotal!!.text = dformat.format(grandTotal).toString()
         //totalAmount = dformat.format(grandTotal).toString()
         //grandTotalPrice = dformat.format(grandTotal).toDouble()
 
