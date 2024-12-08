@@ -14,7 +14,7 @@ data class ProductStockResponse(
 
 data class Product(
     @SerializedName("bounced_amount")
-    val bouncedAmount: Int,
+    val bouncedAmount: Double,
     @SerializedName("bounced_quantity")
     val bouncedQuantity: Int,
     @SerializedName("category_code")
