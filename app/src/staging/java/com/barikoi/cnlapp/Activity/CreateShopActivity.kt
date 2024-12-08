@@ -32,7 +32,7 @@ import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.databinding.ActivityCreateShopBinding
 import com.barikoi.cnlapp.utils.*
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -42,31 +42,29 @@ import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineCallback
-import com.mapbox.android.core.location.LocationEngineRequest
-import com.mapbox.android.core.location.LocationEngineResult
-import com.mapbox.android.core.permissions.PermissionsListener
-import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponent
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.engine.LocationEngine
+import com.mapbox.mapboxsdk.location.engine.LocationEngineCallback
+import com.mapbox.mapboxsdk.location.engine.LocationEngineRequest
+import com.mapbox.mapboxsdk.location.engine.LocationEngineResult
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
+import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
+import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.maps.*
 import io.sentry.Sentry
-import io.sentry.protocol.App
-import kotlinx.android.synthetic.main.activity_create_shop.*
 import org.json.JSONException
 import org.json.JSONObject
-import uk.co.senab.photoview.PhotoViewAttacher
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -75,7 +73,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 
-class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListener {
+class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
+    private lateinit var binding: ActivityCreateShopBinding
+
     private var mapView: MapView? = null
     private var mMap: MapboxMap? = null
     lateinit var fab: FloatingActionButton
@@ -102,13 +102,15 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
     private var selectedBuyer: Int? = -1
     private var inputVerified: Int? = 0
 
-    private var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
-    private var routesList: ArrayList<String>? = ArrayList()
+    var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+    var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_shop)
+
+        binding = ActivityCreateShopBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -124,32 +126,33 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
         gd.cornerRadius = 10f
         gd.setStroke(2, resources.getColor(R.color.required_field))
 
-        spinnerLayoutRoutes.setBackgroundDrawable(gd)
-        etShopName.setBackgroundDrawable(gd)
-        spinnerLayoutType.setBackgroundDrawable(gd)
-        spinnerLayoutCategory.setBackgroundDrawable(gd)
-        etAddress.setBackgroundDrawable(gd)
-        etOwnerName.setBackgroundDrawable(gd)
+        binding.spinnerLayoutRoutes.setBackgroundDrawable(gd)
+        //binding.imagepickerLayout.setBackgroundDrawable(gd)
+        binding.etShopName.setBackgroundDrawable(gd)
+        binding.spinnerLayoutType.setBackgroundDrawable(gd)
+        binding.spinnerLayoutCategory.setBackgroundDrawable(gd)
+        binding.etAddress.setBackgroundDrawable(gd)
+        binding.etOwnerName.setBackgroundDrawable(gd)
         if (userType.equals("TO", true)) {
-            isVerified.visibility = View.VISIBLE
+            binding.isVerified.visibility = View.VISIBLE
         } else {
-            isVerified.visibility = View.GONE
+            binding.isVerified.visibility = View.GONE
         }
         if (intent.hasExtra("fromEdit")) {
-            btnUpdateShop.visibility = View.VISIBLE
-            btnSubmitShop.visibility = View.GONE
-            tvTitle.text = resources.getString(R.string.update_shop_information)
+            binding.btnUpdateShop.visibility = View.VISIBLE
+            binding.btnSubmitShop.visibility = View.GONE
+            binding.tvTitle.text = resources.getString(R.string.update_shop_information)
             shops = intent.getSerializableExtra("fromEdit") as Shops
             getShopDetails(shops!!)
         } else {
-            btnUpdateShop.visibility = View.GONE
-            btnSubmitShop.visibility = View.VISIBLE
-            tvTitle.text = resources.getString(R.string.new_shop_creation)
+            binding.btnUpdateShop.visibility = View.GONE
+            binding.btnSubmitShop.visibility = View.VISIBLE
+            binding.tvTitle.text = resources.getString(R.string.new_shop_creation)
         }
-        imagepicker.taskId = "taskId"
-        imagepicker.CAMERA = 4
-        imagepicker.setMainActivity(this@CreateShopActivity)
-        imagepicker.setCameraLauncher(startCamera)
+        binding.imagepicker.taskId = "taskId"
+        binding.imagepicker.CAMERA = 4
+        binding.imagepicker.setMainActivity(this@CreateShopActivity)
+        binding.imagepicker.setCameraLauncher(startCamera)
 
         routesList = intent.getStringArrayListExtra("routes")
         routeNameList =
@@ -172,7 +175,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
         getBuyer()
         getImageFromDB()
 
-        isVerified.setOnCheckedChangeListener { compoundButton, isChecked ->
+        binding.isVerified.setOnCheckedChangeListener { compoundButton, isChecked ->
             if (isChecked) {
                 inputVerified = 1
             } else {
@@ -181,14 +184,12 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
         }
 
-        btnBack.setOnClickListener {
-            //setResult(55)
-            finish()
-            onBackPressed()
+        binding.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        locationMap.setOnClickListener {
-            Mapbox.getInstance(applicationContext, null)
+        binding.locationMap.setOnClickListener {
+            Mapbox.getInstance(applicationContext)
             val dialog = Dialog(this)
             dialog.setCancelable(false)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -207,12 +208,12 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
             btnSubmit.setOnClickListener {
                 if (mMap!!.cameraPosition.zoom >= 17.0f) {
                     val target = mMap!!.cameraPosition.target
-                    latitude = target.latitude
-                    longitude = target.longitude
+                    latitude = target?.latitude
+                    longitude = target?.longitude
                     var dformat = DecimalFormat("#.#####")
                     if (latitude!! > 0.0 && longitude!! > 0.0) {
-                        etLatitude.setText(dformat.format(latitude).toString())
-                        etLongitude.setText(dformat.format(longitude).toString())
+                        binding.etLatitude.setText(dformat.format(latitude).toString())
+                        binding.etLongitude.setText(dformat.format(longitude).toString())
                         reverseGeoAddress(applicationContext, latitude!!, longitude!!)
                     }
                     dialog.dismiss()
@@ -236,32 +237,32 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
             )
         }
 
-        btnSubmitShop.setOnClickListener {
-            btnSubmitShop.isEnabled = false
+        binding.btnSubmitShop.setOnClickListener {
+            binding.btnSubmitShop.isEnabled = false
             createShop()
         }
-        btnUpdateShop.setOnClickListener {
-            btnUpdateShop.isEnabled = false
+        binding.btnUpdateShop.setOnClickListener {
+            binding.btnUpdateShop.isEnabled = false
             updateShop()
         }
     }
 
     private fun getShopDetails(shops: Shops) {
 
-        etShopName.setText(shops.shop_name)
-        etAddress.setText(shops.address)
-        etOwnerName.setText(shops.shop_owner)
-        etContactNumber.setText(shops.contact_number)
-        etLatitude.setText(shops.latitude.toString())
-        etLongitude.setText(shops.longitude.toString())
+        binding.etShopName.setText(shops.shop_name)
+        binding.etAddress.setText(shops.address)
+        binding.etOwnerName.setText(shops.shop_owner)
+        binding.etContactNumber.setText(shops.contact_number)
+        binding.etLatitude.setText(shops.latitude.toString())
+        binding.etLongitude.setText(shops.longitude.toString())
         latitude = shops.latitude
         longitude = shops.longitude
         inputVerified = shops.isVerified
 
         if (shops.isVerified == 1) {
-            isVerified.isChecked = true
+            binding.isVerified.isChecked = true
         } else {
-            isVerified.isChecked = false
+            binding.isVerified.isChecked = false
         }
 
         if (shops.imageArray.size > 0) {
@@ -271,8 +272,8 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
     private fun generateImages(imageArray: ArrayList<String>) {
 
-        if (imageArray.isNotEmpty()) {
-            imageViewScroll.visibility = View.VISIBLE
+        if (!imageArray.isEmpty()) {
+            binding.imageViewScroll.visibility = View.VISIBLE
             val layout = findViewById<View>(R.id.imageViewLayout) as LinearLayout
             for (i in 0 until imageArray.size) {
                 val image = ImageView(this)
@@ -281,7 +282,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                 image.maxWidth = 200
                 val p = layout.layoutParams as ViewGroup.MarginLayoutParams
                 p.setMargins(8, 8, 4, 8)
-                Log.d("CreateShopActivity", imageArray[i])
+                Log.d("CreateShopActivity", imageArray.get(i))
                 image.layoutParams = p
                 Glide.with(applicationContext)
                     .load(imageArray.get(i))
@@ -310,8 +311,8 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                         .load(imageArray.get(i))
                         .thumbnail(.2.toFloat())
                         .into(ivPreview)
-                    btnClose.setOnClickListener { nagDialog.dismiss() }
-                    val pAttacher = PhotoViewAttacher(ivPreview)
+                    btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
+                    val pAttacher: PhotoViewAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
                     nagDialog.show()
                 }
@@ -321,18 +322,20 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
     private fun getImageFromDB() {
         appDatabase!!.imagesDao()!!.deleteAllImages()
-        val imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
+        var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
+        imageList =
+            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
         if (imageList!!.size > 0) {
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
                 val fileExist: Boolean = File(dbPhotoPath).canRead()
                 if (fileExist) {
                     isImageAdded = true
-                    imageCounter.visibility = View.VISIBLE
-                    imageCounter.text = (imageList.size).toString() + " Photos Added"
+                    binding.imageCounter.visibility = View.VISIBLE
+                    binding.imageCounter.text = (imageList.size).toString() + " Photos Added"
                     try {
-                        var bitmap = imagepicker.getRotateImage(dbPhotoPath)
-                        imagepicker.setLocalImage(
+                        var bitmap = binding.imagepicker.getRotateImage(dbPhotoPath)
+                        binding.imagepicker.setLocalImage(
                             bitmap,
                             dbPhotoPath,
                             imageList[p]!!.position,
@@ -358,60 +361,65 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
         }
     }
 
-    private var startCamera = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
-        if (result.resultCode == RESULT_CANCELED) {
-            if (filePath != null) {
-                Log.d("Image", "Canceled: $filePath")
-                imagepicker.deleteFileLocal(filePath)
-                editor!!.putString(ApiCall.IMAGE_PATH, "")
-                editor!!.apply()
-            }
-        }
-        if (result.resultCode == RESULT_OK) {
-            Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
-            var imagePosition = 0
-            var imageList: ArrayList<Images?>? = java.util.ArrayList()
-            imageList = appDatabase!!.imagesDao()!!
-                .getAllImageDB("Shop") as ArrayList<Images?>?
-            imageCounter.visibility = View.VISIBLE
-            imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
-
-            Log.d("Imagepos", "List: $imageList")
-            imagePosition = if (imageList.size > 0) {
-                imageList[imageList.size - 1]!!.position + 1
-            } else {
-                imagePosition + 1
-            }
-            imagepicker.addNewImage(
-                result.data,
-                CAMERA,
-                imagePosition,
-                "Shop",
-                prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
-            )
-            try {
-                val placeImage = Images(
-                    null, imagePosition,
-                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
-                )
-                isImageAdded = true
-                if (imagePosition > 0) {
-                    Log.d("Imagepos", "insert")
-                    Executors.newSingleThreadExecutor().execute {
-                        appDatabase!!.imagesDao()!!.insertAll(placeImage)
-                    }
+    var startCamera = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        ActivityResultCallback<ActivityResult> { result ->
+            val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+            if (result.getResultCode() == RESULT_CANCELED) {
+                if (filePath != null) {
+                    Log.d("Image", "Canceled: $filePath")
+                    binding.imagepicker.deleteFileLocal(filePath)
                     editor!!.putString(ApiCall.IMAGE_PATH, "")
                     editor!!.apply()
                 }
-            } catch (e: java.lang.Exception) {
-                Log.e("imageUtils", "OnActivity result 2: $e")
-                Sentry.captureException(e)
             }
-        }
-    }
+            if (result.getResultCode() == RESULT_OK) {
+                Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
+                var imagePosition = 0
+                var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
+                imageList = appDatabase!!.imagesDao()!!
+                    .getAllImageDB("Shop") as java.util.ArrayList<Images?>?
+                binding.imageCounter.visibility = View.VISIBLE
+                binding.imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
+                /*if (imageList!!.size > 0){
+                    binding.imageCounter.visibility = View.VISIBLE
+                    binding.imageCounter.text = (imageList.size+1).toString() + " Photos Added"
+                }else{
+                    binding.imageCounter.visibility = View.GONE
+                }*/
+                Log.d("Imagepos", "List: $imageList")
+                imagePosition = if (imageList!!.size > 0) {
+                    imageList[imageList.size - 1]!!.position + 1
+                } else {
+                    imagePosition + 1
+                }
+                binding.imagepicker.addNewImage(
+                    result.data,
+                    CAMERA,
+                    imagePosition,
+                    "Shop",
+                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+                )
+                try {
+                    val placeImage = Images(
+                        null, imagePosition,
+                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
+                    )
+                    isImageAdded = true
+                    if (imagePosition > 0) {
+                        Log.d("Imagepos", "insert")
+                        Executors.newSingleThreadExecutor().execute {
+                            appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                        }
+                        editor!!.putString(ApiCall.IMAGE_PATH, "")
+                        editor!!.apply()
+                    }
+                } catch (e: java.lang.Exception) {
+                    Log.e("imageUtils", "OnActivity result 2: $e")
+                    Sentry.captureException(e)
+                }
+            }
+        })
 
     fun getRoutes() {
         ApiServices.apiGET(
@@ -447,8 +455,8 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                         )
                                         routesList.add(routeObj.getString("route_name"))
                                     }
-                                    if (spinnerRoutes != null) {
-                                        if (spinnerRoutes.adapter == null) {
+                                    if (binding.spinnerRoutes != null) {
+                                        if (binding.spinnerRoutes.adapter == null) {
                                             val adapter = object : ArrayAdapter<String>(
                                                 applicationContext,
                                                 android.R.layout.simple_spinner_item, routesList
@@ -479,10 +487,10 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                                     return view
                                                 }
                                             }
-                                            spinnerRoutes.adapter = adapter
+                                            binding.spinnerRoutes.adapter = adapter
                                         }
 
-                                        spinnerRoutes.onItemSelectedListener =
+                                        binding.spinnerRoutes.onItemSelectedListener =
                                             object : AdapterView.OnItemSelectedListener {
                                                 override fun onItemSelected(
                                                     p0: AdapterView<*>?,
@@ -545,10 +553,10 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
             })
     }
 
-    private fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>) {
+    fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>) {
         var storedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
-        if (spinnerRoutes != null) {
-            if (spinnerRoutes.adapter == null) {
+        if (binding.spinnerRoutes != null) {
+            if (binding.spinnerRoutes.adapter == null) {
                 val adapter = object : ArrayAdapter<String>(
                     applicationContext,
                     android.R.layout.simple_spinner_item, routesList
@@ -579,10 +587,10 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                         return view
                     }
                 }
-                spinnerRoutes.adapter = adapter
+                binding.spinnerRoutes.adapter = adapter
             }
 
-            spinnerRoutes.onItemSelectedListener =
+            binding.spinnerRoutes.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         p0: AdapterView<*>?,
@@ -591,20 +599,20 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                         p3: Long
                     ) {
                         if (p0 != null) {
-                            if (storedRoute.isNotEmpty()) {
-                                if (spinnerRoutes.adapter.count > 0) {
+                            if (storedRoute.length > 0) {
+                                if (binding.spinnerRoutes.adapter.count > 0) {
                                     val pos =
-                                        (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(
+                                        (binding.spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(
                                             storedRoute
                                         )
-                                    Log.e("RouteList", "selectedRoute pos $pos")
+                                    Log.e("RouteList", "selectedRoute pos " + pos)
                                     Log.e(
                                         "RouteList",
-                                        "selectedRoute count " + spinnerRoutes.adapter.count
+                                        "selectedRoute count " + binding.spinnerRoutes.adapter.count
                                     )
                                     if (pos > -1) {
                                         storedRoute = ""
-                                        spinnerRoutes.setSelection(pos)
+                                        binding.spinnerRoutes.setSelection(pos)
                                     }
                                 }
                             }
@@ -612,8 +620,10 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                 if (p2 > 0) {
                                     val view1: TextView = p0.getChildAt(0) as TextView
                                     view1.setTextColor(resources.getColor(R.color.black))
-                                    selectedRoute = routeNameList[p2].first.ifEmpty {
-                                        ""
+                                    if (routeNameList[p2].first.length > 0) {
+                                        selectedRoute = routeNameList[p2].first
+                                    } else {
+                                        selectedRoute = ""
                                     }
                                 } else {
                                     val view1: TextView = p0.getChildAt(0) as TextView
@@ -631,11 +641,11 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                 }
 
             if (shops != null) {
-                if (shops!!.route_name.isNotEmpty()) {
+                if (shops!!.route_name.length > 0) {
                     val pos =
-                        (spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
+                        (binding.spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
                     if (pos > -1) {
-                        spinnerRoutes.setSelection(pos)
+                        binding.spinnerRoutes.setSelection(pos)
                     }
                 }
             }
@@ -643,11 +653,10 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
         }
     }
 
-    private fun getShopType() {
+    fun getShopType() {
         ApiServices.apiGET(Api.get_shop_type, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 if (response != null) {
-                    AppLogger.log("ShopType:: $response")
                     try {
                         val typeList: ArrayList<String> = ArrayList()
                         val obj = JSONObject(response)
@@ -689,9 +698,9 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                         return view
                                     }
                                 }
-                                spinnerShopType.adapter = shopTypeAdapter
+                                binding.spinnerShopType.adapter = shopTypeAdapter
 
-                                spinnerShopType.onItemSelectedListener =
+                                binding.spinnerShopType.onItemSelectedListener =
                                     object : AdapterView.OnItemSelectedListener {
                                         override fun onItemSelected(
                                             p0: AdapterView<*>?,
@@ -717,13 +726,13 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                     }
 
                                 if (shops != null) {
-                                    if (shops!!.shop_type.isNotEmpty()) {
+                                    if (shops!!.shop_type.length > 0) {
                                         val pos =
-                                            (spinnerShopType.adapter as ArrayAdapter<String>).getPosition(
+                                            (binding.spinnerShopType.adapter as ArrayAdapter<String>).getPosition(
                                                 shops!!.shop_type
                                             )
                                         if (pos > -1) {
-                                            spinnerShopType.setSelection(pos)
+                                            binding.spinnerShopType.setSelection(pos)
                                         }
                                     }
                                 }
@@ -756,7 +765,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
         })
     }
 
-    private fun getShopCategory() {
+    fun getShopCategory() {
         ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 if (response != null) {
@@ -801,9 +810,9 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                         return view
                                     }
                                 }
-                                spinnerCatOutlets.adapter = shopCategoryAdapter
+                                binding.spinnerCatOutlets.adapter = shopCategoryAdapter
 
-                                spinnerCatOutlets.onItemSelectedListener =
+                                binding.spinnerCatOutlets.onItemSelectedListener =
                                     object : AdapterView.OnItemSelectedListener {
                                         override fun onItemSelected(
                                             p0: AdapterView<*>?,
@@ -830,11 +839,11 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                 if (shops != null) {
                                     if (shops!!.category.length > 0) {
                                         val pos =
-                                            (spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(
+                                            (binding.spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(
                                                 shops!!.category
                                             )
                                         if (pos > -1) {
-                                            spinnerCatOutlets.setSelection(pos)
+                                            binding.spinnerCatOutlets.setSelection(pos)
                                         }
                                     }
                                 }
@@ -912,9 +921,9 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                         return view
                                     }
                                 }
-                                spinnerMarketOpportunity.adapter = marketOpportunityAdapter
+                                binding.spinnerMarketOpportunity.adapter = marketOpportunityAdapter
 
-                                spinnerMarketOpportunity.onItemSelectedListener =
+                                binding.spinnerMarketOpportunity.onItemSelectedListener =
                                     object : AdapterView.OnItemSelectedListener {
                                         override fun onItemSelected(
                                             p0: AdapterView<*>?,
@@ -943,11 +952,11 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                 if (shops != null) {
                                     if (shops!!.market_opportunity.length > 0) {
                                         val pos =
-                                            (spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(
+                                            (binding.spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(
                                                 shops!!.market_opportunity
                                             )
                                         if (pos > -1) {
-                                            spinnerMarketOpportunity.setSelection(pos)
+                                            binding.spinnerMarketOpportunity.setSelection(pos)
                                         }
                                     }
                                 }
@@ -980,7 +989,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
         })
     }
 
-    private fun getBuyer() {
+    fun getBuyer() {
         val buyerList: ArrayList<String> = ArrayList()
         buyerList.add(resources.getString(R.string.select_buyer))
         buyerList.add(resources.getString(R.string.yes))
@@ -1013,9 +1022,9 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                 return view
             }
         }
-        spinnerBuyer.adapter = buyerAdapter
+        binding.spinnerBuyer.adapter = buyerAdapter
 
-        spinnerBuyer.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerBuyer.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 > 0) {
                     val view1: TextView = p0!!.getChildAt(0) as TextView
@@ -1043,53 +1052,53 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
             if (shops!!.is_buyer > -1) {
                 //val pos= (spinBuyer.adapter as ArrayAdapter<String>).getPosition(p.getRetailData()[0].is_buyer)
                 if (shops!!.is_buyer == 0) {
-                    spinnerBuyer.setSelection(2)
+                    binding.spinnerBuyer.setSelection(2)
                 } else {
-                    spinnerBuyer.setSelection(1)
+                    binding.spinnerBuyer.setSelection(1)
                 }
             }
         }
     }
 
     fun createShop() {
-        showProgress(progressBarShop)
+        showProgress(binding.progressBarShop)
         var inputOk = true
-        if (etShopName.text.trim().length == 0) {
+        if (binding.etShopName.text.trim().length == 0) {
             inputOk = false
-            etShopName.setError(getString(R.string.this_field_is_required))
-            hideProgress(progressBarShop)
+            binding.etShopName.setError(getString(R.string.this_field_is_required))
+            hideProgress(binding.progressBarShop)
         }
-        if (etAddress.text.trim().length == 0) {
+        if (binding.etAddress.text.trim().length == 0) {
             inputOk = false
-            etAddress.setError(getString(R.string.this_field_is_required))
-            hideProgress(progressBarShop)
+            binding.etAddress.setError(getString(R.string.this_field_is_required))
+            hideProgress(binding.progressBarShop)
         }
-        if (etOwnerName.text.trim().length == 0) {
+        if (binding.etOwnerName.text.trim().length == 0) {
             inputOk = false
-            etOwnerName.setError(getString(R.string.this_field_is_required))
-            hideProgress(progressBarShop)
+            binding.etOwnerName.setError(getString(R.string.this_field_is_required))
+            hideProgress(binding.progressBarShop)
         }
         if (selectedRoute!!.length == 0) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
         if (selectedShopType!!.length == 0) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
         if (selectedCategory!!.length == 0) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
                 .show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
                 .show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
 
         if (inputOk) {
@@ -1112,13 +1121,13 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                 }
             }
             val params: MutableMap<String, String> = java.util.HashMap()
-            params["outlet_name"] = URLEncoder.encode(etShopName.text.toString(), "utf-8")
+            params["outlet_name"] = URLEncoder.encode(binding.etShopName.text.toString(), "utf-8")
             params["outlet_type"] = selectedShopType!!
             params["outlet_category"] = selectedCategory!!
-            params["address"] = URLEncoder.encode(etAddress.text.toString(), "utf-8")
-            params["owner_name"] = URLEncoder.encode(etOwnerName.text.toString(), "utf-8")
-            if (etContactNumber.text.trim().length > 0) params["phone_number"] =
-                URLEncoder.encode(etContactNumber.text.toString(), "utf-8")
+            params["address"] = URLEncoder.encode(binding.etAddress.text.toString(), "utf-8")
+            params["owner_name"] = URLEncoder.encode(binding.etOwnerName.text.toString(), "utf-8")
+            if (binding.etContactNumber.text.trim().length > 0) params["phone_number"] =
+                URLEncoder.encode(binding.etContactNumber.text.toString(), "utf-8")
             if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] =
                 selectedMarketOpportunity!!
             if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
@@ -1148,7 +1157,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
                         override fun onNetworkResponseSuccess(response: NetworkResponse) {
                             try {
-                                hideProgress(progressBarShop)
+                                hideProgress(binding.progressBarShop)
                                 val data = JSONObject(String(response.data))
                                 val message = data.getString("message")
                                 appDatabase!!.imagesDao()!!.deleteAllImages()
@@ -1157,7 +1166,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                     message,
                                     object : DialogListener {
                                         override fun onConfirmed() {
-                                            btnSubmitShop.isEnabled = true
+                                            binding.btnSubmitShop.isEnabled = true
                                             finish()
                                             startActivity(getIntent())
                                         }
@@ -1180,8 +1189,8 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                         @RequiresApi(Build.VERSION_CODES.KITKAT)
                         override fun onResponseFailure(error: VolleyError) {
                             try {
-                                btnSubmitShop.isEnabled = true
-                                hideProgress(progressBarShop)
+                                binding.btnSubmitShop.isEnabled = true
+                                hideProgress(binding.progressBarShop)
                                 val s = String(
                                     error.networkResponse.data,
                                     StandardCharsets.UTF_8
@@ -1202,8 +1211,8 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
                         override fun onException(e: Exception) {
                             try {
-                                btnSubmitShop.isEnabled = true
-                                hideProgress(progressBarShop)
+                                binding.btnSubmitShop.isEnabled = true
+                                hideProgress(binding.progressBarShop)
                                 Toast.makeText(
                                     applicationContext,
                                     e.message.toString(),
@@ -1222,56 +1231,56 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
                     })
             } else {
-                hideProgress(progressBarShop)
-                btnSubmitShop.isEnabled = true
+                hideProgress(binding.progressBarShop)
+                binding.btnSubmitShop.isEnabled = true
                 Toast.makeText(applicationContext, "Need to add Shop image", Toast.LENGTH_SHORT)
                     .show()
             }
         } else {
-            hideProgress(progressBarShop)
-            btnSubmitShop.isEnabled = true
+            hideProgress(binding.progressBarShop)
+            binding.btnSubmitShop.isEnabled = true
         }
     }
 
     fun updateShop() {
-        showProgress(progressBarShop)
+        showProgress(binding.progressBarShop)
         var inputOk = true
-        if (etShopName.text.trim().length == 0) {
+        if (binding.etShopName.text.trim().length == 0) {
             inputOk = false
-            etShopName.setError(getString(R.string.this_field_is_required))
-            hideProgress(progressBarShop)
+            binding.etShopName.setError(getString(R.string.this_field_is_required))
+            hideProgress(binding.progressBarShop)
         }
-        if (etAddress.text.trim().length == 0) {
+        if (binding.etAddress.text.trim().length == 0) {
             inputOk = false
-            etAddress.setError(getString(R.string.this_field_is_required))
-            hideProgress(progressBarShop)
+            binding.etAddress.setError(getString(R.string.this_field_is_required))
+            hideProgress(binding.progressBarShop)
         }
-        if (etOwnerName.text.trim().length == 0) {
+        if (binding.etOwnerName.text.trim().length == 0) {
             inputOk = false
-            etOwnerName.setError(getString(R.string.this_field_is_required))
-            hideProgress(progressBarShop)
+            binding.etOwnerName.setError(getString(R.string.this_field_is_required))
+            hideProgress(binding.progressBarShop)
         }
         if (selectedRoute!!.length == 0) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
         if (selectedShopType!!.length == 0) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
         if (selectedCategory!!.length == 0) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
                 .show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
                 .show()
-            hideProgress(progressBarShop)
+            hideProgress(binding.progressBarShop)
         }
 
         if (inputOk) {
@@ -1297,14 +1306,14 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                 }
             }
             val params: MutableMap<String, String> = java.util.HashMap()
-            params["outlet_name"] = URLEncoder.encode(etShopName.text.toString(), "utf-8")
+            params["outlet_name"] = URLEncoder.encode(binding.etShopName.text.toString(), "utf-8")
             params["outlet_id"] = shops!!.shop_id
             params["outlet_type"] = selectedShopType!!
             params["outlet_category"] = selectedCategory!!
-            params["address"] = URLEncoder.encode(etAddress.text.toString(), "utf-8")
-            params["owner_name"] = URLEncoder.encode(etOwnerName.text.toString(), "utf-8")
-            if (etContactNumber.text.trim().length > 0) params["phone_number"] =
-                URLEncoder.encode(etContactNumber.text.toString(), "utf-8")
+            params["address"] = URLEncoder.encode(binding.etAddress.text.toString(), "utf-8")
+            params["owner_name"] = URLEncoder.encode(binding.etOwnerName.text.toString(), "utf-8")
+            if (binding.etContactNumber.text.trim().length > 0) params["phone_number"] =
+                URLEncoder.encode(binding.etContactNumber.text.toString(), "utf-8")
             if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] =
                 selectedMarketOpportunity!!
             if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
@@ -1333,7 +1342,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
                     override fun onNetworkResponseSuccess(response: NetworkResponse) {
                         try {
-                            hideProgress(progressBarShop)
+                            hideProgress(binding.progressBarShop)
                             val data = JSONObject(String(response.data))
                             val message = data.getString("message")
                             appDatabase!!.imagesDao()!!.deleteAllImages()
@@ -1342,7 +1351,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                                 message,
                                 object : DialogListener {
                                     override fun onConfirmed() {
-                                        btnUpdateShop.isEnabled = true
+                                        binding.btnUpdateShop.isEnabled = true
                                         setResult(55)
                                         finish()
                                     }
@@ -1362,11 +1371,10 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                         }
                     }
 
-                    @RequiresApi(Build.VERSION_CODES.KITKAT)
                     override fun onResponseFailure(error: VolleyError) {
                         try {
-                            btnUpdateShop.isEnabled = true
-                            hideProgress(progressBarShop)
+                            binding.btnUpdateShop.isEnabled = true
+                            hideProgress(binding.progressBarShop)
                             val s = String(
                                 error.networkResponse.data,
                                 StandardCharsets.UTF_8
@@ -1386,8 +1394,8 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
                     override fun onException(e: Exception) {
                         try {
-                            btnUpdateShop.isEnabled = true
-                            hideProgress(progressBarShop)
+                            binding.btnUpdateShop.isEnabled = true
+                            hideProgress(binding.progressBarShop)
                             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                         } catch (e: Exception) {
                             Sentry.captureException(e)
@@ -1401,7 +1409,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
 
                 })
         } else {
-            btnUpdateShop.isEnabled = true
+            binding.btnUpdateShop.isEnabled = true
         }
     }
 
@@ -1422,7 +1430,7 @@ class CreateShopActivity : BaseActivity(), OnMapReadyCallback, PermissionsListen
                         val city = place.getString("city")
                         val area = place.getString("area")
                         //address[0] = jsonArray.getJSONObject(0).getString("Address");
-                        etAddress.setText(address + ", " + area + ", " + city)
+                        binding.etAddress.setText(address + ", " + area + ", " + city)
                     } catch (e: JSONException) {
                         e.printStackTrace()
                         Sentry.captureException(e)
