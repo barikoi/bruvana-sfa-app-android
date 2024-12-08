@@ -16,6 +16,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -84,15 +85,16 @@ object NetworkModule {
                     chain.proceed(request)
                 }
             }
-            .callTimeout(5, TimeUnit.MINUTES)
-            .writeTimeout(5, TimeUnit.MINUTES)
-            .readTimeout(5, TimeUnit.MINUTES)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(
                 HttpLoggingInterceptor().setLevel(
                     if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
                     else HttpLoggingInterceptor.Level.NONE
                 )
             )
+            .connectionPool(ConnectionPool(0, 1, TimeUnit.SECONDS))
             .build()
     }
 
