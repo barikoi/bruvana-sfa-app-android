@@ -60,6 +60,16 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     ): View? {
         binding = FragmentShopListBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recylerView = view.findViewById(R.id.shoplist)
+        spinner = view.findViewById(R.id.spinnerRoutes)
+        progressBar2 = view.findViewById(R.id.progress_bar2)
+        et_search = view.findViewById(R.id.etSearch)
+        btncreateShop = view.findViewById(R.id.createShop)
 
         adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
         recylerView!!.adapter = adapter
@@ -126,18 +136,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             }
 
         })
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-
-        recylerView = view.findViewById(R.id.shoplist)
-        spinner = view.findViewById(R.id.spinnerRoutes)
-        progressBar2 = view.findViewById(R.id.progress_bar2)
-        et_search = view.findViewById(R.id.etSearch)
-        btncreateShop = view.findViewById(R.id.createShop)
 
         val gd = GradientDrawable()
         gd.setColor(mContext!!.resources.getColor(R.color.white))
@@ -162,7 +160,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     var startActivityResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
-            if (result.getResultCode() == 55) {
+            if (result.resultCode == 55) {
                 getShopList(RouteActivity.userId!!)
             }
         }
