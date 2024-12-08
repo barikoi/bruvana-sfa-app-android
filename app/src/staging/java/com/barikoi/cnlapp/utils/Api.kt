@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.utils
 
+import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.R
 
 object Api {
@@ -40,7 +41,7 @@ object Api {
     const val START_DATE_ORDER = "start_date_order"
     const val END_DATE_ORDER = "end_date_order"
 
-    private val base_url = CNLApp.appContext.resources.getString(R.string.url_base)
+    private val base_url = BuildConfig.url_base
 
     const val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
     const val distance = "https://barikoi.xyz/v1/api/distance/"
