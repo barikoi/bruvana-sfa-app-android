@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
@@ -73,8 +72,6 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
         user_type = prefs!!.getString(Api.USER_TYPE, "")
-        //sr_id = prefs!!.getString(Api.SR_CODE, "")
-        //route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
         territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
 
         etSearchShop = findViewById(R.id.editTextSearchShop)
@@ -186,11 +183,8 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
 
     private fun setDateFilter() {
         val c = Calendar.getInstance()
-        //c.add(Calendar.DAY_OF_WEEK, -7)
         c.add(Calendar.DATE, -1)
-        //val end = Calendar.getInstance().time
         val end = c.time
-        //val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         StartDate = df.format(end)
