@@ -45,6 +45,16 @@ object Constants {
     //    const val MOBILE_REGEX = "^(?:(?:\\+|00)88|01)?\\d{11}\$"
     const val MOBILE_REGEX = "^(?:\\+?88|0088)?01[15-9]\\d{8}\$"
 
+    val  shopType = listOf(
+        "General Large Store (A)",
+        "General Small Store (B)",
+        "Mudi Large Outlet (Grocery Store) (A)",
+        "Mudi Small Outlet (Grocery Store) (B)",
+        "Confectionary/Bakery (B)",
+        "Pharmacy (P)",
+        "Tea Stall (C)"
+    )
+
     fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
         val startPoint = Location("locationA")
         startPoint.latitude = lat1
