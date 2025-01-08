@@ -15,8 +15,6 @@ class Shops(
     val market_opportunity: String,
     val contact_number: String,
     val is_buyer: Int,
-    /*val distributor_office: String,
-    val distributor_office_code: String,*/
     val imageUrl: String,
     val imageArray: ArrayList<String>,
     val territory_name: String,
@@ -28,5 +26,7 @@ class Shops(
     val isVerified: Int,
     val isOrdered: Int,
     val isNoOrdered: Int,
-    val distance: Float
-): Serializable
+    val distance: Float,
+    val competitive: List<String>?,
+    var needEdit: Boolean = false
+) : Serializable

@@ -26,5 +26,7 @@ class Shops(
     val isVerified: Int,
     val isOrdered: Int,
     val isNoOrdered: Int,
-    val distance: Float
-): Serializable
+    val distance: Float,
+    val competitive: List<String>?,
+    var needEdit: Boolean = false
+) : Serializable

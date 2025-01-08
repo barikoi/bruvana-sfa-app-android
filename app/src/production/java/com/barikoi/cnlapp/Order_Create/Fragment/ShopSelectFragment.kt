@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -17,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
@@ -28,7 +28,6 @@ import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.FragmentShopSelectBinding
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.google.android.gms.location.*
@@ -370,7 +369,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
             }
 
         })
@@ -501,17 +499,18 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                         outletObj.getInt("is_verified"),
                                         outletObj.getInt("ordered_today"),
                                         outletObj.getInt("is_no_order"),
-                                        if (loc == null) Constants.getDistance(
+                                        if (loc == null) getDistance(
                                             0.0,
                                             0.0,
                                             0.0,
                                             0.0
-                                        ) else Constants.getDistance(
+                                        ) else getDistance(
                                             loc!!.latitude,
                                             loc!!.longitude,
                                             outletObj.getDouble("latitude"),
                                             outletObj.getDouble("longitude")
-                                        )
+                                        ),
+                                        null
                                     )
 
                                     shopList!!.add(shops)
@@ -581,6 +580,18 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         queue!!.add(request)
+    }
+
+    private fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startPoint = Location("locationA")
+        startPoint.latitude = lat1
+        startPoint.longitude = lon1
+
+        val endPoint = Location("locationB")
+        endPoint.latitude = lat2
+        endPoint.longitude = lon2
+
+        return startPoint.distanceTo(endPoint)
     }
 
     override fun onAttach(context: Context) {

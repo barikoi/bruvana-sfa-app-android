@@ -510,7 +510,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                             loc!!.longitude,
                                             outletObj.getDouble("latitude"),
                                             outletObj.getDouble("longitude")
-                                        )
+                                        ),
+                                        null
                                     )
 
                                     shopList!!.add(shops)
