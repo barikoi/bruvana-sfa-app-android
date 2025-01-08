@@ -57,7 +57,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
     var mContext: Context? = null
     var queue: RequestQueue? = null
     var appDatabase: AppDatabase? = null
-    private var listener: OnEditOrderListener? = null
+    private lateinit var listener: OnEditOrderListener
     val orderList: ArrayList<OrderList> = ArrayList()
     lateinit var adapter: ConfirmOrderListAdapter
 
@@ -73,6 +73,11 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         downloadChalan = mView.findViewById(R.id.btndownloadChalan)
         recylerView = mView.findViewById(R.id.orderListView)
         progressBar = mView.findViewById(R.id.progressBar2)
+
+
+        listener = this
+        adapter = ConfirmOrderListAdapter(listener, "confirm")
+
         confirmOrder!!.setOnClickListener {
             ViewUtils.viewDialog(mContext!!,
                 mContext!!.resources.getString(R.string.confirm_order_dialog),
@@ -91,16 +96,16 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         }
 
         downloadChalan!!.setOnClickListener {
-            if (orderList.size > 0) {
+            if (orderList.isNotEmpty()) {
                 var orderIDs = ""
                 for (i in 0 until orderList.size) {
-                    if (orderIDs.length == 0) {
+                    if (orderIDs.isEmpty()) {
                         orderIDs = orderList[i].orderId
                     } else {
                         orderIDs = orderIDs + "," + orderList[i].orderId
                     }
                 }
-                if (orderIDs.length > 0) {
+                if (orderIDs.isNotEmpty()) {
                     ApiServices.apiGETInputStream(
                         Api.get_chalan_download + "?order_no=" + orderIDs,
                         mContext!!,
@@ -177,7 +182,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
                         }
                     } catch (e: Exception) {
-                        //progressBar.visibility = View.GONE
                         e.printStackTrace()
                     }
                 }
@@ -207,17 +211,14 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentConfirmOrderBinding.inflate(inflater, container, false)
-        return  binding.root
+        return binding.root
     }
 
     private fun createOrder() {
-        if (orderList.size > 0) {
-            val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val today = df.format(Calendar.getInstance().time)
+        if (orderList.isNotEmpty()) {
             val cal = Calendar.getInstance()
             cal.time = Calendar.getInstance().time
             cal.add(Calendar.DATE, 1)
-            val nextDay = df.format(cal.time)
 
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
@@ -227,14 +228,9 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 orderObj.put("order_no", orderList[i].orderId)
                 orderObj.put("user_id", user_id)
                 orderObj.put("employee_id", sr_id)
-                /*orderObj.put("ordered_at", today)*/
-                /*orderObj.put("delivered_at", nextDay)*/
-                /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
                 orderObj.put("total_ordered_amount", orderList[i].grandTotal)
                 orderObj.put("total_ordered_quantity", orderList[i].totalQuantity)
                 orderObj.put("order_status", "PENDING")
-                /*orderObj.put("longitude", orderList[i].longitude)
-                orderObj.put("latitude", orderList[i].latitude)*/
                 val brandsArray = JSONArray()
                 val brandList = orderList[i].brands_array
                 for (j in 0 until brandList.size) {
@@ -338,17 +334,14 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         listener = this
         ACTIVITY = context as MainActivity
         mCallback = this
-
     }
 
     override fun onEdit(order: OrderList) {
         editor!!.putString(Api.SELECTED_SHOP_ID, order.outletId)
         editor!!.commit()
-        val frag: CreateOrderFragment? = this.parentFragment as CreateOrderFragment?
         CreateOrderFragment.startFragmentWithValue(
             "Order",
             order,
-            /*ProductSelectFragment(),*/
             SelectDokanFragment(),
             ACTIVITY
         )
@@ -441,9 +434,7 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
 
         recylerView.apply {
-            adapter = ConfirmOrderListAdapter(orderList, listener!!, "confirm")
-            recylerView!!.adapter = adapter
-            adapter.notifyDataSetChanged()
+            adapter.updateList(orderList)
         }
     }
 

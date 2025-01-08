@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.Order_Create.Adapter
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.text.SpannableString
@@ -28,16 +29,24 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ConfirmOrderListAdapter(
-    var mValues: List<OrderList>,
     var mListener: OnEditOrderListener,
     var from: String
 ) : RecyclerView.Adapter<ConfirmOrderListAdapter.ViewHolder>(), Filterable {
-    var orderList: List<OrderList> = mValues
+    var mValues: List<OrderList> = emptyList()
+    var orderList: List<OrderList> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.single_confirm_order_view, parent, false)
         return ViewHolder(v)
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(orderList: List<OrderList>) {
+        this.orderList = orderList
+        mValues = orderList
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -47,7 +56,7 @@ class ConfirmOrderListAdapter(
         holder.shopName.text = orderList[position].outletName
         holder.subTotal.text = dformat.format(orderList[position].grandTotal.toDouble()).toString()
 
-        if (orderList[position].brands_array.size > 0) {
+        if (orderList[position].brands_array.isNotEmpty()) {
             val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
@@ -108,7 +117,7 @@ class ConfirmOrderListAdapter(
                 )
                 builder.append(strDistance)
             }
-            holder.orderAt.setText(builder)
+            holder.orderAt.text = builder
         } else {
             holder.orderAt.visibility = View.GONE
         }
@@ -190,18 +199,13 @@ class ConfirmOrderListAdapter(
                 if (charString.isEmpty()) {
                     orderList = mValues
                 } else {
-                    //val filteredList: ArrayList<RetailShops> = ArrayList<RetailShops>()
                     for (row in mValues) {
-
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
                         if (row.outletName.toLowerCase()
                                 .contains(charString.lowercase(Locale.getDefault()))
                         ) {
                             filteredList.add(row)
                         }
                     }
-                    //itemList = filteredList
                 }
                 val filterResults = FilterResults()
                 filterResults.values = filteredList
