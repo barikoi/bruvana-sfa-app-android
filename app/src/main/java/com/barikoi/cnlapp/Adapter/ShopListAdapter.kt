@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.Adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,10 +8,12 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnEditShopListener
+import com.barikoi.cnlapp.utils.Constants
 import java.util.Locale
 
 class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener) :
@@ -26,11 +29,19 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ShopListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setIsRecyclable(false)
+        if (!Constants.shopType.contains(shopList[position].shop_type)) {
+            holder.itemView.backgroundTintList =
+                ContextCompat.getColorStateList(holder.itemView.context, R.color.required_field)
+
+        } else {
+            holder.itemView.backgroundTintList =
+                ContextCompat.getColorStateList(holder.itemView.context, R.color.white)
+        }
+
         holder.shopName.text = shopList[position].shop_name
         holder.address.text = shopList[position].address
-        /*holder.shopState.text = shopList[position].state*/
         if (shopList[position].state.equals("active", true)) {
             holder.shopState.visibility = View.VISIBLE
         } else {
@@ -38,9 +49,11 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         }
         if (!shopList[position].shop_code.equals("null")) holder.shopCode.text =
             shopList[position].shop_code
-        if (!shopList[position].category.equals("null")) holder.shopCategory.text =
-            holder.itemView.context.getString(R.string.category_, shopList[position].category)
-        else holder.shopCategory.text = holder.itemView.context.getString(R.string.category_, "")
+
+//        if (!shopList[position].category.equals("null")) holder.shopCategory.text =
+//            holder.itemView.context.getString(R.string.category_, shopList[position].category)
+//        else holder.shopCategory.text = holder.itemView.context.getString(R.string.category_, "")
+
         holder.shopType.text = shopList[position].shop_type
         holder.territoryName.text = shopList[position].territory_name
 
@@ -53,7 +66,6 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         holder.btnEdit.setOnClickListener {
             mListener.onEdit(shopList[position])
         }
-
     }
 
     override fun getItemCount(): Int {
@@ -97,12 +109,8 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
                 if (charString.isEmpty()) {
                     shopList = mValues
                 } else {
-                    //val filteredList: ArrayList<RetailShops> = ArrayList<RetailShops>()
                     for (row in mValues) {
-
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
-                        if (row.shop_name.toLowerCase()
+                        if (row.shop_name.lowercase(Locale.ROOT)
                                 .contains(charString.lowercase(Locale.getDefault()))
                         ) {
                             filteredList.add(row)
@@ -114,6 +122,7 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
                 return filterResults
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun publishResults(constraint: CharSequence, results: FilterResults) {
                 shopList = results.values as List<Shops>
                 notifyDataSetChanged()

@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NoConnectionError
@@ -35,6 +36,9 @@ import com.barikoi.cnlapp.utils.MoreSpinner
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import com.barikoi.cnlapp.databinding.FragmentShopListBinding
+import com.barikoi.cnlapp.utils.AppLogger
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.sentry.Sentry
 import org.json.JSONArray
 import org.json.JSONException
@@ -161,6 +165,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         ActivityResultContracts.StartActivityForResult(),
         ActivityResultCallback<ActivityResult> { result ->
             if (result.resultCode == 55) {
+                progressBar2!!.isVisible = true
                 getShopList(RouteActivity.userId!!)
             }
         }
@@ -182,7 +187,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
         fun getShopList(userId: String) {
             allRouteList!!.clear()
-            //progressBar2!!.visibility = View.VISIBLE
             queue = RequestQueueSingleton.getInstance(mContext).getRequestQueue()
             routesList!!.clear()
             val request = StringRequest(
@@ -239,12 +243,16 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                 val market_opportunity = outlet.getString("market_opportunity")
                                 val contact_number = outlet.getString("phone_number")
                                 val is_buyer = outlet.getInt("is_buyer")
-                                /*val distributor_office = outlet.getString("distributor_office")
-                                val distributor_office_code = outlet.getString("distributor_office_code")*/
                                 val latitude = outlet.getDouble("latitude")
                                 val longitude = outlet.getDouble("longitude")
                                 val is_Verified = outlet.getInt("is_verified")
-                                /*val last_order_date = outlet.getString("order_delivery_date")*/
+
+                                val competitive: List<String>? = Gson().fromJson(
+                                    outlet.getString("competitive_products"),
+                                    object : TypeToken<List<String>>() {}.type
+                                )
+
+                                AppLogger.log("competitive:: ${competitive}")
 
                                 shopList!!.add(
                                     Shops(
@@ -262,15 +270,14 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                         is_buyer,
                                         imageUrl,
                                         imageList,
-                                        /*distributor_office,
-                                        distributor_office_code,*/
                                         territory_name,
                                         latitude,
                                         longitude,
                                         route_id,
                                         route_name,
                                         "",
-                                        is_Verified, 0, 0, 0.0f
+                                        is_Verified, 0, 0, 0.0f,
+                                        competitive
                                     )
                                 )
                             }
@@ -314,7 +321,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                     Log.d("error", error.toString())
                     progressBar2!!.visibility = View.GONE
                     if (error is TimeoutError) {
-                        //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
                         Toast.makeText(
                             mContext,
                             "Request timeout!! Check your internet connection or Contact Admin",
@@ -334,15 +340,12 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             val s = String(error.networkResponse.data)
                             Log.d("Verify", "message: $s")
                             val data = JSONObject(s)
-                            //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                            //mListerner.onFailure(data.getString("message"))
                             Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
                                 .show()
                         } catch (e: UnsupportedEncodingException) {
                             e.printStackTrace()
                             Sentry.captureException(e)
                         } catch (e: JSONException) {
-                            //mListerner.onFailure(e.message)
                             Sentry.captureException(e)
                             Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
                             e.printStackTrace()
@@ -362,16 +365,13 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
     override fun onResume() {
         super.onResume()
-        //getShopList(userId!!)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        //queue = RequestQueueSingleton.getInstance(context).getRequestQueue()
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
-        //token = prefs.getString("token", "")
         userId = prefs!!.getString(Api.USER_ID, "")
         mContext = context
         listener = this
