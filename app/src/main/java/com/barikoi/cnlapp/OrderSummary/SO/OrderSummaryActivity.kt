@@ -39,8 +39,8 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var queue: RequestQueue? = null
-    var listener: OnEditOrderListener? = null
-    private var adapter: ConfirmOrderListAdapter? = null
+    lateinit var listener: OnEditOrderListener
+    private lateinit var adapter: ConfirmOrderListAdapter
     var StartDate: String? = null
     var EndDate: String? = null
 
@@ -59,22 +59,14 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
         route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
 
         listener = this
-        if (route_id!!.length > 0) {
+        adapter = ConfirmOrderListAdapter(listener, "summary")
+
+
+        if (route_id!!.isNotEmpty()) {
             setDateFilter()
             binding.noRouteCheck.visibility = View.GONE
             binding.bodyLayout.visibility = View.VISIBLE
         } else {
-            //setDateFilter()
-            /*ViewUtils.viewDialogResponse(applicationContext, resources.getString(R.string.no_route_selected_today), object : DialogListener{
-                override fun onConfirmed() {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onCanceled() {
-                    TODO("Not yet implemented")
-                }
-
-            })*/
             binding.progressBar.visibility = View.GONE
             binding.noRouteCheck.visibility = View.VISIBLE
             binding.bodyLayout.visibility = View.GONE
@@ -93,8 +85,8 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
             }
 
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                adapter!!.filter.filter(s)
-                if (s!!.length == 0) {
+                adapter.filter.filter(s)
+                if (s!!.isEmpty()) {
                     getAllOrders(Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING, DELIVERED")
                 }
             }
@@ -126,7 +118,7 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        binding. dateRangeLayout.setOnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
             binding.dateRangeLayout.setEnabled(false)
         }
@@ -152,7 +144,11 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener {
+            binding.dateRangeLayout.setEnabled(
+                true
+            )
+        }
 
         getAllOrders(Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING, DELIVERED")
     }
@@ -172,7 +168,6 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                         val orderArray = obj.getJSONArray("orders")
                         if (orderArray.length() > 0) {
                             for (i in 0 until orderArray.length()) {
-                                //productItems.clear()
                                 val orderObj = orderArray.getJSONObject(i)
                                 val brandArray = orderObj.getJSONArray("products")
                                 binding.tvRouteName.text = orderObj.getString("route_name")
@@ -217,7 +212,6 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                                             orderObj.getString("outlet_name"),
                                             orderObj.getString("route_id"),
                                             orderObj.getString("route_name"),
-                                            /*orderObj.getString("distributor_office_code"),*/
                                             orderObj.getString("total_delivered_amount"),
                                             orderObj.getString("total_delivered_quantity"),
                                             orderObj.getString("latitude"),
@@ -266,7 +260,6 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                                             orderObj.getString("outlet_name"),
                                             orderObj.getString("route_id"),
                                             orderObj.getString("route_name"),
-                                            /*orderObj.getString("distributor_office_code"),*/
                                             orderObj.getString("total_ordered_amount"),
                                             orderObj.getString("total_ordered_quantity"),
                                             orderObj.getString("latitude"),
@@ -281,12 +274,7 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
                         itemList.sortByDescending {
                             it.orderId
                         }
-
-                        adapter = ConfirmOrderListAdapter(itemList, listener!!, "summary")
-                        binding.orderList.adapter = adapter
-                        adapter!!.notifyDataSetChanged()
-
-
+                        adapter.updateList(itemList)
                     }
                 } catch (e: Exception) {
                     binding.progressBarOrder.visibility = View.GONE
