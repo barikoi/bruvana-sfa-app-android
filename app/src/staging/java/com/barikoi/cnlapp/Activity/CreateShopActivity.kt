@@ -5,17 +5,18 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.OnMultiChoiceClickListener
 import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.preference.PreferenceManager
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -23,22 +24,28 @@ import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.ActivityCreateShopBinding
-import com.barikoi.cnlapp.utils.*
-import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.databinding.DialogConfirmBinding
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
+import com.barikoi.cnlapp.utils.*
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.extension.setHapticClickListener
+import com.barikoi.cnlapp.utils.extension.toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -48,6 +55,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.gson.Gson
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -62,13 +70,13 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
 import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.maps.*
+import com.onesignal.common.AndroidSupportV4Compat.ContextCompat
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -106,6 +114,27 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
+    val competitiveArray: Array<String> = arrayOf(
+        "Nutella",
+        "Nocilla",
+        "Chocomo",
+        "Cadbury/Kitkat/Snickers",
+        "Super Kid",
+        "Choco Stix",
+        "Pran chocolate (bar) -Treat & Choco Lord",
+        "Ispi",
+        "Tang",
+        "Taste Me",
+        "Sajeeb Tang",
+        "Foster Clark",
+        "Fruity",
+        "Other Tasty Saline"
+    )
+
+
+    var competitiveList: MutableList<String> = mutableListOf()
+    val selectedCompetitive = BooleanArray(competitiveArray.size)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -122,17 +151,17 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         appDatabase = ImageDatabase.getInstance(applicationContext)
 
         val gd = GradientDrawable()
-        gd.setColor(resources.getColor(R.color.white))
+        gd.setColor(ContextCompat.getColor(this, R.color.white))
         gd.cornerRadius = 10f
-        gd.setStroke(2, resources.getColor(R.color.required_field))
+        gd.setStroke(2, ContextCompat.getColor(this, R.color.required_field))
 
-        binding.spinnerLayoutRoutes.setBackgroundDrawable(gd)
-        //binding.imagepickerLayout.setBackgroundDrawable(gd)
-        binding.etShopName.setBackgroundDrawable(gd)
-        binding.spinnerLayoutType.setBackgroundDrawable(gd)
-        binding.spinnerLayoutCategory.setBackgroundDrawable(gd)
-        binding.etAddress.setBackgroundDrawable(gd)
-        binding.etOwnerName.setBackgroundDrawable(gd)
+        binding.spinnerLayoutRoutes.background = gd
+        binding.etShopName.background = gd
+        binding.spinnerLayoutType.background = gd
+        binding.spinnerLayoutCategory.background = gd
+        binding.etAddress.background = gd
+        binding.etOwnerName.background = gd
+
         if (userType.equals("TO", true)) {
             binding.isVerified.visibility = View.VISIBLE
         } else {
@@ -140,25 +169,28 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
         if (intent.hasExtra("fromEdit")) {
             binding.btnUpdateShop.visibility = View.VISIBLE
+            binding.btnCloseShop.isVisible = true
             binding.btnSubmitShop.visibility = View.GONE
             binding.tvTitle.text = resources.getString(R.string.update_shop_information)
             shops = intent.getSerializableExtra("fromEdit") as Shops
+            AppLogger.log("SHOP:: $shops")
             getShopDetails(shops!!)
         } else {
             binding.btnUpdateShop.visibility = View.GONE
+            binding.btnCloseShop.isVisible = false
             binding.btnSubmitShop.visibility = View.VISIBLE
             binding.tvTitle.text = resources.getString(R.string.new_shop_creation)
         }
-        binding.imagepicker.taskId = "taskId"
-        binding.imagepicker.CAMERA = 4
-        binding.imagepicker.setMainActivity(this@CreateShopActivity)
-        binding.imagepicker.setCameraLauncher(startCamera)
+        binding.imagePicker.taskId = "taskId"
+        binding.imagePicker.CAMERA = 4
+        binding.imagePicker.setMainActivity(this@CreateShopActivity)
+        binding.imagePicker.setCameraLauncher(startCamera)
 
         routesList = intent.getStringArrayListExtra("routes")
         routeNameList =
             intent.getParcelableArrayListExtra<Parcelable>("routeList") as ArrayList<Pair<String, String>>
 
-        if (routesList!!.size > 0) {
+        if (routesList!!.isNotEmpty()) {
             routesList!!.add(0, resources.getString(R.string.select_route))
             routeNameList!!.add(
                 0, Pair(
@@ -210,10 +242,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     val target = mMap!!.cameraPosition.target
                     latitude = target?.latitude
                     longitude = target?.longitude
-                    var dformat = DecimalFormat("#.#####")
                     if (latitude!! > 0.0 && longitude!! > 0.0) {
-                        binding.etLatitude.setText(dformat.format(latitude).toString())
-                        binding.etLongitude.setText(dformat.format(longitude).toString())
                         reverseGeoAddress(applicationContext, latitude!!, longitude!!)
                     }
                     dialog.dismiss()
@@ -245,16 +274,39 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.btnUpdateShop.isEnabled = false
             updateShop()
         }
+
+        binding.btnCloseShop.setHapticClickListener {
+            if (!isImageAdded) {
+                toast("Please add image for close the shop")
+                return@setHapticClickListener
+            }
+            confirmDialog(true)
+        }
+
+        binding.ivCompetitorSelection.setHapticClickListener {
+            showAlertDialog()
+        }
+
+        binding.etCompetitor.doOnTextChanged { text, start, before, count ->
+
+        }
     }
 
     private fun getShopDetails(shops: Shops) {
-
         binding.etShopName.setText(shops.shop_name)
         binding.etAddress.setText(shops.address)
         binding.etOwnerName.setText(shops.shop_owner)
         binding.etContactNumber.setText(shops.contact_number)
-        binding.etLatitude.setText(shops.latitude.toString())
-        binding.etLongitude.setText(shops.longitude.toString())
+        binding.etCompetitor.setText(shops.competitive?.joinToString(", "))
+
+        if (shops.competitive != null && shops.competitive.isNotEmpty()) {
+            competitiveList = shops.competitive.toMutableList()
+
+            competitiveArray.mapIndexed { index, s ->
+                selectedCompetitive[index] = competitiveList.contains(s)
+            }
+        }
+
         latitude = shops.latitude
         longitude = shops.longitude
         inputVerified = shops.isVerified
@@ -265,7 +317,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.isVerified.isChecked = false
         }
 
-        if (shops.imageArray.size > 0) {
+        if (shops.imageArray.isNotEmpty()) {
             generateImages(shops.imageArray)
         }
     }
@@ -322,10 +374,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun getImageFromDB() {
         appDatabase!!.imagesDao()!!.deleteAllImages()
-        var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
+        var imageList: ArrayList<Images?>? = ArrayList()
         imageList =
-            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as java.util.ArrayList<Images?>?
-        if (imageList!!.size > 0) {
+            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
+        if (imageList!!.isNotEmpty()) {
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
                 val fileExist: Boolean = File(dbPhotoPath).canRead()
@@ -334,8 +386,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     binding.imageCounter.visibility = View.VISIBLE
                     binding.imageCounter.text = (imageList.size).toString() + " Photos Added"
                     try {
-                        var bitmap = binding.imagepicker.getRotateImage(dbPhotoPath)
-                        binding.imagepicker.setLocalImage(
+                        var bitmap = binding.imagePicker.getRotateImage(dbPhotoPath)
+                        binding.imagePicker.setLocalImage(
                             bitmap,
                             dbPhotoPath,
                             imageList[p]!!.position,
@@ -368,32 +420,27 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             if (result.getResultCode() == RESULT_CANCELED) {
                 if (filePath != null) {
                     Log.d("Image", "Canceled: $filePath")
-                    binding.imagepicker.deleteFileLocal(filePath)
+                    binding.imagePicker.deleteFileLocal(filePath)
                     editor!!.putString(ApiCall.IMAGE_PATH, "")
                     editor!!.apply()
                 }
             }
             if (result.getResultCode() == RESULT_OK) {
-                Log.e("imageUtils", "OnActivity result code 1: " + RESULT_OK)
+                Log.e("imageUtils", "OnActivity result code 1: $RESULT_OK")
                 var imagePosition = 0
-                var imageList: java.util.ArrayList<Images?>? = java.util.ArrayList()
+                var imageList: ArrayList<Images?>? = ArrayList()
                 imageList = appDatabase!!.imagesDao()!!
-                    .getAllImageDB("Shop") as java.util.ArrayList<Images?>?
+                    .getAllImageDB("Shop") as ArrayList<Images?>?
                 binding.imageCounter.visibility = View.VISIBLE
                 binding.imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
-                /*if (imageList!!.size > 0){
-                    binding.imageCounter.visibility = View.VISIBLE
-                    binding.imageCounter.text = (imageList.size+1).toString() + " Photos Added"
-                }else{
-                    binding.imageCounter.visibility = View.GONE
-                }*/
+
                 Log.d("Imagepos", "List: $imageList")
-                imagePosition = if (imageList!!.size > 0) {
+                imagePosition = if (imageList.isNotEmpty()) {
                     imageList[imageList.size - 1]!!.position + 1
                 } else {
                     imagePosition + 1
                 }
-                binding.imagepicker.addNewImage(
+                binding.imagePicker.addNewImage(
                     result.data,
                     CAMERA,
                     imagePosition,
@@ -431,10 +478,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     if (response != null) {
                         try {
                             val data = JSONObject(response)
-                            var routeNameList: java.util.ArrayList<Pair<String, String>>? =
+                            var routeNameList: ArrayList<Pair<String, String>>? =
                                 ArrayList()
                             if (data.has("routes") && !data.isNull("routes")) {
-                                val routesList = java.util.ArrayList<String>()
+                                val routesList = ArrayList<String>()
                                 val routesArray = data.getJSONArray("routes")
                                 if (routesArray.length() > 0) {
                                     routeNameList!!.add(
@@ -477,12 +524,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                                     ) as TextView
                                                     //set the color of first item in the drop down list to gray
                                                     if (position == 0) {
-                                                        view.setTextColor(resources.getColor(R.color.text_title_2))
+                                                        view.setTextColor(
+                                                            ContextCompat.getColor(
+                                                                this@CreateShopActivity,
+                                                                R.color.text_title_2
+                                                            )
+                                                        )
                                                         view.visibility = View.GONE
                                                     } else {
                                                         //here it is possible to define color for other items by
                                                         //view.setTextColor(Color.RED)
-                                                        view.setTextColor(resources.getColor(R.color.black))
+                                                        view.setTextColor(
+                                                            ContextCompat.getColor(
+                                                                this@CreateShopActivity,
+                                                                R.color.black
+                                                            )
+                                                        )
                                                     }
                                                     return view
                                                 }
@@ -501,7 +558,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                                     if (p2 > 0) {
                                                         val view1: TextView =
                                                             p0!!.getChildAt(0) as TextView
-                                                        view1.setTextColor(resources.getColor(R.color.black))
+                                                        view1.setTextColor(
+                                                            ContextCompat.getColor(
+                                                                this@CreateShopActivity,
+                                                                R.color.black
+                                                            )
+                                                        )
                                                         if (routeNameList[p2].first.length > 0) {
                                                             selectedRoute = routeNameList[p2].first
                                                         } else {
@@ -510,7 +572,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                                     } else {
                                                         val view1: TextView =
                                                             p0!!.getChildAt(0) as TextView
-                                                        view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                        view1.setTextColor(
+                                                            ContextCompat.getColor(
+                                                                this@CreateShopActivity,
+                                                                R.color.text_title_2
+                                                            )
+                                                        )
                                                         selectedRoute = ""
                                                     }
                                                 }
@@ -534,11 +601,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
@@ -577,12 +642,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         ) as TextView
                         //set the color of first item in the drop down list to gray
                         if (position == 0) {
-                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                            view.setTextColor(
+                                ContextCompat.getColor(
+                                    this@CreateShopActivity,
+                                    R.color.text_title_2
+                                )
+                            )
                             view.visibility = View.GONE
                         } else {
                             //here it is possible to define color for other items by
                             //view.setTextColor(Color.RED)
-                            view.setTextColor(resources.getColor(R.color.black))
+                            view.setTextColor(
+                                ContextCompat.getColor(
+                                    this@CreateShopActivity,
+                                    R.color.black
+                                )
+                            )
                         }
                         return view
                     }
@@ -619,7 +694,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                             if (p0.childCount > 0) {
                                 if (p2 > 0) {
                                     val view1: TextView = p0.getChildAt(0) as TextView
-                                    view1.setTextColor(resources.getColor(R.color.black))
+                                    view1.setTextColor(
+                                        ContextCompat.getColor(
+                                            this@CreateShopActivity,
+                                            R.color.black
+                                        )
+                                    )
                                     if (routeNameList[p2].first.length > 0) {
                                         selectedRoute = routeNameList[p2].first
                                     } else {
@@ -627,7 +707,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                     }
                                 } else {
                                     val view1: TextView = p0.getChildAt(0) as TextView
-                                    view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                    view1.setTextColor(
+                                        ContextCompat.getColor(
+                                            this@CreateShopActivity,
+                                            R.color.text_title_2
+                                        )
+                                    )
                                     selectedRoute = ""
                                 }
                             }
@@ -688,12 +773,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         ) as TextView
                                         //set the color of first item in the drop down list to gray
                                         if (position == 0) {
-                                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                                            view.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.text_title_2
+                                                )
+                                            )
                                             view.visibility = View.GONE
                                         } else {
                                             //here it is possible to define color for other items by
                                             //view.setTextColor(Color.RED)
-                                            view.setTextColor(resources.getColor(R.color.black))
+                                            view.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.black
+                                                )
+                                            )
                                         }
                                         return view
                                     }
@@ -710,11 +805,21 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         ) {
                                             if (p2 > 0) {
                                                 val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(resources.getColor(R.color.black))
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.black
+                                                    )
+                                                )
                                                 selectedShopType = typeList[p2]
                                             } else {
                                                 val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.text_title_2
+                                                    )
+                                                )
                                                 selectedShopType = ""
                                             }
                                         }
@@ -726,12 +831,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                     }
 
                                 if (shops != null) {
-                                    if (shops!!.shop_type.length > 0) {
-                                        val pos =
-                                            (binding.spinnerShopType.adapter as ArrayAdapter<String>).getPosition(
-                                                shops!!.shop_type
-                                            )
-                                        if (pos > -1) {
+                                    typeList.mapIndexed { pos, s ->
+                                        if (shops!!.shop_type.trim() == s.trim()) {
                                             binding.spinnerShopType.setSelection(pos)
                                         }
                                     }
@@ -765,7 +866,71 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         })
     }
 
+    private fun showAlertDialog() {
+        val builder = AlertDialog.Builder(this@CreateShopActivity)
+        builder.setTitle("Select Competitor")
+        builder.setCancelable(false)
+
+        builder.setMultiChoiceItems(
+            competitiveArray,
+            selectedCompetitive,
+            object : OnMultiChoiceClickListener {
+                override fun onClick(
+                    dialogInterface: DialogInterface?,
+                    i: Int,
+                    isChecked: Boolean
+                ) {
+                    if (isChecked) {
+                        competitiveList.add(competitiveArray[i])
+                        selectedCompetitive[i] = true
+                    } else {
+                        competitiveList.remove(competitiveArray[i])
+                        selectedCompetitive[i] = false
+                    }
+                }
+            })
+
+        builder.setPositiveButton("OK", object : DialogInterface.OnClickListener {
+            override fun onClick(dialogInterface: DialogInterface?, i: Int) {
+                val stringBuilder = StringBuilder()
+                var etDataList =
+                    binding.etCompetitor.text.toString().split(Regex(",\\s*")).toMutableList()
+                val rowData: MutableList<String> = mutableListOf()
+                etDataList.map { et ->
+                    if (!competitiveArray.contains(et)) {
+                        rowData.add(et)
+                    }
+                }
+                if (!rowData.isEmpty()) {
+                    stringBuilder.append(rowData.joinToString(", "))
+                    if (rowData[0].isNotEmpty())
+                        stringBuilder.append(", ")
+                }
+
+                if (binding.etCompetitor.text.isEmpty() || binding.etCompetitor.text.endsWith(",")) {
+                    stringBuilder.append(competitiveList.joinToString(", "))
+                } else {
+                    stringBuilder.append(competitiveList.joinToString(", "))
+                }
+
+                val uniqueList = stringBuilder.split(Regex(",\\s*")).distinct()
+
+                AppLogger.log("Unique List: $uniqueList")
+
+                binding.etCompetitor.setText(uniqueList.joinToString(", "))
+            }
+        })
+
+        builder.setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
+            override fun onClick(dialogInterface: DialogInterface, i: Int) {
+                dialogInterface.dismiss()
+            }
+        })
+        builder.show()
+    }
+
     fun getShopCategory() {
+        return
         ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 if (response != null) {
@@ -782,7 +947,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
                                 val shopCategoryAdapter = object : ArrayAdapter<String>(
                                     applicationContext,
-                                    android.R.layout.simple_spinner_item, categoryList
+                                    android.R.layout.simple_spinner_dropdown_item, categoryList
                                 ) {
                                     override fun isEnabled(position: Int): Boolean {
                                         return position != 0
@@ -800,12 +965,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         ) as TextView
                                         //set the color of first item in the drop down list to gray
                                         if (position == 0) {
-                                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                                            view.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.text_title_2
+                                                )
+                                            )
                                             view.visibility = View.GONE
                                         } else {
                                             //here it is possible to define color for other items by
                                             //view.setTextColor(Color.RED)
-                                            view.setTextColor(resources.getColor(R.color.black))
+                                            view.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.black
+                                                )
+                                            )
                                         }
                                         return view
                                     }
@@ -822,11 +997,21 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         ) {
                                             if (p2 > 0) {
                                                 val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(resources.getColor(R.color.black))
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.black
+                                                    )
+                                                )
                                                 selectedCategory = categoryList[p2]
                                             } else {
                                                 val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.text_title_2
+                                                    )
+                                                )
                                                 selectedCategory = ""
                                             }
                                         }
@@ -834,15 +1019,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         override fun onNothingSelected(p0: AdapterView<*>?) {
 
                                         }
-
                                     }
                                 if (shops != null) {
-                                    if (shops!!.category.length > 0) {
-                                        val pos =
-                                            (binding.spinnerCatOutlets.adapter as ArrayAdapter<String>).getPosition(
-                                                shops!!.category
-                                            )
-                                        if (pos > -1) {
+                                    categoryList.mapIndexed { pos, s ->
+                                        if (shops!!.category.trim() == s.trim()) {
                                             binding.spinnerCatOutlets.setSelection(pos)
                                         }
                                     }
@@ -857,11 +1037,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
 
             override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
             }
 
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
             }
 
             override fun onResponseFailure(error: VolleyError) {
@@ -874,6 +1052,31 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
 
         })
+    }
+
+    private fun confirmDialog(isClosedShop: Boolean) {
+        val dialogBinding = DialogConfirmBinding.inflate(LayoutInflater.from(this))
+
+        val dialog = Dialog(this)
+        dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogBinding.root)
+
+        dialogBinding.btnYes.setOnClickListener {
+            updateShop(isClosedShop)
+            dialog.dismiss()
+        }
+        dialogBinding.btnNo.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        val window = dialog.window
+        window!!.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
     }
 
     fun getMarketOpportunity() {
@@ -911,12 +1114,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         ) as TextView
                                         //set the color of first item in the drop down list to gray
                                         if (position == 0) {
-                                            view.setTextColor(resources.getColor(R.color.text_title_2))
+                                            view.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.text_title_2
+                                                )
+                                            )
                                             view.visibility = View.GONE
                                         } else {
                                             //here it is possible to define color for other items by
                                             //view.setTextColor(Color.RED)
-                                            view.setTextColor(resources.getColor(R.color.black))
+                                            view.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.black
+                                                )
+                                            )
                                         }
                                         return view
                                     }
@@ -933,12 +1146,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         ) {
                                             if (p2 > 0) {
                                                 val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(resources.getColor(R.color.black))
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.black
+                                                    )
+                                                )
                                                 selectedMarketOpportunity =
                                                     marketOpportunityList[p2]
                                             } else {
                                                 val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(resources.getColor(R.color.text_title_2))
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.text_title_2
+                                                    )
+                                                )
                                                 selectedMarketOpportunity = ""
                                             }
                                         }
@@ -950,7 +1173,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                     }
 
                                 if (shops != null) {
-                                    if (shops!!.market_opportunity.length > 0) {
+                                    if (shops!!.market_opportunity.isNotEmpty()) {
                                         val pos =
                                             (binding.spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(
                                                 shops!!.market_opportunity
@@ -970,11 +1193,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
 
             override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
+                throw NotImplementedError("This function is not implemented yet.")
             }
 
             override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
+                throw NotImplementedError("This function is not implemented yet.")
             }
 
             override fun onResponseFailure(error: VolleyError) {
@@ -1010,14 +1233,21 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             ): View {
                 val view: TextView =
                     super.getDropDownView(position, convertView, parent) as TextView
-                //set the color of first item in the drop down list to gray
                 if (position == 0) {
-                    view.setTextColor(resources.getColor(R.color.text_title_2))
+                    view.setTextColor(
+                        ContextCompat.getColor(
+                            this@CreateShopActivity,
+                            R.color.text_title_2
+                        )
+                    )
                     view.visibility = View.GONE
                 } else {
-                    //here it is possible to define color for other items by
-                    //view.setTextColor(Color.RED)
-                    view.setTextColor(resources.getColor(R.color.black))
+                    view.setTextColor(
+                        ContextCompat.getColor(
+                            this@CreateShopActivity,
+                            R.color.black
+                        )
+                    )
                 }
                 return view
             }
@@ -1028,7 +1258,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 > 0) {
                     val view1: TextView = p0!!.getChildAt(0) as TextView
-                    view1.setTextColor(resources.getColor(R.color.black))
+                    view1.setTextColor(
+                        ContextCompat.getColor(
+                            this@CreateShopActivity,
+                            R.color.black
+                        )
+                    )
 
                     if (p2 == 1) {
                         selectedBuyer = 1
@@ -1037,7 +1272,12 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     }
                 } else {
                     val view1: TextView = p0!!.getChildAt(0) as TextView
-                    view1.setTextColor(resources.getColor(R.color.text_title_2))
+                    view1.setTextColor(
+                        ContextCompat.getColor(
+                            this@CreateShopActivity,
+                            R.color.text_title_2
+                        )
+                    )
                     selectedBuyer = -1
                 }
             }
@@ -1050,7 +1290,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
         if (shops != null) {
             if (shops!!.is_buyer > -1) {
-                //val pos= (spinBuyer.adapter as ArrayAdapter<String>).getPosition(p.getRetailData()[0].is_buyer)
                 if (shops!!.is_buyer == 0) {
                     binding.spinnerBuyer.setSelection(2)
                 } else {
@@ -1063,37 +1302,37 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     fun createShop() {
         showProgress(binding.progressBarShop)
         var inputOk = true
-        if (binding.etShopName.text.trim().length == 0) {
+        if (binding.etShopName.text.trim().isEmpty()) {
             inputOk = false
-            binding.etShopName.setError(getString(R.string.this_field_is_required))
+            binding.etShopName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etAddress.text.trim().length == 0) {
+        if (binding.etAddress.text.trim().isEmpty()) {
             inputOk = false
-            binding.etAddress.setError(getString(R.string.this_field_is_required))
+            binding.etAddress.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etOwnerName.text.trim().length == 0) {
+        if (binding.etOwnerName.text.trim().isEmpty()) {
             inputOk = false
-            binding.etOwnerName.setError(getString(R.string.this_field_is_required))
+            binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (selectedRoute!!.length == 0) {
+        if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-        if (selectedShopType!!.length == 0) {
+        if (selectedShopType!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-        if (selectedCategory!!.length == 0) {
-            inputOk = false
-            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
-                .show()
-            hideProgress(binding.progressBarShop)
-        }
+//        if (selectedCategory!!.isEmpty()) {
+//            inputOk = false
+//            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
+//                .show()
+//            hideProgress(binding.progressBarShop)
+//        }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
@@ -1107,30 +1346,27 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
             var imagesList = ArrayList<Images>()
             imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
-            if (imagesList.size > 0) {
+            if (imagesList.isNotEmpty()) {
                 for (i in 0 until imagesList.size) {
                     val fileExist = File(imagesList[i].filePath).canRead()
                     if (fileExist) {
                         val imagename = imagesList[i].filePath.substring(
                             imagesList[i].filePath.lastIndexOf("/")
                         )
-                        byteparams["images[" + i + "]"] = VolleyMultipartRequest.DataPart(
+                        byteparams["images[$i]"] = VolleyMultipartRequest.DataPart(
                             imagename, ImageUtils.decodeFile(imagesList[i].filePath), "image/jpeg"
                         )
                     }
                 }
             }
-            val params: MutableMap<String, String> = java.util.HashMap()
+            val params: MutableMap<String, String> = HashMap()
             params["outlet_name"] = URLEncoder.encode(binding.etShopName.text.toString(), "utf-8")
             params["outlet_type"] = selectedShopType!!
-            params["outlet_category"] = selectedCategory!!
             params["address"] = URLEncoder.encode(binding.etAddress.text.toString(), "utf-8")
             params["owner_name"] = URLEncoder.encode(binding.etOwnerName.text.toString(), "utf-8")
             if (binding.etContactNumber.text.trim().length > 0) params["phone_number"] =
                 URLEncoder.encode(binding.etContactNumber.text.toString(), "utf-8")
-            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] =
-                selectedMarketOpportunity!!
-            if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
+
             params["outlet_created_at"] = today
             params["created_by_user_id"] = userId!!
             params["created_by_employee_id"] = srId!!
@@ -1138,6 +1374,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
+            params["competitive_products"] =
+                Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
             if (isImageAdded) {
                 ApiServices.apiPOSTMultipart(
@@ -1152,7 +1390,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         }
 
                         override fun onJSONResponseSuccess(response: JSONObject) {
-                            TODO("Not yet implemented")
                         }
 
                         override fun onNetworkResponseSuccess(response: NetworkResponse) {
@@ -1172,7 +1409,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                         }
 
                                         override fun onCanceled() {
-                                            TODO("Not yet implemented")
                                         }
 
                                     })
@@ -1186,7 +1422,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                             }
                         }
 
-                        @RequiresApi(Build.VERSION_CODES.KITKAT)
                         override fun onResponseFailure(error: VolleyError) {
                             try {
                                 binding.btnSubmitShop.isEnabled = true
@@ -1242,40 +1477,40 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
     }
 
-    fun updateShop() {
+    fun updateShop(isClosedShop: Boolean = false) {
         showProgress(binding.progressBarShop)
         var inputOk = true
-        if (binding.etShopName.text.trim().length == 0) {
+        if (binding.etShopName.text.trim().isEmpty()) {
             inputOk = false
-            binding.etShopName.setError(getString(R.string.this_field_is_required))
+            binding.etShopName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etAddress.text.trim().length == 0) {
+        if (binding.etAddress.text.trim().isEmpty()) {
             inputOk = false
             binding.etAddress.setError(getString(R.string.this_field_is_required))
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etOwnerName.text.trim().length == 0) {
+        if (binding.etOwnerName.text.trim().isEmpty()) {
             inputOk = false
             binding.etOwnerName.setError(getString(R.string.this_field_is_required))
             hideProgress(binding.progressBarShop)
         }
-        if (selectedRoute!!.length == 0) {
+        if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-        if (selectedShopType!!.length == 0) {
+        if (selectedShopType!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-        if (selectedCategory!!.length == 0) {
-            inputOk = false
-            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
-                .show()
-            hideProgress(binding.progressBarShop)
-        }
+//        if (selectedCategory!!.isEmpty()) {
+//            inputOk = false
+//            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
+//                .show()
+//            hideProgress(binding.progressBarShop)
+//        }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
@@ -1289,7 +1524,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
             var imagesList = ArrayList<Images>()
             imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
-            if (imagesList.size > 0) {
+            if (imagesList.isNotEmpty()) {
                 for (i in 0 until imagesList.size) {
                     val fileExist = File(imagesList[i].filePath).canRead()
                     if (fileExist) {
@@ -1305,11 +1540,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     }
                 }
             }
-            val params: MutableMap<String, String> = java.util.HashMap()
+            val params: MutableMap<String, String> = HashMap()
             params["outlet_name"] = URLEncoder.encode(binding.etShopName.text.toString(), "utf-8")
             params["outlet_id"] = shops!!.shop_id
             params["outlet_type"] = selectedShopType!!
-            params["outlet_category"] = selectedCategory!!
             params["address"] = URLEncoder.encode(binding.etAddress.text.toString(), "utf-8")
             params["owner_name"] = URLEncoder.encode(binding.etOwnerName.text.toString(), "utf-8")
             if (binding.etContactNumber.text.trim().length > 0) params["phone_number"] =
@@ -1324,6 +1558,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
+            params["is_closed"] = if (isClosedShop) "1" else "0"
+            params["competitive_products"] =
+                Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
             ApiServices.apiPOSTMultipart(
                 Api.update_shop,
@@ -1357,7 +1594,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                     }
 
                                     override fun onCanceled() {
-                                        TODO("Not yet implemented")
                                     }
 
                                 })
@@ -1429,7 +1665,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         }
                         val city = place.getString("city")
                         val area = place.getString("area")
-                        //address[0] = jsonArray.getJSONObject(0).getString("Address");
                         binding.etAddress.setText(address + ", " + area + ", " + city)
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -1489,7 +1724,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                 17.0
                             )
                         } else {
-                            //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, null)
                             showEnableLocationSetting(this@CreateShopActivity)
                         }
                     }
@@ -1503,13 +1737,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     }
 
                 })
-
-
             }
         } else {
             permissionsManager = PermissionsManager(this@CreateShopActivity)
             permissionsManager!!.requestLocationPermissions(this@CreateShopActivity)
-            //showEnableLocationSetting(this@CreateShopActivity)
         }
     }
 
@@ -1538,7 +1769,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         999
                     )
                 } catch (sendEx: SendIntentException) {
-                    // Ignore the error.
                 }
             }
         }
@@ -1567,15 +1797,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             })
 
 
-        val uiSettings: UiSettings = mapboxMap!!.uiSettings
+        val uiSettings: UiSettings = mapboxMap.uiSettings
         uiSettings.setCompassEnabled(false)
-
-        /*try {
-            mapboxMap.style?.let { it1 -> enableLocation(it1) }
-        }catch (e: Exception){
-            e.printStackTrace()
-            Sentry.captureException(e)
-        }*/
 
         fab.setOnClickListener(View.OnClickListener {
             if (locationEngine != null) {
@@ -1611,7 +1834,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     }
 
                     override fun onFailure(exception: Exception) {
-                        TODO("Not yet implemented")
                     }
 
                 })

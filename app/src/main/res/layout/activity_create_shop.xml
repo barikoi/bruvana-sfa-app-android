@@ -40,8 +40,9 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:background="@android:color/transparent"
+                        android:contentDescription="@string/back"
                         android:src="@drawable/ic_back" />
 
 
@@ -57,10 +58,18 @@
                         android:textStyle="bold"
                         android:visibility="visible" />
 
+                    <ImageButton
+                        android:id="@+id/btnCloseShop"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/close"
+                        android:src="@drawable/ic_closed_shop" />
+
                 </RelativeLayout>
-
             </androidx.appcompat.widget.Toolbar>
-
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -72,11 +81,10 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp">
-
 
                 <RelativeLayout
                     android:id="@+id/spinnerLayoutRoutes"
@@ -122,18 +130,17 @@
                 </HorizontalScrollView>
 
                 <RelativeLayout
-                    android:id="@+id/imagepickerLayout"
+                    android:id="@+id/imagePickerLayout"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
                     android:layout_margin="8dp"
                     android:background="@drawable/cardview_bg_required">
 
                     <com.barikoi.cnlapp.imagecapture.ImageCapture
-                        android:id="@+id/imagepicker"
+                        android:id="@+id/imagePicker"
                         android:layout_width="match_parent"
                         android:layout_height="120dp"
                         android:visibility="visible" />
-
 
                     <TextView
                         android:id="@+id/imageCounter"
@@ -161,6 +168,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="4dp"
                     android:layout_weight="4"
+                    android:autofillHints="no"
                     android:background="@drawable/cardview_bg_required"
                     android:ems="10"
                     android:gravity="top"
@@ -208,7 +216,7 @@
                     android:paddingTop="8dp"
                     android:paddingRight="8dp"
                     android:paddingBottom="16dp"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerCatOutlets"
@@ -231,7 +239,7 @@
                     android:paddingTop="8dp"
                     android:paddingRight="8dp"
                     android:paddingBottom="16dp"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerMarketOpportunity"
@@ -254,7 +262,7 @@
                     android:paddingTop="8dp"
                     android:paddingRight="8dp"
                     android:paddingBottom="16dp"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <com.barikoi.cnlapp.utils.MoreSpinner
                         android:id="@+id/spinnerBuyer"
@@ -265,6 +273,74 @@
 
                 </RelativeLayout>
 
+                <RelativeLayout
+                    android:id="@+id/spinnerLayoutCompetitor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/cardview_bg"
+                    android:paddingHorizontal="@dimen/_15dp"
+                    android:paddingVertical="@dimen/_15dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/spinnerCompetitor"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:ellipsize="end"
+                        android:lines="1"
+                        android:text="@string/select_competitor"
+                        android:theme="@style/spinnerItemStyle"
+                        app:drawableEndCompat="@drawable/ic_arrow_drop_down"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/cardview_bg"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/_5dp"
+                    android:paddingEnd="@dimen/_5dp">
+
+                    <EditText
+                        android:id="@+id/etCompetitor"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:autofillHints="no"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:hint="@string/competitor_name"
+                        android:inputType="textMultiLine"
+                        android:maxLines="4"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="16dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/text_title"
+                        android:textColorHint="@color/text_title_2"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/ivCompetitorSelection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/competitor_selection"
+                        android:padding="@dimen/_10sdp"
+                        app:srcCompat="@drawable/ic_arrow_drop_down" />
+
+                </LinearLayout>
+
                 <EditText
                     android:id="@+id/etAddress"
                     android:layout_width="match_parent"
@@ -274,12 +350,13 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="4dp"
+                    android:autofillHints="no"
                     android:background="@drawable/cardview_bg_required"
                     android:enabled="false"
                     android:gravity="center_vertical"
                     android:hint="@string/address"
-                    android:maxLines="4"
                     android:inputType="textMultiLine"
+                    android:maxLines="4"
                     android:paddingStart="16dp"
                     android:paddingTop="16dp"
                     android:paddingEnd="8dp"
@@ -299,6 +376,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="4dp"
                     android:layout_weight="4"
+                    android:autofillHints="no"
                     android:background="@drawable/cardview_bg_required"
                     android:ems="10"
                     android:gravity="top"
@@ -323,6 +401,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="4dp"
                     android:layout_weight="4"
+                    android:autofillHints="no"
                     android:background="@drawable/cardview_bg"
                     android:backgroundTint="@color/white"
                     android:ems="10"
@@ -338,57 +417,6 @@
                     android:textColorHint="@color/text_title_2"
                     android:textSize="15sp" />
 
-                <EditText
-                    android:id="@+id/etLatitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_weight="4"
-                    android:background="@drawable/cardview_bg"
-                    android:backgroundTint="@color/white"
-                    android:ems="10"
-                    android:enabled="false"
-                    android:gravity="top"
-                    android:hint="@string/latitude"
-                    android:inputType="text"
-                    android:paddingStart="16dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="16dp"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/text_title"
-                    android:textColorHint="@color/text_title_2"
-                    android:textSize="15sp" />
-
-                <EditText
-                    android:id="@+id/etLongitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_weight="4"
-                    android:background="@drawable/cardview_bg"
-                    android:backgroundTint="@color/white"
-                    android:ems="10"
-                    android:enabled="false"
-                    android:gravity="top"
-                    android:hint="@string/longitude"
-                    android:inputType="text"
-                    android:paddingStart="16dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="16dp"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/text_title"
-                    android:textColorHint="@color/text_title_2"
-                    android:textSize="15sp" />
             </LinearLayout>
         </ScrollView>
 
@@ -397,12 +425,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/isVerified"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:gravity="start"
             android:paddingTop="10dp"
@@ -423,12 +449,12 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:button="@null"
-            android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
-            android:drawableTint="@color/cnl_color_2"
+            android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
             android:text="@string/verify_shop"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:drawableTint="@color/cnl_color_2" />
 
         <RelativeLayout
             android:id="@+id/buttonLayout"
@@ -501,9 +527,7 @@
             android:gravity="center_horizontal"
             android:text="@string/no_route_selected_today"
             android:textColor="@color/text_title"
-            android:textSize="17sp">
-
-        </TextView>
+            android:textSize="17sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tryAgain"
