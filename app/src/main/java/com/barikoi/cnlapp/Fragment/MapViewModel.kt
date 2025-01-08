@@ -10,17 +10,18 @@ import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
-import com.barikoi.cnlapp.data.remote.models.SocketUserResponse
-import com.barikoi.cnlapp.data.remote.repository.SocketRepository
+import com.barikoi.cnlapp.data.remote.models.TraceUserResponse
+import com.barikoi.cnlapp.data.remote.repository.TraceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val routeRepository: RouteRepository,
-    private val socketRepository: SocketRepository
+    private val traceRepository: TraceRepository
 ) : ViewModel() {
 
     private val _routeResponse = MutableLiveData<ApiState<RouteResponse>>()
@@ -39,46 +40,66 @@ class MapViewModel @Inject constructor(
     val socketGroupResponse: LiveData<ApiState<SocketGroupResponse>> = _socketGroupResponse
 
 
-    private val _socketUsersResponse = MutableLiveData<ApiState<SocketUserResponse>>()
-    val socketUsersResponse: LiveData<ApiState<SocketUserResponse>> = _socketUsersResponse
+    private val _socketUsersResponse = MutableLiveData<ApiState<TraceUserResponse>>()
+    val socketUsersResponse: LiveData<ApiState<TraceUserResponse>> = _socketUsersResponse
 
     fun getSocketGroups() {
         viewModelScope.launch {
-            socketRepository.getAllGroup().collectLatest {
-                _socketGroupResponse.postValue(it)
-            }
+            traceRepository.getAllGroup()
+                .onStart {
+                    _socketGroupResponse.postValue(ApiState.Loading())
+                }
+                .collectLatest {
+                    _socketGroupResponse.postValue(it)
+                }
         }
     }
 
     fun getSocketUserByGroup(groupId: String) {
         viewModelScope.launch {
-            socketRepository.getAllUsersByGroupID(groupId).collectLatest {
-                _socketUsersResponse.postValue(it)
-            }
+            traceRepository.getAllUsersByGroupID(groupId)
+                .onStart {
+                    _socketUsersResponse.postValue(ApiState.Loading())
+                }
+                .collectLatest {
+                    _socketUsersResponse.postValue(it)
+                }
         }
     }
 
     fun getSoList() {
         viewModelScope.launch {
-            routeRepository.getSoList().collectLatest {
-                _soResponse.postValue(it)
-            }
+            routeRepository.getSoList()
+                .onStart {
+                    _soResponse.postValue(ApiState.Loading())
+                }
+                .collectLatest {
+                    _soResponse.postValue(it)
+                }
         }
     }
 
     fun getRoutes(userID: String) {
         viewModelScope.launch {
-            routeRepository.getRoutes(userID).collectLatest {
-                _routeResponse.postValue(it)
-            }
+            routeRepository.getRoutes(userID)
+                .onStart {
+                    _routeResponse.postValue(ApiState.Loading())
+                }
+                .collectLatest {
+                    _routeResponse.postValue(it)
+                }
         }
     }
 
     fun getOutletList(routeID: String, isVerify: String, outletCategory: String) {
         viewModelScope.launch {
-            routeRepository.getOutlets(routeID, isVerify, outletCategory).collectLatest {
-                _outletResponse.postValue(it)
-            }
+            routeRepository.getOutlets(routeID, isVerify, outletCategory)
+                .onStart {
+                    _outletResponse.postValue(ApiState.Loading())
+                }
+                .collectLatest {
+                    _outletResponse.postValue(it)
+                }
         }
     }
 }
