@@ -325,5 +325,10 @@
     <string name="no_data_found">কোনো তথ্য পাওয়া যায়নি।</string>
     <string name="please_select_product">দয়া করে পণ্য নির্বাচন করুন</string>
     <string name="_99">৯৯+</string>
+    <string name="back">পেছনে</string>
+    <string name="are_you_sure_the_shop_is_closed">আপনি কি নিশ্চিত দোকান বন্ধ?</string>
+    <string name="select_competitor">প্রতিযোগী নির্বাচন করুন</string>
+    <string name="competitor_selection">প্রতিযোগী নির্বাচন</string>
+    <string name="competitor_name">প্রতিযোগীর নাম উদাহরণ: ক, খ, গ</string>
 
 </resources>

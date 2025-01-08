@@ -321,4 +321,10 @@
 
     <string name="_99">99+</string>
 
+    <string name="back">Back</string>
+    <string name="are_you_sure_the_shop_is_closed">Are you sure the shop is closed?</string>
+    <string name="select_competitor">Select Competitor</string>
+    <string name="competitor_selection">Competitor Selection</string>
+    <string name="competitor_name">Competitor Name Ex: a, b, c</string>
+
 </resources>
