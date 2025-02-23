@@ -92,7 +92,10 @@ class CreateAttendanceFragment : Fragment() {
 
         getImageFromDB()
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) || sharePrefUtils.getString(
+                Api.USER_TYPE
+            ).equals("ASM", true)
+        ) {
             binding.spinnerLayoutRoute.visibility = View.GONE
             binding.titleRoute.visibility = View.GONE
         } else {
@@ -146,7 +149,10 @@ class CreateAttendanceFragment : Fragment() {
         }
 
         binding.btnCheckIn.setOnClickListener {
-            if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+            if (sharePrefUtils.getString(Api.USER_TYPE)
+                    .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE)
+                    .equals("ASM", true)
+            ) {
                 if (isImageAdded) {
                     binding.progressBar.visibility = View.VISIBLE
                     getLocation("check_in")
@@ -361,39 +367,6 @@ class CreateAttendanceFragment : Fragment() {
                             override fun onConfirmed() {
                                 sharePrefUtils.saveString(Api.SELECTED_ROUTE_ID, routeId.toString())
                                 sharePrefUtils.saveString(Api.SELECTED_ROUTE_NAME, selectedRoute)
-
-                                val titles = arrayOf(
-                                    requireContext().resources.getString(R.string.attendance),
-                                    requireContext().resources.getString(R.string.history),
-                                    requireContext().resources.getString(R.string.summary)
-                                )
-//                                val fragments = ArrayList<Fragment>()
-//                                fragments.add(CreateAttendanceFragment())
-//                                fragments.add(HistoryFragment())
-//                                fragments.add(SummaryFragment())
-//                                viewPager2!!.adapter = ViewPagerAdapter(
-//                                    parentFragmentManager,
-//                                    lifecycle,
-//                                    fragments
-//                                )
-//
-//                                TabLayoutMediator(
-//                                    viewpagertab2!!, viewPager2!!
-//                                ) { tab: TabLayout.Tab, position: Int ->
-//                                    tab.text = titles[position]
-//                                    tab.parent
-//                                }.attach()
-//
-//                                viewPager2!!.currentItem = 0
-//                                viewPager2!!.isUserInputEnabled = false
-//
-//                                for (i in 0 until viewpagertab2!!.tabCount) {
-//                                    val tab =
-//                                        (viewpagertab2!!.getChildAt(0) as ViewGroup).getChildAt(i)
-//                                    val p = tab.layoutParams as ViewGroup.MarginLayoutParams
-//                                    p.setMargins(15, 15, 10, 15)
-//                                    tab.requestLayout()
-//                                }
                             }
 
                             override fun onCanceled() {}
@@ -468,39 +441,6 @@ class CreateAttendanceFragment : Fragment() {
                                 sharePrefUtils.saveString(Api.SELECTED_ROUTE_ID, routeId.toString())
                                 sharePrefUtils.saveString(Api.SELECTED_ROUTE_NAME, selectedRoute)
                                 checkAttendance()
-
-//                                val titles = arrayOf(
-//                                    requireContext().resources.getString(R.string.attendance),
-//                                    requireContext().resources.getString(R.string.history),
-//                                    requireContext().resources.getString(R.string.summary)
-//                                )
-//                                val fragments = ArrayList<Fragment>()
-//                                fragments.add(CreateAttendanceFragment())
-//                                fragments.add(HistoryFragment())
-//                                fragments.add(SummaryFragment())
-//                                viewPager2!!.adapter = ViewPagerAdapter(
-//                                    parentFragmentManager,
-//                                    lifecycle,
-//                                    fragments
-//                                )
-//
-//                                TabLayoutMediator(
-//                                    viewpagertab2!!, viewPager2!!
-//                                ) { tab: TabLayout.Tab, position: Int ->
-//                                    tab.text = titles[position]
-//                                    tab.parent
-//                                }.attach()
-//
-//                                viewPager2!!.currentItem = 0;
-//                                viewPager2!!.isUserInputEnabled = false
-//
-//                                for (i in 0 until viewpagertab2!!.tabCount) {
-//                                    val tab =
-//                                        (viewpagertab2!!.getChildAt(0) as ViewGroup).getChildAt(i)
-//                                    val p = tab.layoutParams as ViewGroup.MarginLayoutParams
-//                                    p.setMargins(15, 15, 10, 15)
-//                                    tab.requestLayout()
-//                                }
                             }
 
                             override fun onCanceled() {}
@@ -546,7 +486,6 @@ class CreateAttendanceFragment : Fragment() {
             }
 
             override fun onFailure() {}
-
         })
     }
 
@@ -599,7 +538,6 @@ class CreateAttendanceFragment : Fragment() {
                                             convertView,
                                             parent
                                         ) as TextView
-                                        //set the color of first item in the drop down list to gray
                                         if (position == 0) {
                                             view.setTextColor(
                                                 requireContext().resources.getColor(
@@ -608,8 +546,6 @@ class CreateAttendanceFragment : Fragment() {
                                             )
                                             view.visibility = View.GONE
                                         } else {
-                                            //here it is possible to define color for other items by
-                                            //view.setTextColor(Color.RED)
                                             view.setTextColor(resources.getColor(R.color.black))
                                         }
                                         return view
@@ -632,8 +568,6 @@ class CreateAttendanceFragment : Fragment() {
                             } else {
                                 binding.spinnerRoutes.setSelection(0)
                             }
-
-
                         }
 
                     }
@@ -643,7 +577,6 @@ class CreateAttendanceFragment : Fragment() {
                 }
             },
             { error ->
-                //loading!!.visibility = View.GONE
                 if (error is TimeoutError) {
                     Toast.makeText(
                         requireContext(),
@@ -652,7 +585,6 @@ class CreateAttendanceFragment : Fragment() {
                     ).show()
                 }
                 if (error is NoConnectionError) {
-                    //mListerner.onFailure("Turn on your internet connection and Try again")
                     Toast.makeText(
                         requireContext(),
                         "Turn on your internet connection and Try again",
@@ -664,8 +596,6 @@ class CreateAttendanceFragment : Fragment() {
                         val s = String(error.networkResponse.data)
                         Log.d("Routes", "message: $s")
                         val data = JSONObject(s)
-                        //Toast.makeText(requireContext().getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                        //mListerner.onFailure(data.getString("message"))
                         Toast.makeText(
                             requireContext(),
                             data.getString("message"),
@@ -676,7 +606,6 @@ class CreateAttendanceFragment : Fragment() {
                         Sentry.captureException(e)
                         e.printStackTrace()
                     } catch (e: JSONException) {
-                        //mListerner.onFailure(e.message)
                         Sentry.captureException(e)
                         Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
                         e.printStackTrace()
