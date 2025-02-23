@@ -1317,6 +1317,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
+        if (binding.etCompetitor.text.trim().isEmpty()) {
+            inputOk = false
+            binding.etOwnerName.error = getString(R.string.this_field_is_required)
+            hideProgress(binding.progressBarShop)
+        }
         if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
@@ -1487,12 +1492,17 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
         if (binding.etAddress.text.trim().isEmpty()) {
             inputOk = false
-            binding.etAddress.setError(getString(R.string.this_field_is_required))
+            binding.etAddress.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
         if (binding.etOwnerName.text.trim().isEmpty()) {
             inputOk = false
-            binding.etOwnerName.setError(getString(R.string.this_field_is_required))
+            binding.etOwnerName.error = getString(R.string.this_field_is_required)
+            hideProgress(binding.progressBarShop)
+        }
+        if (binding.etCompetitor.text.trim().isEmpty()) {
+            inputOk = false
+            binding.etCompetitor.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
         if (selectedRoute!!.isEmpty()) {
