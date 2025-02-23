@@ -41,7 +41,6 @@ class ConfirmOrderListAdapter(
         return ViewHolder(v)
     }
 
-
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(orderList: List<OrderList>) {
         this.orderList = orderList
