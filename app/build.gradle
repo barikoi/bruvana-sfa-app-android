@@ -63,16 +63,15 @@ android {
         production {
             applicationId "com.barikoi.cnlapp"
             dimension "default"
-            versionName "1.2.7.10"
+            versionName "1.2.7.13"
             resValue "string", "app_name", "CNL SFA"
             resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
 
             buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
             buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
 
             buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
-            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
-            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
             buildConfigField 'String', 'sentryDNS', '"https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
@@ -85,7 +84,7 @@ android {
         staging {
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
-            versionName "1.2.7.9_1"
+            versionName "1.2.7.11_1"
             resValue "string", "app_name", "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             resValue "string", "app_name", "CNL Staging SFA"
             resValue "string", "url_base", "https://cnl.barikoimaps.dev:7090/"
