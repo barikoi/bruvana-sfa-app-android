@@ -13,6 +13,7 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -76,6 +77,8 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
         listener = this
 
         adapter = ConfirmOrderListAdapter(listener, "summary")
+        binding.orderList.layoutManager = LinearLayoutManager(this)
+        binding.orderList.adapter = adapter
 
         pd = ProgressDialog(this)
         pd.setMessage("Processing...")
@@ -328,7 +331,8 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                                         sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(
                                             i
                                         ).total_outlets
-                                    binding.totalBounceCount.text = sowithOrderList!![i].total_bounce.toString()
+                                    binding.totalBounceCount.text =
+                                        sowithOrderList!![i].total_bounce.toString()
                                     getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
                                     Log.d("OrderSummary", "row count: " + tabLayout.childCount)
                                     for (t in 0 until tabLayout.childCount) {
