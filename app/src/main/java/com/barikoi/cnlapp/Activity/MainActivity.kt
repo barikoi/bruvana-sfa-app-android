@@ -16,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -93,16 +94,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     @Inject
     lateinit var networkFailureMessage: NetworkFailureMessage
 
-    private var drawer: DrawerLayout? = null
+    private lateinit var drawer: DrawerLayout
+
     private var navigationDrawer: NavigationView? = null
-    private var menuDrawer: ImageView? = null
+    private lateinit var menuDrawer: ImageView
     private var tvHeaderUserName: TextView? = null
     private var token: String? = ""
     private var userId: String? = ""
     private var userType: String? = ""
     private var userName: String? = ""
 
-    private var navView: BottomNavigationView? = null
+    private lateinit var navView: BottomNavigationView
     var queue: RequestQueue? = null
 
 
@@ -119,7 +121,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         startTraceLoginObserve()
         startTraceAuthUserObserve()
 
@@ -129,11 +130,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         userId = sharePrefUtils.getString(Api.USER_ID)
         userType = sharePrefUtils.getString(Api.USER_TYPE)
         userName = sharePrefUtils.getString(Api.NAME)
+
         navView = findViewById(R.id.bottom_nav_view)
 
-        navView!!.background = null
-        navView!!.menu.getItem(2).isEnabled = false
-        navView!!.menu.getItem(2).isVisible = false
+        navView.background = null
+        navView.menu.getItem(2).isEnabled = false
+        navView.menu.getItem(2).isVisible = false
 
         navigationDrawer = findViewById(R.id.nav_view)
         navigationDrawer!!.setNavigationItemSelectedListener(this)
@@ -142,8 +144,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         routeName_selected = findViewById(R.id.routeNameSelected)
 
         menuDrawer = findViewById(R.id.drawer)
-        menuDrawer!!.setOnClickListener {
-            drawer!!.openDrawer(
+        menuDrawer.setOnClickListener {
+            drawer.openDrawer(
                 GravityCompat.START,
                 true
             )
@@ -157,13 +159,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startActivity(Intent(this@MainActivity, NotificationActivity::class.java))
         }
 
-        binding.appContentMain.tvNotificationCount.text = "23"
+        binding.appContentMain.tvNotificationCount.text = "0"
 
         startApprovalCountObserve()
         checkAttendance()
 
         val c = Calendar.getInstance()
-        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.DAY_OF_MONTH, 1)
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
@@ -184,7 +186,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             Api.authUserCheck + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59&app_version=" + BuildConfig.VERSION_NAME
         )
 
-        if (userType.equals("TO", true)) {
+        if (userType.equals("TO", true) || userType.equals("ASM", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
             setCurrentFragment(HomeTOFragment(), this@MainActivity)
         } else {
@@ -225,7 +227,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 DefaultLocaleHelper.getInstance(this).setCurrentLocale("bn")
             }
 
-            if (navView!!.selectedItemId != R.id.navigation_order) {
+            if (navView.selectedItemId != R.id.navigation_order) {
                 recreate()
             } else {
                 lifecycleScope.launch {
@@ -247,16 +249,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .show()
         }
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
+        ) {
             binding.appContentMain.fabOrder.visibility = View.GONE
         } else {
             binding.appContentMain.fabOrder.visibility = View.VISIBLE
         }
 
         binding.appContentMain.fabOrder.setOnClickListener {
-            binding.appContentMain.fabOrder.background.setTint(resources.getColor(R.color.cnl_color_2))
-            binding.appContentMain.fabOrder.drawable.setTint(resources.getColor(R.color.white))
-            navView!!.selectedItemId = R.id.navigation_order
+            binding.appContentMain.fabOrder.background.setTint(
+                ContextCompat.getColor(this, R.color.cnl_color_2)
+            )
+            binding.appContentMain.fabOrder.drawable.setTint(
+                ContextCompat.getColor(this, R.color.white)
+            )
+            navView.selectedItemId = R.id.navigation_order
             binding.appContentMain.userLayout.visibility = View.GONE
             binding.appContentMain.tvTitle.text = resources.getString(R.string.order_collection)
             binding.appContentMain.tvTitle.visibility = View.VISIBLE
@@ -269,20 +277,27 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navigationDrawer!!.menu.findItem(R.id.menu_request_approval).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "TO"
 
+        navigationDrawer!!.menu.findItem(R.id.menu_request_approval).isVisible =
+            sharePrefUtils.getString(Api.USER_TYPE) == "ASM"
+
         navigationDrawer!!.menu.findItem(R.id.menu_product_stock_request).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
 
-        navView!!.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        navView.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
             if (binding.appContentMain.fabOrder.isVisible) {
-                binding.appContentMain.fabOrder.background.setTint(resources.getColor(R.color.white))
-                binding.appContentMain.fabOrder.drawable.setTint(resources.getColor(R.color.fab_icon))
+                binding.appContentMain.fabOrder.background.setTint(
+                    ContextCompat.getColor(this, R.color.white)
+                )
+                binding.appContentMain.fabOrder.drawable.setTint(
+                    ContextCompat.getColor(this, R.color.cnl_color_2)
+                )
             }
             when (item.itemId) {
                 R.id.navigation_home -> {
                     binding.appContentMain.tvTitle.text = ""
                     binding.appContentMain.tvTitle.visibility = View.GONE
                     binding.appContentMain.userLayout.visibility = View.VISIBLE
-                    if (userType.equals("TO", true)) {
+                    if (userType.equals("TO", true) || userType.equals("ASM", true)) {
                         setCurrentFragment(HomeTOFragment(), this@MainActivity)
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
@@ -324,7 +339,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     }
 
-    fun restartApp(context: Context) {
+    private fun restartApp(context: Context) {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
@@ -434,82 +449,55 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun traceAuthCheck(tokenT: String) {
         ApiServices.apiGET(Api.traceAuthCheck, queue!!, tokenT, object : ApiServiceListener {
-            override fun onResponseSuccess(response: String) {
-                if (response != null) {
-                    try {
-                        val obj = JSONObject(response)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+            override fun onResponseSuccess(response: String) {}
 
-                }
-            }
+            override fun onJSONResponseSuccess(response: JSONObject) {}
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
             override fun onResponseFailure(error: VolleyError) {
-                /*ViewUtils.getErrorResponse(error, applicationContext)*/
                 traceLogin()
             }
 
             override fun onException(e: Exception) {
-                /*Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()*/
                 traceLogin()
             }
-
         })
-
     }
 
     private fun getAuthUser(token: String?, url: String) {
         ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
-                if (response != null) {
-                    try {
-                        val obj = JSONObject(response)
-                        OneSignal.User.addTags(
-                            mapOf(
-                                "employee_id" to obj.getJSONObject("user").getString("employee_id")
-                            )
+                try {
+                    val obj = JSONObject(response)
+                    OneSignal.User.addTags(
+                        mapOf(
+                            "employee_id" to obj.getJSONObject("user").getString("employee_id")
                         )
-                        if (obj.has("user")) {
-                            val userObj = obj.getJSONObject("user")
-                            if (userObj.has("so_ranking") && !userObj.isNull("so_ranking")) {
-                                binding.appContentMain.rankLayout.visibility = View.VISIBLE
-                                binding.appContentMain.tvRank.text =
-                                    userObj.getInt("so_ranking").toString()
-                                binding.appContentMain.rankSuffix.text =
-                                    toOrdinal(userObj.getInt("so_ranking"))
-                            } else {
-                                //rankLayout.visibility = View.VISIBLE
-                                //tvRank.setText("0")
-                            }
-                            //routeName_selected!!.setText(prefs!!.getString(Api.SELECTED_ROUTE_NAME, ""))
+                    )
+                    if (obj.has("user")) {
+                        val userObj = obj.getJSONObject("user")
+                        if (userObj.has("so_ranking") && !userObj.isNull("so_ranking")) {
+                            binding.appContentMain.rankLayout.visibility = View.VISIBLE
+                            binding.appContentMain.tvRank.text =
+                                userObj.getInt("so_ranking").toString()
+                            binding.appContentMain.rankSuffix.text =
+                                toOrdinal(userObj.getInt("so_ranking"))
+                        } else {
+                            toast("User not found")
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
-
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
+            override fun onJSONResponseSuccess(response: JSONObject) {}
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
             override fun onResponseFailure(error: VolleyError) {
                 if (error is TimeoutError) {
-                    //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
                     Toast.makeText(
                         applicationContext,
                         "Request timeout!! Check your internet connection or Contact Admin",
@@ -517,7 +505,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     ).show()
                 }
                 if (error is NoConnectionError) {
-                    //mListerner.onFailure("Turn on your internet connection and Try again")
                     Toast.makeText(
                         applicationContext,
                         "Turn on your internet connection and Try again",
@@ -532,8 +519,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         val s = String(error.networkResponse.data)
                         Log.d("Routes", "message: $s")
                         val data = JSONObject(s)
-                        //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                        //mListerner.onFailure(data.getString("message"))
                         Toast.makeText(
                             applicationContext,
                             data.getString("message"),
@@ -543,7 +528,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         Sentry.captureException(e)
                         e.printStackTrace()
                     } catch (e: JSONException) {
-                        //mListerner.onFailure(e.message)
                         Sentry.captureException(e)
                         Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
                         e.printStackTrace()
@@ -556,12 +540,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
 
         })
-
     }
 
     override fun onResume() {
         super.onResume()
-
 
         viewModel.getProductApprovalCount()
     }
@@ -597,13 +579,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     }
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
@@ -630,13 +608,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentLayout, fragment!!)
         fragmentTransaction.commit()
-        //fragmentManager.executePendingTransactions()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.menu_order_summary) {
-            if (userType.equals("TO", true)) {
+            if (userType.equals("TO", true) || userType.equals("ASM", true)) {
                 startActivity(Intent(this@MainActivity, OrderSummaryTOActivity::class.java))
             } else {
                 startActivity(Intent(this@MainActivity, OrderSummaryActivity::class.java))
@@ -660,7 +637,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         } else if (id == R.id.menu_request_approval) {
             startActivity(Intent(this@MainActivity, StockRequestApprovalActivity::class.java))
         }
-        drawer!!.closeDrawer(GravityCompat.START)
+        drawer.closeDrawer(GravityCompat.START)
         return true
     }
 
