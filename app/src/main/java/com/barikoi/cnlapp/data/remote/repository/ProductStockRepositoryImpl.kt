@@ -4,7 +4,6 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
 import com.barikoi.cnlapp.data.remote.api.ApiService
-import com.barikoi.cnlapp.data.remote.models.ApprovalCountResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.DbHousesResponse
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
