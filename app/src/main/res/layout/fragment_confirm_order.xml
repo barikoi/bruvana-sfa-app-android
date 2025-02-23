@@ -104,15 +104,12 @@
             android:gravity="center_horizontal"
             android:text="@string/no_order_found"
             android:textColor="@color/text_title"
-            android:textSize="17sp">
-
-        </TextView>
+            android:textSize="17sp"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tryAgain"
             android:layout_width="100dp"
             android:layout_height="36dp"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp"
             android:background="@drawable/cardview_bg"
