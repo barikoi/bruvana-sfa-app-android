@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -60,7 +61,8 @@ class OrderSummaryActivity : BaseActivity(), OnEditOrderListener {
 
         listener = this
         adapter = ConfirmOrderListAdapter(listener, "summary")
-
+        binding.orderList.layoutManager = LinearLayoutManager(applicationContext)
+        binding.orderList.adapter = adapter
 
         if (route_id!!.isNotEmpty()) {
             setDateFilter()
