@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -43,7 +44,7 @@ import java.util.Locale
 class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessListener {
     private lateinit var binding: FragmentConfirmOrderBinding
 
-    var recylerView: RecyclerView? = null
+    private lateinit var recylerView: RecyclerView
     var progressBar: ProgressBar? = null
     lateinit var ACTIVITY: MainActivity
     var token: String? = null
@@ -77,6 +78,8 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
 
         listener = this
         adapter = ConfirmOrderListAdapter(listener, "confirm")
+        recylerView.layoutManager = LinearLayoutManager(mContext)
+        recylerView.adapter = adapter
 
         confirmOrder!!.setOnClickListener {
             ViewUtils.viewDialog(mContext!!,
@@ -405,7 +408,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                             orderObj.getString("outlet_name"),
                             orderObj.getString("route_id"),
                             orderObj.getString("route_name"),
-                            /*orderObj.getString("distributor_office_code"),*/
                             orderObj.getString("total_ordered_amount"),
                             orderObj.getString("total_ordered_quantity"),
                             orderObj.getString("latitude"),
@@ -420,6 +422,9 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
             orderList.sortByDescending {
                 it.orderId
             }
+
+            adapter.updateList(orderList)
+
         } else {
             binding.noRouteCheck.visibility = View.VISIBLE
             binding.bodyLayout.visibility = View.GONE
@@ -430,11 +435,6 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
                 checkForOrders(queue!!, token!!, user_id!!, route_id!!/*, mCallback!!*/)
             }
 
-        }
-
-
-        recylerView.apply {
-            adapter.updateList(orderList)
         }
     }
 
