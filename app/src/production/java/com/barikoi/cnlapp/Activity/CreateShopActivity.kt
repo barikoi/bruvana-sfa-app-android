@@ -128,7 +128,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         "Sajeeb Tang",
         "Foster Clark",
         "Fruity",
-        "Other Tasty Saline"
+        "Other Tasty Saline",
+        "Divino",
+        "SMC Plus"
     )
 
 
@@ -1317,6 +1319,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
+        if (binding.etCompetitor.text.trim().isEmpty()) {
+            inputOk = false
+            binding.etCompetitor.error = getString(R.string.this_field_is_required)
+            hideProgress(binding.progressBarShop)
+        }
         if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
@@ -1487,12 +1494,17 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
         if (binding.etAddress.text.trim().isEmpty()) {
             inputOk = false
-            binding.etAddress.setError(getString(R.string.this_field_is_required))
+            binding.etAddress.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
         if (binding.etOwnerName.text.trim().isEmpty()) {
             inputOk = false
-            binding.etOwnerName.setError(getString(R.string.this_field_is_required))
+            binding.etOwnerName.error = getString(R.string.this_field_is_required)
+            hideProgress(binding.progressBarShop)
+        }
+        if (binding.etCompetitor.text.trim().isEmpty()) {
+            inputOk = false
+            binding.etCompetitor.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
         if (selectedRoute!!.isEmpty()) {
@@ -1505,12 +1517,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-//        if (selectedCategory!!.isEmpty()) {
-//            inputOk = false
-//            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
-//                .show()
-//            hideProgress(binding.progressBarShop)
-//        }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
