@@ -21,27 +21,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_toStartOf="@+id/layoutDistance"
-            android:layout_toLeftOf="@+id/layoutDistance"
-            android:drawableLeft="@drawable/ic_shop_small"
             android:drawablePadding="8dp"
             android:text=""
             android:textColor="@color/text_title"
             android:textSize="17sp"
-            android:textStyle="bold"/>
-
+            android:textStyle="bold"
+            app:drawableStart="@drawable/ic_shop_small" />
 
         <LinearLayout
             android:id="@+id/layoutDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:gravity="end"
             android:orientation="vertical">
 
@@ -49,11 +44,9 @@
                 android:id="@+id/tvdistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/cardview_bg_stroke_2dp"
                 android:backgroundTint="@color/white"
@@ -66,19 +59,15 @@
                 android:textAllCaps="false"
                 android:textColor="@color/status_bounced"
                 android:textSize="12sp"
-                android:textStyle="bold">
-
-            </TextView>
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/tvdistanceRaw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/cardview_bg_stroke_2dp"
                 android:backgroundTint="@color/color_gray"
@@ -92,11 +81,9 @@
                 android:textColor="@color/status_bounced"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:visibility="gone">
+                android:visibility="gone" />
 
-            </TextView>
         </LinearLayout>
-
     </RelativeLayout>
 
     <LinearLayout
@@ -119,24 +106,21 @@
             android:drawableLeft="@drawable/ic_location"
             android:drawablePadding="4dp"
             android:gravity="start"
-            android:text="not available"
+            android:text="@string/not_available"
             android:textColor="@color/text_title_2"
-            android:textSize="12sp">
-
-        </TextView>
+            android:textSize="12sp" />
 
         <ImageButton
             android:id="@+id/imgRefresh"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:background="@null"
+            android:contentDescription="@string/reload"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_refresh"
-            app:tint="@color/text_title">
+            app:tint="@color/text_title" />
 
-        </ImageButton>
     </LinearLayout>
 
     <TextView
@@ -148,9 +132,7 @@
         android:text="@string/min_order_value"
         android:textColor="@color/cnl_color_1"
         android:textSize="13sp"
-        android:textStyle="bold">
-
-    </TextView>
+        android:textStyle="bold" />
 
     <AutoCompleteTextView
         android:id="@+id/editTextSearchProduct"
@@ -162,15 +144,15 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/stroke_background"
         android:backgroundTint="@color/white"
-        android:drawableRight="@drawable/ic_search"
+        android:drawableEnd="@drawable/ic_search"
         android:drawablePadding="8dp"
-        android:drawableTint="@color/color_gray"
         android:ems="10"
         android:hint="@string/search_product"
         android:imeOptions="actionNext"
         android:inputType="textCapWords"
         android:padding="10dp"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        app:drawableTint="@color/color_gray" />
 
     <LinearLayout
         android:id="@+id/sortingLayout"
@@ -178,8 +160,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextSearchProduct"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/rounded_corner_lightgray"
         android:gravity="center"
         android:orientation="horizontal"
@@ -190,29 +171,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
             android:gravity="center"
             android:padding="4dp"
             android:text="@string/sort_by"
             android:textColor="@color/text_title"
             android:textSize="12sp"
-            android:textStyle="bold">
-
-        </TextView>
+            android:textStyle="bold" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:src="@drawable/ic_sortby"
-            app:tint="@color/text_title">
+            app:tint="@color/text_title" />
 
-        </ImageView>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -235,7 +209,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/buttonLayout"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/button_bg_green_stroke"
@@ -254,9 +227,9 @@
                 android:id="@+id/totalItemCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text="0 Item"
@@ -270,18 +243,16 @@
                 android:layout_height="20dp"
                 android:layout_centerVertical="true"
                 android:layout_margin="2dp"
-                android:layout_toRightOf="@+id/totalItemCount"
-                android:background="@color/white">
-
-            </View>
+                android:layout_toEndOf="@+id/totalItemCount"
+                android:background="@color/white" />
 
             <TextView
                 android:id="@+id/totalAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="8dp"
-                android:layout_toRightOf="@+id/dash"
+                android:layout_marginEnd="8dp"
+                android:layout_toEndOf="@+id/dash"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text="Total 0.0 "
@@ -311,9 +282,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="12sp"
-            android:textStyle="bold">
-
-        </androidx.appcompat.widget.AppCompatButton>
+            android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/save_order"
@@ -327,9 +296,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="12sp"
-            android:textStyle="bold">
-
-        </androidx.appcompat.widget.AppCompatButton>
+            android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/update_order"
@@ -344,9 +311,7 @@
             android:textColor="@color/white"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:visibility="gone">
-
-        </androidx.appcompat.widget.AppCompatButton>
+            android:visibility="gone" />
     </LinearLayout>
 
     <com.github.ybq.android.spinkit.SpinKitView
