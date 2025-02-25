@@ -102,6 +102,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         binding.mapView.getMapAsync(this)
 
         binding.isTrace.isVisible = sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
+        binding.isTrace.isVisible = sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
 
         startRouteObserve()
         startOutletsObserve()
@@ -115,7 +116,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
         SocketHandler.setSocket(sharePrefUtils.getString(Api.TRACE_TOKEN)!!)
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)
+        ) {
             binding.spinnerLayoutSO.visibility = View.VISIBLE
             startSoObserve()
             viewModel.getSoList()
