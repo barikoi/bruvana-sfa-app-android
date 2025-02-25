@@ -53,9 +53,6 @@ class SplashActivity : AppCompatActivity() {
         token = prefs!!.getString(Api.TOKEN, "")
         userId = prefs!!.getString(Api.USER_ID, "")
         isFirst = prefs!!.getBoolean("isFirst", true)
-        val user_name = prefs!!.getString(Api.NAME, "")
-        val user_email = prefs!!.getString(Api.EMAIL, "")
-        val user_phone = prefs!!.getString(Api.PHONE, "")
 
         progressBar = findViewById(R.id.progressBar)
         progressBar!!.setIndeterminateDrawable(ThreeBounce())
