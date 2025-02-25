@@ -60,7 +60,7 @@ class AttendanceFragment : Fragment() {
     ): View? {
 
         binding = FragmentAttendanceBinding.inflate(inflater, container, false)
-        return  binding.root
+        return binding.root
     }
 
     private fun init() {
@@ -71,7 +71,7 @@ class AttendanceFragment : Fragment() {
         )
         val fragments = ArrayList<Fragment>()
         fragments.add(CreateAttendanceFragment())
-        if (user_type.equals("TO", true)) {
+        if (user_type.equals("TO", true) || user_type.equals("ASM", true)) {
             fragments.add(HistoryTOFragment())
             fragments.add(SummaryTOFragment())
         } else {
