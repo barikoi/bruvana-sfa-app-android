@@ -61,7 +61,9 @@ class VisitReportActivity : BaseActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO") ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
+        ) {
             binding.spinnerLayoutRoute.isVisible = true
             getSOList()
         } else {
@@ -188,7 +190,9 @@ class VisitReportActivity : BaseActivity() {
             }
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.isEnabled = true }
+        materialDatePicker.addOnNegativeButtonClickListener {
+            binding.dateRangeLayout.isEnabled = true
+        }
 
     }
 
@@ -273,7 +277,8 @@ class VisitReportActivity : BaseActivity() {
                                 itemList.add(
                                     Pair(
                                         productObj.getString("range"),
-                                        productObj.getString("visited_count").englishToBanglaNumber()
+                                        productObj.getString("visited_count")
+                                            .englishToBanglaNumber()
                                     )
                                 )
                             }
