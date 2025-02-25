@@ -76,7 +76,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
 
         etSearchShop = findViewById(R.id.editTextSearchShop)
 
-        if (user_type.equals("TO", true)) {
+        if (user_type.equals("TO", true)|| user_type.equals("ASM")) {
             sr_id = ""
             route_id = ""
             user_id = ""
