@@ -56,6 +56,7 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentProductSelectBinding
+import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
@@ -134,8 +135,14 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             adapterImage.updateImages(imageFiles)
         }
 
-        binding.sortingLayout.setOnClickListener {
-            val popup = PopupMenu(mContext, binding.sortTitle)
+        binding.btnAddGift.setOnClickListener {
+            startActivity(
+                Intent(mContext, AddGiftActivity::class.java)
+            )
+        }
+
+        binding.ivShort.setOnClickListener {
+            val popup = PopupMenu(mContext, binding.ivShort)
             popup.menuInflater.inflate(R.menu.sort_menu_product, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
@@ -151,7 +158,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 adapter!!.notifyDataSetChanged()
                             }
 
-                            binding.sortTitle.text = resources.getString(R.string.ztoa)
+//                            binding.sortTitle.text = resources.getString(R.string.ztoa)
                         }
 
                         R.id.menu_atoz -> {
@@ -163,7 +170,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            binding.sortTitle.text = resources.getString(R.string.atoz)
+//                            binding.sortTitle.text = resources.getString(R.string.atoz)
                         }
 
                         R.id.menu_mostfrequent -> {
@@ -176,7 +183,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 adapter!!.notifyDataSetChanged()
                             }
 
-                            binding.sortTitle.text = resources.getString(R.string.most_frequent)
+//                            binding.sortTitle.text = resources.getString(R.string.most_frequent)
                         }
 
                         R.id.menu_lowstock -> {
@@ -188,7 +195,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            binding.sortTitle.setText(resources.getString(R.string.low_stock))
+//                            binding.sortTitle.setText(resources.getString(R.string.low_stock))
                         }
 
                         R.id.menu_highstock -> {
@@ -200,7 +207,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
                             }
-                            binding.sortTitle.setText(resources.getString(R.string.high_stock))
+//                            binding.sortTitle.setText(resources.getString(R.string.high_stock))
                         }
                     }
                     return true
@@ -1462,7 +1469,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                             if (productsList!!.size > 0) {
                                 productsList!!.sortByDescending { it.stock_available }
-                                binding.sortTitle.setText(resources.getString(R.string.high_stock))
+//                                binding.sortTitle.setText(resources.getString(R.string.high_stock))
                                 adapter = ProductListAdapter(productsList!!, listener!!)
                                 binding.productlist.adapter = adapter
                                 adapter!!.notifyDataSetChanged()
