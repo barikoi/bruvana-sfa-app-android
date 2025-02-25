@@ -61,7 +61,9 @@ class RouteActivity : BaseActivity() {
 
         token = sharePrefUtils.getString(Api.TOKEN)
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO")) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO") ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
+        ) {
             userId = ""
             srCode = ""
         } else {
@@ -121,7 +123,9 @@ class RouteActivity : BaseActivity() {
             }
         })
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)
+        ) {
             binding.spinnerLayoutSO2.visibility = View.VISIBLE
             getSOList()
         } else {
@@ -136,7 +140,6 @@ class RouteActivity : BaseActivity() {
                     userId = soList[p2].id
                     srCode = soList[p2].employeeId
                     if (sharePrefUtils.getInt(Api.ROUTE_PAGE_SELECTED) == 0) {
-//                        RouteFragment.getAllRouteList(userId!!, RouteFragment.mListener!!)
                     } else if (sharePrefUtils.getInt(Api.ROUTE_PAGE_SELECTED) == 1) {
                         ShopListFragment.getShopList(userId!!)
                     }
@@ -156,16 +159,11 @@ class RouteActivity : BaseActivity() {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
                     binding.progressBar.visibility = View.GONE
-                    //setDateFilter()
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
@@ -174,7 +172,7 @@ class RouteActivity : BaseActivity() {
 
                 override fun onException(e: Exception) {
                     Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                    binding. progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
             })
     }
