@@ -326,5 +326,6 @@
     <string name="select_competitor">Select Competitor</string>
     <string name="competitor_selection">Competitor Selection</string>
     <string name="competitor_name">Competitor Name Ex: a, b, c</string>
+    <string name="reload">Reload</string>
 
 </resources>
