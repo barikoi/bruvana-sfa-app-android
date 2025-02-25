@@ -39,11 +39,11 @@
                         android:id="@+id/btnBack"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:contentDescription="@string/back"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="8dp"
                         android:background="@android:color/transparent"
                         android:src="@drawable/ic_back"/>
-
 
                     <TextView
                         android:id="@+id/tvTitle"
