@@ -39,12 +39,14 @@ import com.barikoi.cnlapp.databinding.FragmentShopListBinding
 import com.barikoi.cnlapp.utils.AppLogger
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
+@AndroidEntryPoint
 class ShopListFragment : Fragment(), OnEditShopListener {
     private lateinit var binding: FragmentShopListBinding
 
@@ -54,14 +56,10 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     private var userId: String? = ""
     private var listener: OnEditShopListener? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentShopListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -75,7 +73,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         et_search = view.findViewById(R.id.etSearch)
         btncreateShop = view.findViewById(R.id.createShop)
 
-        adapter = ShopListAdapter(ArrayList<Shops>(), listener!!)
+        adapter = ShopListAdapter(ArrayList(), listener!!)
         recylerView!!.adapter = adapter
         selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
 
@@ -104,19 +102,15 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                //parent.lastVisiblePosition
-            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         et_search!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter!!.filter.filter(s)
-                if (s!!.length == 0) {
+                if (s!!.isEmpty()) {
                     val shops: ArrayList<Shops> = ArrayList()
                     if (shopList!!.size > 0) {
                         for (i in 0 until shopList!!.size) {
@@ -135,9 +129,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
             }
 
-            override fun afterTextChanged(s: Editable?) {
-
-            }
+            override fun afterTextChanged(s: Editable?) {}
 
         })
 
@@ -161,15 +153,14 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         }
     }
 
-    var startActivityResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-        ActivityResultCallback<ActivityResult> { result ->
-            if (result.resultCode == 55) {
-                progressBar2!!.isVisible = true
-                getShopList(RouteActivity.userId!!)
-            }
+    private var startActivityResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == 55) {
+            progressBar2!!.isVisible = true
+            getShopList(RouteActivity.userId!!)
         }
-    )
+    }
 
     companion object {
         var routesList: ArrayList<String>? = ArrayList()
@@ -334,7 +325,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             Toast.LENGTH_LONG
                         ).show()
                     }
-                    if (error != null && error.networkResponse != null) {
+                    if (error?.networkResponse != null) {
                         try {
                             val s = String(error.networkResponse.data)
                             Log.d("Verify", "message: $s")
@@ -354,16 +345,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             )
             queue!!.add(request)
         }
-    }
-
-    fun generateImages(imageArray: JSONArray) {
-        for (i in 0 until imageArray.length()) {
-
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onAttach(context: Context) {
