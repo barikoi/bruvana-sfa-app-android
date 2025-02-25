@@ -31,6 +31,7 @@
                 <ImageButton
                     android:id="@+id/btnBack"
                     android:layout_width="30dp"
+                    android:contentDescription="@string/back"
                     android:layout_height="30dp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
