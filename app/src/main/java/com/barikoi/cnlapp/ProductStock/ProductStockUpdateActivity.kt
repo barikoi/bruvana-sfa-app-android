@@ -176,7 +176,9 @@ class ProductStockUpdateActivity : BaseActivity() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
+        ) {
             binding.spinnerLayoutRoute.visibility = View.VISIBLE
             viewModel.getDHList(sharePrefUtils.getString(Api.TERRITORY_ID)!!)
         } else {
