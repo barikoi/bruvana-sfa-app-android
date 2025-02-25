@@ -97,7 +97,8 @@ class ProductSummaryActivity : BaseActivity() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
+            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
             binding.spinnerLayoutRoute.visibility = View.VISIBLE
             viewModel.getDHList(sharePrefUtils.getString(TERRITORY_ID)!!)
         } else {
@@ -140,11 +141,11 @@ class ProductSummaryActivity : BaseActivity() {
 
         binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.isEnabled = false
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.isEnabled = true
             val sDate = Date(selection.first!!)
             val eDate = Date(selection.second!!)
             if (sDate.compareTo(eDate) == 0) {
@@ -169,9 +170,7 @@ class ProductSummaryActivity : BaseActivity() {
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayout.setEnabled(
-                true
-            )
+            binding.dateRangeLayout.isEnabled = true
         }
     }
 
