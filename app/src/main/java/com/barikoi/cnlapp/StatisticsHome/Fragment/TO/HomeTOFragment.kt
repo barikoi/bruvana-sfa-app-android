@@ -59,14 +59,10 @@ class HomeTOFragment : Fragment() {
     var userId: String? = ""
     var progressBar: ProgressBar? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentHomeTOBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -93,7 +89,7 @@ class HomeTOFragment : Fragment() {
 
     }
 
-    private fun checkforAttendanceToday() {
+    private fun checkForAttendanceToday() {
         val today = Calendar.getInstance().time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
@@ -106,36 +102,13 @@ class HomeTOFragment : Fragment() {
                         if (attedanceArray.length() > 0) {
                             binding.noRouteCheck.visibility = View.GONE
                             binding.bodyLayout.visibility = View.VISIBLE
-                            val attendanceObj = attedanceArray.getJSONObject(0)
-                            /*if (!attendanceObj.getString("route_id").equals("null")) {
-                                attendanceObj.getInt("route_id")
-                                attendanceObj.getString("route_name")
-                                editor!!.putString(
-                                    Api.SELECTED_ROUTE_ID,
-                                    attendanceObj.getInt("route_id").toString()
-                                )
-                                    .putString(
-                                        Api.SELECTED_ROUTE_NAME,
-                                        attendanceObj.getString("route_name")
-                                    ).commit()
-                                //MainActivity.routeName_selected!!.setText(attendanceObj.getString("route_name"))
-                                //routeId =  attendanceObj.getInt("route_id").toString()
-                                init()
-                            }else{
-                                no_route_check.visibility = View.VISIBLE
-                                bodyLayout.visibility = View.GONE
-
-                                btn_tryAgain.setOnClickListener {
-                                    checkforAttendanceToday()
-                                }
-                            }*/
                             init()
                         } else {
                             binding.noRouteCheck.visibility = View.VISIBLE
                             binding. bodyLayout.visibility = View.GONE
 
                             binding.btnTryAgain.setOnClickListener {
-                                checkforAttendanceToday()
+                                checkForAttendanceToday()
                             }
                         }
                     } catch (e: Exception) {
