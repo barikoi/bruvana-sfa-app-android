@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="@dimen/_10sdp"
     tools:context=".ui.add_gift.AddGiftActivity">
 
     <include
@@ -18,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_20dp"
         android:drawablePadding="@dimen/_10sdp"
-        android:text="Hello World"
+        android:text="@string/shop_name"
         android:textSize="20sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/ic_shop"
@@ -27,11 +26,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
+    <RadioGroup
+        android:id="@+id/rgCat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvShopName">
+
+        <RadioButton
+            android:id="@+id/rbGift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gift" />
+
+        <RadioButton
+            android:id="@+id/rbMerchandise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_20dp"
+            android:text="@string/merchandise" />
+
+        <RadioButton
+            android:id="@+id/rbPOSMGift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5dp"
+            android:text="@string/posm_gift" />
+
+    </RadioGroup>
+
     <Spinner
         android:id="@+id/spinnerCategory"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginEnd="@dimen/_10sdp"
+        android:background="@drawable/shape_oval_10"
+        android:backgroundTint="@color/color_gray"
+        android:minHeight="35dp"
         app:layout_constraintBottom_toBottomOf="@+id/btnAdd"
         app:layout_constraintEnd_toStartOf="@+id/btnAdd"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,18 +76,25 @@
         android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_20dp"
+        android:layout_marginStart="@dimen/_5dp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_15dp"
         android:backgroundTint="@color/cnl_color_1"
-        android:elevation="0dp"
-        android:padding="0dp"
-        android:text="Add"
+        android:drawablePadding="@dimen/_10sdp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="3dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:text="@string/add_more"
+        android:textAllCaps="false"
         android:textColor="@color/white"
-        app:icon="@drawable/baseline_add_24"
+        android:textSize="12sp"
+        app:icon="@drawable/round_add_circle_24"
+        app:iconPadding="0dp"
         app:iconTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvShopName"
-        app:pressedTranslationZ="0dp"
-        app:useCompatPadding="true" />
+        app:layout_constraintTop_toBottomOf="@+id/rgCat" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvGift"
@@ -66,16 +108,18 @@
         app:layout_constraintTop_toBottomOf="@+id/btnAdd"
         tools:listitem="@layout/item_add_gift" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSubmit"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_10sdp"
         android:layout_marginBottom="@dimen/_10sdp"
         android:background="@drawable/button_white_bg_stroke"
         android:backgroundTint="@color/cnl_color_1"
         android:text="@string/submit"
         android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
