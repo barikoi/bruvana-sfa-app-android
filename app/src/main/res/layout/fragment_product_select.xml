@@ -159,44 +159,42 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextSearchProduct"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_marginVertical="@dimen/_10sdp">
 
-        <Button
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/btnAddGift"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Gift"
-            android:textSize="12sp"
             android:layout_marginStart="@dimen/_5dp"
+            android:backgroundTint="#4E7471"
+            android:drawablePadding="@dimen/_10sdp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="3dp"
+            android:paddingStart="6dp"
+            android:textAllCaps="false"
+            android:paddingEnd="6dp"
+            android:text="@string/choose_gift"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:icon="@drawable/baseline_add_24"
+            app:iconGravity="textEnd"
+            app:iconPadding="0dp"
+            app:iconTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/btnAddMerch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5dp"
-            android:text="Add Merch"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btnAddGift"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btnPOSMGift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5dp"
-            android:text="POSM Gift"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btnAddMerch"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:id="@+id/llSort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:background="@drawable/rounded_corner_lightgray"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="4dp"
@@ -214,6 +212,14 @@
                 android:paddingVertical="@dimen/_5dp"
                 android:src="@drawable/ic_sort_by"
                 app:tint="@color/text_title" />
+
+            <TextView
+                android:id="@+id/sortTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:gravity="center" />
 
         </LinearLayout>
 
