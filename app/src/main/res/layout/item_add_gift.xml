@@ -15,11 +15,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
+    <TextView
         android:id="@+id/spinnerGift"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/_10sdp"
+        android:text="Gift Name"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/llCardCounter"
         app:layout_constraintEnd_toStartOf="@+id/llCardCounter"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,13 +80,24 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvImages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Images"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llCardCounter" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llCardCounter">
+        app:layout_constraintTop_toBottomOf="@+id/tvImages">
 
         <include
             android:id="@+id/llImagePickerView"
