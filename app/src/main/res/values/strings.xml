@@ -329,5 +329,10 @@
     <string name="reload">Reload</string>
     <string name="add">Add</string>
     <string name="remove">Remove</string>
+    <string name="gift">Gift</string>
+    <string name="merchandise">Merchandise</string>
+    <string name="posm_gift">POSM Gift</string>
+    <string name="choose_gift">Choose Gift</string>
+    <string name="add_more">Add More</string>
 
 </resources>
