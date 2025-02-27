@@ -4,4 +4,23 @@
         <item>ENG</item>
         <item>বাং</item>
     </array>
+    <string-array name="merchandise_category">
+        <item>merchandise_category 1</item>
+        <item>merchandise_category 2</item>
+        <item>merchandise_category 3</item>
+        <item>merchandise_category 4</item>
+    </string-array>
+
+    <string-array name="gift_category">
+        <item>gift_category 1</item>
+        <item>gift_category 2</item>
+        <item>gift_category 3</item>
+        <item>gift_category 4</item>
+    </string-array>
+    <string-array name="posm_gift_category">
+        <item>posm_gift_category 1</item>
+        <item>posm_gift_category 2</item>
+        <item>posm_gift_category 3</item>
+        <item>posm_gift_category 4</item>
+    </string-array>
 </resources>
