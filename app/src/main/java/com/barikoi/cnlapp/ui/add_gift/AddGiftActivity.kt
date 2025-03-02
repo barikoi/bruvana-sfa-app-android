@@ -190,7 +190,7 @@ class AddGiftActivity : BaseActivity() {
             AppLogger.log("IMAGE_PICKER:: ${sharePrefUtils.getString(Constants.IMAGE_PICKER)}")
 
             imageFiles.add(imageFilePath!!.path)
-            
+
             confirmAddGiftDialog()
 
         }
@@ -215,6 +215,7 @@ class AddGiftActivity : BaseActivity() {
     }
 
     private fun confirmAddGiftDialog() {
+        var count = 1
         val dialogBinding = DialogConfirmGiftBinding.inflate(LayoutInflater.from(this))
 
         val dialog = Dialog(this)
@@ -247,6 +248,20 @@ class AddGiftActivity : BaseActivity() {
         }
         dialogBinding.btnNo.setOnClickListener {
             dialog.dismiss()
+        }
+
+        dialogBinding.btnPlus.setHapticClickListener {
+            count++
+            dialogBinding.tvCount.setText(count.toString())
+        }
+
+        dialogBinding.btnMinus.setHapticClickListener {
+
+            if (count > 1) {
+                count--
+            }
+
+            dialogBinding.tvCount.setText(count.toString())
         }
 
 
