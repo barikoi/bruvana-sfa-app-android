@@ -27,7 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/close"
-            android:src="@drawable/ic_close"
+            app:tint="@color/red"
+            android:src="@drawable/cancel_24dp_e3e3e3_fill1_wght700_grad0_opsz24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
