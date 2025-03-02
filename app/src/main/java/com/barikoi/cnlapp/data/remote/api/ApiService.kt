@@ -1,11 +1,11 @@
 package com.barikoi.cnlapp.data.remote.api
 
-import com.barikoi.cnlapp.data.remote.models.ApprovalCountResponse
 import com.barikoi.cnlapp.data.remote.models.ApproveRequest
 import com.barikoi.cnlapp.data.remote.models.AuthUserResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse2
 import com.barikoi.cnlapp.data.remote.models.DbHousesResponse
+import com.barikoi.cnlapp.data.remote.models.GiftResponse
 import com.barikoi.cnlapp.data.remote.models.LoginResponse
 import com.barikoi.cnlapp.data.remote.models.NotificationResponse
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
@@ -129,4 +129,7 @@ interface ApiService {
         @Query("db_house_id") dbHouseId: String?,
         @Query("user_id") userId: String?
     ): Response<ProductStockResponse>
+
+    @GET("api/v1/gift-types")
+    suspend fun getGifts(): Response<GiftResponse>
 }
