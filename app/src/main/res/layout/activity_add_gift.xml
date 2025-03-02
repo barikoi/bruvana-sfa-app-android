@@ -18,83 +18,13 @@
         android:layout_marginTop="@dimen/_20dp"
         android:drawablePadding="@dimen/_10sdp"
         android:text="@string/shop_name"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/ic_shop"
         app:drawableTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
-    <RadioGroup
-        android:id="@+id/rgCat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/_10sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvShopName">
-
-        <RadioButton
-            android:id="@+id/rbGift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/gift" />
-
-        <RadioButton
-            android:id="@+id/rbMerchandise"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_20dp"
-            android:text="@string/merchandise" />
-
-        <RadioButton
-            android:id="@+id/rbPOSMGift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_5dp"
-            android:text="@string/posm_gift" />
-
-    </RadioGroup>
-
-    <Spinner
-        android:id="@+id/spinnerCategory"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_10sdp"
-        android:background="@drawable/shape_oval_10"
-        android:backgroundTint="@color/color_gray"
-        android:minHeight="35dp"
-        app:layout_constraintBottom_toBottomOf="@+id/btnAdd"
-        app:layout_constraintEnd_toStartOf="@+id/btnAdd"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnAdd" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_5dp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_15dp"
-        android:backgroundTint="@color/cnl_color_1"
-        android:drawablePadding="@dimen/_10sdp"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        android:padding="3dp"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:text="@string/add_more"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:icon="@drawable/round_add_circle_24"
-        app:iconPadding="0dp"
-        app:iconTint="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rgCat" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvGift"
@@ -105,8 +35,8 @@
         app:layout_constraintBottom_toTopOf="@+id/btnSubmit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAdd"
-        tools:listitem="@layout/item_add_gift" />
+        app:layout_constraintTop_toBottomOf="@+id/tvShopName"
+        tools:listitem="@layout/item_gift_main" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSubmit"
@@ -124,5 +54,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rcvGift" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:background="@drawable/shape_oval"
+        android:backgroundTint="@color/white"
+        android:paddingStart="@dimen/_5dp"
+        android:paddingTop="@dimen/_3sdp"
+        android:paddingEnd="@dimen/_5dp"
+        android:paddingBottom="@dimen/_3sdp"
+        android:text="Total: 122"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:translationZ="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnSubmit"
+        app:layout_constraintEnd_toEndOf="@+id/btnSubmit"
+        app:layout_constraintTop_toTopOf="@+id/btnSubmit" />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar"
+        style="@style/SpinKitView.Large.CubeGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_8sdp"
+        android:visibility="gone"
+        app:SpinKit_Color="@color/cnl_color_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
