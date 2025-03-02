@@ -1,31 +1,48 @@
 package com.barikoi.cnlapp.ui.add_gift
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.SpannableStringBuilder
+import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.base.adapter.AdapterImagePickerView
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityAddGiftBinding
+import com.barikoi.cnlapp.databinding.DialogConfirmGiftBinding
+import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -37,8 +54,16 @@ import javax.inject.Inject
 class AddGiftActivity : BaseActivity() {
     private lateinit var binding: ActivityAddGiftBinding
 
+    private val viewModel: AddGiftViewModel by viewModels()
+
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+    private lateinit var adapterImage: AdapterImagePickerView
+
 
     var selectedCategory: String = ""
     var selectedCategories: MutableList<GiftDataModel> = mutableListOf()
@@ -49,16 +74,31 @@ class AddGiftActivity : BaseActivity() {
     private var imageFilePath: File? = null
     private val position = 0
 
+
+    private var imageFiles: MutableList<String> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityAddGiftBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        startGetGiftObserve()
+
         binding.toolbar.tvTitle.text = getString(R.string.add_gift)
 
         binding.toolbar.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.tvShopName.text = intent.getStringExtra("shop_name")
+
+        viewModel.getGifts()
+
+
+        adapterImage = AdapterImagePickerView {
+            imageFiles.removeAt(it)
+            adapterImage.updateImages(imageFiles)
         }
 
         adapterGift = AdapterGift(
@@ -77,38 +117,40 @@ class AddGiftActivity : BaseActivity() {
         binding.rcvGift.layoutManager = LinearLayoutManager(this)
         binding.rcvGift.adapter = adapterGift
 
+        binding.btnSubmit.setHapticClickListener {
+            confirmAddGiftDialog()
+        }
 
-        binding.rgCat.setOnCheckedChangeListener { group, checkedId ->
-            when (checkedId) {
-                R.id.rbGift -> {
-                    initSpinner(resources.getStringArray(R.array.gift_category).toList())
+    }
+
+    private fun startGetGiftObserve() {
+        lifecycleScope.launch {
+            viewModel.routeResponse.observe(this@AddGiftActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startGetGiftObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startGetGiftObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        binding.progressBar.isVisible = true
+                        AppLogger.log("startGetGiftObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startGetGiftObserve:: Success ${it.data}")
+
+                    }
                 }
-
-                R.id.rbMerchandise -> {
-                    initSpinner(resources.getStringArray(R.array.merchandise_category).toList())
-                }
-
-                R.id.rbPOSMGift -> {
-                    initSpinner(resources.getStringArray(R.array.posm_gift_category).toList())
-                }
-
             }
         }
-
-        binding.rgCat.check(R.id.rbGift)
-
-        binding.btnAdd.setHapticClickListener {
-            selectedCategories.add(
-                GiftDataModel(
-                    id = 0,
-                    name = selectedCategory,
-                    images = emptyList()
-                )
-            )
-
-            adapterGift.updateList(selectedCategories)
-        }
-
     }
 
     private fun openCameraForApplicant() {
@@ -147,7 +189,9 @@ class AddGiftActivity : BaseActivity() {
 
             AppLogger.log("IMAGE_PICKER:: ${sharePrefUtils.getString(Constants.IMAGE_PICKER)}")
 
-//            imageFiles.add(imageFilePath!!.path)
+            imageFiles.add(imageFilePath!!.path)
+            
+            confirmAddGiftDialog()
 
         }
     }
@@ -170,29 +214,48 @@ class AddGiftActivity : BaseActivity() {
         return image
     }
 
+    private fun confirmAddGiftDialog() {
+        val dialogBinding = DialogConfirmGiftBinding.inflate(LayoutInflater.from(this))
 
-    private fun initSpinner(data: List<String>) {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, data)
-        binding.spinnerCategory.adapter = adapter
+        val dialog = Dialog(this)
+        dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogBinding.root)
 
-        binding.spinnerCategory.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val selectedItem = data[position]
-                    toast("Selected item: $selectedItem")
-                    selectedCategory = selectedItem
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-            }
-
-        binding.btnAdd.setHapticClickListener {
-            toast("Added")
+        if (imageFiles.isEmpty()) {
+            dialogBinding.llImagePickerView.rvImage.visibility = View.GONE
+        } else {
+            dialogBinding.llImagePickerView.rvImage.visibility = View.VISIBLE
         }
+
+        dialogBinding.llImagePickerView.ivPicImage.setOnClickListener {
+            dialog.dismiss()
+            openCameraForApplicant()
+        }
+
+
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        dialogBinding.llImagePickerView.rvImage.adapter = adapterImage
+        dialogBinding.llImagePickerView.rvImage.layoutManager = layoutManager
+        adapterImage.updateImages(imageFiles)
+
+
+        dialogBinding.btnConfirm.setOnClickListener {
+
+        }
+        dialogBinding.btnNo.setOnClickListener {
+            dialog.dismiss()
+        }
+
+
+        dialog.show()
+        val window = dialog.window
+        window!!.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
     }
+
 }
