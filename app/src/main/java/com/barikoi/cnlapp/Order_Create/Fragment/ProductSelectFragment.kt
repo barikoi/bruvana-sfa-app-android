@@ -137,7 +137,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         binding.btnAddGift.setOnClickListener {
             startActivity(
-                Intent(mContext, AddGiftActivity::class.java)
+                Intent(mContext, AddGiftActivity::class.java).putExtra(
+                    "shop_name",
+                    shopName
+                )
             )
         }
 
