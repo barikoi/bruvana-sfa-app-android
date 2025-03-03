@@ -335,5 +335,6 @@
     <string name="choose_gift">Choose Gift</string>
     <string name="add_more">Add More</string>
     <string name="add_gift">Add Gift</string>
+    <string name="gift_image">Gift Image</string>
 
 </resources>
