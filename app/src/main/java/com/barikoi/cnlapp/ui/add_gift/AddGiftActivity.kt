@@ -9,22 +9,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.SpannableStringBuilder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,9 +25,9 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.adapter.AdapterImagePickerView
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.remote.models.Gift
 import com.barikoi.cnlapp.databinding.ActivityAddGiftBinding
 import com.barikoi.cnlapp.databinding.DialogConfirmGiftBinding
-import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
@@ -65,14 +57,15 @@ class AddGiftActivity : BaseActivity() {
     private lateinit var adapterImage: AdapterImagePickerView
 
 
-    var selectedCategory: String = ""
-    var selectedCategories: MutableList<GiftDataModel> = mutableListOf()
-
-    private lateinit var adapterGift: AdapterGift
+    private lateinit var adapterGift: AdapterMainGift
 
 
     private var imageFilePath: File? = null
-    private val position = 0
+
+    private var posMain = 0
+    private var posChild = 0
+
+    var giftData: MutableList<GiftModel> = mutableListOf()
 
 
     private var imageFiles: MutableList<String> = mutableListOf()
@@ -101,16 +94,22 @@ class AddGiftActivity : BaseActivity() {
             adapterImage.updateImages(imageFiles)
         }
 
-        adapterGift = AdapterGift(
-            addImageClickListener = {
-                openCameraForApplicant()
-            },
-            removeImageClickListener = {
+        adapterGift = AdapterMainGift(
+            addClickListener = { posMain, posChild ->
+                this.posMain = posMain
+                this.posChild = posChild
 
+                imageFiles.clear()
+                confirmAddGiftDialog()
             },
             removeItemClickListener = {
-                selectedCategories.removeAt(it)
-                adapterGift.updateList(selectedCategories)
+
+            },
+            incrementClickListener = {
+
+            },
+            decrementClickListener = {
+
             }
         )
 
@@ -147,11 +146,34 @@ class AddGiftActivity : BaseActivity() {
                         binding.progressBar.isVisible = false
                         AppLogger.log("startGetGiftObserve:: Success ${it.data}")
 
+                        giftData = processData(it.data?.gifts!!).toMutableList()
+                        adapterGift.updateList(giftData)
+
                     }
                 }
             }
         }
     }
+
+    private fun processData(data: List<Gift>): List<GiftModel> {
+        Log.d("GiftList", "Received data: ${data.size}") // Debugging log
+
+        val groupedData = data.groupBy { it.categoryId }
+        Log.d("GroupedGifts", "Grouped data: $groupedData") // Debugging log
+
+        return groupedData.map { (categoryId, gifts) ->
+            Log.d(
+                "CategoryProcessing",
+                "Processing category: $categoryId with ${gifts.size} gifts"
+            ) // Debugging log
+
+            GiftModel(
+                title = gifts.first().category.name, // Using category name as title
+                gifts = gifts
+            )
+        }
+    }
+
 
     private fun openCameraForApplicant() {
         val pictureIntent = Intent(
@@ -235,6 +257,8 @@ class AddGiftActivity : BaseActivity() {
             openCameraForApplicant()
         }
 
+        dialogBinding.tvCount.setText(count.toString())
+
 
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
@@ -244,9 +268,20 @@ class AddGiftActivity : BaseActivity() {
 
 
         dialogBinding.btnConfirm.setOnClickListener {
+            if (imageFiles.isEmpty()) {
+                toast("Please add image")
+                return@setOnClickListener
+            }
+
+            dialog.dismiss()
+
+            giftData[posMain].gifts[posChild].qty = count
+            giftData[posMain].gifts[posChild].images = imageFiles
+            adapterGift.updateList(giftData)
 
         }
         dialogBinding.btnNo.setOnClickListener {
+
             dialog.dismiss()
         }
 
