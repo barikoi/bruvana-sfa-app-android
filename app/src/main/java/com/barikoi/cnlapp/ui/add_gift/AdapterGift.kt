@@ -64,9 +64,11 @@ class AdapterGift(
         if (giftList[position].images.isNullOrEmpty()) {
             holder.binding.llCardCounter.isVisible = false
             holder.binding.btnAdd.isVisible = true
+            holder.binding.ivDelete.isVisible = false
         } else {
             holder.binding.llCardCounter.isVisible = true
             holder.binding.btnAdd.isVisible = false
+            holder.binding.ivDelete.isVisible = true
         }
 
 
