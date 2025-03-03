@@ -30,7 +30,11 @@ data class Gift(
     @SerializedName("status")
     val status: String,
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String,
+
+    var qty: Int = 0,
+    var images: List<String>? = emptyList()
+
 )
 
 data class Category(
