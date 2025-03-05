@@ -1,7 +1,9 @@
 package com.barikoi.cnlapp.data.remote.models
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 data class GiftResponse(
     @SerializedName("gifts")
@@ -12,6 +14,7 @@ data class GiftResponse(
     val statusCode: Int
 )
 
+@Parcelize
 data class Gift(
     @SerializedName("category")
     val category: Category,
@@ -35,8 +38,9 @@ data class Gift(
     var qty: Int = 0,
     var images: List<String>? = emptyList()
 
-)
+) : Parcelable
 
+@Parcelize
 data class Category(
     @SerializedName("created_at")
     val createdAt: String,
@@ -50,4 +54,4 @@ data class Category(
     val startDate: String,
     @SerializedName("updated_at")
     val updatedAt: String
-)
+) : Parcelable
