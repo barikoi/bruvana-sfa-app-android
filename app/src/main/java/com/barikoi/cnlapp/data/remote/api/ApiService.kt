@@ -16,6 +16,7 @@ import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -132,4 +133,9 @@ interface ApiService {
 
     @GET("api/v1/gift-types")
     suspend fun getGifts(): Response<GiftResponse>
+
+    @POST("api/v1/gift-history")
+    suspend fun saveGifts(
+        @Body body: RequestBody
+    ): Response<BaseResponse>
 }
