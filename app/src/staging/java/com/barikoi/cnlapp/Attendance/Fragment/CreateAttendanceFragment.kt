@@ -91,7 +91,10 @@ class CreateAttendanceFragment : Fragment() {
 
         getImageFromDB()
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) || sharePrefUtils.getString(
+                Api.USER_TYPE
+            ).equals("ASM")
+        ) {
             binding.spinnerLayoutRoute.visibility = View.GONE
             binding.titleRoute.visibility = View.GONE
         } else {
@@ -145,7 +148,9 @@ class CreateAttendanceFragment : Fragment() {
         }
 
         binding.btnCheckIn.setOnClickListener {
-            if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
+            if (sharePrefUtils.getString(Api.USER_TYPE)
+                    .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
+            ) {
                 if (isImageAdded) {
                     binding.progressBar.visibility = View.VISIBLE
                     getLocation("check_in")
