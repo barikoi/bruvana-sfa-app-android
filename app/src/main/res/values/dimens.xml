@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="design_navigation_separator_vertical_padding">4dp</dimen>
     <dimen name="_8sdp">8dp</dimen>
     <dimen name="_4sdp">4dp</dimen>
@@ -9,4 +9,5 @@
     <dimen name="_3sdp">3dp</dimen>
     <dimen name="_10sdp">10dp</dimen>
     <dimen name="_15dp">15dp</dimen>
+    <dimen name="design_fab_image_size" tools:override="true">36dp</dimen>
 </resources>

@@ -25,12 +25,12 @@
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
             android:layout_toStartOf="@+id/layoutDistance"
+            android:drawableStart="@drawable/ic_shop_small"
             android:drawablePadding="8dp"
             android:text=""
             android:textColor="@color/text_title"
             android:textSize="17sp"
-            android:textStyle="bold"
-            app:drawableStart="@drawable/ic_shop_small" />
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/layoutDistance"
@@ -59,7 +59,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/status_bounced"
                 android:textSize="12sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvdistanceRaw"
@@ -146,48 +146,86 @@
         android:backgroundTint="@color/white"
         android:drawableEnd="@drawable/ic_search"
         android:drawablePadding="8dp"
+        android:drawableTint="@color/color_gray"
         android:ems="10"
         android:hint="@string/search_product"
         android:imeOptions="actionNext"
         android:inputType="textCapWords"
         android:padding="10dp"
-        android:textSize="12sp"
-        app:drawableTint="@color/color_gray" />
+        android:textSize="12sp" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/sortingLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextSearchProduct"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/rounded_corner_lightgray"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="4dp">
+        android:layout_marginVertical="@dimen/_10sdp">
 
-        <TextView
-            android:id="@+id/sortTitle"
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/btnAddGift"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
-            android:gravity="center"
-            android:padding="4dp"
-            android:text="@string/sort_by"
-            android:textColor="@color/text_title"
+            android:layout_marginStart="@dimen/_5dp"
+            android:backgroundTint="#4E7471"
+            android:drawablePadding="@dimen/_10sdp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="5dp"
+            android:paddingStart="10dp"
+            android:textAllCaps="false"
+            android:paddingEnd="10dp"
+            android:text="@string/choose_gift"
+            android:textColor="@color/white"
             android:textSize="12sp"
-            android:textStyle="bold" />
+            app:icon="@drawable/baseline_add_24"
+            app:iconGravity="textEnd"
+            android:textStyle="bold"
+            app:iconPadding="10dp"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+
+        <LinearLayout
+            android:id="@+id/llSort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_sortby"
-            app:tint="@color/text_title" />
+            android:background="@drawable/rounded_corner_lightgray"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivShort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/sort_by"
+                android:paddingStart="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_5dp"
+                android:src="@drawable/ic_sort_by"
+                app:tint="@color/text_title" />
+
+            <TextView
+                android:id="@+id/sortTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="4dp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productlist"

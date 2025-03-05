@@ -123,7 +123,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_sortby"
+                    android:src="@drawable/ic_sort_by"
                     app:tint="@color/text_title"/>
 
             </LinearLayout>

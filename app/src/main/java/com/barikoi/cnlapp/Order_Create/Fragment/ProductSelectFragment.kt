@@ -56,6 +56,7 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentProductSelectBinding
+import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
@@ -68,8 +69,6 @@ import java.io.File
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -123,9 +122,32 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     private var orderTypeNew: String = "save_order"
 
+    private var giftData: String = ""
+
+
+    private val addGiftResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+
+                // Safely check if the data is not null before accessing it
+                if (data != null) {
+                    giftData = data.getStringExtra("gift_result") ?: ""
+
+                    if (giftData.isNotEmpty()) {
+                        // Update the button icon if the gift data is not empty
+                        binding.btnAddGift.setIconResource(R.drawable.ic_edit_square)
+                    }
+                } else {
+                    // Handle case where data is null (optional)
+                    Log.e("MainActivity", "Received null data from result.")
+                }
+            }
+        }
+
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentProductSelectBinding.inflate(inflater, container, false)
 
@@ -134,8 +156,26 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             adapterImage.updateImages(imageFiles)
         }
 
-        binding.sortingLayout.setOnClickListener {
-            val popup = PopupMenu(mContext, binding.sortTitle)
+        binding.btnAddGift.setOnClickListener {
+
+            addGiftResultLauncher.launch(Intent(
+                requireActivity(),
+                AddGiftActivity::class.java
+            ).apply {
+                    putExtra("outlet_id", shopId)
+                    putExtra("shop_name", shopName)
+                    if (giftData.isNotEmpty()) {
+                        putExtra(
+                            "gift_data", giftData
+                        )
+                    }
+                }
+
+            )
+        }
+
+        binding.llSort.setOnClickListener {
+            val popup = PopupMenu(mContext, binding.llSort)
             popup.menuInflater.inflate(R.menu.sort_menu_product, popup.menu)
             popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
                 PopupMenu.OnMenuItemClickListener {
@@ -236,25 +276,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             strDistance.setSpan(
                                 ForegroundColorSpan(
                                     ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.status_bounced
+                                        mContext!!, R.color.status_bounced
                                     )
-                                ),
-                                0,
-                                strDistance.length,
-                                0
+                                ), 0, strDistance.length, 0
                             )
                         } else {
                             strDistance.setSpan(
                                 ForegroundColorSpan(
                                     ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.cnl_color_2
+                                        mContext!!, R.color.cnl_color_2
                                     )
-                                ),
-                                0,
-                                strDistance.length,
-                                0
+                                ), 0, strDistance.length, 0
                             )
                         }
                     }
@@ -265,31 +297,23 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     strShop.setSpan(
                         ForegroundColorSpan(
                             ContextCompat.getColor(
-                                mContext!!,
-                                R.color.cnl_color_1
+                                mContext!!, R.color.cnl_color_1
                             )
-                        ),
-                        0,
-                        strShop.length,
-                        0
+                        ), 0, strShop.length, 0
                     )
                     builder.append(strShop)
                     appDatabase!!.saveOrderDao().deleteALL()
 
                     confirmDialog(
-                        builder,
-                        "save_order"
+                        builder, "save_order"
                     )
 
                     return@setOnClickListener
 
-                    ViewUtils.viewDialog(
-                        mContext!!,
-                        "",
-                        /*"Are you sure want to save " + str1 + "'s order?"*/
+                    ViewUtils.viewDialog(mContext!!,
+                        "",/*"Are you sure want to save " + str1 + "'s order?"*/
                         builder,
-                        object :
-                            DialogListener {
+                        object : DialogListener {
                             override fun onConfirmed() {
                                 binding.progressBar.visibility = View.VISIBLE
                                 getLocation("save_order")
@@ -310,25 +334,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             strDistance.setSpan(
                                 ForegroundColorSpan(
                                     ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.status_bounced
+                                        mContext!!, R.color.status_bounced
                                     )
-                                ),
-                                0,
-                                strDistance.length,
-                                0
+                                ), 0, strDistance.length, 0
                             )
                         } else {
                             strDistance.setSpan(
                                 ForegroundColorSpan(
                                     ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.cnl_color_2
+                                        mContext!!, R.color.cnl_color_2
                                     )
-                                ),
-                                0,
-                                strDistance.length,
-                                0
+                                ), 0, strDistance.length, 0
                             )
                         }
                     }
@@ -339,13 +355,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     strShop.setSpan(
                         ForegroundColorSpan(
                             ContextCompat.getColor(
-                                mContext!!,
-                                R.color.cnl_color_1
+                                mContext!!, R.color.cnl_color_1
                             )
-                        ),
-                        0,
-                        strShop.length,
-                        0
+                        ), 0, strShop.length, 0
                     )
                     builder.append(strShop)
                     val str3 = SpannableString(getString(R.string.and_selecting_no_order))
@@ -355,27 +367,20 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 //                    )
 
                     return@setOnClickListener
-                    ViewUtils.viewDialog(
-                        mContext!!,
-                        "",
-                        builder,
-                        object :
-                            DialogListener {
-                            override fun onConfirmed() {
-                                binding.progressBar.visibility = View.GONE
-                            }
+                    ViewUtils.viewDialog(mContext!!, "", builder, object : DialogListener {
+                        override fun onConfirmed() {
+                            binding.progressBar.visibility = View.GONE
+                        }
 
-                            override fun onCanceled() {
-                                getLocation("reversegeo")
-                            }
+                        override fun onCanceled() {
+                            getLocation("reversegeo")
+                        }
 
-                        })
+                    })
                 }
             } else {
                 Toast.makeText(
-                    mContext!!,
-                    "Kindly wait for distance to be updated",
-                    Toast.LENGTH_SHORT
+                    mContext!!, "Kindly wait for distance to be updated", Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -390,25 +395,17 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     strDistance.setSpan(
                         ForegroundColorSpan(
                             ContextCompat.getColor(
-                                mContext!!,
-                                R.color.status_bounced
+                                mContext!!, R.color.status_bounced
                             )
-                        ),
-                        0,
-                        strDistance.length,
-                        0
+                        ), 0, strDistance.length, 0
                     )
                 } else {
                     strDistance.setSpan(
                         ForegroundColorSpan(
                             ContextCompat.getColor(
-                                mContext!!,
-                                R.color.cnl_color_2
+                                mContext!!, R.color.cnl_color_2
                             )
-                        ),
-                        0,
-                        strDistance.length,
-                        0
+                        ), 0, strDistance.length, 0
                     )
                 }
             }
@@ -430,8 +427,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 confirmDialog(builder, "no_order")
                 return@setOnClickListener
 
-                ViewUtils.viewDialog(mContext!!, "", builder, object :
-                    DialogListener {
+                ViewUtils.viewDialog(mContext!!, "", builder, object : DialogListener {
                     override fun onConfirmed() {
                         binding.progressBar.visibility = View.VISIBLE
                         getLocation("no_order")
@@ -492,8 +488,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 )
                 AppLogger.log("openCamera:: $photoURI")
                 pictureIntent.putExtra(
-                    MediaStore.EXTRA_OUTPUT,
-                    photoURI
+                    MediaStore.EXTRA_OUTPUT, photoURI
                 )
                 startCamera.launch(pictureIntent)
             }
@@ -502,11 +497,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
-        val timeStamp =
-            SimpleDateFormat(
-                "yyyyMMdd_HHmmss",
-                Locale.getDefault()
-            ).format(Date())
+        val timeStamp = SimpleDateFormat(
+            "yyyyMMdd_HHmmss", Locale.getDefault()
+        ).format(Date())
         val imageFileName = "IMG_" + timeStamp + "_"
         val storageDir =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
@@ -519,8 +512,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     private fun confirmDialog(
-        styleString: SpannableStringBuilder,
-        orderType: String
+        styleString: SpannableStringBuilder, orderType: String
     ) {
         orderTypeNew = orderType
         val dialogBinding = DialogConfirmOrderBinding.inflate(LayoutInflater.from(mContext))
@@ -576,8 +568,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         dialog.show()
         val window = dialog.window
         window!!.setLayout(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
         )
     }
 
@@ -617,8 +608,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             getString(R.string.items_, itemCountt.toString())
                     }
                     binding.totalAmount.text = getString(
-                        R.string.total_,
-                        dFormat.format(selectedOrder!!.grandTotal.toDouble())
+                        R.string.total_, dFormat.format(selectedOrder!!.grandTotal.toDouble())
                     )
                     appDatabase!!.saveOrderDao().insertAll(
                         SaveOrder(
@@ -642,8 +632,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         try {
-            ApiServices.apiGET(
-                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
+            ApiServices.apiGET(Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
                 queue!!,
                 token!!,
                 object : ApiServiceListener {
@@ -665,8 +654,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                     override fun onException(e: Exception) {
                         Toast.makeText(
-                            mContext!!.applicationContext,
-                            e.message, Toast.LENGTH_SHORT
+                            mContext!!.applicationContext, e.message, Toast.LENGTH_SHORT
                         ).show()
                     }
 
@@ -693,28 +681,21 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             builder.append(str1)
             val str2 = SpannableString(shopName)
             str2.setSpan(
-                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)),
-                0,
-                str2.length,
-                0
+                ForegroundColorSpan(resources.getColor(R.color.cnl_color_1)), 0, str2.length, 0
             )
             builder.append(str2)
             val str3 = SpannableString("'s order?")
             builder.append(str3)
-            ViewUtils.viewDialog(
-                mContext!!,
-                "", builder,
-                object :
-                    DialogListener {
-                    override fun onConfirmed() {
-                        binding.progressBar.visibility = View.VISIBLE
-                        getLocation("update_order")
-                    }
+            ViewUtils.viewDialog(mContext!!, "", builder, object : DialogListener {
+                override fun onConfirmed() {
+                    binding.progressBar.visibility = View.VISIBLE
+                    getLocation("update_order")
+                }
 
-                    override fun onCanceled() {
+                override fun onCanceled() {
 
-                    }
-                })
+                }
+            })
 
         }
         getAllProducts()
@@ -723,8 +704,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
         // Create an animation instance
         val an: Animation = RotateAnimation(
-            fromDegrees, toDegrees, (v.width / 2).toFloat(),
-            (v.height / 2).toFloat()
+            fromDegrees, toDegrees, (v.width / 2).toFloat(), (v.height / 2).toFloat()
         )
         an.setDuration(500)
         an.fillAfter = true
@@ -809,10 +789,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     ) {
 
         val distance = Constants.getDistance(
-            currentLatitude,
-            currentLongitude,
-            shopLatitude,
-            shopLongitude
+            currentLatitude, currentLongitude, shopLatitude, shopLongitude
         )
         distanceValue = distance.toDouble()
 
@@ -828,15 +805,13 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             binding.tvdistance.setTextColor(
                 ContextCompat.getColor(
-                    mContext!!,
-                    R.color.status_bounced
+                    mContext!!, R.color.status_bounced
                 )
             )
         } else {
             binding.tvdistance.setTextColor(
                 ContextCompat.getColor(
-                    mContext!!,
-                    R.color.cnl_color_2
+                    mContext!!, R.color.cnl_color_2
                 )
             )
 
@@ -850,7 +825,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
 
         ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shopLongitude + "," + shopLatitude + "/" + currentLongitude + "," + currentLatitude + "?profile=" + profile,
-            queue!!, token!!, object : ApiServiceListener {
+            queue!!,
+            token!!,
+            object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
                         AppLogger.log("response: $response")
@@ -869,15 +846,13 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                     getString(R.string.meter, distMeter.toString())
                                 binding.tvdistance.setTextColor(
                                     ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.status_bounced
+                                        mContext!!, R.color.status_bounced
                                     )
                                 )
                             } else {
                                 binding.tvdistance.setTextColor(
                                     ContextCompat.getColor(
-                                        mContext!!,
-                                        R.color.cnl_color_2
+                                        mContext!!, R.color.cnl_color_2
                                     )
                                 )
                                 binding.tvdistance.text =
@@ -939,7 +914,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
         ApiServices.apiGET(Api.reverseGeo + "?key=" + Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
-            queue!!, token!!, object : ApiServiceListener {
+            queue!!,
+            token!!,
+            object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
                         val data = JSONObject(response)
@@ -992,8 +969,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             orderObj.put("outlet_id", shopId)
             orderObj.put("order_no", selectedOrder!!.orderId)
             orderObj.put("user_id", user_id)
-            orderObj.put("employee_id", sr_id)
-            /*orderObj.put("ordered_at", today)
+            orderObj.put("employee_id", sr_id)/*orderObj.put("ordered_at", today)
             orderObj.put("delivered_at", nextDay)*/
             orderObj.put("total_ordered_amount", grandTotalPrice.toString())
             orderObj.put("total_ordered_quantity", totalCount.toString())
@@ -1013,8 +989,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("unit_code", addedProducts!![j].unit_code)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put(
-                        "discounted_unit_price",
-                        addedProducts!![j].discounted_unit_price.toString()
+                        "discounted_unit_price", addedProducts!![j].discounted_unit_price.toString()
                     )
                     brandObj.put("category_id", addedProducts!![j].category_id)
                     brandObj.put("category_name", addedProducts!![j].category_name)
@@ -1023,8 +998,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
                     brandObj.put(
-                        "ordered_amount",
-                        addedProducts!![j].ordered_total_price.toString()
+                        "ordered_amount", addedProducts!![j].ordered_total_price.toString()
                     )
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
@@ -1040,8 +1014,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             if (obj1.length() > 0) {
                 Log.d("ConfirmOrder", "response: " + obj1)
                 if (deliveredQuantity > 0) {
-                    ApiServices.apiJSONObjectPOST(
-                        Api.update_saved_order,
+                    ApiServices.apiJSONObjectPOST(Api.update_saved_order,
                         queue!!,
                         token!!,
                         obj1,
@@ -1055,14 +1028,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val message = response.getString("message")
                                 //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
 
-                                ViewUtils.viewDialogResponse(
-                                    mContext!!,
+                                ViewUtils.viewDialogResponse(mContext!!,
                                     message,
                                     object : DialogListener {
                                         override fun onConfirmed() {
                                             CreateOrderFragment.setCurrentFragment(
-                                                ShopSelectFragment(),
-                                                ACTIVITY
+                                                ShopSelectFragment(), ACTIVITY
                                             )
                                         }
 
@@ -1088,8 +1059,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         })
                 } else {
-                    ViewUtils.viewDialogResponse(
-                        mContext!!,
+                    ViewUtils.viewDialogResponse(mContext!!,
                         "No products selected to order",
                         object : DialogListener {
                             override fun onConfirmed() {
@@ -1129,11 +1099,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             if (startOrderTime != null) orderObj.put("order_start_time", startOrderTime)
             orderObj.put("order_end_time", today)
             if (binding.tvdistance.text.toString().isNotEmpty()) orderObj.put(
-                "distance_from_outlets",
-                distanceValue.toString()
-            )
-            /*orderObj.put("delivered_at", nextDay)*/
-            /*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
+                "distance_from_outlets", distanceValue.toString()
+            )/*orderObj.put("delivered_at", nextDay)*//*orderObj.put("distributor_office_code", selectedShop!!.distributor_office_code)*/
 
             orderObj.put("longitude", location.longitude.toString())
             orderObj.put("latitude", location.latitude.toString())
@@ -1152,8 +1119,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("unit_code", addedProducts!![j].unit_code)
                     brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
                     brandObj.put(
-                        "discounted_unit_price",
-                        addedProducts!![j].discounted_unit_price.toString()
+                        "discounted_unit_price", addedProducts!![j].discounted_unit_price.toString()
                     )
                     brandObj.put("category_id", addedProducts!![j].category_id)
                     brandObj.put("category_name", addedProducts!![j].category_name)
@@ -1162,8 +1128,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
                     brandObj.put(
-                        "ordered_amount",
-                        addedProducts!![j].ordered_total_price.toString()
+                        "ordered_amount", addedProducts!![j].ordered_total_price.toString()
                     )
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
@@ -1191,8 +1156,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             if (obj1.length() > 0) {
                 Log.d("ConfirmOrder", "response: $obj1")
                 if (orderedQuantity > 0) {
-                    ApiServices.apiJSONObjectPOST(
-                        Api.confirm_order,
+                    ApiServices.apiJSONObjectPOST(Api.confirm_order,
                         queue!!,
                         token!!,
                         obj1,
@@ -1206,14 +1170,12 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
                                 appDatabase!!.orderListDao().deleteByShop(shopId!!)
 
-                                ViewUtils.viewDialogResponse(
-                                    mContext!!,
+                                ViewUtils.viewDialogResponse(mContext!!,
                                     message,
                                     object : DialogListener {
                                         override fun onConfirmed() {
                                             CreateOrderFragment.setCurrentFragment(
-                                                ShopSelectFragment(),
-                                                ACTIVITY
+                                                ShopSelectFragment(), ACTIVITY
                                             )
                                         }
 
@@ -1244,8 +1206,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                         })
                 } else {
-                    ViewUtils.viewDialogResponse(
-                        mContext!!,
+                    ViewUtils.viewDialogResponse(mContext!!,
                         getString(R.string.no_products_selected_to_order),
                         object : DialogListener {
                             override fun onConfirmed() {
@@ -1275,8 +1236,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         orderObj.put("user_id", user_id)
         orderObj.put("employee_id", sr_id)
         if (distanceValue.toString().isNotEmpty()) orderObj.put(
-            "distance_from_outlets",
-            distanceValue.toString()
+            "distance_from_outlets", distanceValue.toString()
         )
 
         if (startOrderTime != null) orderObj.put("order_start_time", startOrderTime)
@@ -1289,8 +1249,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         if (obj1.length() > 0) {
             Log.d("ConfirmOrder", "response: $obj1")
-            ApiServices.apiJSONObjectPOST(
-                Api.no_order,
+            ApiServices.apiJSONObjectPOST(Api.no_order,
                 queue!!,
                 token!!,
                 obj1,
@@ -1308,8 +1267,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 editor!!.putString(Api.ORDERED_ROUTE_ID, selectedShop!!.route_code)
                                 editor!!.commit()
                                 CreateOrderFragment.setCurrentFragment(
-                                    ShopSelectFragment(),
-                                    ACTIVITY
+                                    ShopSelectFragment(), ACTIVITY
                                 )
                             }
 
@@ -1341,181 +1299,175 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         binding.progressBar.visibility = View.VISIBLE
         val url =
             Api.all_product_list + "?with_stock=1&user_id=" + user_id + "&is_active=1"/*+ "&route_id=" + routeId*/
-        val request = StringRequest(
-            Request.Method.GET, url,
-            { response ->
-                try {
-                    binding.progressBar.visibility = View.GONE
+        val request = StringRequest(Request.Method.GET, url, { response ->
+            try {
+                binding.progressBar.visibility = View.GONE
 
-                    val data = JSONObject(response)
-                    if (data.has("products") && !data.isNull("products")) {
-                        val productArray = data.getJSONArray("products")
-                        if (productArray.length() > 0) {
-                            productsList!!.clear()
-                            for (i in 0 until productArray.length()) {
-                                var orderedQty = 0
-                                var orderedTotalPrice = 0.0
-                                var imageUrl = "null"
-                                val productObj = productArray.getJSONObject(i)
-                                val productId = productObj.getString("id")
-                                val productName =
-                                    if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
-                                val productCode =
-                                    if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""
-                                /*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
-                                if (productObj.has("images") && !productObj.isNull("images")) {
-                                    val imageArray = productObj.getJSONArray("images")
-                                    if (imageArray.length() > 0) {
-                                        val imageobj = imageArray.getJSONObject(0)
-                                        if (imageobj.has("image_url")) {
-                                            imageUrl = imageobj.getString("image_url")
-                                        }
+                val data = JSONObject(response)
+                if (data.has("products") && !data.isNull("products")) {
+                    val productArray = data.getJSONArray("products")
+                    if (productArray.length() > 0) {
+                        productsList!!.clear()
+                        for (i in 0 until productArray.length()) {
+                            var orderedQty = 0
+                            var orderedTotalPrice = 0.0
+                            var imageUrl = "null"
+                            val productObj = productArray.getJSONObject(i)
+                            val productId = productObj.getString("id")
+                            val productName =
+                                if (!productObj.isNull("product_name")) productObj.getString("product_name") else ""
+                            val productCode =
+                                if (!productObj.isNull("product_code")) productObj.getString("product_code") else ""/*val discount = if (!productObj.isNull("discount")) productObj.getDouble("discount") else 0.0*/
+                            if (productObj.has("images") && !productObj.isNull("images")) {
+                                val imageArray = productObj.getJSONArray("images")
+                                if (imageArray.length() > 0) {
+                                    val imageobj = imageArray.getJSONObject(0)
+                                    if (imageobj.has("image_url")) {
+                                        imageUrl = imageobj.getString("image_url")
                                     }
-                                }
-                                val skuCode =
-                                    if (!productObj.isNull("sku_code")) productObj.getString("sku_code") else ""
-                                val unitId =
-                                    if (!productObj.isNull("unit_id")) productObj.getString("unit_id") else ""
-                                val unitName =
-                                    if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
-                                val unitCode =
-                                    if (!productObj.isNull("unit_code")) productObj.getString("unit_code") else ""
-                                val categoryId =
-                                    if (!productObj.isNull("category_id")) productObj.getString("category_id") else ""
-                                val categoryName =
-                                    if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
-                                val categoryCode =
-                                    if (!productObj.isNull("category_code")) productObj.getString("category_code") else ""
-                                val qtyLastMonth =
-                                    if (!productObj.isNull("quantity_last_month")) productObj.getInt(
-                                        "quantity_last_month"
-                                    ) else 0
-                                val availableStock =
-                                    if (!productObj.isNull("current_available_stock")) productObj.getInt(
-                                        "current_available_stock"
-                                    ) else 0
-                                var price = 0.0
-                                var discount_price = 0.0
-                                if (!productObj.isNull("unit_price")) {
-                                    price = productObj.getDouble("unit_price")
-                                } else {
-                                    price = 0.0
-                                }
-                                if (!productObj.isNull("discounted_unit_price")) {
-                                    discount_price = productObj.getDouble("discounted_unit_price")
-                                } else {
-                                    discount_price = 0.0
-                                }
-                                if (selectedOrder != null) {
-                                    //var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
-                                    val exist = selectedOrder!!.brands_array.find {
-                                        it.product_id == productId
-                                    }
-
-                                    if (exist != null) {
-                                        orderedQty = exist.ordered_quantity
-                                        orderedTotalPrice = exist.ordered_total_price
-                                    }
-                                } else if (addedProducts!!.size > 0) {
-                                    val exist = addedProducts?.find {
-                                        it.product_id == productId
-                                    }
-
-                                    if (exist != null) {
-                                        orderedQty = exist.ordered_quantity
-                                        orderedTotalPrice = exist.ordered_total_price
-                                    }
-                                }
-                                val products = Products(
-                                    productId,
-                                    productName,
-                                    productCode,
-                                    price,
-                                    discount_price,
-                                    skuCode,
-                                    imageUrl,
-                                    unitId,
-                                    unitName,
-                                    unitCode,
-                                    categoryId,
-                                    categoryName,
-                                    categoryCode,
-                                    qtyLastMonth,
-                                    availableStock,
-                                    0,
-                                    orderedQty,
-                                    orderedTotalPrice
-                                )
-
-                                productsList!!.add(products)
-                                if (orderedQty > 0) {
-                                    val exist = addedProducts?.find {
-                                        it.product_id == productId
-                                    }
-
-                                    if (exist == null) {
-                                        addedProducts!!.add(products)
-                                    }
-
                                 }
                             }
+                            val skuCode =
+                                if (!productObj.isNull("sku_code")) productObj.getString("sku_code") else ""
+                            val unitId =
+                                if (!productObj.isNull("unit_id")) productObj.getString("unit_id") else ""
+                            val unitName =
+                                if (!productObj.isNull("unit_name")) productObj.getString("unit_name") else ""
+                            val unitCode =
+                                if (!productObj.isNull("unit_code")) productObj.getString("unit_code") else ""
+                            val categoryId =
+                                if (!productObj.isNull("category_id")) productObj.getString("category_id") else ""
+                            val categoryName =
+                                if (!productObj.isNull("category_name")) productObj.getString("category_name") else ""
+                            val categoryCode =
+                                if (!productObj.isNull("category_code")) productObj.getString("category_code") else ""
+                            val qtyLastMonth =
+                                if (!productObj.isNull("quantity_last_month")) productObj.getInt(
+                                    "quantity_last_month"
+                                ) else 0
+                            val availableStock =
+                                if (!productObj.isNull("current_available_stock")) productObj.getInt(
+                                    "current_available_stock"
+                                ) else 0
+                            var price = 0.0
+                            var discount_price = 0.0
+                            if (!productObj.isNull("unit_price")) {
+                                price = productObj.getDouble("unit_price")
+                            } else {
+                                price = 0.0
+                            }
+                            if (!productObj.isNull("discounted_unit_price")) {
+                                discount_price = productObj.getDouble("discounted_unit_price")
+                            } else {
+                                discount_price = 0.0
+                            }
+                            if (selectedOrder != null) {
+                                //var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
+                                val exist = selectedOrder!!.brands_array.find {
+                                    it.product_id == productId
+                                }
 
-                            if (productsList!!.size > 0) {
-                                productsList!!.sortByDescending { it.stock_available }
-                                binding.sortTitle.setText(resources.getString(R.string.high_stock))
-                                adapter = ProductListAdapter(productsList!!, listener!!)
-                                binding.productlist.adapter = adapter
-                                adapter!!.notifyDataSetChanged()
+                                if (exist != null) {
+                                    orderedQty = exist.ordered_quantity
+                                    orderedTotalPrice = exist.ordered_total_price
+                                }
+                            } else if (addedProducts!!.size > 0) {
+                                val exist = addedProducts?.find {
+                                    it.product_id == productId
+                                }
+
+                                if (exist != null) {
+                                    orderedQty = exist.ordered_quantity
+                                    orderedTotalPrice = exist.ordered_total_price
+                                }
+                            }
+                            val products = Products(
+                                productId,
+                                productName,
+                                productCode,
+                                price,
+                                discount_price,
+                                skuCode,
+                                imageUrl,
+                                unitId,
+                                unitName,
+                                unitCode,
+                                categoryId,
+                                categoryName,
+                                categoryCode,
+                                qtyLastMonth,
+                                availableStock,
+                                0,
+                                orderedQty,
+                                orderedTotalPrice
+                            )
+
+                            productsList!!.add(products)
+                            if (orderedQty > 0) {
+                                val exist = addedProducts?.find {
+                                    it.product_id == productId
+                                }
+
+                                if (exist == null) {
+                                    addedProducts!!.add(products)
+                                }
+
                             }
                         }
 
+                        if (productsList!!.size > 0) {
+                            productsList!!.sortByDescending { it.stock_available }
+                            binding.sortTitle.setText(resources.getString(R.string.high_stock))
+                            adapter = ProductListAdapter(productsList!!, listener!!)
+                            binding.productlist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
+                        }
                     }
-                } catch (e: Exception) {
+
+                }
+            } catch (e: Exception) {
+                Sentry.captureException(e)
+                e.printStackTrace()
+            }
+        }, { error ->
+            binding.progressBar.visibility = View.GONE
+            if (error is TimeoutError) {
+                //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
+                Toast.makeText(
+                    mContext,
+                    "Request timeout!! Check your internet connection or Contact Admin",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            if (error is NoConnectionError) {
+                //mListerner.onFailure("Turn on your internet connection and Try again")
+                Toast.makeText(
+                    mContext,
+                    "Turn on your internet connection and Try again",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            if (error != null && error.networkResponse != null) {
+                try {
+                    val s = String(error.networkResponse.data)
+                    Log.d("Routes", "message: $s")
+                    val data = JSONObject(s)
+                    //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
+                    //mListerner.onFailure(data.getString("message"))
+                    Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
+                } catch (e: UnsupportedEncodingException) {
                     Sentry.captureException(e)
                     e.printStackTrace()
+                } catch (e: JSONException) {
+                    //mListerner.onFailure(e.message)
+                    Sentry.captureException(e)
+                    Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
+                    e.printStackTrace()
                 }
-            },
-            { error ->
-                binding.progressBar.visibility = View.GONE
-                if (error is TimeoutError) {
-                    //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
-                    Toast.makeText(
-                        mContext,
-                        "Request timeout!! Check your internet connection or Contact Admin",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                if (error is NoConnectionError) {
-                    //mListerner.onFailure("Turn on your internet connection and Try again")
-                    Toast.makeText(
-                        mContext,
-                        "Turn on your internet connection and Try again",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                if (error != null && error.networkResponse != null) {
-                    try {
-                        val s = String(error.networkResponse.data)
-                        Log.d("Routes", "message: $s")
-                        val data = JSONObject(s)
-                        //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                        //mListerner.onFailure(data.getString("message"))
-                        Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
-                            .show()
-                    } catch (e: UnsupportedEncodingException) {
-                        Sentry.captureException(e)
-                        e.printStackTrace()
-                    } catch (e: JSONException) {
-                        //mListerner.onFailure(e.message)
-                        Sentry.captureException(e)
-                        Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                        e.printStackTrace()
-                    }
-                }
-            })
+            }
+        })
         request.retryPolicy = DefaultRetryPolicy(
-            60 * 1000, 0,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            60 * 1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         queue!!.add(request)
     }
@@ -1528,8 +1480,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         brands_array: JSONArray,
         outletCategory: String,
         lastOrderDate: String,
-        minimum_order: String
-        /*listItem: ArrayList<ProductStatistics>*/
+        minimum_order: String/*listItem: ArrayList<ProductStatistics>*/
     ) {
         val dialog = Dialog(mContext)
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -1560,8 +1511,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
         if (lastOrderDate.length > 0 && !lastOrderDate.equals("null")) {
             val orderDate = df.format(oldDate.parse(lastOrderDate))
-            tvLastOrderDate.text =
-                mContext.resources.getString(R.string.last_order_date, orderDate)
+            tvLastOrderDate.text = mContext.resources.getString(R.string.last_order_date, orderDate)
         }
         if (lastDelivery.length > 0 && !lastDelivery.equals("null")) {
             val deliveryDate = df.format(oldDate.parse(lastDelivery))
@@ -1624,8 +1574,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                tvItemCount.text = productItems.size.toString() + mContext.resources
-                                    .getString(R.string.items)
+                                tvItemCount.text =
+                                    productItems.size.toString() + mContext.resources.getString(R.string.items)
 
                                 var grandTotal = 0.0
                                 if (productItems.size > 0) {
@@ -1672,8 +1622,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                         }
                                     }
                                 }
-                                tvItemCount.text = productItems.size.toString() + mContext.resources
-                                    .getString(R.string.items)
+                                tvItemCount.text =
+                                    productItems.size.toString() + mContext.resources.getString(R.string.items)
 
                                 var grandTotal = 0.0
                                 if (productItems.size > 0) {
@@ -1726,8 +1676,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     }
                 }
             }
-            tvItemCount.text = productItems.size.toString() + mContext.resources
-                .getString(R.string.items)
+            tvItemCount.text =
+                productItems.size.toString() + mContext.resources.getString(R.string.items)
 
             var grandTotal = 0.0
             if (productItems.size > 0) {
@@ -1854,8 +1804,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         dialog.show()
         val window = dialog.window
         window!!.setLayout(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
     }
