@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.ui.add_gift
+package com.barikoi.cnlapp.ui.add_gift.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -33,9 +33,7 @@ class AdapterGift(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GiftViewHolder {
         return GiftViewHolder(
             ItemAddGift2Binding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+                LayoutInflater.from(parent.context), parent, false
             )
         )
     }
@@ -48,11 +46,22 @@ class AdapterGift(
         notifyDataSetChanged()
     }
 
+    fun updateByPos(pos: Int, list: List<Gift>) {
+        giftList = list
+        notifyItemChanged(pos)
+    }
+
     override fun onBindViewHolder(holder: GiftViewHolder, position: Int) {
-        holder.binding.tvGiftName.text =
-            giftList[position].name
+        holder.binding.tvGiftName.text = giftList[position].name
 
         holder.binding.tvCount.setText(giftList[position].qty.toString())
+
+        if (giftList[position].images.isNullOrEmpty()) {
+            holder.binding.tvImageCount.isVisible = false
+        } else {
+            holder.binding.tvImageCount.isVisible = true
+            holder.binding.tvImageCount.text = "${giftList[position].images?.size} Images Added"
+        }
 
         holder.binding.ivGift.load(
             giftList[position].image,
@@ -74,6 +83,18 @@ class AdapterGift(
 
         holder.binding.btnAdd.setHapticClickListener {
             addClickListener.invoke(position)
+        }
+
+        holder.binding.ivDelete.setHapticClickListener {
+            removeItemClickListener.invoke(position)
+        }
+
+        holder.binding.btnPlus.setHapticClickListener {
+            incrementClickListener.invoke(position)
+        }
+
+        holder.binding.btnMinus.setHapticClickListener {
+            decrementClickListener.invoke(position)
         }
 
     }
