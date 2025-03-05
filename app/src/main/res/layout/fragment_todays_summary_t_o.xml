@@ -1,161 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:background="@drawable/rounded_corner_lightgray">
+        android:background="@drawable/rounded_corner_lightgray"
+        android:backgroundTint="@color/white">
+
         <LinearLayout
             android:id="@+id/summaryLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:orientation="vertical"
-            >
+            android:visibility="gone">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:background="@drawable/rounded_corner_bg_stroke"
+                android:gravity="center"
 
-                android:padding="8dp"
-                android:background="@drawable/rounded_corner_bg_stroke">
+                android:orientation="horizontal"
+                android:padding="8dp">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="2dp"
                         android:layout_marginStart="4dp"
-                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="2dp"
                         android:gravity="start"
                         android:text="@string/ov"
-                        android:textStyle="bold"
                         android:textAllCaps="true"
                         android:textColor="@color/cnl_color_1"
                         android:textSize="16sp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginRight="2dp"
-                        android:layout_marginLeft="4dp">
-                    </TextView>
+                        android:textStyle="bold"/>
+
                     <TextView
                         android:id="@+id/ovCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
                         android:layout_marginStart="2dp"
-                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="4dp"
                         android:gravity="start"
                         android:text=""
-                        android:textStyle="bold"
                         android:textAllCaps="true"
                         android:textColor="@color/text_title"
                         android:textSize="16sp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginRight="4dp"
-                        android:layout_marginLeft="2dp">
-                    </TextView>
+                        android:textStyle="bold"/>
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="2dp"
                         android:layout_marginStart="4dp"
-                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="2dp"
                         android:gravity="start"
                         android:text="@string/bpc"
-                        android:textStyle="bold"
                         android:textAllCaps="true"
                         android:textColor="@color/cnl_color_1"
                         android:textSize="16sp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginRight="2dp"
-                        android:layout_marginLeft="4dp">
-                    </TextView>
+                        android:textStyle="bold"/>
+
                     <TextView
                         android:id="@+id/bpcCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
                         android:layout_marginStart="2dp"
-                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="4dp"
                         android:gravity="start"
                         android:text=""
-                        android:textStyle="bold"
                         android:textAllCaps="true"
                         android:textColor="@color/text_title"
                         android:textSize="16sp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginRight="4dp"
-                        android:layout_marginLeft="2dp">
-                    </TextView>
+                        android:textStyle="bold"/>
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="2dp"
                         android:layout_marginStart="4dp"
-                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="2dp"
                         android:gravity="start"
                         android:text="@string/lpc"
-                        android:textStyle="bold"
                         android:textAllCaps="true"
                         android:textColor="@color/cnl_color_1"
                         android:textSize="16sp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginRight="2dp"
-                        android:layout_marginLeft="4dp">
-                    </TextView>
+                        android:textStyle="bold"/>
+
                     <TextView
                         android:id="@+id/lpcCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
                         android:layout_marginStart="2dp"
-                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="4dp"
                         android:gravity="start"
                         android:text=""
-                        android:textStyle="bold"
                         android:textAllCaps="true"
                         android:textColor="@color/text_title"
                         android:textSize="16sp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginRight="4dp"
-                        android:layout_marginLeft="2dp">
-                    </TextView>
+                        android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <TableLayout
                     android:id="@+id/tabLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:layout_margin="4dp">
-                </TableLayout>
+                    android:layout_margin="4dp"
+                    android:background="@color/white"/>
 
             </LinearLayout>
 
@@ -171,16 +151,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    >
+                    tools:ignore="UselessParent">
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginTop="4dp"
                         android:layout_marginLeft="16dp"
+                        android:layout_marginTop="4dp"
                         android:layout_marginRight="16dp"
-                        android:background="@color/color_gray">
-                    </View>
+                        android:layout_marginBottom="4dp"
+                        android:background="@color/color_gray"/>
 
                     <TableLayout
                         android:id="@+id/tabLayoutTarget"
@@ -195,32 +175,31 @@
 
             </RelativeLayout>
         </LinearLayout>
+
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/progressBarHome"
             style="@style/SpinKitView.Circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:padding="8dp"
             android:visibility="visible"
-            android:layout_centerInParent="true"
             app:SpinKit_Color="@color/cnl_color_1" />
+
         <TextView
             android:id="@+id/tryAgain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="2dp"
             android:layout_centerInParent="true"
-            android:visibility="gone"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/rounded_stroke_bg"
             android:text="@string/refresh"
-            android:textStyle="bold"
             android:textAllCaps="true"
             android:textColor="@color/text_title"
             android:textSize="16sp"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="2dp">
-        </TextView>
+            android:textStyle="bold"
+            android:visibility="gone"/>
     </RelativeLayout>
 
 </LinearLayout>
