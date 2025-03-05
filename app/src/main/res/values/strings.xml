@@ -336,5 +336,8 @@
     <string name="add_more">Add More</string>
     <string name="add_gift">Add Gift</string>
     <string name="gift_image">Gift Image</string>
+    <string name="edit_gift">Edit Gift</string>
+    <string name="please_add_gift">Please add gift</string>
+    <string name="please_add_image">Please add image</string>
 
 </resources>
