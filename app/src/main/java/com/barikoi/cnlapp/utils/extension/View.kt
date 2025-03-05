@@ -33,6 +33,16 @@ fun Activity.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
 
+fun View.isViewEnable(isEnable: Boolean) {
+    if (isEnable) {
+        this.isEnabled = true
+        this.alpha = 1f
+    } else {
+        this.isEnabled = false
+        this.alpha = 0.7f
+    }
+}
+
 
 fun View.setHapticClickListener(f: () -> Unit) {
     var lastTimeClicked: Long = 0
