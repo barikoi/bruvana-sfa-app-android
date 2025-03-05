@@ -4,19 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="@dimen/_10sdp"
-    android:layout_margin="@dimen/_5dp">
+    android:layout_margin="@dimen/_5dp"
+    app:cardCornerRadius="@dimen/_10sdp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:paddingBottom="@dimen/_10sdp"
         android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/ivGift"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:scaleType="fitXY"
             android:contentDescription="@string/gift_image"
+            android:scaleType="fitXY"
             android:src="@drawable/product_gift"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,8 +31,8 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_10sdp"
             android:text="Gift Name"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ivGift" />
 
         <ImageView
@@ -67,7 +68,7 @@
             app:icon="@drawable/round_add_circle_24"
             app:iconPadding="5dp"
             app:iconTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tvImageCount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvGiftName" />
 
@@ -82,7 +83,7 @@
             android:orientation="horizontal"
             android:padding="1dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tvImageCount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvGiftName">
 
@@ -127,5 +128,17 @@
                 app:tint="@color/colorPrimaryDark" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvImageCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3 Images Added"
+            android:textColor="@color/cnl_color_2"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="SmallSp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
