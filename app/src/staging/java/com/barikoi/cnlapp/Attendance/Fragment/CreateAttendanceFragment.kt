@@ -170,7 +170,7 @@ class CreateAttendanceFragment : Fragment() {
                     if (!isImageAdded) {
                         Toast.makeText(
                             requireContext(),
-                            "Upload image for attendance",
+                            getString(R.string.upload_image_for_attendance),
                             Toast.LENGTH_SHORT
                         )
                             .show()
