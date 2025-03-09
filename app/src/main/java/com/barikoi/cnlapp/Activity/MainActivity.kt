@@ -277,8 +277,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navigationDrawer!!.menu.findItem(R.id.menu_request_approval).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "TO"
 
-        navigationDrawer!!.menu.findItem(R.id.menu_request_approval).isVisible =
-            sharePrefUtils.getString(Api.USER_TYPE) == "ASM"
+
+        navigationDrawer!!.menu.findItem(R.id.menu_visit_report).isVisible =
+            sharePrefUtils.getString(Api.USER_TYPE) != "ASM"
 
         navigationDrawer!!.menu.findItem(R.id.menu_product_stock_request).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
