@@ -124,9 +124,9 @@ class ProductStockUpdateActivity : BaseActivity() {
 
         adapter = ProductStockAdapter(
             false,
-            sharePrefUtils.getString(Api.USER_TYPE) == "TO",
+            sharePrefUtils.getString(Api.USER_TYPE) == "TO" || sharePrefUtils.getString(Api.USER_TYPE) == "ASM",
             {
-                if (sharePrefUtils.getString(Api.USER_TYPE) != "TO")
+                if (sharePrefUtils.getString(Api.USER_TYPE) != "TO" && sharePrefUtils.getString(Api.USER_TYPE) != "ASM")
                     enableSelectionMode(it)
 
             }, {
