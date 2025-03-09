@@ -61,10 +61,20 @@ class LastWeekSummaryTOFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setLastWeekSummary()
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+//            setTodaySummaryForASM()
+        } else {
+            setLastWeekSummary()
+        }
+
 
         binding.tryAgain.setOnClickListener {
-            setLastWeekSummary()
+            if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+//            setTodaySummaryForASM()
+            } else {
+                setLastWeekSummary()
+            }
+
         }
     }
 
@@ -80,7 +90,9 @@ class LastWeekSummaryTOFragment : Fragment() {
             startDate = df.format(start)
             endDate = df.format(start)
             ApiServices.apiGET(
-                Api.get_all_so_list + "?last_week_summary=1&start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(Api.USER_ID),
+                Api.get_all_so_list + "?last_week_summary=1&start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                    Api.USER_ID
+                ),
                 mQueue,
                 sharePrefUtils.getString(Api.TOKEN)!!,
                 object :
@@ -227,7 +239,8 @@ class LastWeekSummaryTOFragment : Fragment() {
                 c2.setTextColor(resources.getColor(R.color.text_title))
                 c2.text = data[i].second
                 c2.gravity = Gravity.CENTER
-                c2.background = ContextCompat.getDrawable(requireContext(), R.drawable.button_white_bg_stroke)
+                c2.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.button_white_bg_stroke)
                 tr.addView(c1)
                 tr.addView(c2)
 
@@ -278,7 +291,7 @@ class LastWeekSummaryTOFragment : Fragment() {
             sharePrefUtils.getString(Api.TOKEN)!!,
             object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
-                   try {
+                    try {
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
@@ -309,7 +322,7 @@ class LastWeekSummaryTOFragment : Fragment() {
                                     )
                                 if (!targetObj.isNull("delivered_value")) deliveryValue =
                                     dFormat.format(
-                                         targetObj.getString("delivered_value").toDouble()
+                                        targetObj.getString("delivered_value").toDouble()
                                     )
                             }
                         }
