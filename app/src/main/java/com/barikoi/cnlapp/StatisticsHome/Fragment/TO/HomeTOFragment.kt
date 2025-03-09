@@ -214,8 +214,6 @@ class HomeTOFragment : Fragment() {
                 ) + "&user_id=" + sharePrefUtils.getString(Api.USER_ID)
             )
         }
-
-
     }
 
     private fun getSummaryTargets(url: String) {
