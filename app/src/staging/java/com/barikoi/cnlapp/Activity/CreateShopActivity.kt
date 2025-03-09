@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
-import android.content.DialogInterface.OnMultiChoiceClickListener
 import android.content.IntentSender.SendIntentException
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -21,8 +19,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -110,11 +106,11 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var selectedBuyer: Int? = -1
     private var inputVerified: Int? = 0
 
-    var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
-    var routesList: ArrayList<String>? = ArrayList()
+    private var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+    private var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
-    val competitiveArray: Array<String> = arrayOf(
+    private val competitiveArray: Array<String> = arrayOf(
         "Nutella",
         "Nocilla",
         "Chocomo",
@@ -132,8 +128,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     )
 
 
-    var competitiveList: MutableList<String> = mutableListOf()
-    val selectedCompetitive = BooleanArray(competitiveArray.size)
+    private var competitiveList: MutableList<String> = mutableListOf()
+    private val selectedCompetitive = BooleanArray(competitiveArray.size)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -207,7 +203,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         getBuyer()
         getImageFromDB()
 
-        binding.isVerified.setOnCheckedChangeListener { compoundButton, isChecked ->
+        binding.isVerified.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 inputVerified = 1
             } else {
@@ -230,7 +226,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
             val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
 
-            mapView = dialog.findViewById<MapView>(R.id.map_view)
+            mapView = dialog.findViewById(R.id.map_view)
             mapView!!.onCreate(savedInstanceState)
             mapView!!.getMapAsync(this)
             mapView!!.onStart()
@@ -299,7 +295,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         binding.etContactNumber.setText(shops.contact_number)
         binding.etCompetitor.setText(shops.competitive?.joinToString(", "))
 
-        if (shops.competitive != null && shops.competitive.isNotEmpty()) {
+        if (!shops.competitive.isNullOrEmpty()) {
             competitiveList = shops.competitive.toMutableList()
 
             competitiveArray.mapIndexed { index, s ->
@@ -337,15 +333,14 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 Log.d("CreateShopActivity", imageArray.get(i))
                 image.layoutParams = p
                 Glide.with(applicationContext)
-                    .load(imageArray.get(i))
+                    .load(imageArray[i])
                     .override(200, 200)
-                    /*.apply(RequestOptions.bitmapTransform(RoundedCorners(10)))*/
                     .transform(CenterCrop(), RoundedCorners(10))
                     .into(image)
 
                 // Adds the view to the layout
                 layout.addView(image)
-                image.setOnClickListener { view: View? ->
+                image.setOnClickListener {
                     val nagDialog = Dialog(
                         this@CreateShopActivity,
                         android.R.style.Theme_NoTitleBar_Fullscreen
@@ -355,16 +350,14 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     nagDialog.setContentView(R.layout.preview_image)
                     val btnClose =
                         nagDialog.findViewById<Button>(R.id.btnIvClose)
-                    /*val btnDelete =
-                        nagDialog.findViewById<Button>(R.id.btnIvDelete)*/
                     val ivPreview =
                         nagDialog.findViewById<ImageView>(R.id.iv_preview_image)
                     Glide.with(applicationContext)
-                        .load(imageArray.get(i))
+                        .load(imageArray[i])
                         .thumbnail(.2.toFloat())
                         .into(ivPreview)
-                    btnClose.setOnClickListener { view1: View? -> nagDialog.dismiss() }
-                    val pAttacher: PhotoViewAttacher = PhotoViewAttacher(ivPreview)
+                    btnClose.setOnClickListener { nagDialog.dismiss() }
+                    val pAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
                     nagDialog.show()
                 }
@@ -374,9 +367,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun getImageFromDB() {
         appDatabase!!.imagesDao()!!.deleteAllImages()
-        var imageList: ArrayList<Images?>? = ArrayList()
-        imageList =
-            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
+        val imageList: ArrayList<Images?>? = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
         if (imageList!!.isNotEmpty()) {
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
@@ -386,7 +377,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     binding.imageCounter.visibility = View.VISIBLE
                     binding.imageCounter.text = (imageList.size).toString() + " Photos Added"
                     try {
-                        var bitmap = binding.imagePicker.getRotateImage(dbPhotoPath)
+                        val bitmap = binding.imagePicker.getRotateImage(dbPhotoPath)
                         binding.imagePicker.setLocalImage(
                             bitmap,
                             dbPhotoPath,
@@ -413,60 +404,59 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
     }
 
-    var startCamera = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-        ActivityResultCallback<ActivityResult> { result ->
-            val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
-            if (result.getResultCode() == RESULT_CANCELED) {
-                if (filePath != null) {
-                    Log.d("Image", "Canceled: $filePath")
-                    binding.imagePicker.deleteFileLocal(filePath)
+    private var startCamera = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val filePath = prefs!!.getString(ApiCall.IMAGE_PATH, "")
+        if (result.resultCode == RESULT_CANCELED) {
+            if (filePath != null) {
+                Log.d("Image", "Canceled: $filePath")
+                binding.imagePicker.deleteFileLocal(filePath)
+                editor!!.putString(ApiCall.IMAGE_PATH, "")
+                editor!!.apply()
+            }
+        }
+        if (result.resultCode == RESULT_OK) {
+            Log.e("imageUtils", "OnActivity result code 1: $RESULT_OK")
+            var imagePosition = 0
+            val imageList = appDatabase!!.imagesDao()!!
+                .getAllImageDB("Shop") as ArrayList<Images?>?
+            binding.imageCounter.visibility = View.VISIBLE
+            binding.imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
+
+            Log.d("Imagepos", "List: $imageList")
+            imagePosition = if (imageList.isNotEmpty()) {
+                imageList[imageList.size - 1]!!.position + 1
+            } else {
+                imagePosition + 1
+            }
+            binding.imagePicker.addNewImage(
+                result.data,
+                CAMERA,
+                imagePosition,
+                "Shop",
+                prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
+            )
+            try {
+                val placeImage = Images(
+                    null, imagePosition,
+                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
+                )
+                isImageAdded = true
+                if (imagePosition > 0) {
+                    Log.d("Imagepos", "insert")
+                    Executors.newSingleThreadExecutor().execute {
+                        appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                    }
                     editor!!.putString(ApiCall.IMAGE_PATH, "")
                     editor!!.apply()
                 }
+            } catch (e: java.lang.Exception) {
+                Log.e("imageUtils", "OnActivity result 2: $e")
+                Sentry.captureException(e)
             }
-            if (result.getResultCode() == RESULT_OK) {
-                Log.e("imageUtils", "OnActivity result code 1: $RESULT_OK")
-                var imagePosition = 0
-                var imageList: ArrayList<Images?>? = ArrayList()
-                imageList = appDatabase!!.imagesDao()!!
-                    .getAllImageDB("Shop") as ArrayList<Images?>?
-                binding.imageCounter.visibility = View.VISIBLE
-                binding.imageCounter.text = (imageList!!.size + 1).toString() + " Photos Added"
-
-                Log.d("Imagepos", "List: $imageList")
-                imagePosition = if (imageList.isNotEmpty()) {
-                    imageList[imageList.size - 1]!!.position + 1
-                } else {
-                    imagePosition + 1
-                }
-                binding.imagePicker.addNewImage(
-                    result.data,
-                    CAMERA,
-                    imagePosition,
-                    "Shop",
-                    prefs!!.getString(ApiCall.IMAGE_PATH, "")!!
-                )
-                try {
-                    val placeImage = Images(
-                        null, imagePosition,
-                        prefs!!.getString(ApiCall.IMAGE_PATH, "")!!, "Shop"
-                    )
-                    isImageAdded = true
-                    if (imagePosition > 0) {
-                        Log.d("Imagepos", "insert")
-                        Executors.newSingleThreadExecutor().execute {
-                            appDatabase!!.imagesDao()!!.insertAll(placeImage)
-                        }
-                        editor!!.putString(ApiCall.IMAGE_PATH, "")
-                        editor!!.apply()
-                    }
-                } catch (e: java.lang.Exception) {
-                    Log.e("imageUtils", "OnActivity result 2: $e")
-                    Sentry.captureException(e)
-                }
-            }
-        })
+        }
+    }
 
     fun getRoutes() {
         ApiServices.apiGET(
@@ -475,136 +465,128 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             "",
             object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
-                    if (response != null) {
-                        try {
-                            val data = JSONObject(response)
-                            var routeNameList: ArrayList<Pair<String, String>>? =
-                                ArrayList()
-                            if (data.has("routes") && !data.isNull("routes")) {
-                                val routesList = ArrayList<String>()
-                                val routesArray = data.getJSONArray("routes")
-                                if (routesArray.length() > 0) {
-                                    routeNameList!!.add(
+                    try {
+                        val data = JSONObject(response)
+                        val routeNameList: ArrayList<Pair<String, String>> =
+                            ArrayList()
+                        if (data.has("routes") && !data.isNull("routes")) {
+                            val routesList = ArrayList<String>()
+                            val routesArray = data.getJSONArray("routes")
+                            if (routesArray.length() > 0) {
+                                routeNameList.add(
+                                    Pair(
+                                        "",
+                                        resources.getString(R.string.select_route)
+                                    )
+                                )
+                                routesList.add(resources.getString(R.string.select_route))
+                                for (i in 0 until routesArray.length()) {
+                                    val routeObj = routesArray.getJSONObject(i)
+
+                                    routeNameList.add(
                                         Pair(
-                                            "",
-                                            resources.getString(R.string.select_route)
+                                            routeObj.getString("id"),
+                                            routeObj.getString("route_name")
                                         )
                                     )
-                                    routesList.add(resources.getString(R.string.select_route))
-                                    for (i in 0 until routesArray.length()) {
-                                        val routeObj = routesArray.getJSONObject(i)
-
-                                        routeNameList.add(
-                                            Pair(
-                                                routeObj.getString("id"),
-                                                routeObj.getString("route_name")
-                                            )
-                                        )
-                                        routesList.add(routeObj.getString("route_name"))
-                                    }
-                                    if (binding.spinnerRoutes != null) {
-                                        if (binding.spinnerRoutes.adapter == null) {
-                                            val adapter = object : ArrayAdapter<String>(
-                                                applicationContext,
-                                                android.R.layout.simple_spinner_item, routesList
-                                            ) {
-                                                override fun isEnabled(position: Int): Boolean {
-                                                    return position != 0
-                                                }
-
-                                                override fun getDropDownView(
-                                                    position: Int,
-                                                    convertView: View?,
-                                                    parent: ViewGroup
-                                                ): View {
-                                                    val view: TextView = super.getDropDownView(
-                                                        position,
-                                                        convertView,
-                                                        parent
-                                                    ) as TextView
-                                                    //set the color of first item in the drop down list to gray
-                                                    if (position == 0) {
-                                                        view.setTextColor(
-                                                            ContextCompat.getColor(
-                                                                this@CreateShopActivity,
-                                                                R.color.text_title_2
-                                                            )
-                                                        )
-                                                        view.visibility = View.GONE
-                                                    } else {
-                                                        //here it is possible to define color for other items by
-                                                        //view.setTextColor(Color.RED)
-                                                        view.setTextColor(
-                                                            ContextCompat.getColor(
-                                                                this@CreateShopActivity,
-                                                                R.color.black
-                                                            )
-                                                        )
-                                                    }
-                                                    return view
-                                                }
-                                            }
-                                            binding.spinnerRoutes.adapter = adapter
+                                    routesList.add(routeObj.getString("route_name"))
+                                }
+                                if (binding.spinnerRoutes.adapter == null) {
+                                    val adapter = object : ArrayAdapter<String>(
+                                        applicationContext,
+                                        android.R.layout.simple_spinner_item, routesList
+                                    ) {
+                                        override fun isEnabled(position: Int): Boolean {
+                                            return position != 0
                                         }
 
-                                        binding.spinnerRoutes.onItemSelectedListener =
-                                            object : AdapterView.OnItemSelectedListener {
-                                                override fun onItemSelected(
-                                                    p0: AdapterView<*>?,
-                                                    p1: View?,
-                                                    p2: Int,
-                                                    p3: Long
-                                                ) {
-                                                    if (p2 > 0) {
-                                                        val view1: TextView =
-                                                            p0!!.getChildAt(0) as TextView
-                                                        view1.setTextColor(
-                                                            ContextCompat.getColor(
-                                                                this@CreateShopActivity,
-                                                                R.color.black
-                                                            )
-                                                        )
-                                                        if (routeNameList[p2].first.length > 0) {
-                                                            selectedRoute = routeNameList[p2].first
-                                                        } else {
-                                                            selectedRoute = ""
-                                                        }
-                                                    } else {
-                                                        val view1: TextView =
-                                                            p0!!.getChildAt(0) as TextView
-                                                        view1.setTextColor(
-                                                            ContextCompat.getColor(
-                                                                this@CreateShopActivity,
-                                                                R.color.text_title_2
-                                                            )
-                                                        )
-                                                        selectedRoute = ""
-                                                    }
-                                                }
-
-                                                override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                                                }
-
+                                        override fun getDropDownView(
+                                            position: Int,
+                                            convertView: View?,
+                                            parent: ViewGroup
+                                        ): View {
+                                            val view: TextView = super.getDropDownView(
+                                                position,
+                                                convertView,
+                                                parent
+                                            ) as TextView
+                                            //set the color of first item in the drop down list to gray
+                                            if (position == 0) {
+                                                view.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.text_title_2
+                                                    )
+                                                )
+                                                view.visibility = View.GONE
+                                            } else {
+                                                //here it is possible to define color for other items by
+                                                //view.setTextColor(Color.RED)
+                                                view.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.black
+                                                    )
+                                                )
                                             }
-
+                                            return view
+                                        }
                                     }
+                                    binding.spinnerRoutes.adapter = adapter
                                 }
 
+                                binding.spinnerRoutes.onItemSelectedListener =
+                                    object : AdapterView.OnItemSelectedListener {
+                                        override fun onItemSelected(
+                                            p0: AdapterView<*>?,
+                                            p1: View?,
+                                            p2: Int,
+                                            p3: Long
+                                        ) {
+                                            if (p2 > 0) {
+                                                val view1: TextView =
+                                                    p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.black
+                                                    )
+                                                )
+                                                if (routeNameList[p2].first.isNotEmpty()) {
+                                                    selectedRoute = routeNameList[p2].first
+                                                } else {
+                                                    selectedRoute = ""
+                                                }
+                                            } else {
+                                                val view1: TextView =
+                                                    p0!!.getChildAt(0) as TextView
+                                                view1.setTextColor(
+                                                    ContextCompat.getColor(
+                                                        this@CreateShopActivity,
+                                                        R.color.text_title_2
+                                                    )
+                                                )
+                                                selectedRoute = ""
+                                            }
+                                        }
+
+                                        override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+                                    }
+
                             }
-                        } catch (e: Exception) {
-                            Sentry.captureException(e)
-                            e.printStackTrace()
+
                         }
+                    } catch (e: Exception) {
+                        Sentry.captureException(e)
+                        e.printStackTrace()
                     }
 
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, applicationContext)
@@ -618,241 +600,228 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             })
     }
 
-    fun setRoutes(routesList: ArrayList<String>, routeNameList: ArrayList<Pair<String, String>>) {
+    private fun setRoutes(
+        routesList: ArrayList<String>,
+        routeNameList: ArrayList<Pair<String, String>>
+    ) {
         var storedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
-        if (binding.spinnerRoutes != null) {
-            if (binding.spinnerRoutes.adapter == null) {
-                val adapter = object : ArrayAdapter<String>(
-                    applicationContext,
-                    android.R.layout.simple_spinner_item, routesList
-                ) {
-                    override fun isEnabled(position: Int): Boolean {
-                        return position != 0
-                    }
-
-                    override fun getDropDownView(
-                        position: Int,
-                        convertView: View?,
-                        parent: ViewGroup
-                    ): View {
-                        val view: TextView = super.getDropDownView(
-                            position,
-                            convertView,
-                            parent
-                        ) as TextView
-                        //set the color of first item in the drop down list to gray
-                        if (position == 0) {
-                            view.setTextColor(
-                                ContextCompat.getColor(
-                                    this@CreateShopActivity,
-                                    R.color.text_title_2
-                                )
-                            )
-                            view.visibility = View.GONE
-                        } else {
-                            //here it is possible to define color for other items by
-                            //view.setTextColor(Color.RED)
-                            view.setTextColor(
-                                ContextCompat.getColor(
-                                    this@CreateShopActivity,
-                                    R.color.black
-                                )
-                            )
-                        }
-                        return view
-                    }
+        if (binding.spinnerRoutes.adapter == null) {
+            val adapter = object : ArrayAdapter<String>(
+                applicationContext,
+                android.R.layout.simple_spinner_item, routesList
+            ) {
+                override fun isEnabled(position: Int): Boolean {
+                    return position != 0
                 }
-                binding.spinnerRoutes.adapter = adapter
-            }
 
-            binding.spinnerRoutes.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        p0: AdapterView<*>?,
-                        p1: View?,
-                        p2: Int,
-                        p3: Long
-                    ) {
-                        if (p0 != null) {
-                            if (storedRoute.length > 0) {
-                                if (binding.spinnerRoutes.adapter.count > 0) {
-                                    val pos =
-                                        (binding.spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(
-                                            storedRoute
-                                        )
-                                    Log.e("RouteList", "selectedRoute pos " + pos)
-                                    Log.e(
-                                        "RouteList",
-                                        "selectedRoute count " + binding.spinnerRoutes.adapter.count
-                                    )
-                                    if (pos > -1) {
-                                        storedRoute = ""
-                                        binding.spinnerRoutes.setSelection(pos)
-                                    }
+                override fun getDropDownView(
+                    position: Int,
+                    convertView: View?,
+                    parent: ViewGroup
+                ): View {
+                    val view: TextView = super.getDropDownView(
+                        position,
+                        convertView,
+                        parent
+                    ) as TextView
+                    //set the color of first item in the drop down list to gray
+                    if (position == 0) {
+                        view.setTextColor(
+                            ContextCompat.getColor(
+                                this@CreateShopActivity,
+                                R.color.text_title_2
+                            )
+                        )
+                        view.visibility = View.GONE
+                    } else {
+                        //here it is possible to define color for other items by
+                        //view.setTextColor(Color.RED)
+                        view.setTextColor(
+                            ContextCompat.getColor(
+                                this@CreateShopActivity,
+                                R.color.black
+                            )
+                        )
+                    }
+                    return view
+                }
+            }
+            binding.spinnerRoutes.adapter = adapter
+        }
+
+        binding.spinnerRoutes.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    p0: AdapterView<*>?,
+                    p1: View?,
+                    p2: Int,
+                    p3: Long
+                ) {
+                    if (p0 != null) {
+                        if (storedRoute.isNotEmpty()) {
+                            if (binding.spinnerRoutes.adapter.count > 0) {
+                                val pos =
+                                    (binding.spinnerRoutes.adapter as ArrayAdapter<String>)
+                                        .getPosition(storedRoute)
+                                if (pos > -1) {
+                                    storedRoute = ""
+                                    binding.spinnerRoutes.setSelection(pos)
                                 }
                             }
-                            if (p0.childCount > 0) {
-                                if (p2 > 0) {
-                                    val view1: TextView = p0.getChildAt(0) as TextView
-                                    view1.setTextColor(
-                                        ContextCompat.getColor(
-                                            this@CreateShopActivity,
-                                            R.color.black
-                                        )
+                        }
+                        if (p0.childCount > 0) {
+                            if (p2 > 0) {
+                                val view1: TextView = p0.getChildAt(0) as TextView
+                                view1.setTextColor(
+                                    ContextCompat.getColor(
+                                        this@CreateShopActivity,
+                                        R.color.black
                                     )
-                                    if (routeNameList[p2].first.length > 0) {
-                                        selectedRoute = routeNameList[p2].first
-                                    } else {
-                                        selectedRoute = ""
-                                    }
+                                )
+                                if (routeNameList[p2].first.isNotEmpty()) {
+                                    selectedRoute = routeNameList[p2].first
                                 } else {
-                                    val view1: TextView = p0.getChildAt(0) as TextView
-                                    view1.setTextColor(
-                                        ContextCompat.getColor(
-                                            this@CreateShopActivity,
-                                            R.color.text_title_2
-                                        )
-                                    )
                                     selectedRoute = ""
                                 }
+                            } else {
+                                val view1: TextView = p0.getChildAt(0) as TextView
+                                view1.setTextColor(
+                                    ContextCompat.getColor(
+                                        this@CreateShopActivity,
+                                        R.color.text_title_2
+                                    )
+                                )
+                                selectedRoute = ""
                             }
                         }
                     }
+                }
 
-                    override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                    }
+                override fun onNothingSelected(p0: AdapterView<*>?) {
 
                 }
 
-            if (shops != null) {
-                if (shops!!.route_name.length > 0) {
-                    val pos =
-                        (binding.spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
-                    if (pos > -1) {
-                        binding.spinnerRoutes.setSelection(pos)
-                    }
-                }
             }
 
+        if (shops != null) {
+            if (shops!!.route_name.isNotEmpty()) {
+                val pos =
+                    (binding.spinnerRoutes.adapter as ArrayAdapter<String>).getPosition(shops!!.route_name)
+                if (pos > -1) {
+                    binding.spinnerRoutes.setSelection(pos)
+                }
+            }
         }
+
     }
 
-    fun getShopType() {
+    private fun getShopType() {
         ApiServices.apiGET(Api.get_shop_type, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
-                if (response != null) {
-                    try {
-                        val typeList: ArrayList<String> = ArrayList()
-                        val obj = JSONObject(response)
-                        if (obj.has("outlet_types") && !obj.isNull("outlet_types")) {
-                            val typesArray = obj.getJSONArray("outlet_types")
-                            if (typesArray.length() > 0) {
-                                typeList.add(resources.getString(R.string.select_shop_type))
-                                for (i in 0 until typesArray.length()) {
-                                    typeList.add(typesArray.getString(i))
+                try {
+                    val typeList: ArrayList<String> = ArrayList()
+                    val obj = JSONObject(response)
+                    if (obj.has("outlet_types") && !obj.isNull("outlet_types")) {
+                        val typesArray = obj.getJSONArray("outlet_types")
+                        if (typesArray.length() > 0) {
+                            typeList.add(resources.getString(R.string.select_shop_type))
+                            for (i in 0 until typesArray.length()) {
+                                typeList.add(typesArray.getString(i))
+                            }
+
+                            val shopTypeAdapter = object : ArrayAdapter<String>(
+                                applicationContext,
+                                android.R.layout.simple_spinner_item, typeList
+                            ) {
+                                override fun isEnabled(position: Int): Boolean {
+                                    return position != 0
                                 }
 
-                                val shopTypeAdapter = object : ArrayAdapter<String>(
-                                    applicationContext,
-                                    android.R.layout.simple_spinner_item, typeList
-                                ) {
-                                    override fun isEnabled(position: Int): Boolean {
-                                        return position != 0
-                                    }
-
-                                    override fun getDropDownView(
-                                        position: Int,
-                                        convertView: View?,
-                                        parent: ViewGroup
-                                    ): View {
-                                        val view: TextView = super.getDropDownView(
-                                            position,
-                                            convertView,
-                                            parent
-                                        ) as TextView
-                                        //set the color of first item in the drop down list to gray
-                                        if (position == 0) {
-                                            view.setTextColor(
-                                                ContextCompat.getColor(
-                                                    this@CreateShopActivity,
-                                                    R.color.text_title_2
-                                                )
+                                override fun getDropDownView(
+                                    position: Int,
+                                    convertView: View?,
+                                    parent: ViewGroup
+                                ): View {
+                                    val view: TextView = super.getDropDownView(
+                                        position,
+                                        convertView,
+                                        parent
+                                    ) as TextView
+                                    //set the color of first item in the drop down list to gray
+                                    if (position == 0) {
+                                        view.setTextColor(
+                                            ContextCompat.getColor(
+                                                this@CreateShopActivity,
+                                                R.color.text_title_2
                                             )
-                                            view.visibility = View.GONE
-                                        } else {
-                                            //here it is possible to define color for other items by
-                                            //view.setTextColor(Color.RED)
-                                            view.setTextColor(
+                                        )
+                                        view.visibility = View.GONE
+                                    } else {
+                                        view.setTextColor(
+                                            ContextCompat.getColor(
+                                                this@CreateShopActivity,
+                                                R.color.black
+                                            )
+                                        )
+                                    }
+                                    return view
+                                }
+                            }
+                            binding.spinnerShopType.adapter = shopTypeAdapter
+
+                            binding.spinnerShopType.onItemSelectedListener =
+                                object : AdapterView.OnItemSelectedListener {
+                                    override fun onItemSelected(
+                                        p0: AdapterView<*>?,
+                                        p1: View?,
+                                        p2: Int,
+                                        p3: Long
+                                    ) {
+                                        if (p2 > 0) {
+                                            val view1: TextView = p0!!.getChildAt(0) as TextView
+                                            view1.setTextColor(
                                                 ContextCompat.getColor(
                                                     this@CreateShopActivity,
                                                     R.color.black
                                                 )
                                             )
+                                            selectedShopType = typeList[p2]
+                                        } else {
+                                            val view1: TextView = p0!!.getChildAt(0) as TextView
+                                            view1.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.text_title_2
+                                                )
+                                            )
+                                            selectedShopType = ""
                                         }
-                                        return view
                                     }
+
+                                    override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                                    }
+
                                 }
-                                binding.spinnerShopType.adapter = shopTypeAdapter
 
-                                binding.spinnerShopType.onItemSelectedListener =
-                                    object : AdapterView.OnItemSelectedListener {
-                                        override fun onItemSelected(
-                                            p0: AdapterView<*>?,
-                                            p1: View?,
-                                            p2: Int,
-                                            p3: Long
-                                        ) {
-                                            if (p2 > 0) {
-                                                val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(
-                                                    ContextCompat.getColor(
-                                                        this@CreateShopActivity,
-                                                        R.color.black
-                                                    )
-                                                )
-                                                selectedShopType = typeList[p2]
-                                            } else {
-                                                val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(
-                                                    ContextCompat.getColor(
-                                                        this@CreateShopActivity,
-                                                        R.color.text_title_2
-                                                    )
-                                                )
-                                                selectedShopType = ""
-                                            }
-                                        }
-
-                                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                                        }
-
-                                    }
-
-                                if (shops != null) {
-                                    typeList.mapIndexed { pos, s ->
-                                        if (shops!!.shop_type.trim() == s.trim()) {
-                                            binding.spinnerShopType.setSelection(pos)
-                                        }
+                            if (shops != null) {
+                                typeList.mapIndexed { pos, s ->
+                                    if (shops!!.shop_type.trim() == s.trim()) {
+                                        binding.spinnerShopType.setSelection(pos)
                                     }
                                 }
                             }
                         }
-                    } catch (e: Exception) {
-                        Sentry.captureException(e)
-                        e.printStackTrace()
                     }
+                } catch (e: Exception) {
+                    Sentry.captureException(e)
+                    e.printStackTrace()
                 }
             }
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
+            override fun onJSONResponseSuccess(response: JSONObject) {}
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+            override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
             override fun onResponseFailure(error: VolleyError) {
                 ViewUtils.getErrorResponse(error, applicationContext)
@@ -873,63 +842,55 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
         builder.setMultiChoiceItems(
             competitiveArray,
-            selectedCompetitive,
-            object : OnMultiChoiceClickListener {
-                override fun onClick(
-                    dialogInterface: DialogInterface?,
-                    i: Int,
-                    isChecked: Boolean
-                ) {
-                    if (isChecked) {
-                        competitiveList.add(competitiveArray[i])
-                        selectedCompetitive[i] = true
-                    } else {
-                        competitiveList.remove(competitiveArray[i])
-                        selectedCompetitive[i] = false
-                    }
-                }
-            })
-
-        builder.setPositiveButton("OK", object : DialogInterface.OnClickListener {
-            override fun onClick(dialogInterface: DialogInterface?, i: Int) {
-                val stringBuilder = StringBuilder()
-                var etDataList =
-                    binding.etCompetitor.text.toString().split(Regex(",\\s*")).toMutableList()
-                val rowData: MutableList<String> = mutableListOf()
-                etDataList.map { et ->
-                    if (!competitiveArray.contains(et)) {
-                        rowData.add(et)
-                    }
-                }
-                if (!rowData.isEmpty()) {
-                    stringBuilder.append(rowData.joinToString(", "))
-                    if (rowData[0].isNotEmpty())
-                        stringBuilder.append(", ")
-                }
-
-                if (binding.etCompetitor.text.isEmpty() || binding.etCompetitor.text.endsWith(",")) {
-                    stringBuilder.append(competitiveList.joinToString(", "))
-                } else {
-                    stringBuilder.append(competitiveList.joinToString(", "))
-                }
-
-                val uniqueList = stringBuilder.split(Regex(",\\s*")).distinct()
-
-                AppLogger.log("Unique List: $uniqueList")
-
-                binding.etCompetitor.setText(uniqueList.joinToString(", "))
+            selectedCompetitive
+        ) { _, i, isChecked ->
+            if (isChecked) {
+                competitiveList.add(competitiveArray[i])
+                selectedCompetitive[i] = true
+            } else {
+                competitiveList.remove(competitiveArray[i])
+                selectedCompetitive[i] = false
             }
-        })
+        }
 
-        builder.setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
-            override fun onClick(dialogInterface: DialogInterface, i: Int) {
-                dialogInterface.dismiss()
+        builder.setPositiveButton(
+            "OK"
+        ) { _, _ ->
+            val stringBuilder = StringBuilder()
+            val etDataList =
+                binding.etCompetitor.text.toString().split(Regex(",\\s*")).toMutableList()
+            val rowData: MutableList<String> = mutableListOf()
+            etDataList.map { et ->
+                if (!competitiveArray.contains(et)) {
+                    rowData.add(et)
+                }
             }
-        })
+            if (rowData.isNotEmpty()) {
+                stringBuilder.append(rowData.joinToString(", "))
+                if (rowData[0].isNotEmpty())
+                    stringBuilder.append(", ")
+            }
+
+            if (binding.etCompetitor.text.isEmpty() || binding.etCompetitor.text.endsWith(",")) {
+                stringBuilder.append(competitiveList.joinToString(", "))
+            } else {
+                stringBuilder.append(competitiveList.joinToString(", "))
+            }
+
+            val uniqueList = stringBuilder.split(Regex(",\\s*")).distinct()
+
+            AppLogger.log("Unique List: $uniqueList")
+
+            binding.etCompetitor.setText(uniqueList.joinToString(", "))
+        }
+
+        builder.setNegativeButton(
+            "Cancel"
+        ) { dialogInterface, _ -> dialogInterface.dismiss() }
         builder.show()
     }
 
-    fun getShopCategory() {
+    private fun getShopCategory() {
         return
         ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
@@ -1079,116 +1040,114 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         )
     }
 
-    fun getMarketOpportunity() {
+    private fun getMarketOpportunity() {
         ApiServices.apiGET(Api.get_market_opportunity, queue!!, "", object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
-                if (response != null) {
-                    try {
-                        val marketOpportunityList: ArrayList<String> = ArrayList()
-                        val obj = JSONObject(response)
-                        if (obj.has("outlet_market_opportunities") && !obj.isNull("outlet_market_opportunities")) {
-                            val marketArray = obj.getJSONArray("outlet_market_opportunities")
-                            if (marketArray.length() > 0) {
-                                marketOpportunityList.add(resources.getString(R.string.select_market_opportunity))
-                                for (i in 0 until marketArray.length()) {
-                                    marketOpportunityList.add(marketArray.getString(i))
+                try {
+                    val marketOpportunityList: ArrayList<String> = ArrayList()
+                    val obj = JSONObject(response)
+                    if (obj.has("outlet_market_opportunities") && !obj.isNull("outlet_market_opportunities")) {
+                        val marketArray = obj.getJSONArray("outlet_market_opportunities")
+                        if (marketArray.length() > 0) {
+                            marketOpportunityList.add(resources.getString(R.string.select_market_opportunity))
+                            for (i in 0 until marketArray.length()) {
+                                marketOpportunityList.add(marketArray.getString(i))
+                            }
+
+                            val marketOpportunityAdapter = object : ArrayAdapter<String>(
+                                applicationContext,
+                                android.R.layout.simple_spinner_item, marketOpportunityList
+                            ) {
+                                override fun isEnabled(position: Int): Boolean {
+                                    return position != 0
                                 }
 
-                                val marketOpportunityAdapter = object : ArrayAdapter<String>(
-                                    applicationContext,
-                                    android.R.layout.simple_spinner_item, marketOpportunityList
-                                ) {
-                                    override fun isEnabled(position: Int): Boolean {
-                                        return position != 0
-                                    }
-
-                                    override fun getDropDownView(
-                                        position: Int,
-                                        convertView: View?,
-                                        parent: ViewGroup
-                                    ): View {
-                                        val view: TextView = super.getDropDownView(
-                                            position,
-                                            convertView,
-                                            parent
-                                        ) as TextView
-                                        //set the color of first item in the drop down list to gray
-                                        if (position == 0) {
-                                            view.setTextColor(
-                                                ContextCompat.getColor(
-                                                    this@CreateShopActivity,
-                                                    R.color.text_title_2
-                                                )
+                                override fun getDropDownView(
+                                    position: Int,
+                                    convertView: View?,
+                                    parent: ViewGroup
+                                ): View {
+                                    val view: TextView = super.getDropDownView(
+                                        position,
+                                        convertView,
+                                        parent
+                                    ) as TextView
+                                    //set the color of first item in the drop down list to gray
+                                    if (position == 0) {
+                                        view.setTextColor(
+                                            ContextCompat.getColor(
+                                                this@CreateShopActivity,
+                                                R.color.text_title_2
                                             )
-                                            view.visibility = View.GONE
-                                        } else {
-                                            //here it is possible to define color for other items by
-                                            //view.setTextColor(Color.RED)
-                                            view.setTextColor(
+                                        )
+                                        view.visibility = View.GONE
+                                    } else {
+                                        //here it is possible to define color for other items by
+                                        //view.setTextColor(Color.RED)
+                                        view.setTextColor(
+                                            ContextCompat.getColor(
+                                                this@CreateShopActivity,
+                                                R.color.black
+                                            )
+                                        )
+                                    }
+                                    return view
+                                }
+                            }
+                            binding.spinnerMarketOpportunity.adapter = marketOpportunityAdapter
+
+                            binding.spinnerMarketOpportunity.onItemSelectedListener =
+                                object : AdapterView.OnItemSelectedListener {
+                                    override fun onItemSelected(
+                                        p0: AdapterView<*>?,
+                                        p1: View?,
+                                        p2: Int,
+                                        p3: Long
+                                    ) {
+                                        if (p2 > 0) {
+                                            val view1: TextView = p0!!.getChildAt(0) as TextView
+                                            view1.setTextColor(
                                                 ContextCompat.getColor(
                                                     this@CreateShopActivity,
                                                     R.color.black
                                                 )
                                             )
-                                        }
-                                        return view
-                                    }
-                                }
-                                binding.spinnerMarketOpportunity.adapter = marketOpportunityAdapter
-
-                                binding.spinnerMarketOpportunity.onItemSelectedListener =
-                                    object : AdapterView.OnItemSelectedListener {
-                                        override fun onItemSelected(
-                                            p0: AdapterView<*>?,
-                                            p1: View?,
-                                            p2: Int,
-                                            p3: Long
-                                        ) {
-                                            if (p2 > 0) {
-                                                val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(
-                                                    ContextCompat.getColor(
-                                                        this@CreateShopActivity,
-                                                        R.color.black
-                                                    )
+                                            selectedMarketOpportunity =
+                                                marketOpportunityList[p2]
+                                        } else {
+                                            val view1: TextView = p0!!.getChildAt(0) as TextView
+                                            view1.setTextColor(
+                                                ContextCompat.getColor(
+                                                    this@CreateShopActivity,
+                                                    R.color.text_title_2
                                                 )
-                                                selectedMarketOpportunity =
-                                                    marketOpportunityList[p2]
-                                            } else {
-                                                val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(
-                                                    ContextCompat.getColor(
-                                                        this@CreateShopActivity,
-                                                        R.color.text_title_2
-                                                    )
-                                                )
-                                                selectedMarketOpportunity = ""
-                                            }
-                                        }
-
-                                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                                        }
-
-                                    }
-
-                                if (shops != null) {
-                                    if (shops!!.market_opportunity.isNotEmpty()) {
-                                        val pos =
-                                            (binding.spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(
-                                                shops!!.market_opportunity
                                             )
-                                        if (pos > -1) {
-                                            binding.spinnerMarketOpportunity.setSelection(pos)
+                                            selectedMarketOpportunity = ""
                                         }
+                                    }
+
+                                    override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                                    }
+
+                                }
+
+                            if (shops != null) {
+                                if (shops!!.market_opportunity.isNotEmpty()) {
+                                    val pos =
+                                        (binding.spinnerMarketOpportunity.adapter as ArrayAdapter<String>).getPosition(
+                                            shops!!.market_opportunity
+                                        )
+                                    if (pos > -1) {
+                                        binding.spinnerMarketOpportunity.setSelection(pos)
                                     }
                                 }
                             }
                         }
-                    } catch (e: Exception) {
-                        Sentry.captureException(e)
-                        e.printStackTrace()
                     }
+                } catch (e: Exception) {
+                    Sentry.captureException(e)
+                    e.printStackTrace()
                 }
             }
 
@@ -1212,7 +1171,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         })
     }
 
-    fun getBuyer() {
+    private fun getBuyer() {
         val buyerList: ArrayList<String> = ArrayList()
         buyerList.add(resources.getString(R.string.select_buyer))
         buyerList.add(resources.getString(R.string.yes))
@@ -1265,10 +1224,10 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         )
                     )
 
-                    if (p2 == 1) {
-                        selectedBuyer = 1
+                    selectedBuyer = if (p2 == 1) {
+                        1
                     } else {
-                        selectedBuyer = 0
+                        0
                     }
                 } else {
                     val view1: TextView = p0!!.getChildAt(0) as TextView
@@ -1282,9 +1241,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 }
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
 
         }
 
@@ -1299,7 +1256,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
     }
 
-    fun createShop() {
+    private fun createShop() {
         showProgress(binding.progressBarShop)
         var inputOk = true
         if (binding.etShopName.text.trim().isEmpty()) {
@@ -1349,8 +1306,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
-            var imagesList = ArrayList<Images>()
-            imagesList = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
+            val imagesList: ArrayList<Images> = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
             if (imagesList.isNotEmpty()) {
                 for (i in 0 until imagesList.size) {
                     val fileExist = File(imagesList[i].filePath).canRead()
@@ -1369,7 +1325,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["outlet_type"] = selectedShopType!!
             params["address"] = URLEncoder.encode(binding.etAddress.text.toString(), "utf-8")
             params["owner_name"] = URLEncoder.encode(binding.etOwnerName.text.toString(), "utf-8")
-            if (binding.etContactNumber.text.trim().length > 0) params["phone_number"] =
+            if (binding.etContactNumber.text.trim().isNotEmpty()) params["phone_number"] =
                 URLEncoder.encode(binding.etContactNumber.text.toString(), "utf-8")
 
             params["outlet_created_at"] = today
@@ -1556,9 +1512,9 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["outlet_type"] = selectedShopType!!
             params["address"] = URLEncoder.encode(binding.etAddress.text.toString(), "utf-8")
             params["owner_name"] = URLEncoder.encode(binding.etOwnerName.text.toString(), "utf-8")
-            if (binding.etContactNumber.text.trim().length > 0) params["phone_number"] =
+            if (binding.etContactNumber.text.trim().isNotEmpty()) params["phone_number"] =
                 URLEncoder.encode(binding.etContactNumber.text.toString(), "utf-8")
-            if (selectedMarketOpportunity!!.trim().length > 0) params["market_opportunity"] =
+            if (selectedMarketOpportunity!!.trim().isNotEmpty()) params["market_opportunity"] =
                 selectedMarketOpportunity!!
             if (selectedBuyer!! > -1) params["is_buyer"] = selectedBuyer!!.toString()
             params["outlet_updated_at"] = today
@@ -1659,7 +1615,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         }
     }
 
-    fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
+    private fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
         try {
             val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
             val request: StringRequest = object : StringRequest(
@@ -1705,7 +1661,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         if (PermissionsManager.areLocationPermissionsGranted(applicationContext)) {
 
             // Get an instance of the component
-            val locationComponent: LocationComponent = mMap!!.getLocationComponent()
+            val locationComponent: LocationComponent = mMap!!.locationComponent
 
             // Activate with options
             locationComponent.activateLocationComponent(
@@ -1798,13 +1754,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     override fun onMapReady(mapboxMap: MapboxMap) {
         mMap = mapboxMap
         mMap!!.setStyle(
-            Style.Builder().fromUrl(getString(R.string.map_view_styleUrl)),
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(p0: Style) {
-                    enableLocation(p0)
-                }
-
-            })
+            Style.Builder().fromUrl(getString(R.string.map_view_styleUrl))
+        ) { p0 -> enableLocation(p0) }
 
 
         val uiSettings: UiSettings = mapboxMap.uiSettings
