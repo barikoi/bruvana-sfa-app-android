@@ -331,4 +331,18 @@
     <string name="competitor_selection">প্রতিযোগী নির্বাচন</string>
     <string name="competitor_name">প্রতিযোগীর নাম উদাহরণ: ক, খ, গ</string>
 
+    <string name="reload">রিলোড</string>
+    <string name="add">যোগ করুন</string>
+    <string name="remove">অপসারণ করুন</string>
+    <string name="gift">উপহার</string>
+    <string name="merchandise">পণ্য</string>
+    <string name="posm_gift">POSM উপহার</string>
+    <string name="choose_gift">উপহার নির্বাচন করুন</string>
+    <string name="add_more">আরও যোগ করুন</string>
+    <string name="add_gift">উপহার যোগ করুন</string>
+    <string name="gift_image">উপহার ছবি</string>
+    <string name="edit_gift">উপহার সম্পাদনা করুন</string>
+    <string name="please_add_gift">অনুগ্রহ করে উপহার যোগ করুন</string>
+    <string name="please_add_image">অনুগ্রহ করে ছবি যোগ করুন</string>
+
 </resources>
