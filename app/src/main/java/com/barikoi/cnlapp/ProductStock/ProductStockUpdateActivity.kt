@@ -176,11 +176,12 @@ class ProductStockUpdateActivity : BaseActivity() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
-            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
-        ) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
             binding.spinnerLayoutRoute.visibility = View.VISIBLE
-            viewModel.getDHList(sharePrefUtils.getString(Api.TERRITORY_ID)!!)
+            viewModel.getDHList(sharePrefUtils.getString(Api.TERRITORY_ID)!!, null)
+        } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)) {
+            binding.spinnerLayoutRoute.visibility = View.VISIBLE
+            viewModel.getDHList(null, sharePrefUtils.getString(Constants.REGION_ID)!!)
         } else {
             binding.spinnerLayoutRoute.visibility = View.GONE
 
