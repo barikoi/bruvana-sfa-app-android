@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.utils
 import android.location.Location
 
 object Constants {
+    const val TOKEN = "token"
     const val REQUEST_TYPE = "REQUEST_TYPE"
     const val STATUS_DECLINED = "REJECTED"
     const val STATUS_PENDING = "PENDING"
