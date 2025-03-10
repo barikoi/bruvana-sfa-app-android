@@ -14,19 +14,28 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.FragmentTodaysSummaryTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.toast
+import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -39,8 +48,19 @@ import javax.inject.Inject
 class TodaySummaryTOFragment : Fragment() {
     private lateinit var binding: FragmentTodaysSummaryTOBinding
 
+    private val viewModel: TodaySummeryTOViewModel by viewModels()
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
+
+
+    val dFormat = DecimalFormat("#.##")
+
+
+    private val itemListDetails: MutableList<ArrayList<Pair<String, String>>> = mutableListOf()
 
 
     @Inject
@@ -62,15 +82,31 @@ class TodaySummaryTOFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val c = Calendar.getInstance()
+        c.add(Calendar.DAY_OF_WEEK, -1)
+
+        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        endDate = df.format(c.time)
+
+        startTodaySummaryObserve()
+
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
-//            setTodaySummaryForASM()
+            viewModel.getTodaySummary(
+                endDate!!,
+                endDate!!,
+                "1"
+            )
         } else {
             setTodaySummary()
         }
 
         binding.tryAgain.setOnClickListener {
             if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
-                setTodaySummaryForASM()
+                viewModel.getTodaySummary(
+                    endDate!!,
+                    endDate!!,
+                    "1"
+                )
             } else {
                 setTodaySummary()
             }
@@ -183,11 +219,130 @@ class TodaySummaryTOFragment : Fragment() {
         }
     }
 
+    private fun startTodaySummaryObserve() {
+        lifecycleScope.launch {
+            viewModel.todaySummaryResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startTodaySummaryObserve::Empty")
+
+                        binding.progressBarHome.visibility = View.GONE
+                        binding.summaryLayout.visibility = View.GONE
+                        binding.tryAgain.visibility = View.GONE
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startTodaySummaryObserve::Error ${it.error}")
+
+                        binding.progressBarHome.visibility = View.GONE
+                        binding.summaryLayout.visibility = View.GONE
+                        binding.tryAgain.visibility = View.VISIBLE
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startTodaySummaryObserve::Loading")
+
+                        binding.progressBarHome.visibility = View.VISIBLE
+                        binding.summaryLayout.visibility = View.GONE
+                        binding.tryAgain.visibility = View.GONE
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startTodaySummaryObserve:: Success ${it.data}")
+
+                        binding.progressBarHome.visibility = View.GONE
+                        binding.summaryLayout.visibility = View.VISIBLE
+                        binding.tryAgain.visibility = View.GONE
+
+
+                        val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
+
+                        val nm = it.data?.toList?.sumOf { s ->
+                            s.totalOrders
+                        }
+
+                        val ov = it.data?.toList?.sumOf { s ->
+                            s.totalOrderedAmount.toDoubleOrNull()
+                                ?: 0.0  // Convert to Double, default to 0.0 if conversion fails
+                        }
+
+                        val totalSku = it.data?.toList?.sumOf { s ->
+                            s.numOfSku
+                        }
+
+                        val spm = totalSku?.takeIf { nm != null && nm != 0 }?.div(nm!!) ?: 0
+
+                        binding.ovCount.text = dFormat.format(ov)
+                        binding.bpcCount.text = dFormat.format(spm)
+                        binding.lpcCount.text = nm.toString()
+
+
+                        it.data?.toList!!.forEach { to ->
+                            val keyPair = Pair(to.toName, to.toId.toString())
+                            val value = to.totalAmountFormatted()
+                            itemList.add(Pair(keyPair, value))
+
+                            val skuPerMemo =
+                                to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
+                            val aiv = to.totalOrderedAmount.toDoubleOrNull()
+                                ?.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0.0
+
+
+                            val itemListDetailsTmp = ArrayList<Pair<String, String>>()
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.total_order_value),
+                                    to.totalAmountFormatted()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.sku_per_memo),
+                                    skuPerMemo.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.number_of_memo),
+                                    to.totalOrders.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.visit_ratio),
+                                    to.numOfVisits.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.visit_500m),
+                                    to.oneToHundred.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.aiv),
+                                    aiv.toString().totalAmountFormatted()
+                                )
+                            )
+
+
+                            itemListDetails.add(itemListDetailsTmp)
+                        }
+
+                        createTableClickable(itemList, binding.tabLayout2)
+                    }
+                }
+            }
+        }
+    }
+
     private fun setTodaySummaryForASM() {
         try {
             binding.progressBarHome.visibility = View.VISIBLE
             binding.summaryLayout.visibility = View.GONE
-            val dFormat = DecimalFormat("#.##")
             val c = Calendar.getInstance()
             c.add(Calendar.DAY_OF_WEEK, -7)
             val end = Calendar.getInstance().time
@@ -195,7 +350,7 @@ class TodaySummaryTOFragment : Fragment() {
             endDate = df.format(end)
 
             ApiServices.apiGET(
-                Api.get_all_so_list + "?today_summary=1&start_date=" + endDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                Api.get_all_to_list + "?today_summary=1&start_date=" + endDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
                     Api.USER_ID
                 ),
                 mQueue,
@@ -207,6 +362,8 @@ class TodaySummaryTOFragment : Fragment() {
                             binding.progressBarHome.visibility = View.GONE
                             binding.summaryLayout.visibility = View.VISIBLE
                             binding.tryAgain.visibility = View.GONE
+
+
                             val obj = JSONObject(response)
                             val toArray = obj.getJSONArray("so_list")
                             val toObj = toArray.getJSONObject(0)
@@ -376,7 +533,13 @@ class TodaySummaryTOFragment : Fragment() {
 
                     try {
                         soId = data[i].first.second
-                        getSummaryTargets(Api.get_summary + "?today_summary=1&today_for_so=1&user_id=" + data[i].first.second)
+                        if (sharePrefUtils.getString(Api.USER_TYPE) == "ASM") {
+
+                            binding.progressBarHome.visibility = View.GONE
+                            binding.targetLayout.visibility = View.VISIBLE
+                            createTable(itemListDetails[i], binding.tabLayoutTarget)
+                        } else
+                            getSummaryTargets(Api.get_summary + "?today_summary=1&today_for_so=1&user_id=" + data[i].first.second)
                         Log.d("OrderSummary", "row count: " + tabLayout.childCount)
                         for (t in 0 until tabLayout.childCount) {
                             if (tabLayout.getChildAt(t).tag == it.tag) {
