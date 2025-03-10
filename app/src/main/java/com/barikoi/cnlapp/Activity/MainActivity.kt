@@ -162,6 +162,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.appContentMain.tvNotificationCount.text = "0"
 
         startApprovalCountObserve()
+        startLogoutObserve()
         checkAttendance()
 
         val c = Calendar.getInstance()
@@ -242,7 +243,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setTitle(R.string.logout)
                 .setMessage(R.string.sure_log_out)
                 .setPositiveButton(R.string.yes) { _, _ ->
-                    logout(this@MainActivity)
+                    viewModel.logout()
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .setIcon(AppCompatResources.getDrawable(this, R.drawable.warning))
@@ -508,7 +509,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     ).show()
                 }
                 if (error is AuthFailureError) {
-                    logout(applicationContext)
+                    viewModel.logout()
                 }
                 if (error.networkResponse != null) {
                     try {
@@ -638,6 +639,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun logout(context: Context) {
+        viewModel.logout()
+        return
         val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
         val token = prefs.getString(Api.TOKEN, "")
         val editor = prefs.edit()
@@ -701,6 +704,38 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
         queue.add(request)
+    }
+
+    private fun startLogoutObserve() {
+        lifecycleScope.launch {
+            viewModel.logoutResponse.observe(this@MainActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startLogoutObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startLogoutObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startLogoutObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startLogoutObserve:: Success ${it.data}")
+
+                        toast(it.data?.message ?: "")
+
+                        sharePrefUtils.clear()
+                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                        finish()
+
+                    }
+                }
+            }
+        }
     }
 
     private fun startApprovalCountObserve() {
