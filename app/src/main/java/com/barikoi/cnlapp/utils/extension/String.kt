@@ -2,6 +2,8 @@ package com.barikoi.cnlapp.utils.extension
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.text.intl.Locale
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
@@ -27,6 +29,11 @@ fun String.englishToBanglaNumber(): String {
         banglaNumber += banglaNumerals[digit.toString()] ?: digit // Use original digit if not found
     }
     return banglaNumber
+}
+
+fun String.totalAmountFormatted(): String {
+    return BigDecimal(this.toDouble()).setScale(2, RoundingMode.HALF_UP)
+        .toString()
 }
 
 @SuppressLint("SimpleDateFormat")
