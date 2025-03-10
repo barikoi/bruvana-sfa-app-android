@@ -20,6 +20,7 @@ import com.barikoi.cnlapp.databinding.ActivityProductSummaryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Api.TERRITORY_ID
 import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -97,10 +98,12 @@ class ProductSummaryActivity : BaseActivity() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
-            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
             binding.spinnerLayoutRoute.visibility = View.VISIBLE
-            viewModel.getDHList(sharePrefUtils.getString(TERRITORY_ID)!!)
+            viewModel.getDHList(sharePrefUtils.getString(TERRITORY_ID)!!, null)
+        } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)) {
+            binding.spinnerLayoutRoute.visibility = View.VISIBLE
+            viewModel.getDHList(null, sharePrefUtils.getString(Constants.REGION_ID)!!)
         } else {
             binding.spinnerLayoutRoute.visibility = View.GONE
             viewModel.getProductStock(
