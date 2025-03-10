@@ -10,7 +10,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
