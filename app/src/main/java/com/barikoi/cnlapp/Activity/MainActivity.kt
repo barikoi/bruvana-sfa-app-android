@@ -284,7 +284,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navigationDrawer!!.menu.findItem(R.id.menu_product_stock_request).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
 
-        navView.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        navView.setOnItemSelectedListener { item ->
             if (binding.appContentMain.fabOrder.isVisible) {
                 binding.appContentMain.fabOrder.background.setTint(
                     ContextCompat.getColor(this, R.color.white)
@@ -303,7 +303,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_route -> {
@@ -311,20 +311,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.userLayout.visibility = View.GONE
                     binding.appContentMain.tvTitle.visibility = View.VISIBLE
                     setCurrentFragment(MapFragment(), this@MainActivity)
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
-                /*R.id.navigation_order -> {
-                    userLayout.visibility = View.GONE
-                    tvTitle.text = ""
-                    tvTitle.visibility = View.VISIBLE
-                    return@OnNavigationItemSelectedListener true
-                }*/
+
                 R.id.navigation_chat -> {
                     binding.appContentMain.tvTitle.text = resources.getString(R.string.title_chat)
                     setCurrentFragment(ChatFragment(), this@MainActivity)
                     binding.appContentMain.userLayout.visibility = View.GONE
                     binding.appContentMain.tvTitle.visibility = View.VISIBLE
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_attendance -> {
@@ -332,11 +327,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.tvTitle.visibility = View.VISIBLE
                     binding.appContentMain.userLayout.visibility = View.GONE
                     setCurrentFragment(AttendanceFragment(), this@MainActivity)
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
             }
             false
-        })
+        }
 
     }
 
@@ -748,7 +743,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
                             }
                         }
-
                     }
                 }
             }
