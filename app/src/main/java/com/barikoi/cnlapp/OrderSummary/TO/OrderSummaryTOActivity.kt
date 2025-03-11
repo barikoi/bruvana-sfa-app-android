@@ -29,6 +29,7 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.Order
+import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.ActivityOrderSummaryToBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
@@ -69,6 +70,8 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
 
 
     private val itemListDetails: MutableList<ArrayList<Pair<String, String>>> = mutableListOf()
+
+    private var toList: List<To> = emptyList()
 
     lateinit var listener: OnEditOrderListener
     private lateinit var adapter: ConfirmOrderListAdapter
@@ -259,6 +262,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                         binding.tryAgain2.visibility = View.GONE
                         binding.bodyLayout.visibility = View.VISIBLE
 
+                        toList = it.data?.toList ?: emptyList()
 
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
 
@@ -486,25 +490,55 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                     Thread {
                         this@OrderSummaryTOActivity.runOnUiThread {
                             try {
-                                orderArray = shoWithOrderList[i].ordersArray
-                                binding.bodyLayoutScroll.visibility = View.VISIBLE
-                                binding.collectionLayout.visibility = View.VISIBLE
-                                binding.orderCollectionCount.text =
-                                    shoWithOrderList.get(i).order_collected + "/" + shoWithOrderList.get(
-                                        i
-                                    ).total_outlets
-                                binding.totalBounceCount.text =
-                                    shoWithOrderList[i].total_bounce
+                                if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                                    binding.bodyLayoutScroll.visibility = View.VISIBLE
+                                    binding.collectionLayout.visibility = View.VISIBLE
+                                    binding.orderCollectionCount.text =
+                                        getString(
+                                            R.string.by_das_by,
+                                            toList[i].totalOrders.toString(),
+                                            toList[i].uniqueOutletCount.toString()
+                                        )
+                                    binding.totalBounceCount.text =
+                                        toList[i].totalBouncedAmount
 
-                                getSummaryTargets(Api.get_summary + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+//                                    createTable(itemListDetails[i], binding.tabLayoutTarget)
 
-                                for (t in 0 until tabLayout.childCount) {
-                                    if (tabLayout.getChildAt(t).tag == it.tag) {
-                                        tabLayout.getChildAt(t)
-                                            .setBackgroundColor(resources.getColor(R.color.light_yellow))
-                                    } else {
-                                        tabLayout.getChildAt(t)
-                                            .setBackgroundColor(resources.getColor(R.color.white))
+                                    getSummaryTargets(Api.get_summary + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+
+                                    for (t in 0 until tabLayout.childCount) {
+                                        if (tabLayout.getChildAt(t).tag == it.tag) {
+                                            tabLayout.getChildAt(t)
+                                                .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                        } else {
+                                            tabLayout.getChildAt(t)
+                                                .setBackgroundColor(resources.getColor(R.color.white))
+                                        }
+                                    }
+
+
+                                } else {
+                                    binding.bodyLayoutScroll.visibility = View.VISIBLE
+                                    binding.collectionLayout.visibility = View.VISIBLE
+                                    binding.orderCollectionCount.text =
+                                        getString(
+                                            R.string.by_das_by,
+                                            shoWithOrderList[i].order_collected,
+                                            shoWithOrderList[i].total_outlets
+                                        )
+                                    binding.totalBounceCount.text =
+                                        shoWithOrderList[i].total_bounce
+
+                                    getSummaryTargets(Api.get_summary + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+
+                                    for (t in 0 until tabLayout.childCount) {
+                                        if (tabLayout.getChildAt(t).tag == it.tag) {
+                                            tabLayout.getChildAt(t)
+                                                .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                        } else {
+                                            tabLayout.getChildAt(t)
+                                                .setBackgroundColor(resources.getColor(R.color.white))
+                                        }
                                     }
                                 }
 
