@@ -43,20 +43,30 @@ import com.barikoi.cnlapp.databinding.FragmentPendingOrderBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener,
     OnValueChangeListener {
     private lateinit var binding: FragmentPendingOrderBinding
 
-    var recylerView: RecyclerView? = null
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+
+    val dFormat = DecimalFormat("#.##")
+
     var progressBar: ProgressBar? = null
     private var tvItemCount: TextView? = null
     private var tvGrandTotal: TextView? = null
@@ -80,17 +90,27 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     private var listener: OnEditOrderListener? = null
     var valuelistener: OnValueChangeListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
-    lateinit var adapter: OrderDeliveryListAdapter
+
+    private lateinit var adapterOrder: OrderDeliveryListAdapter
+
     var updatedProducts: ArrayList<ProductStatistics>? = ArrayList()
-    var orderedProducts: ArrayList<Products>? = ArrayList()
+    private var orderedProducts: ArrayList<Products>? = ArrayList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recylerView = view.findViewById(R.id.orderListView)
         progressBar = view.findViewById(R.id.progressBar1)
 
-        checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
+//        checkForOrders(
+//            queue!!,
+//            token!!,
+//            user_id!!,
+//            sr_id!!,
+//            territory_id!!,
+//            sharePrefUtils.getString(Constants.REGION_ID)!!,
+//            StartDate!!,
+//            EndDate!!
+//        )
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -98,9 +118,9 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                adapter.filter.filter(s)
-                if (s!!.length == 0) {
-                    if (sr_id!!.length == 0) {
+                adapterOrder.filter.filter(s)
+                if (s.isNullOrEmpty()) {
+                    if (sr_id!!.isEmpty()) {
                         getAllOrders(
                             Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
                             queue!!,
@@ -119,9 +139,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
             }
 
-            override fun afterTextChanged(s: Editable?) {
-
-            }
+            override fun afterTextChanged(s: Editable?) {}
 
         })
     }
@@ -129,7 +147,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPendingOrderBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -137,23 +155,35 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     companion object {
         var mCallback: OrderListSuccessListener? = PendingOrderFragment()
-        fun checkforOrders(
+        fun checkForOrders(
             queue: RequestQueue,
             token: String,
             user_id: String,
             sr_id: String,
             territory_id: String,
+            regionId: String,
             start: String,
-            end: String
+            end: String,
+            sharePrefUtils: SharePrefUtils
         ) {
             if (mCallback != null) {
-                if (sr_id.length == 0) {
-                    getAllOrders(
-                        Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
-                        queue,
-                        token,
-                        mCallback!!
-                    )
+                if (sr_id.isEmpty()) {
+
+                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=PENDING&region_id=${regionId}&include_filter_by_asm=1",
+                            queue,
+                            token,
+                            mCallback!!
+                        )
+                    } else {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
+                            queue,
+                            token,
+                            mCallback!!
+                        )
+                    }
                 } else {
                     getAllOrders(
                         Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=PENDING",
@@ -176,25 +206,18 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             ApiServices.apiGET(url, queue, token, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
-                        if (response != null) {
-                            val obj = JSONObject(response)
-                            val orderArray = obj.getJSONArray("orders")
-                            callback.onSuccess(orderArray)
+                        val obj = JSONObject(response)
+                        val orderArray = obj.getJSONArray("orders")
+                        callback.onSuccess(orderArray)
 
-                        }
                     } catch (e: Exception) {
-                        //progressBar.visibility = View.GONE
                         e.printStackTrace()
                     }
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     callback.onFailure(error)
@@ -285,14 +308,14 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 it.orderId
             }
 
-            recylerView.apply {
+            binding.orderListView.apply {
                 if (user_type.equals("TO", true)) {
-                    adapter = OrderDeliveryListAdapter(orderList, listener!!, "TO")
+                    adapterOrder = OrderDeliveryListAdapter(orderList, listener!!, "TO")
                 } else {
-                    adapter = OrderDeliveryListAdapter(orderList, listener!!, "SO")
+                    adapterOrder = OrderDeliveryListAdapter(orderList, listener!!, "SO")
                 }
-                recylerView!!.adapter = adapter
-                adapter.notifyDataSetChanged()
+                binding.orderListView.adapter = adapterOrder
+                adapterOrder.notifyDataSetChanged()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -672,14 +695,16 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                         val message = response.getString("message")
                         ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
                             override fun onConfirmed() {
-                                checkforOrders(
+                                checkForOrders(
                                     queue!!,
                                     token!!,
                                     user_id!!,
                                     sr_id!!,
                                     territory_id!!,
+                                    sharePrefUtils.getString(Constants.REGION_ID)!!,
                                     StartDate!!,
-                                    EndDate!!
+                                    EndDate!!,
+                                    sharePrefUtils
                                 )
                             }
 
@@ -709,7 +734,6 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
 
     override fun onValueChanged(products: Any, position: Int) {
-        var dformat = DecimalFormat("#.##")
         products as ProductStatistics
         val prodList = appDatabase!!.updateOrderDao().getOrdersDB(selected_outlet!!)
         val itemCount = prodList!![0].itemsCount
@@ -760,9 +784,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             Log.d("Product", "exception 2: " + e.message + " " + position)
             e.printStackTrace()
         }
-        tvGrandTotal!!.text = dformat.format(grandTotal).toString()
-        //totalAmount = dformat.format(grandTotal).toString()
-        //grandTotalPrice = dformat.format(grandTotal).toDouble()
+        tvGrandTotal!!.text = dFormat.format(grandTotal).toString()
 
     }
 }
