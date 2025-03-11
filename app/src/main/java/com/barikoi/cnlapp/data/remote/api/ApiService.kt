@@ -14,6 +14,7 @@ import com.barikoi.cnlapp.data.remote.models.ProductStockResponse
 import com.barikoi.cnlapp.data.remote.models.RequestStockResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
+import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
@@ -63,7 +64,6 @@ interface ApiService {
         @Query("user_id") userId: String,
         @Query("with_outlets") filterWithOutlet: String
     ): Response<RouteResponse>
-
 
 
     @GET("api/v1/get-so")
@@ -152,4 +152,10 @@ interface ApiService {
         @Query("end_date") endDate: String,
         @Query("today_summary") todaySummary: String
     ): Response<TodaySummaryResponse>
+
+
+    @GET("api/v1/to-wise-so")
+    suspend fun getSOByTO(
+        @Query("to_id") toId: String,
+    ): Response<SoResponseX>
 }
