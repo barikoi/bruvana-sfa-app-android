@@ -31,7 +31,9 @@ data class To(
     @SerializedName("total_ordered_amount")
     val totalOrderedAmount: String,
     @SerializedName("total_orders")
-    val totalOrders: Int
+    val totalOrders: Int,
+    @SerializedName("unique_outlet_count")
+    val uniqueOutletCount: Int
 ) {
     @SuppressLint("DefaultLocale")
     fun totalAmountFormatted(): String {
