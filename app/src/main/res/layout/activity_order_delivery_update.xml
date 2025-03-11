@@ -31,12 +31,12 @@
                 <ImageButton
                     android:id="@+id/btnBack"
                     android:layout_width="30dp"
-                    android:contentDescription="@string/back"
                     android:layout_height="30dp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/ic_back"/>
+                    android:contentDescription="@string/back"
+                    android:src="@drawable/ic_back" />
 
                 <TextView
                     android:id="@+id/tvTitle"
@@ -48,14 +48,14 @@
                     android:textColor="@color/text_title"
                     android:textSize="17sp"
                     android:textStyle="bold"
-                    android:visibility="visible"/>
+                    android:visibility="visible" />
 
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <RelativeLayout
-        android:id="@+id/spinnerLayoutRoute"
+        android:id="@+id/spinnerLayoutTO"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -66,14 +66,37 @@
         android:background="@drawable/stroke_background"
         android:backgroundTint="@color/white"
         android:padding="4dp"
-        android:visibility="gone">
+        android:visibility="visible">
+
+        <com.barikoi.cnlapp.utils.MoreSpinner
+            android:id="@+id/spinnerTO"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:theme="@style/spinnerItemStyle"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/spinnerLayoutSO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/stroke_background"
+        android:backgroundTint="@color/white"
+        android:padding="4dp"
+        android:visibility="visible">
 
         <com.barikoi.cnlapp.utils.MoreSpinner
             android:id="@+id/spinnerSO"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:theme="@style/spinnerItemStyle"
-            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"/>
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
     </RelativeLayout>
 
@@ -85,7 +108,7 @@
         android:layout_margin="8dp"
         android:background="@drawable/stroke_background"
         android:backgroundTint="@color/white"
-        android:drawableRight="@drawable/ic_search"
+        android:drawableEnd="@drawable/ic_search"
         android:drawablePadding="8dp"
         android:drawableTint="@color/color_gray"
         android:ems="10"
@@ -106,7 +129,7 @@
         android:text="@string/date_range"
         android:textColor="@color/text_title"
         android:textSize="15sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/dateRangeLayout"
@@ -133,7 +156,7 @@
             android:gravity="start"
             android:text=""
             android:textColor="@color/text_title_2"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
     </androidx.cardview.widget.CardView>
 
