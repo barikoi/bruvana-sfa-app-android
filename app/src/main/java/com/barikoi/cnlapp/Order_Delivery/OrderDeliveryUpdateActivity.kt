@@ -312,8 +312,10 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                             user_id!!,
                             sr_id!!,
                             territory_id!!,
+                            sharePrefUtils.getString(Constants.REGION_ID)!!,
                             StartDate!!,
-                            EndDate!!
+                            EndDate!!,
+                            sharePrefUtils
                         )
                     }
 
@@ -325,8 +327,10 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                             user_id!!,
                             sr_id!!,
                             territory_id!!,
+                            sharePrefUtils.getString(Constants.REGION_ID)!!,
                             StartDate!!,
-                            EndDate!!
+                            EndDate!!,
+                            sharePrefUtils
                         )
                     }
                 }
