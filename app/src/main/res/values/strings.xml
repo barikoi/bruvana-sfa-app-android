@@ -240,6 +240,7 @@
     <string name="outlet_s">%1$s Outlet(s)</string>
     <string name="select_date_range">Select date range</string>
     <string name="date_range_">%1$s - %2$s</string>
+    <string name="by_das_by">%1$s / %2$s</string>
     <string name="logo">logo</string>
     <string name="shop_image">Shop Image</string>
     <string name="order_complete_image">Order Complete Image</string>
