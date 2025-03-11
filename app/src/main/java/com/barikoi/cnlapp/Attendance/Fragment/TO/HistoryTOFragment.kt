@@ -50,11 +50,6 @@ class HistoryTOFragment : Fragment() {
     val soList: ArrayList<SOList> = ArrayList()
     val filteredsoList: ArrayList<HistoryList> = ArrayList()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
@@ -75,9 +70,7 @@ class HistoryTOFragment : Fragment() {
                 }
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
 
         }
     }
@@ -117,7 +110,7 @@ class HistoryTOFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentHistoryTOBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -151,19 +144,17 @@ class HistoryTOFragment : Fragment() {
         })
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.isEnabled = true
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
-                binding.tvDateRange.setText(simpleFormat.format(s_date))
+                binding.tvDateRange.text = simpleFormat.format(s_date)
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                binding.tvDateRange.setText(
-                    simpleFormat.format(s_date) + " - " + simpleFormat.format(
-                        e_date
-                    )
+                binding.tvDateRange.text = simpleFormat.format(s_date) + " - " + simpleFormat.format(
+                    e_date
                 )
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
@@ -178,13 +169,11 @@ class HistoryTOFragment : Fragment() {
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayout.setEnabled(
-                true
-            )
+            binding.dateRangeLayout.isEnabled = true
         }
     }
 
-    fun getAttendance(url: String) {
+    private fun getAttendance(url: String) {
         ApiServices.apiGET(
             url,
             mQueue!!, token!!, object : ApiServiceListener {
@@ -214,46 +203,44 @@ class HistoryTOFragment : Fragment() {
 
     private fun viewSOList(response: String) {
         try {
-            if (response != null) {
-                soList.clear()
-                val obj = JSONObject(response)
-                val toArray = obj.getJSONArray("so_list")
-                val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
-                val soNameList: ArrayList<String> = ArrayList()
-                soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
+            soList.clear()
+            val obj = JSONObject(response)
+            val toArray = obj.getJSONArray("so_list")
+            val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
+            val soNameList: ArrayList<String> = ArrayList()
+            soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
 
-                if (soArray.length() > 0) {
-                    for (i in 0 until soArray.length()) {
-                        val soObj = soArray.getJSONObject(i)
-                        var imageUrl = "null"
-                        if (soObj.has("images") && !soObj.isNull("images")) {
-                            val imageArray = soObj.getJSONArray("images")
-                            if (imageArray.length() > 0) {
-                                val imageobj = imageArray.getJSONObject(0)
-                                if (imageobj.has("image_url")) {
-                                    imageUrl = imageobj.getString("image_url")
-                                }
+            if (soArray.length() > 0) {
+                for (i in 0 until soArray.length()) {
+                    val soObj = soArray.getJSONObject(i)
+                    var imageUrl = "null"
+                    if (soObj.has("images") && !soObj.isNull("images")) {
+                        val imageArray = soObj.getJSONArray("images")
+                        if (imageArray.length() > 0) {
+                            val imageobj = imageArray.getJSONObject(0)
+                            if (imageobj.has("image_url")) {
+                                imageUrl = imageobj.getString("image_url")
                             }
                         }
-                        soList.add(
-                            SOList(
-                                soObj.getString("id"),
-                                soObj.getString("user_name"),
-                                soObj.getString("designation"),
-                                if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
-                                imageUrl
-                            )
-                        )
-                        soNameList.add(soObj.getString("user_name"))
-
                     }
+                    soList.add(
+                        SOList(
+                            soObj.getString("id"),
+                            soObj.getString("user_name"),
+                            soObj.getString("designation"),
+                            if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
+                            imageUrl
+                        )
+                    )
+                    soNameList.add(soObj.getString("user_name"))
+
                 }
-                val adapter = ArrayAdapter(
-                    mContext!!,
-                    android.R.layout.simple_spinner_item, soNameList
-                )
-                binding.spinnerSO.adapter = adapter
             }
+            val adapter = ArrayAdapter(
+                mContext!!,
+                android.R.layout.simple_spinner_item, soNameList
+            )
+            binding.spinnerSO.adapter = adapter
         } catch (e: Exception) {
             e.printStackTrace()
         }
