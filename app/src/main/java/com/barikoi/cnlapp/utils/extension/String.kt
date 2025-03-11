@@ -31,7 +31,10 @@ fun String.englishToBanglaNumber(): String {
     return banglaNumber
 }
 
-fun String.totalAmountFormatted(): String {
+fun String?.totalAmountFormatted(): String {
+    if (this == null || this == "null" || this == "") {
+        return "0.00"
+    }
     return BigDecimal(this.toDouble()).setScale(2, RoundingMode.HALF_UP)
         .toString()
 }
