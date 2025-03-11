@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_app"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:ignore="UselessParent">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <RelativeLayout
                 android:id="@+id/spinnerLayoutRoute"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/stroke_background"
                 android:backgroundTint="@color/white"
@@ -32,66 +36,63 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:theme="@style/spinnerItemStyle"
-                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"/>
 
-                </com.barikoi.cnlapp.utils.MoreSpinner>
             </RelativeLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
                 android:gravity="start"
-                android:textStyle="bold"
-                android:textSize="15sp"
+                android:text="@string/date_range"
                 android:textColor="@color/text_title"
-                android:text="@string/date_range">
-            </TextView>
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/dateRangeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                app:cardCornerRadius="5dp"
                 android:background="@null"
                 android:backgroundTint="@color/white"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:cardCornerRadius="5dp">
+
                 <TextView
                     android:id="@+id/tvDateRange"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginBottom="8dp"
                     android:drawableLeft="@drawable/ic_date_range"
                     android:drawablePadding="4dp"
                     android:gravity="start"
                     android:text=""
                     android:textColor="@color/text_title_2"
-                    android:textSize="14sp">
+                    android:textSize="14sp"/>
 
-                </TextView>
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/historyTOListView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/single_attendance_history_to">
-
-            </androidx.recyclerview.widget.RecyclerView>
+                tools:listitem="@layout/single_attendance_history_to"/>
 
         </LinearLayout>
-
     </ScrollView>
 </RelativeLayout>
