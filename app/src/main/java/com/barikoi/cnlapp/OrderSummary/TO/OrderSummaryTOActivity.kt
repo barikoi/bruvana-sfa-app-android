@@ -12,7 +12,9 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -24,15 +26,22 @@ import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.ProductStock.Model.OrdersSO
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.remote.models.Order
 import com.barikoi.cnlapp.databinding.ActivityOrderSummaryToBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.toast
+import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -47,11 +56,19 @@ import javax.inject.Inject
 class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
     private lateinit var binding: ActivityOrderSummaryToBinding
 
+    private val viewModel: OrderSummeryTOViewModel by viewModels()
+
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
     @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+    @Inject
     lateinit var queue: RequestQueue
+
+
+    private val itemListDetails: MutableList<ArrayList<Pair<String, String>>> = mutableListOf()
 
     lateinit var listener: OnEditOrderListener
     private lateinit var adapter: ConfirmOrderListAdapter
@@ -75,6 +92,8 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
 
         binding = ActivityOrderSummaryToBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        startTodaySummaryObserve()
 
         listener = this
 
@@ -122,11 +141,21 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
         customDate =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         binding.tvDateRange.text = customDate
-        getOrderSummary(
-            Api.get_all_so_list + "?last_week_summary=1&start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
-                Api.USER_ID
+
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+            viewModel.getTodaySummary(
+                startDate!!,
+                endDate!!,
+                "1"
             )
-        )
+
+        } else {
+            getOrderSummary(
+                Api.get_all_so_list + "?last_week_summary=1&start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                    Api.USER_ID
+                )
+            )
+        }
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -161,19 +190,156 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 customDate = simpleFormat.format(sDate) + " - " + simpleFormat.format(eDate)
             }
 
-            getOrderSummary(
-                Api.get_all_so_list + "?start_date=" + df.format(
-                    sDate
-                ) + " 00:00:00" + "&end_date=" + df.format(eDate) + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
-                    Api.USER_ID
+            if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                viewModel.getTodaySummary(
+                    startDate!!,
+                    endDate!!,
+                    "1"
                 )
-            )
+
+            } else
+
+                getOrderSummary(
+                    Api.get_all_so_list + "?start_date=" + df.format(
+                        sDate
+                    ) + " 00:00:00" + "&end_date=" + df.format(eDate) + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                        Api.USER_ID
+                    )
+                )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
             binding.dateRangeLayout.isEnabled = true
         }
 
+    }
+
+    private fun startTodaySummaryObserve() {
+        lifecycleScope.launch {
+            viewModel.todaySummaryResponse.observe(this@OrderSummaryTOActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startTodaySummaryObserve::Empty")
+
+                        binding.progressBar4.visibility = View.GONE
+                        binding.summaryLayout2.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.GONE
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startTodaySummaryObserve::Error ${it.error}")
+
+                        binding.bodyLayout.visibility = View.GONE
+                        binding.progressBar4.visibility = View.GONE
+                        binding.summaryLayout2.visibility = View.GONE
+                        binding.targetLayout.visibility = View.GONE
+                        binding.bodyLayoutScroll.visibility = View.GONE
+                        binding.collectionLayout.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.VISIBLE
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startTodaySummaryObserve::Loading")
+
+                        binding.progressBar4.visibility = View.VISIBLE
+                        binding.summaryLayout2.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.GONE
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startTodaySummaryObserve:: Success ${it.data}")
+
+                        binding.progressBar4.visibility = View.GONE
+                        binding.summaryLayout2.visibility = View.VISIBLE
+                        binding.collectionLayout.visibility = View.GONE
+                        binding.targetLayout.visibility = View.GONE
+                        binding.bodyLayoutScroll.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.GONE
+                        binding.bodyLayout.visibility = View.VISIBLE
+
+
+                        val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
+
+                        val nm = it.data?.toList?.sumOf { s ->
+                            s.totalOrders
+                        }
+
+                        val ov = it.data?.toList?.sumOf { s ->
+                            s.totalOrderedAmount.toDoubleOrNull()
+                                ?: 0.0  // Convert to Double, default to 0.0 if conversion fails
+                        }
+
+                        val totalSku = it.data?.toList?.sumOf { s ->
+                            s.numOfSku
+                        }
+
+                        val spm = totalSku?.takeIf { nm != null && nm != 0 }?.div(nm!!) ?: 0
+
+                        binding.ovCount.text = dFormat.format(ov)
+                        binding.bpcCount.text = dFormat.format(spm)
+                        binding.lpcCount.text = nm.toString()
+
+
+                        it.data?.toList!!.forEach { to ->
+                            val keyPair = Pair(to.toName, to.toId.toString())
+                            val value = to.totalAmountFormatted()
+                            itemList.add(Pair(keyPair, value))
+
+                            val skuPerMemo =
+                                to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
+                            val aiv = to.totalOrderedAmount.toDoubleOrNull()
+                                ?.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0.0
+
+
+                            val itemListDetailsTmp = ArrayList<Pair<String, String>>()
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.total_order_value),
+                                    to.totalAmountFormatted()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.sku_per_memo),
+                                    skuPerMemo.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.number_of_memo),
+                                    to.totalOrders.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.visit_ratio),
+                                    to.numOfVisits.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.visit_500m),
+                                    to.oneToHundred.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.aiv),
+                                    aiv.toString().totalAmountFormatted()
+                                )
+                            )
+
+
+                            itemListDetails.add(itemListDetailsTmp)
+                        }
+
+                        createTableClickable(itemList, binding.tabLayoutOrder)
+                    }
+                }
+            }
+        }
     }
 
     private fun getOrderSummary(url: String) {
