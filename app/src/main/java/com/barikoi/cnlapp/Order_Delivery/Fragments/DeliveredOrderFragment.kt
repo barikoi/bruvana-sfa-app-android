@@ -42,21 +42,39 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
     private lateinit var binding: FragmentDeliveredOrderBinding
 
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkforOrders(queue!!, token!!, user_id!!, sr_id!!, territory_id!!, StartDate!!, EndDate!!)
+        checkforOrders(
+            queue!!,
+            token!!,
+            user_id!!,
+            sr_id!!,
+            territory_id!!,
+            sharePrefUtils.getString(Constants.REGION_ID)!!,
+            StartDate!!,
+            EndDate!!,
+            sharePrefUtils
+        )
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -65,8 +83,8 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapterDelivery.filter.filter(s)
-                if (s!!.length == 0) {
-                    if (sr_id!!.length == 0) {
+                if (s!!.isEmpty()) {
+                    if (sr_id!!.isEmpty()) {
                         getAllOrders(
                             Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
                             queue!!,
@@ -122,17 +140,28 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             user_id: String,
             sr_id: String,
             territory_id: String,
+            regionId: String,
             start: String,
-            end: String
+            end: String,
+            sharePrefUtils: SharePrefUtils
         ) {
             if (mCallback2 != null) {
-                if (sr_id.length == 0) {
-                    getAllOrders(
-                        Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
-                        queue,
-                        token,
-                        mCallback2!!
-                    )
+                if (sr_id.isEmpty()) {
+                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&region_id=${regionId}&include_filter_by_asm=1",
+                            queue,
+                            token,
+                            mCallback2!!
+                        )
+                    } else {
+                        getAllOrders(
+                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
+                            queue,
+                            token,
+                            mCallback2!!
+                        )
+                    }
                 } else {
                     getAllOrders(
                         Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=DELIVERED",
@@ -269,11 +298,11 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             }
 
             binding.orderListView.apply {
-                if (user_type.equals("TO", true)) {
-                    adapterDelivery = OrderDeliveryListAdapter(orderList, listener!!, "TO")
-                } else {
-                    adapterDelivery = OrderDeliveryListAdapter(orderList, listener!!, "SO")
-                }
+                adapterDelivery = OrderDeliveryListAdapter(
+                    orderList,
+                    listener!!,
+                    sharePrefUtils.getString(Api.USER_TYPE)!!
+                )
                 binding.orderListView.adapter = adapterDelivery
                 adapterDelivery.notifyDataSetChanged()
             }
@@ -302,6 +331,10 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
 
         user_type = prefs!!.getString(Api.USER_TYPE, "")
         if (user_type.equals("TO", true)) {
+            sr_id = ""
+            route_id = ""
+            user_id = OrderDeliveryUpdateActivity.user_id
+        } else if (user_type.equals("ASM", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
@@ -508,24 +541,29 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                         appDatabase!!.orderListDao().deleteALL()
                         appDatabase!!.saveOrderDao().deleteALL()
                         val message = response.getString("message")
-                        ViewUtils.viewDialogResponse(requireContext(), message, object : DialogListener {
-                            override fun onConfirmed() {
-                                checkforOrders(
-                                    queue!!,
-                                    token!!,
-                                    user_id!!,
-                                    sr_id!!,
-                                    territory_id!!,
-                                    StartDate!!,
-                                    EndDate!!
-                                )
-                            }
+                        ViewUtils.viewDialogResponse(
+                            requireContext(),
+                            message,
+                            object : DialogListener {
+                                override fun onConfirmed() {
+                                    checkforOrders(
+                                        queue!!,
+                                        token!!,
+                                        user_id!!,
+                                        sr_id!!,
+                                        territory_id!!,
+                                        sharePrefUtils.getString(Constants.REGION_ID)!!,
+                                        StartDate!!,
+                                        EndDate!!,
+                                        sharePrefUtils
+                                    )
+                                }
 
-                            override fun onCanceled() {
-                                TODO("Not yet implemented")
-                            }
+                                override fun onCanceled() {
+                                    TODO("Not yet implemented")
+                                }
 
-                        })
+                            })
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
