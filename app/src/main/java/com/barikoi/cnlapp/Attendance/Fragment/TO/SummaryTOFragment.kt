@@ -50,11 +50,6 @@ class SummaryTOFragment : Fragment() {
     val filteredsoList: ArrayList<Pair<String, String>> = ArrayList()
     var reasonList: ArrayList<Pair<String, String>> = ArrayList()
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
@@ -74,8 +69,8 @@ class SummaryTOFragment : Fragment() {
                         } else {
                             binding.imageUser.visibility = View.GONE
                         }
-                        binding.userName.setText(soList[p2 - 1].name)
-                        binding.userDesignation.setText(soList[p2 - 1].designation)
+                        binding.userName.text = soList[p2 - 1].name
+                        binding.userDesignation.text = soList[p2 - 1].designation
                     } else {
                         binding.userLayout.visibility = View.GONE
                     }
@@ -97,7 +92,7 @@ class SummaryTOFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSummaryTOBinding.inflate(inflater, container, false)
         return  binding.root
     }
@@ -136,46 +131,44 @@ class SummaryTOFragment : Fragment() {
 
     private fun viewSOList(response: String) {
         try {
-            if (response != null) {
-                soList.clear()
-                val obj = JSONObject(response)
-                val toArray = obj.getJSONArray("so_list")
-                val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
-                val soNameList: ArrayList<String> = ArrayList()
-                soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
+            soList.clear()
+            val obj = JSONObject(response)
+            val toArray = obj.getJSONArray("so_list")
+            val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
+            val soNameList: ArrayList<String> = ArrayList()
+            soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
 
-                if (soArray.length() > 0) {
-                    for (i in 0 until soArray.length()) {
-                        val soObj = soArray.getJSONObject(i)
-                        var imageUrl = "null"
-                        if (soObj.has("images")  && !soObj.isNull("images")){
-                            val imageArray = soObj.getJSONArray("images")
-                            if (imageArray.length() > 0){
-                                val imageobj = imageArray.getJSONObject(0)
-                                if (imageobj.has("image_url")){
-                                    imageUrl = imageobj.getString("image_url")
-                                }
+            if (soArray.length() > 0) {
+                for (i in 0 until soArray.length()) {
+                    val soObj = soArray.getJSONObject(i)
+                    var imageUrl = "null"
+                    if (soObj.has("images")  && !soObj.isNull("images")){
+                        val imageArray = soObj.getJSONArray("images")
+                        if (imageArray.length() > 0){
+                            val imageobj = imageArray.getJSONObject(0)
+                            if (imageobj.has("image_url")){
+                                imageUrl = imageobj.getString("image_url")
                             }
                         }
-                        soList.add(
-                            SOList(
-                                soObj.getString("id"),
-                                soObj.getString("user_name"),
-                                soObj.getString("designation"),
-                                if(soObj.has("employee_id")) soObj.getString("employee_id") else "",
-                                imageUrl
-                            )
-                        )
-                        soNameList.add(soObj.getString("user_name"))
-
                     }
+                    soList.add(
+                        SOList(
+                            soObj.getString("id"),
+                            soObj.getString("user_name"),
+                            soObj.getString("designation"),
+                            if(soObj.has("employee_id")) soObj.getString("employee_id") else "",
+                            imageUrl
+                        )
+                    )
+                    soNameList.add(soObj.getString("user_name"))
+
                 }
-                val adapter = ArrayAdapter(
-                    mContext!!,
-                    android.R.layout.simple_spinner_item, soNameList
-                )
-                binding. spinnerSO.adapter = adapter
             }
+            val adapter = ArrayAdapter(
+                mContext!!,
+                android.R.layout.simple_spinner_item, soNameList
+            )
+            binding. spinnerSO.adapter = adapter
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -191,7 +184,7 @@ class SummaryTOFragment : Fragment() {
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
-        binding.tvDateRange.setText(simpleFormat.format(start) + " - " + simpleFormat.format(end))
+        binding.tvDateRange.text = simpleFormat.format(start) + " - " + simpleFormat.format(end)
         editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
         editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
         editor!!.commit()
@@ -204,13 +197,13 @@ class SummaryTOFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        binding.dateRangeLayout.setOnClickListener(View.OnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.setEnabled(false)
-        })
+            binding.dateRangeLayout.isEnabled = false
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.isEnabled = true
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
@@ -232,10 +225,11 @@ class SummaryTOFragment : Fragment() {
             )
         }
 
-        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.setEnabled(true) }
+        materialDatePicker.addOnNegativeButtonClickListener { binding.dateRangeLayout.isEnabled =
+            true }
     }
 
-    fun getAttendance(url: String) {
+    private fun getAttendance(url: String) {
         ApiServices.apiGET(
             url,
             mQueue!!, token!!, object : ApiServiceListener {
@@ -244,13 +238,9 @@ class SummaryTOFragment : Fragment() {
                     getHistoryList(response)
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
                     ViewUtils.getErrorResponse(error, mContext!!)
@@ -265,18 +255,35 @@ class SummaryTOFragment : Fragment() {
 
     fun getHistoryList(response: String) {
         try {
-            if (response != null) {
-                val obj = JSONObject(response)
-                val attedanceArray = obj.getJSONArray("attendances")
-                var absent = 0
-                var present = 0
-                var late = 0
-                var total = 0
-                reasonList.clear()
-                if (attedanceArray.length() > 0) {
-                    for (i in 0 until attedanceArray.length()) {
-                        val attendanceObj = attedanceArray.getJSONObject(i)
-                        if (attendanceObj.getString("user_id").equals(selected_so_id)) {
+            val obj = JSONObject(response)
+            val attedanceArray = obj.getJSONArray("attendances")
+            var absent = 0
+            var present = 0
+            var late = 0
+            var total = 0
+            reasonList.clear()
+            if (attedanceArray.length() > 0) {
+                for (i in 0 until attedanceArray.length()) {
+                    val attendanceObj = attedanceArray.getJSONObject(i)
+                    if (attendanceObj.getString("user_id").equals(selected_so_id)) {
+                        total +=1
+                        if (!attendanceObj.getString("remarks")
+                                .equals("null") && attendanceObj.getString("remarks").length > 0
+                        ) {
+                            reasonList.add(
+                                Pair(
+                                    attendanceObj.getString("checkin_time"),
+                                    attendanceObj.getString("remarks")
+                                )
+                            )
+                        }
+                        if (attendanceObj.getString("checkin_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
+                            total -= 1
+                        }
+                        if (attendanceObj.getInt("is_late") == 1) late += 1
+                        if (attendanceObj.getInt("is_absent") == 1) absent += 1
+                    }else{
+                        if (selected_so == 0){
                             total +=1
                             if (!attendanceObj.getString("remarks")
                                     .equals("null") && attendanceObj.getString("remarks").length > 0
@@ -293,44 +300,25 @@ class SummaryTOFragment : Fragment() {
                             }
                             if (attendanceObj.getInt("is_late") == 1) late += 1
                             if (attendanceObj.getInt("is_absent") == 1) absent += 1
-                        }else{
-                            if (selected_so == 0){
-                                total +=1
-                                if (!attendanceObj.getString("remarks")
-                                        .equals("null") && attendanceObj.getString("remarks").length > 0
-                                ) {
-                                    reasonList.add(
-                                        Pair(
-                                            attendanceObj.getString("checkin_time"),
-                                            attendanceObj.getString("remarks")
-                                        )
-                                    )
-                                }
-                                if (attendanceObj.getString("checkin_time").equals("null") && attendanceObj.getInt("is_absent") == 0) {
-                                    total -= 1
-                                }
-                                if (attendanceObj.getInt("is_late") == 1) late += 1
-                                if (attendanceObj.getInt("is_absent") == 1) absent += 1
-                            }
                         }
                     }
-
-                    present = total - absent
-
-                    editor!!.putInt(Api.TOTAL_PRESENT, present)
-                    editor!!.putInt(Api.TOTAL_LATE, late)
-                    editor!!.putInt(Api.TOTAL_ABSENT, absent)
-                    editor!!.commit()
                 }
 
-                val adapter = ReasonListAdapter(reasonList)
-                binding.summaryListTOView.adapter = adapter
-                adapter.notifyDataSetChanged()
+                present = total - absent
 
-                binding.presentCount.setText(present.toString())
-                binding.lateCount.setText(late.toString())
-                binding.absentCount.setText(absent.toString())
+                editor!!.putInt(Api.TOTAL_PRESENT, present)
+                editor!!.putInt(Api.TOTAL_LATE, late)
+                editor!!.putInt(Api.TOTAL_ABSENT, absent)
+                editor!!.commit()
             }
+
+            val adapter = ReasonListAdapter(reasonList)
+            binding.summaryListTOView.adapter = adapter
+            adapter.notifyDataSetChanged()
+
+            binding.presentCount.text = present.toString()
+            binding.lateCount.text = late.toString()
+            binding.absentCount.text = absent.toString()
         } catch (e: Exception) {
             e.printStackTrace()
         }
