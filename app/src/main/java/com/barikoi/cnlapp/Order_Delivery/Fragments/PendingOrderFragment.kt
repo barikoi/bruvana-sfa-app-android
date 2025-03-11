@@ -101,16 +101,17 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
         progressBar = view.findViewById(R.id.progressBar1)
 
-//        checkForOrders(
-//            queue!!,
-//            token!!,
-//            user_id!!,
-//            sr_id!!,
-//            territory_id!!,
-//            sharePrefUtils.getString(Constants.REGION_ID)!!,
-//            StartDate!!,
-//            EndDate!!
-//        )
+        checkForOrders(
+            queue!!,
+            token!!,
+            user_id!!,
+            sr_id!!,
+            territory_id!!,
+            sharePrefUtils.getString(Constants.REGION_ID)!!,
+            StartDate!!,
+            EndDate!!,
+            sharePrefUtils
+        )
 
         etSearchShop!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -309,11 +310,12 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             }
 
             binding.orderListView.apply {
-                if (user_type.equals("TO", true)) {
-                    adapterOrder = OrderDeliveryListAdapter(orderList, listener!!, "TO")
-                } else {
-                    adapterOrder = OrderDeliveryListAdapter(orderList, listener!!, "SO")
-                }
+                adapterOrder = OrderDeliveryListAdapter(
+                    orderList,
+                    listener!!,
+                    sharePrefUtils.getString(Api.USER_TYPE)!!
+                )
+
                 binding.orderListView.adapter = adapterOrder
                 adapterOrder.notifyDataSetChanged()
             }
@@ -340,6 +342,10 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         token = prefs!!.getString(Api.TOKEN, "")
         user_type = prefs!!.getString(Api.USER_TYPE, "")
         if (user_type.equals("TO", true)) {
+            sr_id = ""
+            route_id = ""
+            user_id = OrderDeliveryUpdateActivity.user_id
+        } else if (user_type.equals("ASM", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
