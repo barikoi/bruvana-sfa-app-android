@@ -306,10 +306,25 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                             )
                             itemListDetailsTmp.add(
                                 Pair(
+                                    resources.getString(R.string.ads),
+                                    to.ads.toString().totalAmountFormatted()
+                                )
+                            )
+
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.rds),
+                                    to.rds.toString().totalAmountFormatted()
+                                )
+                            )
+
+                            itemListDetailsTmp.add(
+                                Pair(
                                     resources.getString(R.string.sku_per_memo),
                                     skuPerMemo.toString()
                                 )
                             )
+
                             itemListDetailsTmp.add(
                                 Pair(
                                     resources.getString(R.string.number_of_memo),
@@ -324,14 +339,15 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                             )
                             itemListDetailsTmp.add(
                                 Pair(
-                                    resources.getString(R.string.visit_500m),
-                                    to.oneToHundred.toString()
+                                    resources.getString(R.string.aiv),
+                                    to.aiv.toString().totalAmountFormatted()
                                 )
                             )
+
                             itemListDetailsTmp.add(
                                 Pair(
-                                    resources.getString(R.string.aiv),
-                                    aiv.toString().totalAmountFormatted()
+                                    resources.getString(R.string.bounce) + " (%)",
+                                    to.bouncedPercentage.toString()
                                 )
                             )
 
@@ -502,9 +518,8 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                                     binding.totalBounceCount.text =
                                         toList[i].totalBouncedAmount
 
-//                                    createTable(itemListDetails[i], binding.tabLayoutTarget)
-
-                                    getSummaryTargets(Api.get_summary + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+                                    createTable(itemListDetails[i], binding.tabLayoutTarget)
+                                    binding.targetLayout.visibility = View.VISIBLE
 
                                     for (t in 0 until tabLayout.childCount) {
                                         if (tabLayout.getChildAt(t).tag == it.tag) {
@@ -515,7 +530,6 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                                                 .setBackgroundColor(resources.getColor(R.color.white))
                                         }
                                     }
-
 
                                 } else {
                                     binding.bodyLayoutScroll.visibility = View.VISIBLE
