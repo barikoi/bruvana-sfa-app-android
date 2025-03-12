@@ -16,6 +16,16 @@ data class TodaySummaryResponse(
 )
 
 data class To(
+    @SerializedName("ads")
+    val ads: Double,
+    @SerializedName("aiv")
+    val aiv: Double,
+    @SerializedName("bounced_percentage")
+    val bouncedPercentage: Double,
+    @SerializedName("bounced_amount")
+    val bouncedAmount: String,
+    @SerializedName("rds")
+    val rds: Double,
     @SerializedName("num_of_sku")
     val numOfSku: Int,
     @SerializedName("num_of_visits")
