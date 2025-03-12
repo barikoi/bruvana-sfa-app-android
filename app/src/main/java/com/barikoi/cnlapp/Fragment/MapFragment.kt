@@ -4,6 +4,7 @@ package com.barikoi.cnlapp.Fragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.IntentSender.SendIntentException
 import android.location.Location
 import android.os.Build
@@ -23,7 +24,8 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.GroupUser
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
-import com.barikoi.cnlapp.data.remote.models.SalesOfficer
+import com.barikoi.cnlapp.data.remote.models.SoUser
+import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.FragmentMapBinding
 import com.barikoi.cnlapp.socket.SocketHandler
 import com.barikoi.cnlapp.socket.model.SocketResponse
@@ -32,7 +34,9 @@ import com.barikoi.cnlapp.utils.Api.TRACE_GROUP_ID
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.convertDate
+import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.getDifferenceInMinutes
+import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.gms.common.api.ResolvableApiException
@@ -57,6 +61,7 @@ import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.maps.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -72,7 +77,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private val viewModel: MapViewModel by viewModels()
 
-
     private lateinit var mMap: MapboxMap
 
     private var locationEngine: LocationEngine? = null
@@ -80,8 +84,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private var permissionsManager: PermissionsManager? = null
 
-    private var soNewList: List<SalesOfficer> = emptyList()
-    private var selectedSo: SalesOfficer? = null
+    private var toList: List<To> = emptyList()
+    private var soNewList: List<SoUser> = emptyList()
+
+    private var selectedSo: SoUser? = null
 
     private var routeNewList: List<Route> = emptyList()
     private var routeID = ""
@@ -90,6 +96,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private var categoryList: ArrayList<String> = ArrayList()
     private var selectedCategory: String = ""
+
+    private lateinit var loading: Dialog
 
 
     override fun onCreateView(
@@ -114,16 +122,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireContext().loadingDialog {
+            loading = it
+        }
+
         SocketHandler.setSocket(sharePrefUtils.getString(Api.TRACE_TOKEN)!!)
 
-        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) ||
-            sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)
-        ) {
+        startSoObserve()
+        startToObserve()
+
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
             binding.spinnerLayoutSO.visibility = View.VISIBLE
-            startSoObserve()
-            viewModel.getSoList()
+            binding.spinnerLayoutTO.visibility = View.GONE
+            viewModel.getSoByTo(
+                sharePrefUtils.getString(Api.USER_ID)!!
+            )
+
+        } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)) {
+            binding.spinnerLayoutTO.visibility = View.VISIBLE
+            binding.spinnerLayoutSO.visibility = View.VISIBLE
+            viewModel.getTo(
+                Calendar.getInstance().time.formatDate(),
+                Calendar.getInstance().time.formatDate(),
+                "0"
+            )
         } else {
             binding.spinnerLayoutSO.visibility = View.GONE
+            binding.spinnerLayoutTO.visibility = View.GONE
         }
 
         binding.shopCount.setHapticClickListener {
@@ -134,6 +159,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             AppLogger.log("SocketHandler:: ${aa.isActive}")
 
             SocketHandler.onConnectError()
+        }
+
+        binding.spinnerTO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.getSoByTo(
+                    toList[position].toId.toString()
+                )
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
         binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -237,7 +273,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             }
         }
 
-
         binding.isVerified.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (routeID.isEmpty()) {
                 return@setOnCheckedChangeListener
@@ -255,35 +290,80 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     }
 
-    private fun startSoObserve() {
+    private fun startToObserve() {
         lifecycleScope.launch {
-            viewModel.soResponse.observe(viewLifecycleOwner) {
+            viewModel.toResponse.observe(viewLifecycleOwner) {
                 when (it) {
                     is ApiState.Empty -> {
-                        binding.progressBar1.isVisible = false
+                        AppLogger.log("startToObserve::Empty")
+                        loading.hide()
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startToObserve::Error ${it.error}")
+                        loading.hide()
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startToObserve::Loading")
+                        loading.show()
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startToObserve:: Success ${it.data}")
+                        loading.hide()
+
+                        if (it.data?.toList.isNullOrEmpty()) {
+                            toast("To list empty")
+                            return@observe
+                        }
+
+                        toList = it.data?.toList ?: emptyList()
+                        val toNameList = it.data?.toList?.map { to -> to.toName }!!.toMutableList()
+
+                        val adapter = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            toNameList.toMutableList()
+                        )
+                        binding.spinnerTO.adapter = adapter
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startSoObserve() {
+        lifecycleScope.launch {
+            viewModel.soNewResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        loading.hide()
                         AppLogger.log("startSoObserve::Empty")
                     }
 
                     is ApiState.Error -> {
-                        binding.progressBar1.isVisible = false
+                        loading.hide()
                         AppLogger.log("startSoObserve: Error ${it.error}")
                         toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
-                        binding.progressBar1.isVisible = true
+                        loading.show()
                         AppLogger.log("startSoObserve::Loading")
                     }
 
                     is ApiState.Success -> {
-                        binding.progressBar1.isVisible = false
+                        loading.hide()
                         AppLogger.log("startSoObserve::Success ${it.data}")
 
-                        AppLogger.log("SIZE: ${it.data?.soList?.get(0)?.salesOfficers?.size}")
 
-                        soNewList = it.data?.soList?.get(0)?.salesOfficers ?: emptyList()
+                        soNewList = it.data?.users ?: emptyList()
                         val soNameList =
-                            it.data?.soList?.get(0)?.salesOfficers?.map { so -> so.userName }
+                            it.data?.users?.map { so -> so.userName }
 
                         if (!soNameList.isNullOrEmpty()) {
                             AppLogger.log("SIZE: ${soNameList.size}")
