@@ -323,7 +323,7 @@ class LastWeekSummaryTOFragment : Fragment() {
                             itemListDetailsTmp.add(
                                 Pair(
                                     resources.getString(R.string.aiv),
-                                    aiv.toString().totalAmountFormatted()
+                                    to.aiv.toString().totalAmountFormatted()
                                 )
                             )
 
