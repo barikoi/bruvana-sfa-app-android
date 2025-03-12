@@ -286,6 +286,7 @@ class TodaySummaryTOFragment : Fragment() {
 
                             val skuPerMemo =
                                 to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
+
                             val aiv = to.totalOrderedAmount.toDoubleOrNull()
                                 ?.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0.0
 
@@ -324,7 +325,7 @@ class TodaySummaryTOFragment : Fragment() {
                             itemListDetailsTmp.add(
                                 Pair(
                                     resources.getString(R.string.aiv),
-                                    aiv.toString().totalAmountFormatted()
+                                    to.aiv.toString().totalAmountFormatted()
                                 )
                             )
 
