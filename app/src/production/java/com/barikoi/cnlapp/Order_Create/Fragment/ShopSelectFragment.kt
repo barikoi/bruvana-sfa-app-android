@@ -369,6 +369,7 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
             }
 
             override fun afterTextChanged(s: Editable?) {
+
             }
 
         })
