@@ -23,7 +23,7 @@ class OrderSummeryTOViewModel @Inject constructor(
     val todaySummaryResponse: LiveData<ApiState<TodaySummaryResponse>> = _todaySummaryResponse
 
 
-    fun getTodaySummary(startDate: String, endDate: String, todaySummary: String) {
+    fun getTodaySummary(startDate: String, endDate: String, todaySummary: String?) {
         viewModelScope.launch {
             summaryRepository.getTodaySummary(startDate, endDate, todaySummary)
                 .onStart {
