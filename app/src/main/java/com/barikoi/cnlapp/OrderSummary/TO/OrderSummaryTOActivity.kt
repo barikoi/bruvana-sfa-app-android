@@ -141,6 +141,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         startDate = df.format(start)
         endDate = df.format(end)
+
         customDate =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         binding.tvDateRange.text = customDate
@@ -149,7 +150,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
             viewModel.getTodaySummary(
                 startDate!!,
                 endDate!!,
-                "1"
+                null
             )
 
         } else {
@@ -197,7 +198,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 viewModel.getTodaySummary(
                     startDate!!,
                     endDate!!,
-                    "1"
+                    null
                 )
 
             } else
