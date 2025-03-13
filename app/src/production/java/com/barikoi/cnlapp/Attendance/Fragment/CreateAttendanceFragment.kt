@@ -31,7 +31,6 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.extension.formatDateToFullName
 import com.barikoi.cnlapp.utils.extension.rotateViewAnimation
-import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import org.json.JSONException
@@ -94,7 +93,7 @@ class CreateAttendanceFragment : Fragment() {
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true) || sharePrefUtils.getString(
                 Api.USER_TYPE
-            ).equals("ASM", true)
+            ).equals("ASM")
         ) {
             binding.spinnerLayoutRoute.visibility = View.GONE
             binding.titleRoute.visibility = View.GONE
@@ -150,8 +149,7 @@ class CreateAttendanceFragment : Fragment() {
 
         binding.btnCheckIn.setOnClickListener {
             if (sharePrefUtils.getString(Api.USER_TYPE)
-                    .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE)
-                    .equals("ASM", true)
+                    .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
             ) {
                 if (isImageAdded) {
                     binding.progressBar.visibility = View.VISIBLE
@@ -172,7 +170,7 @@ class CreateAttendanceFragment : Fragment() {
                     if (!isImageAdded) {
                         Toast.makeText(
                             requireContext(),
-                            "Upload image for attendance",
+                            getString(R.string.upload_image_for_attendance),
                             Toast.LENGTH_SHORT
                         )
                             .show()
@@ -486,6 +484,7 @@ class CreateAttendanceFragment : Fragment() {
             }
 
             override fun onFailure() {}
+
         })
     }
 
@@ -538,6 +537,7 @@ class CreateAttendanceFragment : Fragment() {
                                             convertView,
                                             parent
                                         ) as TextView
+                                        //set the color of first item in the drop down list to gray
                                         if (position == 0) {
                                             view.setTextColor(
                                                 requireContext().resources.getColor(
@@ -546,6 +546,8 @@ class CreateAttendanceFragment : Fragment() {
                                             )
                                             view.visibility = View.GONE
                                         } else {
+                                            //here it is possible to define color for other items by
+                                            //view.setTextColor(Color.RED)
                                             view.setTextColor(resources.getColor(R.color.black))
                                         }
                                         return view
@@ -568,6 +570,8 @@ class CreateAttendanceFragment : Fragment() {
                             } else {
                                 binding.spinnerRoutes.setSelection(0)
                             }
+
+
                         }
 
                     }
@@ -577,6 +581,7 @@ class CreateAttendanceFragment : Fragment() {
                 }
             },
             { error ->
+                //loading!!.visibility = View.GONE
                 if (error is TimeoutError) {
                     Toast.makeText(
                         requireContext(),
