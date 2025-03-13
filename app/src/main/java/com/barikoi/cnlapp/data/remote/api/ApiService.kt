@@ -150,7 +150,7 @@ interface ApiService {
     suspend fun getTodaySummary(
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
-        @Query("today_summary") todaySummary: String
+        @Query("today_summary") todaySummary: String?
     ): Response<TodaySummaryResponse>
 
 
