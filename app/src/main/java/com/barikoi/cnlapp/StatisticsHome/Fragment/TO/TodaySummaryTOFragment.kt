@@ -14,7 +14,6 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +30,7 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.toast
 import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import dagger.hilt.android.AndroidEntryPoint
@@ -82,11 +82,7 @@ class TodaySummaryTOFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -1)
-
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        endDate = df.format(c.time)
+        endDate = Calendar.getInstance().time.formatDate()
 
         startTodaySummaryObserve()
 
@@ -118,8 +114,7 @@ class TodaySummaryTOFragment : Fragment() {
             binding.progressBarHome.visibility = View.VISIBLE
             binding.summaryLayout.visibility = View.GONE
             val dFormat = DecimalFormat("#.##")
-            val c = Calendar.getInstance()
-            c.add(Calendar.DAY_OF_WEEK, -7)
+
             val end = Calendar.getInstance().time
             val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
             endDate = df.format(end)
@@ -186,11 +181,9 @@ class TodaySummaryTOFragment : Fragment() {
 
                     }
 
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                    }
+                    override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    }
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                     override fun onResponseFailure(error: VolleyError) {
                         try {
@@ -287,10 +280,6 @@ class TodaySummaryTOFragment : Fragment() {
                             val skuPerMemo =
                                 to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
 
-                            val aiv = to.totalOrderedAmount.toDoubleOrNull()
-                                ?.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0.0
-
-
                             val itemListDetailsTmp = ArrayList<Pair<String, String>>()
                             itemListDetailsTmp.add(
                                 Pair(
@@ -340,118 +329,11 @@ class TodaySummaryTOFragment : Fragment() {
         }
     }
 
-    private fun setTodaySummaryForASM() {
-        try {
-            binding.progressBarHome.visibility = View.VISIBLE
-            binding.summaryLayout.visibility = View.GONE
-            val c = Calendar.getInstance()
-            c.add(Calendar.DAY_OF_WEEK, -7)
-            val end = Calendar.getInstance().time
-            val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-            endDate = df.format(end)
-
-            ApiServices.apiGET(
-                Api.get_all_to_list + "?today_summary=1&start_date=" + endDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
-                    Api.USER_ID
-                ),
-                mQueue,
-                sharePrefUtils.getString(Api.TOKEN)!!,
-                object :
-                    ApiServiceListener {
-                    override fun onResponseSuccess(response: String) {
-                        try {
-                            binding.progressBarHome.visibility = View.GONE
-                            binding.summaryLayout.visibility = View.VISIBLE
-                            binding.tryAgain.visibility = View.GONE
-
-
-                            val obj = JSONObject(response)
-                            val toArray = obj.getJSONArray("so_list")
-                            val toObj = toArray.getJSONObject(0)
-                            val ordersArray = toObj.getJSONArray("sales_officers")
-                            val itemList: ArrayList<Pair<Pair<String, String>, String>> =
-                                ArrayList()
-                            if (ordersArray.length() > 0) {
-                                for (i in 0 until ordersArray.length()) {
-                                    val orderObj = ordersArray.getJSONObject(i)
-                                    itemList.add(
-                                        Pair(
-                                            Pair(
-                                                orderObj.getString("user_name"),
-                                                orderObj.getString("id")
-                                            ),
-                                            dFormat.format(
-                                                orderObj.getString("so_ordered_value")
-                                                    .toDouble()
-                                            )
-                                        )
-                                    )
-                                }
-                            }
-                            if (!toObj.getString("order_amount")
-                                    .equals("null")
-                            ) binding.ovCount.text = dFormat.format(
-                                toObj.getString("order_amount").toDouble()
-                            )
-                            if (!toObj.getString("sku_per_memo")
-                                    .equals("null")
-                            ) binding.bpcCount.text = dFormat.format(
-                                toObj.getString("sku_per_memo").toDouble()
-                            )
-                            if (!toObj.getString("number_of_memo")
-                                    .equals("null")
-                            ) binding.lpcCount.text = dFormat.format(
-                                toObj.getString("number_of_memo").toDouble()
-                            )
-                            createTableClickable(itemList, binding.tabLayout2)
-
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            binding.progressBarHome.visibility = View.GONE
-                            binding.summaryLayout.visibility = View.GONE
-                            binding.tryAgain.visibility = View.VISIBLE
-                        }
-
-                    }
-
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                    }
-
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    }
-
-                    override fun onResponseFailure(error: VolleyError) {
-                        try {
-                            ViewUtils.getErrorResponse(error, requireContext())
-                            binding.progressBarHome.visibility = View.GONE
-                            binding.summaryLayout.visibility = View.GONE
-                            binding.tryAgain.visibility = View.VISIBLE
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-
-                    override fun onException(e: Exception) {
-                        try {
-                            binding.progressBarHome.visibility = View.GONE
-                            binding.summaryLayout.visibility = View.GONE
-                            binding.tryAgain.visibility = View.VISIBLE
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-
-                })
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     private fun createTable(data: ArrayList<Pair<String, String>>, tabLayout: TableLayout) {
         tabLayout.isStretchAllColumns = true
         tabLayout.bringToFront()
         tabLayout.removeAllViews()
-        if (data.size > 0) {
+        if (data.isNotEmpty()) {
             for (i in 0 until data.size) {
                 val tr = TableRow(requireContext())
                 val c1 = TextView(requireContext())
@@ -489,7 +371,7 @@ class TodaySummaryTOFragment : Fragment() {
         tabLayout.removeAllViews()
         binding.tabLayoutTarget.removeAllViews()
         binding.targetLayout.visibility = View.GONE
-        if (data.size > 0) {
+        if (data.isNotEmpty()) {
             for (i in 0 until data.size) {
                 val tr = TableRow(requireContext())
                 val tableRowParams = TableLayout.LayoutParams(
@@ -683,4 +565,5 @@ class TodaySummaryTOFragment : Fragment() {
         pd!!.setMessage("Processing...")
         pd!!.setCancelable(false)
     }
+
 }
