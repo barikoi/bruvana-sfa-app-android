@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 interface SummaryRepository {
     suspend fun getTodaySummary(
-        startDate: String, endDate: String, todaySummary: String
+        startDate: String, endDate: String, todaySummary: String?
     ): Flow<ApiState<TodaySummaryResponse>>
 }
 
@@ -24,7 +24,7 @@ class SummaryRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : SummaryRepository {
     override suspend fun getTodaySummary(
-        startDate: String, endDate: String, todaySummary: String
+        startDate: String, endDate: String, todaySummary: String?
     ): Flow<ApiState<TodaySummaryResponse>> {
         return flow {
             try {
