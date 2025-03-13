@@ -36,7 +36,7 @@ data class Gift(
     val updatedAt: String,
 
     var qty: Int = 0,
-    var images: List<String>? = emptyList()
+    var images: MutableList<String>? = mutableListOf()
 
 ) : Parcelable
 
