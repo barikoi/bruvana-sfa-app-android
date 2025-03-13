@@ -356,9 +356,9 @@ class CreateAttendanceFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     val data = JSONObject(String(response.data))
                     val message = data.getString("message")
-                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO", true)) {
-                        ViewUtils.startTracking(requireActivity(), requireContext())
-                    }
+
+                    ViewUtils.startTracking(requireActivity(), requireContext())
+
                     checkAttendance()
                     ViewUtils.viewDialogResponse(
                         requireContext(),
