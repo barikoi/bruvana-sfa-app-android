@@ -30,6 +30,7 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.toast
 import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import dagger.hilt.android.AndroidEntryPoint
@@ -82,10 +83,9 @@ class LastWeekSummaryTOFragment : Fragment() {
 
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
-        val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        startDate = df.format(start)
-        endDate = df.format(start)
+
+        startDate = c.time.formatDate()
+        endDate = c.time.formatDate()
 
         startTodaySummaryObserve()
 
@@ -285,9 +285,6 @@ class LastWeekSummaryTOFragment : Fragment() {
 
                             val skuPerMemo =
                                 to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
-                            val aiv = to.totalOrderedAmount.toDoubleOrNull()
-                                ?.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0.0
-
 
                             val itemListDetailsTmp = ArrayList<Pair<String, String>>()
                             itemListDetailsTmp.add(
@@ -342,7 +339,7 @@ class LastWeekSummaryTOFragment : Fragment() {
         tabLayout.isStretchAllColumns = true
         tabLayout.bringToFront()
         tabLayout.removeAllViews()
-        if (data.size > 0) {
+        if (data.isNotEmpty()) {
             for (i in 0 until data.size) {
                 val tr = TableRow(requireContext())
                 val c1 = TextView(requireContext())
@@ -370,7 +367,7 @@ class LastWeekSummaryTOFragment : Fragment() {
         tabLayout.removeAllViews()
         binding.tabLayoutTarget.removeAllViews()
         binding.targetLayout.visibility = View.GONE
-        if (data.size > 0) {
+        if (data.isNotEmpty()) {
             for (i in 0 until data.size) {
                 val tr = TableRow(requireContext())
                 val tableRowParams = TableLayout.LayoutParams(
@@ -520,7 +517,6 @@ class LastWeekSummaryTOFragment : Fragment() {
                     } catch (e: Exception) {
                         e.printStackTrace()
                         binding.progressBarHome.visibility = View.GONE
-                        //getAllOrders(orderArray!!)
                         pd!!.dismiss()
                     }
 
