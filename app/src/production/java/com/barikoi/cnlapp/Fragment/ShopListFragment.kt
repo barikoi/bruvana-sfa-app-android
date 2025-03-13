@@ -1,64 +1,75 @@
 package com.barikoi.cnlapp.Fragment
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.activityViewModels
 import com.android.volley.NoConnectionError
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
-import com.barikoi.cnlapp.Activity.RouteActivity
+import com.barikoi.cnlapp.Activity.RouteViewModel
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.MoreSpinner
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import com.barikoi.cnlapp.databinding.FragmentShopListBinding
-import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShopListFragment : Fragment(), OnEditShopListener {
     private lateinit var binding: FragmentShopListBinding
 
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    private var adapter: ShopListAdapter? = null
+    private val viewModel: RouteViewModel by activityViewModels()
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    @Inject
+    lateinit var queue: RequestQueue
+
+
+    private var routesList: ArrayList<String>? = ArrayList()
+    private var allRouteList: ArrayList<Routes>? = ArrayList()
+    private var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
+    private var shopList: ArrayList<Shops>? = ArrayList()
+
+    private lateinit var adapter: ShopListAdapter
+
     private var userId: String? = ""
     private var listener: OnEditShopListener? = null
 
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentShopListBinding.inflate(inflater, container, false)
         return binding.root
@@ -67,55 +78,62 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recylerView = view.findViewById(R.id.shoplist)
-        spinner = view.findViewById(R.id.spinnerRoutes)
-        progressBar2 = view.findViewById(R.id.progress_bar2)
-        et_search = view.findViewById(R.id.etSearch)
-        btncreateShop = view.findViewById(R.id.createShop)
 
         adapter = ShopListAdapter(ArrayList(), listener!!)
-        recylerView!!.adapter = adapter
-        selectedRoute = prefs!!.getString(Api.SELECTED_ROUTE_NAME_LIST, "")!!
 
-        spinner!!.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
+        binding.shoplist.adapter = adapter
+
+
+        viewModel.soSelected.observe(viewLifecycleOwner) {
+            userId = it
+            getShopList(it)
+        }
+
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
+            getShopList(sharePrefUtils.getString(Api.USER_ID)!!)
+        }
+
+        binding.spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            @SuppressLint("NotifyDataSetChanged")
             override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
+                parent: AdapterView<*>, view: View, position: Int, id: Long
             ) {
-                editor!!.putString(Api.SELECTED_ROUTE_ID_LIST, routeNameList!![position].first)
-                editor!!.putString(
-                    Api.SELECTED_ROUTE_NAME_LIST,
-                    routeNameList!![position].second
+                sharePrefUtils.saveString(
+                    Api.SELECTED_ROUTE_ID_LIST,
+                    routeNameList!![position].first
                 )
-                editor!!.commit()
+                sharePrefUtils.saveString(
+                    Api.SELECTED_ROUTE_NAME_LIST, routeNameList!![position].second
+                )
                 val shops: ArrayList<Shops> = ArrayList()
                 for (i in 0 until shopList!!.size) {
                     if (shopList!![i].route_name == routesList!![position]) {
                         shops.add(shopList!![i])
                     }
-
                 }
                 adapter = ShopListAdapter(shops, listener!!)
-                recylerView!!.adapter = adapter
-                adapter!!.notifyDataSetChanged()
+                binding.shoplist.adapter = adapter
+                adapter.notifyDataSetChanged()
 
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        et_search!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                adapter!!.filter.filter(s)
+                adapter.filter.filter(s)
                 if (s!!.isEmpty()) {
                     val shops: ArrayList<Shops> = ArrayList()
                     if (shopList!!.size > 0) {
                         for (i in 0 until shopList!!.size) {
                             if (routesList!!.size > 0) {
-                                if (shopList!![i].route_name == routesList!![spinner!!.selectedItemPosition]) {
+                                if (shopList!![i].route_name == routesList!![binding.spinnerRoutes.selectedItemPosition]) {
                                     shops.add(shopList!![i])
                                 }
                             }
@@ -123,8 +141,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                         }
                     }
                     adapter = ShopListAdapter(shops, listener!!)
-                    recylerView!!.adapter = adapter
-                    adapter!!.notifyDataSetChanged()
+                    binding.shoplist.adapter = adapter
+                    adapter.notifyDataSetChanged()
                 }
 
             }
@@ -134,21 +152,33 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         })
 
         val gd = GradientDrawable()
-        gd.setColor(mContext!!.resources.getColor(R.color.white))
+        gd.setColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.white
+            )
+        )
         gd.cornerRadius = 5f
-        gd.setStroke(2, mContext!!.resources.getColor(R.color.cnl_color_2))
+        gd.setStroke(
+            2,
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.cnl_color_2
+            )
+        )
         binding.createShop.setBackgroundDrawable(gd)
 
         binding.createShop.setOnClickListener {
             if (routesList!!.size > 0) {
                 startActivityResult.launch(
-                    Intent(requireActivity(), CreateShopActivity::class.java)
-                        .putExtra("requestCode", 55)
-                        .putStringArrayListExtra("routes", routesList)
+                    Intent(
+                        requireActivity(),
+                        CreateShopActivity::class.java
+                    ).putExtra("requestCode", 55).putStringArrayListExtra("routes", routesList)
                         .putExtra("routeList", routeNameList)
                 )
             } else {
-                Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Routes not Available", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -157,217 +187,195 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == 55) {
-            progressBar2!!.isVisible = true
-            getShopList(RouteActivity.userId!!)
+            if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM") ||
+                sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
+            ) {
+                getShopList(userId!!)
+            } else getShopList(sharePrefUtils.getString(Api.USER_ID)!!)
         }
     }
 
-    companion object {
-        var routesList: ArrayList<String>? = ArrayList()
-        var allRouteList: ArrayList<Routes>? = ArrayList()
-        var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
-        var shopList: ArrayList<Shops>? = ArrayList()
-        var recylerView: RecyclerView? = null
-        var progressBar2: ProgressBar? = null
-        var mContext: Context? = null
-        var queue: RequestQueue? = null
-        var spinner: MoreSpinner? = null
-        var btncreateShop: AppCompatButton? = null
-        var et_search: AutoCompleteTextView? = null
-        var selectedRoute: String = ""
 
-        fun getShopList(userId: String) {
-            allRouteList!!.clear()
-            queue = RequestQueueSingleton.getInstance(mContext).getRequestQueue()
-            routesList!!.clear()
-            val request = StringRequest(
-                Request.Method.GET,
-                Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
-                { response ->
-                    //success
-                    Log.d("RouteFrag", response)
-                    try {
-                        progressBar2!!.visibility = View.GONE
-                        val data = JSONObject(response)
-                        val routesArray = data.getJSONArray("routes")
-                        shopList!!.clear()
-                        routesList!!.clear()
-                        routeNameList!!.clear()
-                        for (i in 0 until routesArray.length()) {
-                            val route = routesArray.getJSONObject(i)
-                            val route_id = route.getString("id")
-                            val route_name = route.getString("route_name")
-                            val route_code = route.getString("route_code")
-                            val territory_name = route.getString("territory_name")
-                            routesList!!.add(route_name)
+    private fun getShopList(userId: String) {
+        binding.progressBar2.isVisible = true
+        allRouteList!!.clear()
+        queue = RequestQueueSingleton.getInstance(requireContext()).getRequestQueue()
+        routesList!!.clear()
+        val request = StringRequest(Request.Method.GET,
+            Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
+            { response ->
+                Log.d("RouteFrag", response)
+                try {
+                    binding.progressBar2.isVisible = false
+                    val data = JSONObject(response)
+                    val routesArray = data.getJSONArray("routes")
+                    shopList!!.clear()
+                    routesList!!.clear()
+                    routeNameList!!.clear()
+                    for (i in 0 until routesArray.length()) {
+                        val route = routesArray.getJSONObject(i)
+                        val routeId = route.getString("id")
+                        val routeName = route.getString("route_name")
+                        val routeCode = route.getString("route_code")
+                        val territoryName = route.getString("territory_name")
+                        routesList!!.add(routeName)
 
-                            val route_outlet_list = route.getJSONArray("outlets")
-                            for (j in 0 until route_outlet_list.length()) {
-                                val outlet = route_outlet_list.getJSONObject(j)
-                                var imageUrl = "null"
-                                var imageList: ArrayList<String> = ArrayList()
-                                if (outlet.has("images") && !outlet.isNull("images")) {
-                                    val imageArray = outlet.getJSONArray("images")
-                                    if (imageArray.length() > 0) {
-                                        val imageobj = imageArray.getJSONObject(0)
+                        val routeOutletList = route.getJSONArray("outlets")
+                        for (j in 0 until routeOutletList.length()) {
+                            val outlet = routeOutletList.getJSONObject(j)
+                            var imageUrl = "null"
+                            val imageList: ArrayList<String> = ArrayList()
+                            if (outlet.has("images") && !outlet.isNull("images")) {
+                                val imageArray = outlet.getJSONArray("images")
+                                if (imageArray.length() > 0) {
+                                    val imageObj = imageArray.getJSONObject(0)
+                                    if (imageObj.has("image_url")) {
+                                        imageUrl = imageObj.getString("image_url")
+                                    }
+
+                                    for (p in 0 until imageArray.length()) {
+                                        val imageobj = imageArray.getJSONObject(p)
                                         if (imageobj.has("image_url")) {
-                                            imageUrl = imageobj.getString("image_url")
+                                            imageList.add(imageobj.getString("image_url"))
                                         }
 
-                                        for (p in 0 until imageArray.length()) {
-                                            val imageobj = imageArray.getJSONObject(p)
-                                            if (imageobj.has("image_url")) {
-                                                imageList.add(imageobj.getString("image_url"))
-                                            }
-
-                                        }
                                     }
                                 }
-                                val outlet_id = outlet.getString("id")
-                                val outlet_name = outlet.getString("outlet_name")
-                                val outlet_status = outlet.getString("outlet_status")
-                                val outlet_address = outlet.getString("address")
-                                val outlet_code = outlet.getString("outlet_code")
-                                val outlet_type = outlet.getString("outlet_type")
-                                val outlet_category = outlet.getString("outlet_category")
-                                val owner_name = outlet.getString("owner_name")
-                                val market_opportunity = outlet.getString("market_opportunity")
-                                val contact_number = outlet.getString("phone_number")
-                                val is_buyer = outlet.getInt("is_buyer")
-                                val latitude = outlet.getDouble("latitude")
-                                val longitude = outlet.getDouble("longitude")
-                                val is_Verified = outlet.getInt("is_verified")
 
-                                val competitive: List<String>? = Gson().fromJson(
-                                    outlet.getString("competitive_products"),
-                                    object : TypeToken<List<String>>() {}.type
-                                )
-
-                                AppLogger.log("competitive:: ${competitive}")
-
-                                shopList!!.add(
-                                    Shops(
-                                        outlet_id,
-                                        outlet_name,
-                                        outlet_status,
-                                        outlet_address,
-                                        outlet_code,
-                                        outlet_type,
-                                        outlet_category,
-                                        owner_name,
-                                        "",
-                                        market_opportunity,
-                                        contact_number,
-                                        is_buyer,
-                                        imageUrl,
-                                        imageList,
-                                        territory_name,
-                                        latitude,
-                                        longitude,
-                                        route_id,
-                                        route_name,
-                                        "",
-                                        is_Verified, 0, 0, 0.0f,
-                                        competitive
-                                    )
-                                )
                             }
-                            Log.d("RouteList", "all 1 " + shopList!!.size.toString())
-                            allRouteList!!.add(
-                                Routes(
-                                    route_id,
-                                    route_code,
-                                    route_name,
+                            val outletId = outlet.getString("id")
+                            val outletName = outlet.getString("outlet_name")
+                            val outletStatus = outlet.getString("outlet_status")
+                            val outletAddress = outlet.getString("address")
+                            val outletCode = outlet.getString("outlet_code")
+                            val outletType = outlet.getString("outlet_type")
+                            val outletCategory = outlet.getString("outlet_category")
+                            val ownerName = outlet.getString("owner_name")
+                            val marketOpportunity = outlet.getString("market_opportunity")
+                            val contactNumber = outlet.getString("phone_number")
+                            val isBuyer = outlet.getInt("is_buyer")
+                            val latitude = outlet.getDouble("latitude")
+                            val longitude = outlet.getDouble("longitude")
+                            val isVerified = outlet.getInt("is_verified")
+                            val competitive: List<String>? = Gson().fromJson(
+                                outlet.getString("competitive_products"),
+                                object : TypeToken<List<String>>() {}.type
+                            )
+
+                            shopList!!.add(
+                                Shops(
+                                    outletId,
+                                    outletName,
+                                    outletStatus,
+                                    outletAddress,
+                                    outletCode,
+                                    outletType,
+                                    outletCategory,
+                                    ownerName,
                                     "",
+                                    marketOpportunity,
+                                    contactNumber,
+                                    isBuyer,
+                                    imageUrl,
+                                    imageList,
+                                    territoryName,
+                                    latitude,
+                                    longitude,
+                                    routeId,
+                                    routeName,
                                     "",
-                                    "",
-                                    shopList!!
+                                    isVerified,
+                                    0,
+                                    0,
+                                    0.0f,
+                                    competitive
                                 )
                             )
-                            routeNameList!!.add(
-                                Pair(
-                                    route_id,
-                                    route_name
-                                )
-                            )
-                            btncreateShop!!.visibility = View.VISIBLE
                         }
-                        if (spinner != null) {
-                            val adapter = ArrayAdapter(
-                                mContext!!,
-                                android.R.layout.simple_spinner_item, routesList!!
+                        Log.d("RouteList", "all 1 " + shopList!!.size.toString())
+                        allRouteList!!.add(
+                            Routes(
+                                routeId, routeCode, routeName, "", "", "", shopList!!
                             )
-                            spinner!!.adapter = adapter
+                        )
+                        routeNameList!!.add(
+                            Pair(
+                                routeId, routeName
+                            )
+                        )
+                        binding.createShop.visibility = View.VISIBLE
+                    }
 
-                        }
+                    val adapter = ArrayAdapter(
+                        requireContext(), android.R.layout.simple_spinner_item, routesList!!
+                    )
+                    binding.spinnerRoutes.adapter = adapter
 
+
+                } catch (e: JSONException) {
+                    Sentry.captureException(e)
+                    e.printStackTrace()
+                }
+
+            },
+            { error ->
+                binding.progressBar2.isVisible = false
+
+                if (error is TimeoutError) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Request timeout!! Check your internet connection or Contact Admin",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                if (error is NoConnectionError) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Turn on your internet connection and Try again",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                if (error?.networkResponse != null) {
+                    try {
+                        val s = String(error.networkResponse.data)
+                        Log.d("Verify", "message: $s")
+                        val data = JSONObject(s)
+                        Toast.makeText(
+                            requireContext(),
+                            data.getString("message"),
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    } catch (e: UnsupportedEncodingException) {
+                        e.printStackTrace()
+                        Sentry.captureException(e)
                     } catch (e: JSONException) {
                         Sentry.captureException(e)
+                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
                         e.printStackTrace()
                     }
-
-                },
-                { error ->
-                    //error
-                    Log.d("error", error.toString())
-                    progressBar2!!.visibility = View.GONE
-                    if (error is TimeoutError) {
-                        Toast.makeText(
-                            mContext,
-                            "Request timeout!! Check your internet connection or Contact Admin",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    if (error is NoConnectionError) {
-                        Toast.makeText(
-                            mContext,
-                            "Turn on your internet connection and Try again",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    if (error?.networkResponse != null) {
-                        try {
-                            val s = String(error.networkResponse.data)
-                            Log.d("Verify", "message: $s")
-                            val data = JSONObject(s)
-                            Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG)
-                                .show()
-                        } catch (e: UnsupportedEncodingException) {
-                            e.printStackTrace()
-                            Sentry.captureException(e)
-                        } catch (e: JSONException) {
-                            Sentry.captureException(e)
-                            Toast.makeText(mContext, e.message, Toast.LENGTH_LONG).show()
-                            e.printStackTrace()
-                        }
-                    }
                 }
-            )
-            queue!!.add(request)
-        }
+            })
+        queue.add(request)
     }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = prefs!!.edit()
-        userId = prefs!!.getString(Api.USER_ID, "")
-        mContext = context
         listener = this
     }
 
     override fun onEdit(shops: Shops) {
-        if (routesList!!.isNotEmpty()) {
+        if (routesList!!.size > 0) {
             startActivityResult.launch(
-                Intent(requireActivity(), CreateShopActivity::class.java)
-                    .putExtra("requestCode", 55)
-                    .putExtra("fromEdit", shops)
-                    .putStringArrayListExtra("routes", routesList)
+                Intent(requireActivity(), CreateShopActivity::class.java).putExtra(
+                    "requestCode",
+                    55
+                ).putExtra("fromEdit", shops).putStringArrayListExtra("routes", routesList)
                     .putExtra("routeList", routeNameList)
             )
         } else {
-            Toast.makeText(mContext, "Routes not Available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Routes not Available", Toast.LENGTH_SHORT).show()
         }
     }
 }
