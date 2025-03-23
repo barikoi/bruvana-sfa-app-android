@@ -32,6 +32,7 @@ object Constants {
     const val CUSTOMER_ADDRESS = "CUSTOMER_ADDRESS"
 
     const val DB_HOUSE_ID = "db_house_id"
+    const val DB_HOUSE = "DB_HOUSE"
     const val AREA_ID = "area_id"
     const val TERRITORY_ID = "territory_id"
     const val REGION_ID = "region_id"
