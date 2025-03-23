@@ -22,6 +22,8 @@ data class AuthUser(
     val createdAt: String,
     @SerializedName("db_house_id")
     val dbHouseId: Int,
+    @SerializedName("db_house")
+    val dbHouse: String?,
     @SerializedName("designation")
     val designation: String?,
     @SerializedName("email")
