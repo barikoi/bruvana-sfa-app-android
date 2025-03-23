@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -76,6 +77,14 @@ class ProductStockUpdateActivity : BaseActivity() {
         starStockRequestObserve()
 
         binding.toolbar.tvTitle.text = getString(R.string.title_product_stock_update)
+        if (sharePrefUtils.getString(Api.USER_TYPE) == "SO") {
+            binding.toolbar.tvSUbTitle.text =
+                HtmlCompat.fromHtml(
+                    "<b>DB House: </b> ${sharePrefUtils.getString(Constants.DB_HOUSE)}",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+            binding.toolbar.tvSUbTitle.isVisible = true
+        }
         binding.toolbar.btnBack.setOnClickListener {
             if (productSelectMode) {
                 cancelProductSelectionMode()
@@ -421,9 +430,24 @@ class ProductStockUpdateActivity : BaseActivity() {
                         }
 
                         adapter.updateProducts(it.data?.products!!)
+
+                        binding.tvTotalAmount.text =
+                            getString(
+                                R.string.total_stock_value,
+                                "${it.data.products.sumOf { s -> s.currentAvailableStock * s.unitPrice.toDouble() }}"
+                            )
+
+                        binding.tvTotalCount.text =
+                            getString(
+                                R.string.total_stock_count,
+                                "${it.data.products.sumOf { s -> s.currentAvailableStock }}"
+                            )
                     }
                 }
             }
         }
     }
 }
+
+//https://cnl.barikoimaps.dev:7090/api/v1/products?start_date=2025-03-01%2000%3A00%3A00&end_date=2025-03-23%2023%3A59%3A59&with_order=1&user_id=101
+//https://cnl.barikoimaps.dev:7090/api/v1/products?start_date=2025-03-01%2000%3A00%3A00&end_date=2025-03-23%2023%3A59%3A59&with_order=1
