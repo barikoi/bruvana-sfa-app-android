@@ -47,8 +47,6 @@ class ProductStockAdapter(
         holder.setIsRecyclable(false)
         val mItem = products[position]
 
-        AppLogger.log("deliveredQuantity:: ${mItem.deliveredQuantity}")
-
         holder.binding.productName.text = mItem.productName
         if (isSummaryActivity == true) {
             holder.binding.cbSelect.visibility = View.GONE
@@ -56,6 +54,7 @@ class ProductStockAdapter(
             holder.binding.tvPerUnitSold.visibility = View.VISIBLE
             holder.binding.tvPerUnitSold.text = mItem.deliveredQuantity.toString()
             holder.binding.tvPerUnit.text = mItem.unitName
+            holder.binding.tvAmount.text = mItem.deliveredAmount.toString()
 
             holder.binding.tvSoldQuantity.text =
                 "${holder.itemView.context.resources.getString(R.string.sold_in)} ${mItem.productiveRoutes} ${
@@ -69,6 +68,10 @@ class ProductStockAdapter(
             holder.binding.etPerUnitSold.visibility = View.VISIBLE
             holder.binding.tvPerUnitSold.visibility = View.GONE
             holder.binding.tvPerUnitSold.text = mItem.deliveredQuantity.toString()
+
+            holder.binding.tvAmount.text =
+                (mItem.unitPrice.toDouble() * mItem.currentAvailableStock).toString()
+
             holder.binding.tvPerUnit.text = mItem.unitName
             holder.binding.tvSoldQuantity.text =
                 "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
@@ -80,6 +83,10 @@ class ProductStockAdapter(
             holder.binding.cbSelect.visibility = View.VISIBLE
             holder.binding.tvPerUnitSold.visibility = View.GONE
             holder.binding.tvPerUnit.text = mItem.unitName
+
+            holder.binding.tvAmount.text =
+                (mItem.unitPrice.toDouble() * mItem.currentAvailableStock).toString()
+
             holder.binding.tvSoldQuantity.text =
                 "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
                     holder.itemView.context.getString(
