@@ -144,6 +144,12 @@ class LoginActivity : BaseActivity() {
                                 Constants.DB_HOUSE_ID,
                                 data.user.dbHouseId.toString()
                             )
+
+                            sharePrefUtils.saveString(
+                                Constants.DB_HOUSE,
+                                data.user.dbHouse ?: ""
+                            )
+
                             sharePrefUtils.saveString(
                                 Constants.AREA_ID,
                                 data.user.areaId.toString()
