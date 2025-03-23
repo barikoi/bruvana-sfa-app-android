@@ -8,7 +8,6 @@
     android:background="@color/background_app"
     android:padding="10dp">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
@@ -19,6 +18,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <RelativeLayout
+            android:id="@+id/spinnerLayoutTO"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:padding="4dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginTop="20dp">
+
+            <com.barikoi.cnlapp.utils.MoreSpinner
+                android:id="@+id/spinnerTO"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:theme="@style/spinnerItemStyle"
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck">
+
+            </com.barikoi.cnlapp.utils.MoreSpinner>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/spinnerLayoutSO"
@@ -33,7 +57,7 @@
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerLayoutTO"
             app:layout_goneMarginTop="20dp">
 
             <com.barikoi.cnlapp.utils.MoreSpinner
@@ -96,7 +120,6 @@
             </com.barikoi.cnlapp.utils.MoreSpinner>
         </RelativeLayout>
 
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/llCheckBox"
             android:layout_width="match_parent"
@@ -122,7 +145,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/isTrace"
@@ -169,7 +191,6 @@
             app:layout_constraintTop_toBottomOf="@+id/llCheckBox"
             app:trackThickness="2dp" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -193,7 +214,6 @@
         app:pressedTranslationZ="12dp"
         tools:visibility="visible" />
 
-
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -213,20 +233,5 @@
 
     </androidx.cardview.widget.CardView>
 
-
-    <!--    <com.github.ybq.android.spinkit.SpinKitView-->
-    <!--        android:id="@+id/progressBar1"-->
-    <!--        style="@style/SpinKitView.Large.ThreeBounce"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_centerInParent="true"-->
-    <!--        android:layout_marginTop="8dp"-->
-    <!--        android:visibility="visible"-->
-    <!--        app:SpinKit_Color="@color/cnl_color_1"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        tools:visibility="visible" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

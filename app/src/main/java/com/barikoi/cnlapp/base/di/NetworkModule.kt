@@ -5,6 +5,7 @@ import com.android.volley.RequestQueue
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.api.ApiService
+import com.barikoi.cnlapp.data.remote.api.AuthInterceptor
 import com.barikoi.cnlapp.data.remote.api.TraceApiService
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Constants.CNL_OK_CLIENT
@@ -44,19 +45,13 @@ object NetworkModule {
     @Singleton
     @Provides
     @Named(CNL_OK_CLIENT)
-    fun provideCNOkClient(sharePrefUtils: SharePrefUtils): OkHttpClient {
-        return OkHttpClient
-            .Builder().apply {
-                addInterceptor { chain ->
-                    val request = chain.request().newBuilder()
-                        .addHeader(
-                            "Authorization",
-                            "Bearer ${sharePrefUtils.getString(Api.TOKEN)}"
-                        )
-                        .build()
-                    chain.proceed(request)
-                }
-            }
+    fun provideCNOkClient(
+        sharePrefUtils: SharePrefUtils,
+        @ApplicationContext context: Context
+    ): OkHttpClient {
+        return OkHttpClient()
+            .newBuilder()
+            .addInterceptor(AuthInterceptor(sharePrefUtils, context))
             .callTimeout(5, TimeUnit.MINUTES)
             .writeTimeout(5, TimeUnit.MINUTES)
             .readTimeout(5, TimeUnit.MINUTES)
@@ -116,8 +111,7 @@ object NetworkModule {
     @Provides
     @Named("TRACE_OK_CLIENT")
     fun provideTraceRetrofitInstance(
-        @Named(TRACE_OK_CLIENT) okHttpClient: OkHttpClient,
-        @ApplicationContext context: Context
+        @Named(TRACE_OK_CLIENT) okHttpClient: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.TRACE_BASE_URL)

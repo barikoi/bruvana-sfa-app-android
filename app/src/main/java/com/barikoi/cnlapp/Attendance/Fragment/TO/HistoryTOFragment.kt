@@ -12,6 +12,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -21,63 +23,101 @@ import com.barikoi.cnlapp.Attendance.Adapter.TO.HistoryListTOAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.FragmentHistoryTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.formatDate
+import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class HistoryTOFragment : Fragment() {
     private lateinit var binding: FragmentHistoryTOBinding
 
 
-    lateinit var ACTIVITY: MainActivity
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    var mContext: Context? = null
-    var mQueue: RequestQueue? = null
-    var user_id: String? = null
-    var token: String? = null
+    private val viewModel: HistoryTOViewModel by viewModels()
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+
+    private var toList: List<To> = emptyList()
+
+    @Inject
+    lateinit var mQueue: RequestQueue
+
     var historyList: ArrayList<HistoryList> = ArrayList()
+
     var adapter: HistoryListTOAdapter? = null
+
     var selected_so: Int? = null
     var selected_so_id: String? = null
     val soList: ArrayList<SOList> = ArrayList()
     val filteredsoList: ArrayList<HistoryList> = ArrayList()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentHistoryTOBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         init()
+
+        startToObserve()
+
 
         binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (binding.spinnerSO.adapter.count > 0) {
-                    selected_so = p2
-                    if (p2 > 0) {
-                        selected_so_id = soList[p2 - 1].id
-                    }
-                    if (p2 == 0) {
-                        setDateFilter("&with_to=1")
+                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                        selected_so = p2
+                        if (p2 > 0) {
+                            selected_so_id = toList[p2 - 1].toId.toString()
+                        }
+                        if (p2 == 0) {
+                            setDateFilter("&with_asm=1")
+                        } else {
+                            setDateFilter("")
+                        }
                     } else {
-                        setDateFilter("")
+                        selected_so = p2
+                        if (p2 > 0) {
+                            selected_so_id = soList[p2 - 1].id
+                        }
+                        if (p2 == 0) {
+                            setDateFilter("&with_to=1")
+                        } else {
+                            setDateFilter("")
+                        }
                     }
                 }
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
 
         }
     }
@@ -85,41 +125,79 @@ class HistoryTOFragment : Fragment() {
     private fun getSOList() {
         ApiServices.apiGET(
             Api.get_all_so_list,
-            mQueue!!, token!!, object : ApiServiceListener {
+            mQueue, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
-                    //setDateFilter()
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
+                    ViewUtils.getErrorResponse(error, requireContext())
                 }
 
                 override fun onException(e: Exception) {
-                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
                 }
 
             })
     }
 
-    private fun init() {
-        getSOList()
+    private fun startToObserve() {
+        lifecycleScope.launch {
+            viewModel.toResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startToObserve::Empty")
+
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startToObserve::Error ${it.error}")
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startToObserve::Loading")
+
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startToObserve:: Success ${it.data}")
+                        if (it.data?.toList.isNullOrEmpty()) {
+                            toast("To list empty")
+                            return@observe
+                        }
+
+                        toList = it.data?.toList ?: emptyList()
+                        val toNameList = it.data?.toList?.map { to -> to.toName }!!.toMutableList()
+                        toNameList.add(0, "${sharePrefUtils.getString(Api.NAME)} (You)")
+
+                        val adapter = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item, toNameList.toMutableList()
+                        )
+                        binding.spinnerSO.adapter = adapter
+
+                    }
+                }
+            }
+        }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentHistoryTOBinding.inflate(inflater, container, false)
-        return binding.root
+    private fun init() {
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+            viewModel.getTodaySummary(
+                Calendar.getInstance().time.formatDate(),
+                Calendar.getInstance().time.formatDate(),
+                "0"
+            )
+        } else {
+            getSOList()
+        }
     }
 
     fun setDateFilter(urlSuffix: String) {
@@ -129,15 +207,15 @@ class HistoryTOFragment : Fragment() {
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH)
-        val StartDate = df.format(start)
-        val EndDate = df.format(end)
+        val startDate = df.format(start)
+        val endDate = df.format(end)
 
-        binding.tvDateRange.text = simpleFormat.format(start) + " - " + simpleFormat.format(end)
-        editor!!.putString(Api.START_DATE_ATTENDANCE, StartDate)
-        editor!!.putString(Api.END_DATE_ATTENDANCE, EndDate)
-        editor!!.commit()
+        binding.tvDateRange.text =
+            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
+        sharePrefUtils.saveString(Api.START_DATE_ATTENDANCE, startDate)
+        sharePrefUtils.saveString(Api.END_DATE_ATTENDANCE, endDate)
 
-        getAttendance(Api.get_attendance + "?start_date=" + StartDate + "&end_date=" + EndDate + urlSuffix)
+        getAttendance(Api.get_attendance + "?start_date=" + startDate + "&end_date=" + endDate + urlSuffix)
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -145,68 +223,61 @@ class HistoryTOFragment : Fragment() {
 
         val materialDatePicker = materialDateBuilder.build()
 
-        binding.dateRangeLayout.setOnClickListener(View.OnClickListener {
+        binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.setEnabled(false)
-        })
+            binding.dateRangeLayout.isEnabled = false
+        }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayout.setEnabled(true)
-            val s_date = Date(selection.first!!)
-            val e_date = Date(selection.second!!)
-            if (s_date.compareTo(e_date) == 0) {
-                binding.tvDateRange.setText(simpleFormat.format(s_date))
-                editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.commit()
+            binding.dateRangeLayout.isEnabled = true
+            val sDate = Date(selection.first!!)
+            val eDate = Date(selection.second!!)
+            if (sDate.compareTo(eDate) == 0) {
+                binding.tvDateRange.text = simpleFormat.format(sDate)
+                sharePrefUtils.saveString(Api.START_DATE_ATTENDANCE, df.format(sDate))
+                sharePrefUtils.saveString(Api.END_DATE_ATTENDANCE, df.format(sDate))
             } else {
-                binding.tvDateRange.setText(
-                    simpleFormat.format(s_date) + " - " + simpleFormat.format(
-                        e_date
-                    )
+                binding.tvDateRange.text = getString(
+                    R.string.date_range_,
+                    simpleFormat.format(sDate),
+                    simpleFormat.format(eDate)
                 )
-                editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
-                editor!!.commit()
+
+                sharePrefUtils.saveString(Api.START_DATE_ATTENDANCE, df.format(sDate))
+                sharePrefUtils.saveString(Api.END_DATE_ATTENDANCE, df.format(eDate))
             }
 
             getAttendance(
-                Api.get_attendance + "?start_date=" + df.format(s_date) + "&end_date=" + df.format(
-                    e_date
+                Api.get_attendance + "?start_date=" + df.format(sDate) + "&end_date=" + df.format(
+                    eDate
                 ) + urlSuffix
             )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayout.setEnabled(
-                true
-            )
+            binding.dateRangeLayout.isEnabled = true
         }
     }
 
-    fun getAttendance(url: String) {
+    private fun getAttendance(url: String) {
         ApiServices.apiGET(
             url,
-            mQueue!!, token!!, object : ApiServiceListener {
+            mQueue, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 @RequiresApi(Build.VERSION_CODES.N)
                 override fun onResponseSuccess(response: String) {
                     getHistoryList(response)
                 }
 
-                override fun onJSONResponseSuccess(response: JSONObject) {
-                    TODO("Not yet implemented")
-                }
+                override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                    TODO("Not yet implemented")
-                }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
+                    ViewUtils.getErrorResponse(error, requireContext())
                 }
 
                 override fun onException(e: Exception) {
-                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
                 }
 
             })
@@ -214,46 +285,44 @@ class HistoryTOFragment : Fragment() {
 
     private fun viewSOList(response: String) {
         try {
-            if (response != null) {
-                soList.clear()
-                val obj = JSONObject(response)
-                val toArray = obj.getJSONArray("so_list")
-                val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
-                val soNameList: ArrayList<String> = ArrayList()
-                soNameList.add(prefs!!.getString(Api.NAME, "") + " (You)")
+            soList.clear()
+            val obj = JSONObject(response)
+            val toArray = obj.getJSONArray("so_list")
+            val soArray = toArray.getJSONObject(0).getJSONArray("sales_officers")
+            val soNameList: ArrayList<String> = ArrayList()
+            soNameList.add(sharePrefUtils.getString(Api.NAME) + " (You)")
 
-                if (soArray.length() > 0) {
-                    for (i in 0 until soArray.length()) {
-                        val soObj = soArray.getJSONObject(i)
-                        var imageUrl = "null"
-                        if (soObj.has("images") && !soObj.isNull("images")) {
-                            val imageArray = soObj.getJSONArray("images")
-                            if (imageArray.length() > 0) {
-                                val imageobj = imageArray.getJSONObject(0)
-                                if (imageobj.has("image_url")) {
-                                    imageUrl = imageobj.getString("image_url")
-                                }
+            if (soArray.length() > 0) {
+                for (i in 0 until soArray.length()) {
+                    val soObj = soArray.getJSONObject(i)
+                    var imageUrl = "null"
+                    if (soObj.has("images") && !soObj.isNull("images")) {
+                        val imageArray = soObj.getJSONArray("images")
+                        if (imageArray.length() > 0) {
+                            val imageobj = imageArray.getJSONObject(0)
+                            if (imageobj.has("image_url")) {
+                                imageUrl = imageobj.getString("image_url")
                             }
                         }
-                        soList.add(
-                            SOList(
-                                soObj.getString("id"),
-                                soObj.getString("user_name"),
-                                soObj.getString("designation"),
-                                if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
-                                imageUrl
-                            )
-                        )
-                        soNameList.add(soObj.getString("user_name"))
-
                     }
+                    soList.add(
+                        SOList(
+                            soObj.getString("id"),
+                            soObj.getString("user_name"),
+                            soObj.getString("designation"),
+                            if (soObj.has("employee_id")) soObj.getString("employee_id") else "",
+                            imageUrl
+                        )
+                    )
+                    soNameList.add(soObj.getString("user_name"))
+
                 }
-                val adapter = ArrayAdapter(
-                    mContext!!,
-                    android.R.layout.simple_spinner_item, soNameList
-                )
-                binding.spinnerSO.adapter = adapter
             }
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item, soNameList
+            )
+            binding.spinnerSO.adapter = adapter
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -262,91 +331,68 @@ class HistoryTOFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     fun getHistoryList(response: String) {
         try {
-            if (response != null) {
-                val obj = JSONObject(response)
-                val attedanceArray = obj.getJSONArray("attendances")
-                historyList.clear()
-                if (attedanceArray.length() > 0) {
-                    for (i in 0 until attedanceArray.length()) {
-                        val attendanceObj = attedanceArray.getJSONObject(i)
-                        var latitude = 0.0
-                        var longitude = 0.0
-                        var imageUrl = "null"
-                        if (!attendanceObj.getString("checkin_time").equals("null")) {
-                            if (!attendanceObj.getString("latitude").equals("null")) latitude =
-                                attendanceObj.getDouble("latitude")
-                            if (!attendanceObj.getString("longitude").equals("null")) longitude =
-                                attendanceObj.getDouble("longitude")
-                            if (attendanceObj.has("images") && !attendanceObj.isNull("images")) {
-                                val imageArray = attendanceObj.getJSONArray("images")
-                                if (imageArray.length() > 0) {
-                                    val imageobj = imageArray.getJSONObject(0)
-                                    if (imageobj.has("image_url")) {
-                                        imageUrl = imageobj.getString("image_url")
-                                    }
+            val obj = JSONObject(response)
+            val attedanceArray = obj.getJSONArray("attendances")
+            historyList.clear()
+            if (attedanceArray.length() > 0) {
+                for (i in 0 until attedanceArray.length()) {
+                    val attendanceObj = attedanceArray.getJSONObject(i)
+                    var latitude = 0.0
+                    var longitude = 0.0
+                    var imageUrl = "null"
+                    if (!attendanceObj.getString("checkin_time").equals("null")) {
+                        if (!attendanceObj.getString("latitude").equals("null")) latitude =
+                            attendanceObj.getDouble("latitude")
+                        if (!attendanceObj.getString("longitude").equals("null")) longitude =
+                            attendanceObj.getDouble("longitude")
+                        if (attendanceObj.has("images") && !attendanceObj.isNull("images")) {
+                            val imageArray = attendanceObj.getJSONArray("images")
+                            if (imageArray.length() > 0) {
+                                val imageobj = imageArray.getJSONObject(0)
+                                if (imageobj.has("image_url")) {
+                                    imageUrl = imageobj.getString("image_url")
                                 }
                             }
-                            historyList.add(
-                                HistoryList(
-                                    attendanceObj.getString("user_name"),
-                                    attendanceObj.getString("user_id"),
-                                    attendanceObj.getString("id"),
-                                    attendanceObj.getString("checkin_time"),
-                                    attendanceObj.getString("checkout_time"),
-                                    attendanceObj.getInt("is_late"),
-                                    attendanceObj.getInt("is_absent"),
-                                    attendanceObj.getString("checkin_address"),
-                                    latitude,
-                                    longitude,
-                                    imageUrl,
-                                    attendanceObj.getString("remarks"),
-                                    attendanceObj.getString("route_id"),
-                                    attendanceObj.getString("route_name")
-                                )
-                            )
-                            /*if (attendanceObj.getInt("is_late") == 1) late += 1
-                            if (attendanceObj.getInt("is_absent") == 1) absent += 1*/
                         }
+                        historyList.add(
+                            HistoryList(
+                                attendanceObj.getString("user_name"),
+                                attendanceObj.getString("user_id"),
+                                attendanceObj.getString("id"),
+                                attendanceObj.getString("checkin_time"),
+                                attendanceObj.getString("checkout_time"),
+                                attendanceObj.getInt("is_late"),
+                                attendanceObj.getInt("is_absent"),
+                                attendanceObj.getString("checkin_address"),
+                                latitude,
+                                longitude,
+                                imageUrl,
+                                attendanceObj.getString("remarks"),
+                                attendanceObj.getString("route_id"),
+                                attendanceObj.getString("route_name")
+                            )
+                        )
                     }
                 }
-
-                if (selected_so == 0) {
-                    adapter = HistoryListTOAdapter(historyList)
-                    binding.historyTOListView.adapter = adapter
-                    adapter!!.notifyDataSetChanged()
-                } else {
-                    filteredsoList.clear()
-                    filteredsoList.addAll(historyList)
-                    filteredsoList.removeIf {
-                        !it.userId.equals(selected_so_id, true)
-                    }
-                    /*if (filteredsoList.size > 0){
-                        adapter = HistoryListTOAdapter(filteredsoList)
-                        historyTOListView.adapter = adapter
-                        adapter!!.notifyDataSetChanged()
-                    }*/
-                    adapter = HistoryListTOAdapter(filteredsoList)
-                    binding.historyTOListView.adapter = adapter
-                    adapter!!.notifyDataSetChanged()
-                }
-
-                /*adapter = HistoryListTOAdapter(historyList)
-                historyListView.adapter = adapter
-                adapter!!.notifyDataSetChanged()*/
             }
+
+            if (selected_so == 0) {
+                adapter = HistoryListTOAdapter(historyList)
+                binding.historyTOListView.adapter = adapter
+                adapter!!.notifyDataSetChanged()
+            } else {
+                filteredsoList.clear()
+                filteredsoList.addAll(historyList)
+                filteredsoList.removeIf {
+                    !it.userId.equals(selected_so_id, true)
+                }
+                adapter = HistoryListTOAdapter(filteredsoList)
+                binding.historyTOListView.adapter = adapter
+                adapter!!.notifyDataSetChanged()
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = prefs!!.edit()
-        mContext = context
-        mQueue = RequestQueueSingleton.getInstance(context).getRequestQueue()
-        user_id = prefs!!.getString(Api.USER_ID, "")
-        token = prefs!!.getString(Api.TOKEN, "")
-        ACTIVITY = context as MainActivity
     }
 }

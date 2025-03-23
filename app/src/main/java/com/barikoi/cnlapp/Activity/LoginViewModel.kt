@@ -41,7 +41,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-
     fun login(employeeId: String, password: String) {
         viewModelScope.launch {
             authRepository.login(employeeId, password)

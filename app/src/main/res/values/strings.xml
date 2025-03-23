@@ -339,5 +339,11 @@
     <string name="edit_gift">Edit Gift</string>
     <string name="please_add_gift">Please add gift</string>
     <string name="please_add_image">Please add image</string>
+    <string name="high_to_low">High to Low</string>
+    <string name="low_to_high">Low to High</string>
+    <string name="by_das_by">%1$s / %2$s</string>
+    <string name="total_amount">Total Amount: %1$s</string>
+    <string name="total_stock_value">Total Stock Value: %1$s</string>
+    <string name="total_stock_count">Total Stock Count: %1$s</string>
 
 </resources>

@@ -14,7 +14,9 @@ import com.barikoi.cnlapp.data.remote.models.ProductStockResponse
 import com.barikoi.cnlapp.data.remote.models.RequestStockResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponse
+import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
+import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -63,6 +65,7 @@ interface ApiService {
         @Query("with_outlets") filterWithOutlet: String
     ): Response<RouteResponse>
 
+
     @GET("api/v1/get-so")
     suspend fun getSoList(): Response<SoResponse>
 
@@ -109,7 +112,10 @@ interface ApiService {
     ): Response<BaseResponse>
 
     @GET("api/v1/db-houses")
-    suspend fun getDHList(@Query("territory_id") territoryId: String): Response<DbHousesResponse>
+    suspend fun getDHList(
+        @Query("territory_id") territoryId: String?,
+        @Query("region_id") regionId: String?
+    ): Response<DbHousesResponse>
 
     @GET("api/v1/db-houses")
     suspend fun sendStockRequest(@Query("territory_id") territoryId: String): Response<DbHousesResponse>
@@ -138,4 +144,18 @@ interface ApiService {
     suspend fun saveGifts(
         @Body body: RequestBody
     ): Response<BaseResponse>
+
+
+    @GET("api/v1/get-to")
+    suspend fun getTodaySummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("today_summary") todaySummary: String?
+    ): Response<TodaySummaryResponse>
+
+
+    @GET("api/v1/to-wise-so")
+    suspend fun getSOByTO(
+        @Query("to_id") toId: String,
+    ): Response<SoResponseX>
 }

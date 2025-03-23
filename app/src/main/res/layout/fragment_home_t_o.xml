@@ -27,7 +27,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
@@ -45,7 +45,7 @@
                     android:id="@+id/dateRangeLayoutHome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
@@ -66,9 +66,8 @@
                         android:gravity="start"
                         android:text=""
                         android:textColor="@color/text_title_2"
-                        android:textSize="14sp">
+                        android:textSize="14sp"/>
 
-                    </TextView>
                 </LinearLayout>
 
             </RelativeLayout>
@@ -83,9 +82,8 @@
                 android:layout_marginBottom="8dp"
                 android:orientation="horizontal"
                 app:layoutManager="LinearLayoutManager"
-                tools:listitem="@layout/single_summary_view">
+                tools:listitem="@layout/single_summary_view"/>
 
-            </androidx.recyclerview.widget.RecyclerView>
             <!--active, inactive-->
             <RelativeLayout
                 android:id="@+id/layoutSecond"
@@ -100,6 +98,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:baselineAligned="false"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -139,7 +138,7 @@
                                 android:text="@string/active"
                                 android:textColor="@color/text_title"
                                 android:textSize="15sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold" />
 
 
                             <TextView
@@ -150,7 +149,7 @@
                                 android:text=""
                                 android:textColor="@color/text_title"
                                 android:textSize="20sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 
@@ -191,7 +190,7 @@
                                 android:text="@string/inactive"
                                 android:textColor="@color/text_title"
                                 android:textSize="15sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/inactiveCount"
@@ -201,7 +200,7 @@
                                 android:text=""
                                 android:textColor="@color/text_title"
                                 android:textSize="20sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -230,7 +229,7 @@
                     android:textColor="@color/text_title_blue"
                     android:textColorLink="@color/text_title_blue"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -243,7 +242,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="4dp"
-                        android:background="@color/white"/>
+                        android:background="@color/white" />
 
                 </LinearLayout>
 
@@ -271,7 +270,7 @@
                     android:textColor="@color/text_title_blue"
                     android:textColorLink="@color/text_title_blue"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -331,13 +330,12 @@
             android:gravity="center_horizontal"
             android:text="@string/no_route_selected_today"
             android:textColor="@color/text_title"
-            android:textSize="17sp"/>
+            android:textSize="17sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tryAgain"
             android:layout_width="100dp"
             android:layout_height="36dp"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp"
             android:background="@drawable/cardview_bg"

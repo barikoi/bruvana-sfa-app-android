@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.utils
 import android.location.Location
 
 object Constants {
+    const val TOKEN = "token"
     const val REQUEST_TYPE = "REQUEST_TYPE"
     const val STATUS_DECLINED = "REJECTED"
     const val STATUS_PENDING = "PENDING"
@@ -31,6 +32,7 @@ object Constants {
     const val CUSTOMER_ADDRESS = "CUSTOMER_ADDRESS"
 
     const val DB_HOUSE_ID = "db_house_id"
+    const val DB_HOUSE = "DB_HOUSE"
     const val AREA_ID = "area_id"
     const val TERRITORY_ID = "territory_id"
     const val REGION_ID = "region_id"

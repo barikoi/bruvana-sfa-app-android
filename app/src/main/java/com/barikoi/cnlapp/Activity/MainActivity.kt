@@ -162,6 +162,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.appContentMain.tvNotificationCount.text = "0"
 
         startApprovalCountObserve()
+        startLogoutObserve()
         checkAttendance()
 
         val c = Calendar.getInstance()
@@ -242,7 +243,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setTitle(R.string.logout)
                 .setMessage(R.string.sure_log_out)
                 .setPositiveButton(R.string.yes) { _, _ ->
-                    logout(this@MainActivity)
+                    viewModel.logout()
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .setIcon(AppCompatResources.getDrawable(this, R.drawable.warning))
@@ -277,13 +278,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navigationDrawer!!.menu.findItem(R.id.menu_request_approval).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "TO"
 
-        navigationDrawer!!.menu.findItem(R.id.menu_request_approval).isVisible =
-            sharePrefUtils.getString(Api.USER_TYPE) == "ASM"
+
+        navigationDrawer!!.menu.findItem(R.id.menu_visit_report).isVisible =
+            sharePrefUtils.getString(Api.USER_TYPE) != "ASM"
 
         navigationDrawer!!.menu.findItem(R.id.menu_product_stock_request).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
 
-        navView.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        navView.setOnItemSelectedListener { item ->
             if (binding.appContentMain.fabOrder.isVisible) {
                 binding.appContentMain.fabOrder.background.setTint(
                     ContextCompat.getColor(this, R.color.white)
@@ -302,7 +304,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_route -> {
@@ -310,20 +312,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.userLayout.visibility = View.GONE
                     binding.appContentMain.tvTitle.visibility = View.VISIBLE
                     setCurrentFragment(MapFragment(), this@MainActivity)
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
-                /*R.id.navigation_order -> {
-                    userLayout.visibility = View.GONE
-                    tvTitle.text = ""
-                    tvTitle.visibility = View.VISIBLE
-                    return@OnNavigationItemSelectedListener true
-                }*/
+
                 R.id.navigation_chat -> {
                     binding.appContentMain.tvTitle.text = resources.getString(R.string.title_chat)
                     setCurrentFragment(ChatFragment(), this@MainActivity)
                     binding.appContentMain.userLayout.visibility = View.GONE
                     binding.appContentMain.tvTitle.visibility = View.VISIBLE
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_attendance -> {
@@ -331,11 +328,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.tvTitle.visibility = View.VISIBLE
                     binding.appContentMain.userLayout.visibility = View.GONE
                     setCurrentFragment(AttendanceFragment(), this@MainActivity)
-                    return@OnNavigationItemSelectedListener true
+                    return@setOnItemSelectedListener true
                 }
             }
             false
-        })
+        }
 
     }
 
@@ -512,7 +509,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     ).show()
                 }
                 if (error is AuthFailureError) {
-                    logout(applicationContext)
+                    viewModel.logout()
                 }
                 if (error.networkResponse != null) {
                     try {
@@ -641,70 +638,36 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    fun logout(context: Context) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
-        val token = prefs.getString(Api.TOKEN, "")
-        val editor = prefs.edit()
-        editor.remove(Api.TOKEN)
-        editor.remove(Api.NAME)
-        editor.remove(Api.USER_ID)
-        editor.remove(Api.USER_TYPE)
-        editor.remove(Api.PHONE)
-        editor.remove(Api.SELECTED_ROUTE_NAME)
-        editor.remove(Api.SELECTED_ROUTE_ID)
-        editor.remove(Api.SELECTED_MARKET_NAME)
-        editor.remove(Api.SELECTED_MARKET_ID)
-        editor.remove(Api.SELECTED_SHOP)
-        editor.remove(Api.SELECTED_SHOP_ID)
-        editor.apply()
+    private fun startLogoutObserve() {
+        lifecycleScope.launch {
+            viewModel.logoutResponse.observe(this@MainActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startLogoutObserve::Empty")
+                    }
 
-        val queue = RequestQueueSingleton.getInstance(context.applicationContext).requestQueue
-        val request: StringRequest = object : StringRequest(
-            Method.POST,
-            Api.logouturl,
-            Response.Listener {
-                val home = Intent(context, SplashActivity::class.java)
-                home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(home)
-                finish()
-            },
-            Response.ErrorListener { error: VolleyError? ->
-                if (error?.networkResponse != null) {
-                    try {
-                        val s = String(error.networkResponse.data)
-                        Log.d("Verify", "message: $s")
-                        val data: JSONObject?
-                        try {
-                            data = JSONObject(s)
-                            Toast.makeText(
-                                context.applicationContext,
-                                "Error: " + data.getString("message"),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                            Sentry.captureException(e)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Sentry.captureException(e)
+                    is ApiState.Error -> {
+                        AppLogger.log("startLogoutObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startLogoutObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startLogoutObserve:: Success ${it.data}")
+
+                        toast(it.data?.message ?: "")
+
+                        sharePrefUtils.clear()
+                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                        finish()
+
                     }
                 }
-                val home = Intent(context, SplashActivity::class.java)
-                home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(home)
-                finish()
-            }) {
-            override fun getHeaders(): Map<String, String> {
-                val params: MutableMap<String, String> = HashMap()
-                params["Accept"] = "application/json"
-                if (token != "") {
-                    params["Authorization"] = "bearer $token"
-                }
-                return params
             }
         }
-        queue.add(request)
     }
 
     private fun startApprovalCountObserve() {
@@ -747,7 +710,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
                             }
                         }
-
                     }
                 }
             }

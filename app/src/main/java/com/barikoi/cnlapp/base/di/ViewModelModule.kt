@@ -12,8 +12,12 @@ import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.SoRepository
+import com.barikoi.cnlapp.data.remote.repository.SoRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SocketRepository
 import com.barikoi.cnlapp.data.remote.repository.SocketRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.SummaryRepository
+import com.barikoi.cnlapp.data.remote.repository.SummaryRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.TraceRepository
 import com.barikoi.cnlapp.data.remote.repository.TraceRepositoryImpl
 import dagger.Module
@@ -53,4 +57,12 @@ object ViewModelModule {
     @Provides
     fun providesGiftRepository(apiService: ApiService): AddGiftRepository =
         AddGiftRepositoryImpl(apiService)
+
+    @Provides
+    fun providesSummaryRepository(apiService: ApiService): SummaryRepository =
+        SummaryRepositoryImpl(apiService)
+
+    @Provides
+    fun providesSORepository(apiService: ApiService): SoRepository =
+        SoRepositoryImpl(apiService)
 }

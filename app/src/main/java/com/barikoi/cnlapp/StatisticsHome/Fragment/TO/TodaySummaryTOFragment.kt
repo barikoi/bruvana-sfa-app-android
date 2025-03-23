@@ -23,7 +23,7 @@ import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
-import com.barikoi.cnlapp.databinding.FragmentLastWeekSummaryTOBinding
+import com.barikoi.cnlapp.databinding.FragmentTodaysSummaryTOBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -45,87 +45,82 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class LastWeekSummaryTOFragment : Fragment() {
-    private lateinit var binding: FragmentLastWeekSummaryTOBinding
+class TodaySummaryTOFragment : Fragment() {
+    private lateinit var binding: FragmentTodaysSummaryTOBinding
 
-    val viewModel: LastWeekSummeryTOViewModel by viewModels()
+    private val viewModel: TodaySummeryTOViewModel by viewModels()
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
 
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
-    @Inject
-    lateinit var mQueue: RequestQueue
 
-    @Inject
-    lateinit var networkFailureMessage: NetworkFailureMessage
+    val dFormat = DecimalFormat("#.##")
 
 
     private val itemListDetails: MutableList<ArrayList<Pair<String, String>>> = mutableListOf()
 
 
-    private val dFormat = DecimalFormat("#.##")
+    @Inject
+    lateinit var mQueue: RequestQueue
 
     var pd: ProgressDialog? = null
 
-    var startDate: String? = null
     var endDate: String? = null
+    private var soId: String? = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentLastWeekSummaryTOBinding.inflate(inflater, container, false)
+        binding = FragmentTodaysSummaryTOBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -7)
-
-        startDate = c.time.formatDate()
-        endDate = c.time.formatDate()
+        endDate = Calendar.getInstance().time.formatDate()
 
         startTodaySummaryObserve()
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
             viewModel.getTodaySummary(
-                startDate!!,
                 endDate!!,
-                todaySummary = "1"
+                endDate!!,
+                "1"
             )
         } else {
-            setLastWeekSummary()
+            setTodaySummary()
         }
-
 
         binding.tryAgain.setOnClickListener {
             if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
                 viewModel.getTodaySummary(
-                    startDate!!,
                     endDate!!,
-                    todaySummary = "1"
+                    endDate!!,
+                    "1"
                 )
             } else {
-                setLastWeekSummary()
+                setTodaySummary()
             }
-
         }
     }
 
-    private fun setLastWeekSummary() {
+    private fun setTodaySummary() {
         try {
             binding.progressBarHome.visibility = View.VISIBLE
             binding.summaryLayout.visibility = View.GONE
-            val c = Calendar.getInstance()
-            c.add(Calendar.DAY_OF_WEEK, -7)
-            val start = c.time
+            val dFormat = DecimalFormat("#.##")
+
+            val end = Calendar.getInstance().time
             val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-            startDate = df.format(start)
-            endDate = df.format(start)
+            endDate = df.format(end)
+
             ApiServices.apiGET(
-                Api.get_all_so_list + "?last_week_summary=1&start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                Api.get_all_so_list + "?today_summary=1&start_date=" + endDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
                     Api.USER_ID
                 ),
                 mQueue,
@@ -254,6 +249,7 @@ class LastWeekSummaryTOFragment : Fragment() {
                         binding.summaryLayout.visibility = View.VISIBLE
                         binding.tryAgain.visibility = View.GONE
 
+
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
 
                         val nm = it.data?.toList?.sumOf { s ->
@@ -276,12 +272,10 @@ class LastWeekSummaryTOFragment : Fragment() {
                         binding.lpcCount.text = nm.toString()
 
 
-
                         it.data?.toList!!.forEach { to ->
                             val keyPair = Pair(to.toName, to.toId.toString())
                             val value = to.totalAmountFormatted()
                             itemList.add(Pair(keyPair, value))
-
 
                             val skuPerMemo =
                                 to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
@@ -344,11 +338,21 @@ class LastWeekSummaryTOFragment : Fragment() {
                 val tr = TableRow(requireContext())
                 val c1 = TextView(requireContext())
                 c1.gravity = Gravity.START
-                c1.setTextColor(resources.getColor(R.color.text_title))
+                c1.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.text_title
+                    )
+                )
                 c1.text = data[i].first
                 val c2 = TextView(requireContext())
                 c2.gravity = Gravity.END
-                c2.setTextColor(resources.getColor(R.color.text_title))
+                c2.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.text_title
+                    )
+                )
                 c2.text = data[i].second
                 tr.addView(c1)
                 tr.addView(c2)
@@ -371,7 +375,7 @@ class LastWeekSummaryTOFragment : Fragment() {
             for (i in 0 until data.size) {
                 val tr = TableRow(requireContext())
                 val tableRowParams = TableLayout.LayoutParams(
-                    TableLayout.LayoutParams.FILL_PARENT,
+                    TableLayout.LayoutParams.MATCH_PARENT,
                     TableLayout.LayoutParams.WRAP_CONTENT
                 )
                 val leftMargin = 0
@@ -385,11 +389,21 @@ class LastWeekSummaryTOFragment : Fragment() {
                 tr.tag = i
                 val c1 = TextView(requireContext())
                 c1.gravity = Gravity.START
-                c1.setTextColor(resources.getColor(R.color.text_title))
+                c1.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.text_title
+                    )
+                )
                 c1.text = data[i].first.first
                 val c2 = TextView(requireContext())
                 c2.gravity = Gravity.END
-                c2.setTextColor(resources.getColor(R.color.text_title))
+                c2.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.text_title
+                    )
+                )
                 c2.text = data[i].second
                 c2.gravity = Gravity.CENTER
                 c2.background =
@@ -398,24 +412,35 @@ class LastWeekSummaryTOFragment : Fragment() {
                 tr.addView(c2)
 
                 tr.setOnClickListener {
-                    Log.d("OrderSummary", "pd.isShowing: " + pd!!.isShowing)
                     pd!!.show()
 
                     try {
+                        soId = data[i].first.second
                         if (sharePrefUtils.getString(Api.USER_TYPE) == "ASM") {
+
                             binding.progressBarHome.visibility = View.GONE
                             binding.targetLayout.visibility = View.VISIBLE
                             createTable(itemListDetails[i], binding.tabLayoutTarget)
                         } else
-                            getSummaryTargets(Api.get_summary + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&user_id=" + data[i].first.second)
+                            getSummaryTargets(Api.get_summary + "?today_summary=1&today_for_so=1&user_id=" + data[i].first.second)
                         Log.d("OrderSummary", "row count: " + tabLayout.childCount)
                         for (t in 0 until tabLayout.childCount) {
                             if (tabLayout.getChildAt(t).tag == it.tag) {
                                 tabLayout.getChildAt(t)
-                                    .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                    .setBackgroundColor(
+                                        ContextCompat.getColor(
+                                            requireContext(),
+                                            R.color.light_yellow
+                                        )
+                                    )
                             } else {
                                 tabLayout.getChildAt(t)
-                                    .setBackgroundColor(resources.getColor(R.color.white))
+                                    .setBackgroundColor(
+                                        ContextCompat.getColor(
+                                            requireContext(),
+                                            R.color.white
+                                        )
+                                    )
                             }
                         }
 
@@ -437,10 +462,8 @@ class LastWeekSummaryTOFragment : Fragment() {
         var lpcCompleted = "--:--"
         var bpcCompleted = "--:--"
         var aivCompleted = "--:--"
-        var adsCompleted = "--:--"
-        var rdsCompleted = "--:--"
         var visitCompleted = "--:--"
-        var bounceCompleted = "--:--"
+        var visitCovered = "--:--"
         val dFormat = DecimalFormat("#.##")
         ApiServices.apiGET(
             url,
@@ -450,18 +473,16 @@ class LastWeekSummaryTOFragment : Fragment() {
                 override fun onResponseSuccess(response: String) {
                     try {
                         val obj = JSONObject(response)
-                        val completedArray = obj.getJSONArray("target_completed")
+                        val completedArray = obj.getJSONArray("today_summary")
                         binding.progressBarHome.visibility = View.GONE
                         binding.targetLayout.visibility = View.VISIBLE
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
-                                if (!targetObj.isNull("revenue")) totalTargetCompleted =
-                                    dFormat.format(targetObj.getString("revenue").toDouble())
-                                if (!targetObj.isNull("ads")) adsCompleted =
-                                    dFormat.format(targetObj.getString("ads").toDouble())
-                                if (!targetObj.isNull("rds")) rdsCompleted =
-                                    dFormat.format(targetObj.getString("rds").toDouble())
+                                if (!targetObj.isNull("today_ordered_amount")) totalTargetCompleted =
+                                    dFormat.format(
+                                        targetObj.getString("today_ordered_amount").toDouble()
+                                    )
                                 if (!targetObj.isNull("sku_per_memo")) bpcCompleted =
                                     dFormat.format(targetObj.getString("sku_per_memo").toDouble())
                                 if (!targetObj.isNull("number_of_memo")) lpcCompleted =
@@ -470,24 +491,22 @@ class LastWeekSummaryTOFragment : Fragment() {
                                     dFormat.format(
                                         targetObj.getString("number_of_visits").toDouble()
                                     )
+                                if (!targetObj.isNull("distance_from_outlets")) visitCovered =
+                                    dFormat.format(
+                                        targetObj.getString("distance_from_outlets").toDouble()
+                                    )
                                 if (!targetObj.isNull("aiv")) aivCompleted =
                                     dFormat.format(targetObj.getString("aiv").toDouble())
-                                if (!targetObj.isNull("bounce_amount_percentage")) bounceCompleted =
-                                    dFormat.format(
-                                        targetObj.getString("bounce_amount_percentage").toDouble()
-                                    )
                             }
                         }
 
                         val itemList: ArrayList<Pair<String, String>> = ArrayList()
                         itemList.add(
                             Pair(
-                                resources.getString(R.string.total_delivery_value),
+                                resources.getString(R.string.total_order_value),
                                 totalTargetCompleted
                             )
                         )
-                        itemList.add(Pair(resources.getString(R.string.ads), adsCompleted))
-                        itemList.add(Pair(resources.getString(R.string.rds), rdsCompleted))
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.sku_per_memo),
@@ -506,13 +525,9 @@ class LastWeekSummaryTOFragment : Fragment() {
                                 visitCompleted
                             )
                         )
+                        itemList.add(Pair(resources.getString(R.string.visit_500m), visitCovered))
                         itemList.add(Pair(resources.getString(R.string.aiv), aivCompleted))
-                        itemList.add(
-                            Pair(
-                                resources.getString(R.string.bounce) + " (%)",
-                                bounceCompleted
-                            )
-                        )
+
                         createTable(itemList, binding.tabLayoutTarget)
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -543,7 +558,6 @@ class LastWeekSummaryTOFragment : Fragment() {
 
     }
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -551,4 +565,5 @@ class LastWeekSummaryTOFragment : Fragment() {
         pd!!.setMessage("Processing...")
         pd!!.setCancelable(false)
     }
+
 }

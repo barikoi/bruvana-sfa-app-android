@@ -88,6 +88,9 @@ class AddGiftActivity : BaseActivity() {
 
     private var imageFiles: MutableList<String> = mutableListOf()
 
+
+    var count = 1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -126,7 +129,7 @@ class AddGiftActivity : BaseActivity() {
             },
             removeItemClickListener = { posMain, posChild ->
                 giftData[posMain].gifts[posChild].qty = 0
-                giftData[posMain].gifts[posChild].images = emptyList()
+                giftData[posMain].gifts[posChild].images = mutableListOf()
                 adapterGift.updateList(giftData)
 
                 binding.tvCount.text = giftData.flatMap { it.gifts }.sumOf { it.qty }.toString()
@@ -333,7 +336,6 @@ class AddGiftActivity : BaseActivity() {
     }
 
     private fun confirmAddGiftDialog() {
-        var count = 1
         val dialogBinding = DialogConfirmGiftBinding.inflate(LayoutInflater.from(this))
 
         val dialog = Dialog(this)
@@ -375,15 +377,17 @@ class AddGiftActivity : BaseActivity() {
             dialog.dismiss()
 
             giftData[posMain].gifts[posChild].qty = count
-            giftData[posMain].gifts[posChild].images = imageFiles
+            giftData[posMain].gifts[posChild].images = imageFiles.toMutableList()
             adapterGift.updateList(giftData)
 
             binding.tvCount.text = giftData.flatMap { it.gifts }.sumOf { it.qty }.toString()
+            count = 1
 
         }
         dialogBinding.btnNo.setOnClickListener {
 
             dialog.dismiss()
+            count = 1
         }
 
         dialogBinding.btnPlus.setHapticClickListener {

@@ -1,18 +1,20 @@
+@file:Suppress("DEPRECATION")
+
 package com.barikoi.cnlapp.OrderSummary.TO
 
 import android.app.ProgressDialog
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
-import androidx.preference.PreferenceManager
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -24,14 +26,23 @@ import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.ProductStock.Model.OrdersSO
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.remote.models.Order
+import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.ActivityOrderSummaryToBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.toast
+import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import com.google.android.material.datepicker.MaterialDatePicker
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -39,28 +50,45 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
     private lateinit var binding: ActivityOrderSummaryToBinding
 
-    var token: String? = null
-    var user_id: String? = null
-    var sr_id: String? = null
-    var route_id: String? = null
-    var employeeId: String? = ""
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    var queue: RequestQueue? = null
+    private val viewModel: OrderSummeryTOViewModel by viewModels()
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+    @Inject
+    lateinit var queue: RequestQueue
+
+
+    private val itemListDetails: MutableList<ArrayList<Pair<String, String>>> = mutableListOf()
+
+    private var toList: List<To> = emptyList()
+
     lateinit var listener: OnEditOrderListener
     private lateinit var adapter: ConfirmOrderListAdapter
-    var StartDate: String? = null
-    var EndDate: String? = null
-    var customDate: String? = null
-    var sowithOrderList: ArrayList<OrdersSO> = ArrayList()
-    var orderArray: JSONArray? = null
+
+    var startDate: String? = null
+    var endDate: String? = null
+
+    private var customDate: String? = null
+    private var shoWithOrderList: ArrayList<OrdersSO> = ArrayList()
+    private var orderArray: JSONArray? = null
+
     val itemList: ArrayList<OrderList> = ArrayList()
+
     lateinit var pd: ProgressDialog
+
+
+    val dFormat = DecimalFormat("#.##")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,12 +96,8 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
         binding = ActivityOrderSummaryToBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        queue = RequestQueueSingleton.getInstance(applicationContext).getRequestQueue()
-        prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        editor = prefs!!.edit()
-        token = prefs!!.getString(Api.TOKEN, "")
-        user_id = prefs!!.getString(Api.USER_ID, "")
-        employeeId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+        startTodaySummaryObserve()
+
         listener = this
 
         adapter = ConfirmOrderListAdapter(listener, "summary")
@@ -89,9 +113,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
         }
 
         binding.editTextSearchShop.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 adapter.filter.filter(s)
@@ -100,32 +122,44 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 }
             }
 
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
+            override fun afterTextChanged(p0: Editable?) {}
 
         })
         binding.tryAgain2.setOnClickListener {
-            setDateFilter(/*spinnerMenu.selectedItemPosition*/)
+            setDateFilter()
         }
 
-        setDateFilter(/*spinnerMenu.selectedItemPosition*/)
-
+        setDateFilter()
     }
 
-    private fun setDateFilter(/*position: Int*/) {
+    private fun setDateFilter() {
         val c = Calendar.getInstance()
         c.add(Calendar.DAY_OF_WEEK, -7)
         val end = Calendar.getInstance().time
         val start = c.time
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-        StartDate = df.format(start)
-        EndDate = df.format(end)
+        startDate = df.format(start)
+        endDate = df.format(end)
+
         customDate =
             getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
         binding.tvDateRange.text = customDate
-        getOrderSummary(Api.get_all_so_list + "?last_week_summary=1&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&to_id=" + user_id)
+
+        if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+            viewModel.getTodaySummary(
+                startDate!!,
+                endDate!!,
+                null
+            )
+
+        } else {
+            getOrderSummary(
+                Api.get_all_so_list + "?last_week_summary=1&start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                    Api.USER_ID
+                )
+            )
+        }
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
         materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
@@ -135,19 +169,19 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
 
         binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.isEnabled = false
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             pd.show()
             binding.spinnerMenu.setSelection(2)
-            binding.dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.isEnabled = true
             binding.summaryLayout2.visibility = View.GONE
             binding.tryAgain2.visibility = View.GONE
             val sDate = Date(selection.first!!)
             val eDate = Date(selection.second!!)
-            StartDate = df.format(sDate)
-            EndDate = df.format(eDate)
+            startDate = df.format(sDate)
+            endDate = df.format(eDate)
             if (sDate.compareTo(eDate) == 0) {
                 binding.tvDateRange.text = simpleFormat.format(sDate)
                 customDate = simpleFormat.format(sDate)
@@ -160,29 +194,67 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 customDate = simpleFormat.format(sDate) + " - " + simpleFormat.format(eDate)
             }
 
-            getOrderSummary(
-                Api.get_all_so_list + "?start_date=" + df.format(
-                    sDate
-                ) + " 00:00:00" + "&end_date=" + df.format(eDate) + " 23:59:59" + "&to_id=" + user_id
-            )
+            if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                viewModel.getTodaySummary(
+                    startDate!!,
+                    endDate!!,
+                    null
+                )
+
+            } else
+
+                getOrderSummary(
+                    Api.get_all_so_list + "?start_date=" + df.format(
+                        sDate
+                    ) + " 00:00:00" + "&end_date=" + df.format(eDate) + " 23:59:59" + "&to_id=" + sharePrefUtils.getString(
+                        Api.USER_ID
+                    )
+                )
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayout.setEnabled(
-                true
-            )
+            binding.dateRangeLayout.isEnabled = true
         }
 
     }
 
-    private fun getOrderSummary(url: String) {
-        binding.progressBar4.visibility = View.VISIBLE
-        val dFormat = DecimalFormat("#.##")
-        ApiServices.apiGET(url, queue!!, token!!, object :
-            ApiServiceListener {
-            override fun onResponseSuccess(response: String) {
-                try {
-                    if (response != null) {
+    private fun startTodaySummaryObserve() {
+        lifecycleScope.launch {
+            viewModel.todaySummaryResponse.observe(this@OrderSummaryTOActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startTodaySummaryObserve::Empty")
+
+                        binding.progressBar4.visibility = View.GONE
+                        binding.summaryLayout2.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.GONE
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startTodaySummaryObserve::Error ${it.error}")
+
+                        binding.bodyLayout.visibility = View.GONE
+                        binding.progressBar4.visibility = View.GONE
+                        binding.summaryLayout2.visibility = View.GONE
+                        binding.targetLayout.visibility = View.GONE
+                        binding.bodyLayoutScroll.visibility = View.GONE
+                        binding.collectionLayout.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.VISIBLE
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startTodaySummaryObserve::Loading")
+
+                        binding.progressBar4.visibility = View.VISIBLE
+                        binding.summaryLayout2.visibility = View.GONE
+                        binding.tryAgain2.visibility = View.GONE
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startTodaySummaryObserve:: Success ${it.data}")
+
                         binding.progressBar4.visibility = View.GONE
                         binding.summaryLayout2.visibility = View.VISIBLE
                         binding.collectionLayout.visibility = View.GONE
@@ -190,53 +262,166 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                         binding.bodyLayoutScroll.visibility = View.GONE
                         binding.tryAgain2.visibility = View.GONE
                         binding.bodyLayout.visibility = View.VISIBLE
-                        val obj = JSONObject(response)
-                        val toArray = obj.getJSONArray("so_list")
-                        val toObj = toArray.getJSONObject(0)
-                        val ordersArray = toObj.getJSONArray("sales_officers")
+
+                        toList = it.data?.toList ?: emptyList()
+
                         val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
-                        sowithOrderList.clear()
-                        if (ordersArray.length() > 0) {
-                            for (i in 0 until ordersArray.length()) {
-                                val orderObj = ordersArray.getJSONObject(i)
-                                itemList.add(
-                                    Pair(
-                                        Pair(
-                                            orderObj.getString("user_name"),
-                                            orderObj.getString("id")
-                                        ),
-                                        dFormat.format(
-                                            orderObj.getString("so_ordered_value").toDouble()
-                                        )
-                                    )
-                                )
-                                sowithOrderList!!.add(
-                                    OrdersSO(
-                                        orderObj.getString("id"),
-                                        orderObj.getString("user_name"),
-                                        orderObj.getString("productive_outlets"),
-                                        orderObj.getString("total_outlets"),
-                                        dFormat.format(orderObj.getDouble("total_bounced_amount")),
-                                        (if (orderObj.has("orders")) orderObj.getJSONArray("orders") else JSONArray())!!
-                                    )
-                                )
-                            }
-                            if (!toObj.getString("order_amount")
-                                    .equals("null")
-                            ) binding.ovCount.text =
-                                dFormat.format(toObj.getString("order_amount").toDouble())
-                            if (!toObj.getString("sku_per_memo")
-                                    .equals("null")
-                            ) binding.bpcCount.text =
-                                dFormat.format(toObj.getString("sku_per_memo").toDouble())
-                            if (!toObj.getString("number_of_memo")
-                                    .equals("null")
-                            ) binding.lpcCount.text =
-                                dFormat.format(toObj.getString("number_of_memo").toDouble())
-                            createTableClickable(itemList, binding.tabLayoutOrder)
+
+                        val nm = it.data?.toList?.sumOf { s ->
+                            s.totalOrders
                         }
 
+                        val ov = it.data?.toList?.sumOf { s ->
+                            s.totalOrderedAmount.toDoubleOrNull()
+                                ?: 0.0  // Convert to Double, default to 0.0 if conversion fails
+                        }
+
+                        val totalSku = it.data?.toList?.sumOf { s ->
+                            s.numOfSku
+                        }
+
+                        val spm = totalSku?.takeIf { nm != null && nm != 0 }?.div(nm!!) ?: 0
+
+                        binding.ovCount.text = dFormat.format(ov)
+                        binding.bpcCount.text = dFormat.format(spm)
+                        binding.lpcCount.text = nm.toString()
+
+
+                        it.data?.toList!!.forEach { to ->
+                            val keyPair = Pair(to.toName, to.toId.toString())
+                            val value = to.totalAmountFormatted()
+                            itemList.add(Pair(keyPair, value))
+
+                            val skuPerMemo =
+                                to.numOfSku.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0
+                            val aiv = to.totalOrderedAmount.toDoubleOrNull()
+                                ?.takeIf { to.totalOrders != 0 }?.div(to.totalOrders) ?: 0.0
+
+
+                            val itemListDetailsTmp = ArrayList<Pair<String, String>>()
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.total_order_value),
+                                    to.totalAmountFormatted()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.ads),
+                                    to.ads.toString().totalAmountFormatted()
+                                )
+                            )
+
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.rds),
+                                    to.rds.toString().totalAmountFormatted()
+                                )
+                            )
+
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.sku_per_memo),
+                                    skuPerMemo.toString()
+                                )
+                            )
+
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.number_of_memo),
+                                    to.totalOrders.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.visit_ratio),
+                                    to.numOfVisits.toString()
+                                )
+                            )
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.aiv),
+                                    to.aiv.toString().totalAmountFormatted()
+                                )
+                            )
+
+                            itemListDetailsTmp.add(
+                                Pair(
+                                    resources.getString(R.string.bounce) + " (%)",
+                                    to.bouncedPercentage.toString()
+                                )
+                            )
+
+
+                            itemListDetails.add(itemListDetailsTmp)
+                        }
+
+                        createTableClickable(itemList, binding.tabLayoutOrder)
                     }
+                }
+            }
+        }
+    }
+
+    private fun getOrderSummary(url: String) {
+        binding.progressBar4.visibility = View.VISIBLE
+        ApiServices.apiGET(url, queue, sharePrefUtils.getString(Api.TOKEN)!!, object :
+            ApiServiceListener {
+            override fun onResponseSuccess(response: String) {
+                try {
+                    binding.progressBar4.visibility = View.GONE
+                    binding.summaryLayout2.visibility = View.VISIBLE
+                    binding.collectionLayout.visibility = View.GONE
+                    binding.targetLayout.visibility = View.GONE
+                    binding.bodyLayoutScroll.visibility = View.GONE
+                    binding.tryAgain2.visibility = View.GONE
+                    binding.bodyLayout.visibility = View.VISIBLE
+                    val obj = JSONObject(response)
+                    val toArray = obj.getJSONArray("so_list")
+                    val toObj = toArray.getJSONObject(0)
+                    val ordersArray = toObj.getJSONArray("sales_officers")
+                    val itemList: ArrayList<Pair<Pair<String, String>, String>> = ArrayList()
+                    shoWithOrderList.clear()
+                    if (ordersArray.length() > 0) {
+                        for (i in 0 until ordersArray.length()) {
+                            val orderObj = ordersArray.getJSONObject(i)
+                            itemList.add(
+                                Pair(
+                                    Pair(
+                                        orderObj.getString("user_name"),
+                                        orderObj.getString("id")
+                                    ),
+                                    dFormat.format(
+                                        orderObj.getString("so_ordered_value").toDouble()
+                                    )
+                                )
+                            )
+                            shoWithOrderList.add(
+                                OrdersSO(
+                                    orderObj.getString("id"),
+                                    orderObj.getString("user_name"),
+                                    orderObj.getString("productive_outlets"),
+                                    orderObj.getString("total_outlets"),
+                                    dFormat.format(orderObj.getDouble("total_bounced_amount")),
+                                    (if (orderObj.has("orders")) orderObj.getJSONArray("orders") else JSONArray())!!
+                                )
+                            )
+                        }
+                        if (!toObj.getString("order_amount")
+                                .equals("null")
+                        ) binding.ovCount.text =
+                            dFormat.format(toObj.getString("order_amount").toDouble())
+                        if (!toObj.getString("sku_per_memo")
+                                .equals("null")
+                        ) binding.bpcCount.text =
+                            dFormat.format(toObj.getString("sku_per_memo").toDouble())
+                        if (!toObj.getString("number_of_memo")
+                                .equals("null")
+                        ) binding.lpcCount.text =
+                            dFormat.format(toObj.getString("number_of_memo").toDouble())
+                        createTableClickable(itemList, binding.tabLayoutOrder)
+                    }
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                     binding.bodyLayout.visibility = View.GONE
@@ -297,7 +482,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 val bottomMargin = 8
 
                 tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
-                tr.setLayoutParams(tableRowParams)
+                tr.layoutParams = tableRowParams
                 tr.gravity = Gravity.CENTER_VERTICAL
                 tr.tag = i
                 val c1 = TextView(applicationContext)
@@ -309,32 +494,34 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 c2.setTextColor(resources.getColor(R.color.text_title))
                 c2.text = data[i].second
                 c2.gravity = Gravity.CENTER
-                c2.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
+                c2.background = ContextCompat.getDrawable(this, R.drawable.button_white_bg_stroke)
                 tr.addView(c1)
                 tr.addView(c2)
 
                 tr.setOnClickListener {
-                    Log.d("OrderSummary", "pd.isShowing: " + pd.isShowing)
                     binding.bodyLayoutScroll.visibility = View.GONE
                     binding.collectionLayout.visibility = View.GONE
                     binding.targetLayout.visibility = View.GONE
                     binding.orderList.visibility = View.GONE
                     pd.show()
                     Thread {
-                        this@OrderSummaryTOActivity.runOnUiThread(object : Runnable {
-                            override fun run() {
-                                try {
-                                    orderArray = sowithOrderList[i].ordersArray
+                        this@OrderSummaryTOActivity.runOnUiThread {
+                            try {
+                                if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
                                     binding.bodyLayoutScroll.visibility = View.VISIBLE
                                     binding.collectionLayout.visibility = View.VISIBLE
                                     binding.orderCollectionCount.text =
-                                        sowithOrderList!!.get(i).order_collected + "/" + sowithOrderList!!.get(
-                                            i
-                                        ).total_outlets
+                                        getString(
+                                            R.string.by_das_by,
+                                            toList[i].totalOrders.toString(),
+                                            toList[i].uniqueOutletCount.toString()
+                                        )
                                     binding.totalBounceCount.text =
-                                        sowithOrderList!![i].total_bounce.toString()
-                                    getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
-                                    Log.d("OrderSummary", "row count: " + tabLayout.childCount)
+                                        toList[i].totalBouncedAmount
+
+                                    createTable(itemListDetails[i], binding.tabLayoutTarget)
+                                    binding.targetLayout.visibility = View.VISIBLE
+
                                     for (t in 0 until tabLayout.childCount) {
                                         if (tabLayout.getChildAt(t).tag == it.tag) {
                                             tabLayout.getChildAt(t)
@@ -345,30 +532,49 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                                         }
                                     }
 
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    Sentry.captureException(e)
+                                } else {
+                                    binding.bodyLayoutScroll.visibility = View.VISIBLE
+                                    binding.collectionLayout.visibility = View.VISIBLE
+                                    binding.orderCollectionCount.text =
+                                        getString(
+                                            R.string.by_das_by,
+                                            shoWithOrderList[i].order_collected,
+                                            shoWithOrderList[i].total_outlets
+                                        )
+                                    binding.totalBounceCount.text =
+                                        shoWithOrderList[i].total_bounce
+
+                                    getSummaryTargets(Api.get_summary + "?start_date=" + startDate + " 00:00:00" + "&end_date=" + endDate + " 23:59:59" + "&user_id=" + data[i].first.second/*+"&route_id="+routeId*/)
+
+                                    for (t in 0 until tabLayout.childCount) {
+                                        if (tabLayout.getChildAt(t).tag == it.tag) {
+                                            tabLayout.getChildAt(t)
+                                                .setBackgroundColor(resources.getColor(R.color.light_yellow))
+                                        } else {
+                                            tabLayout.getChildAt(t)
+                                                .setBackgroundColor(resources.getColor(R.color.white))
+                                        }
+                                    }
                                 }
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Sentry.captureException(e)
                             }
-
-                        })
+                        }
                     }.start()
-
-
                 }
                 tabLayout.addView(tr)
             }
         }
-        pd!!.dismiss()
+        pd.dismiss()
     }
 
     private fun getAllOrders(orderArray: JSONArray) {
-        //progressBar5.visibility = View.GONE
         try {
             itemList.clear()
             if (orderArray.length() > 0) {
                 for (i in 0 until orderArray.length()) {
-                    //productItems.clear()
                     val orderObj = orderArray.getJSONObject(i)
                     val brandArray = orderObj.getJSONArray("products")
                     val productItems: ArrayList<Products> = ArrayList()
@@ -407,7 +613,6 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                             orderObj.getString("outlet_name"),
                             "",
                             "",
-                            /*orderObj.getString("distributor_office_code"),*/
                             orderObj.getString("total_ordered_amount"),
                             orderObj.getString("total_ordered_quantity"),
                             orderObj.getString("latitude"),
@@ -422,13 +627,13 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
             adapter.updateList(itemList)
 
             binding.orderList
-                .getViewTreeObserver()
+                .viewTreeObserver
                 .addOnGlobalLayoutListener(
                     object : OnGlobalLayoutListener {
                         override fun onGlobalLayout() {
-                            pd!!.dismiss()
+                            pd.dismiss()
                             binding.orderList
-                                .getViewTreeObserver()
+                                .viewTreeObserver
                                 .removeOnGlobalLayoutListener(this)
                         }
                     })
@@ -440,59 +645,48 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
     }
 
     private fun getSummaryTargets(url: String) {
-        var total_target = "--:--"
-        var total_target_completed = "--:--"
-        var lpc = "--:--"
-        var lpc_completed = "--:--"
-        var bpc = "--:--"
-        var bpc_completed = "--:--"
-        var aiv = "--:--"
-        var aiv_completed = "--:--"
-        var ads = "--:--"
-        var ads_completed = "--:--"
-        var rds = "--:--"
-        var rds_completed = "--:--"
-        var visit_completed = "--:--"
-        var visited = "--:--"
-        var bounce_completed = "--:--"
-        var bounced = "--:--"
-        var delivery_value = "--:--"
-        var dformat = DecimalFormat("#.##")
-        ApiServices.apiGET(url, queue!!, token!!, object : ApiServiceListener {
-            override fun onResponseSuccess(response: String) {
-                try {
-                    if (response != null) {
+        var totalTargetCompleted = "--:--"
+        var lpcCompleted = "--:--"
+        var bpcCompleted = "--:--"
+        var aivCompleted = "--:--"
+        var adsCompleted = "--:--"
+        var rdsCompleted = "--:--"
+        var visitCompleted = "--:--"
+        var bounceCompleted = "--:--"
+        ApiServices.apiGET(
+            url,
+            queue,
+            sharePrefUtils.getString(Api.TOKEN)!!,
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    try {
                         val obj = JSONObject(response)
-                        val targetsArray = obj.getJSONArray("targets")
+                        obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
                         binding.progressBarHome.visibility = View.GONE
                         binding.targetLayout.visibility = View.VISIBLE
                         if (completedArray.length() > 0) {
                             for (i in 0 until completedArray.length()) {
                                 val targetObj = completedArray.getJSONObject(i)
-                                if (!targetObj.isNull("revenue")) total_target_completed =
-                                    dformat.format(targetObj.getString("revenue").toDouble())
-                                if (!targetObj.isNull("ads")) ads_completed =
-                                    dformat.format(targetObj.getString("ads").toDouble())
-                                if (!targetObj.isNull("rds")) rds_completed =
-                                    dformat.format(targetObj.getString("rds").toDouble())
-                                if (!targetObj.isNull("sku_per_memo")) bpc_completed =
-                                    dformat.format(targetObj.getString("sku_per_memo").toDouble())
-                                if (!targetObj.isNull("number_of_memo")) lpc_completed =
-                                    dformat.format(targetObj.getString("number_of_memo").toDouble())
-                                if (!targetObj.isNull("number_of_visits")) visit_completed =
-                                    dformat.format(
+                                if (!targetObj.isNull("revenue")) totalTargetCompleted =
+                                    dFormat.format(targetObj.getString("revenue").toDouble())
+                                if (!targetObj.isNull("ads")) adsCompleted =
+                                    dFormat.format(targetObj.getString("ads").toDouble())
+                                if (!targetObj.isNull("rds")) rdsCompleted =
+                                    dFormat.format(targetObj.getString("rds").toDouble())
+                                if (!targetObj.isNull("sku_per_memo")) bpcCompleted =
+                                    dFormat.format(targetObj.getString("sku_per_memo").toDouble())
+                                if (!targetObj.isNull("number_of_memo")) lpcCompleted =
+                                    dFormat.format(targetObj.getString("number_of_memo").toDouble())
+                                if (!targetObj.isNull("number_of_visits")) visitCompleted =
+                                    dFormat.format(
                                         targetObj.getString("number_of_visits").toDouble()
                                     )
-                                if (!targetObj.isNull("aiv")) aiv_completed =
-                                    dformat.format(targetObj.getString("aiv").toDouble())
-                                if (!targetObj.isNull("bounce_amount_percentage")) bounce_completed =
-                                    dformat.format(
+                                if (!targetObj.isNull("aiv")) aivCompleted =
+                                    dFormat.format(targetObj.getString("aiv").toDouble())
+                                if (!targetObj.isNull("bounce_amount_percentage")) bounceCompleted =
+                                    dFormat.format(
                                         targetObj.getString("bounce_amount_percentage").toDouble()
-                                    )
-                                if (!targetObj.isNull("delivered_value")) delivery_value =
-                                    dformat.format(
-                                        targetObj.getString("delivered_value").toDouble()
                                     )
                             }
                         }
@@ -501,67 +695,64 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.total_delivery_value),
-                                total_target_completed
+                                totalTargetCompleted
                             )
                         )
-                        itemList.add(Pair(resources.getString(R.string.ads), ads_completed))
-                        itemList.add(Pair(resources.getString(R.string.rds), rds_completed))
+                        itemList.add(Pair(resources.getString(R.string.ads), adsCompleted))
+                        itemList.add(Pair(resources.getString(R.string.rds), rdsCompleted))
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.sku_per_memo),
-                                bpc_completed
+                                bpcCompleted
                             )
                         )
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.number_of_memo),
-                                lpc_completed
+                                lpcCompleted
                             )
                         )
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.visit_ratio),
-                                visit_completed
+                                visitCompleted
                             )
                         )
-                        itemList.add(Pair(resources.getString(R.string.aiv), aiv_completed))
+                        itemList.add(Pair(resources.getString(R.string.aiv), aivCompleted))
                         itemList.add(
                             Pair(
                                 resources.getString(R.string.bounce) + " (%)",
-                                bounce_completed
+                                bounceCompleted
                             )
                         )
 
                         createTable(itemList, binding.tabLayoutTarget)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        binding.progressBarHome.visibility = View.GONE
+                        pd.dismiss()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    binding.progressBarHome.visibility = View.GONE
-                    pd!!.dismiss()
+
                 }
 
-            }
+                override fun onJSONResponseSuccess(response: JSONObject) {
+                }
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                }
 
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                    binding.progressBarHome.visibility = View.GONE
+                    pd.dismiss()
+                }
 
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, applicationContext)
-                binding.progressBarHome.visibility = View.GONE
-                pd!!.dismiss()
-            }
+                override fun onException(e: Exception) {
+                    binding.progressBarHome.visibility = View.GONE
+                    pd.dismiss()
+                }
 
-            override fun onException(e: Exception) {
-                binding.progressBarHome.visibility = View.GONE
-                pd!!.dismiss()
-            }
-
-        })
+            })
 
     }
 
@@ -586,7 +777,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                 tabLayout.addView(tr)
             }
         }
-        pd!!.dismiss()
+        pd.dismiss()
     }
 
     override fun onEdit(order: OrderList) {

@@ -22,7 +22,7 @@ import java.net.UnknownHostException
 import javax.inject.Inject
 
 interface ProductStockRepository {
-    fun getDHList(territoryId: String): Flow<ApiState<DbHousesResponse>>
+    fun getDHList(territoryId: String?, regionId: String?): Flow<ApiState<DbHousesResponse>>
 
 
     fun getApprovalCount(): Flow<ApiState<PendingResponse>>
@@ -117,10 +117,13 @@ class ProductStockRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getDHList(territoryId: String): Flow<ApiState<DbHousesResponse>> {
+    override fun getDHList(
+        territoryId: String?,
+        regionId: String?
+    ): Flow<ApiState<DbHousesResponse>> {
         return flow {
             try {
-                val response = apiService.getDHList(territoryId)
+                val response = apiService.getDHList(territoryId, regionId)
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {

@@ -1,16 +1,21 @@
 package com.barikoi.cnlapp.utils.extension
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.SystemClock
 import android.view.HapticFeedbackConstants
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.barikoi.cnlapp.databinding.DialogLoadingBinding
 import java.util.Locale
 
 
@@ -71,6 +76,15 @@ fun Activity.hideKeyboard() {
 fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+fun Context.loadingDialog(onShow: (dialog: Dialog) -> Unit) {
+    val bindingView = DialogLoadingBinding.inflate(LayoutInflater.from(this))
+    val dialog = Dialog(this)
+    dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    dialog.setCancelable(true)
+    dialog.setContentView(bindingView.root)
+    onShow(dialog)
 }
 
 object AppLocale {

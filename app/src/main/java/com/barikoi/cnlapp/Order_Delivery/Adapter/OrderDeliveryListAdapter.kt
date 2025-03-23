@@ -17,27 +17,32 @@ import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderProductListAdapter
 import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEditOrderListener, var from: String): RecyclerView.Adapter<OrderDeliveryListAdapter.ViewHolder>(),
+class OrderDeliveryListAdapter(
+    var mValues: List<OrderList>,
+    var mListener: OnEditOrderListener,
+    var from: String
+) : RecyclerView.Adapter<OrderDeliveryListAdapter.ViewHolder>(),
     Filterable {
     var orderList: List<OrderList> = mValues
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.single_order_delivery_status_view, parent, false)
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_order_delivery_status_view, parent, false)
         return ViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mItem = orderList[position]
-        var dformat = DecimalFormat("#.##")
         holder.routeName.text = mItem.routeName
         holder.shopName.text = mItem.outletName
-        holder.subTotal.text = dformat.format(mItem.grandTotal.toDouble()).toString()
+        holder.subTotal.text = mItem.grandTotal.totalAmountFormatted()
 
-        if (mItem.brands_array.size > 0){
+        if (mItem.brands_array.size > 0) {
             val adapter = ConfirmOrderProductListAdapter(mItem.brands_array)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
@@ -71,14 +76,15 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
             }
         }
 
-        if (!mItem.orderedAt.equals("null")){
+        if (!mItem.orderedAt.equals("null")) {
             holder.orderAt.visibility = View.VISIBLE
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(mItem.orderedAt))
             var dformat = DecimalFormat("#.##")
             val builder = SpannableStringBuilder()
-            val str1 = SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
+            val str1 =
+                SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
             builder.append(str1)
             val str2 = SpannableString(orderDate)
             builder.append(str2)
@@ -89,22 +95,32 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
                     boldSpan3, 0, str3.length, 0
                 )
                 builder.append(str3)
-                val suffix = if(orderList[position].distance.toDouble()/1000 <1){
-                    dformat.format(orderList[position].distance.toDouble())+"m"
-                }else{
-                    dformat.format(orderList[position].distance.toDouble()/1000)+"km"
+                val suffix = if (orderList[position].distance.toDouble() / 1000 < 1) {
+                    dformat.format(orderList[position].distance.toDouble()) + "m"
+                } else {
+                    dformat.format(orderList[position].distance.toDouble() / 1000) + "km"
                 }
                 val strDistance = SpannableString(suffix)
                 if (mItem.distance.toDouble() > 100) {
                     strDistance.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.red)),
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                holder.itemView.context,
+                                R.color.red
+                            )
+                        ),
                         0,
                         strDistance.length,
                         0
                     )
                 } else {
                     strDistance.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(holder.itemView.context, R.color.cnl_color_2)),
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                holder.itemView.context,
+                                R.color.cnl_color_2
+                            )
+                        ),
                         0,
                         strDistance.length,
                         0
@@ -117,17 +133,17 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
                 builder.append(strDistance)
             }
             holder.orderAt.setText(builder)
-        }else{
+        } else {
             holder.orderAt.visibility = View.GONE
         }
 
-        if (from.equals("SO", true)){
+        if (from.equals("SO", true)) {
             if (mItem.orderStatus.equals("PENDING")) {
                 holder.editItem.visibility = View.VISIBLE
-            }else{
+            } else {
                 holder.editItem.visibility = View.GONE
             }
-        }else{
+        } else {
             holder.editItem.visibility = View.GONE
         }
 
@@ -154,7 +170,9 @@ class OrderDeliveryListAdapter(var mValues: List<OrderList>, var mListener: OnEd
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.outletName.toLowerCase().contains(charString.lowercase(Locale.getDefault()))) {
+                        if (row.outletName.toLowerCase()
+                                .contains(charString.lowercase(Locale.getDefault()))
+                        ) {
                             filteredList.add(row)
                         }
                     }

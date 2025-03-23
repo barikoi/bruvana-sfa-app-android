@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <RelativeLayout
             android:id="@+id/spinnerLayoutRoute"
@@ -48,7 +49,7 @@
             android:background="@drawable/stroke_background"
             android:backgroundTint="@color/white"
             android:padding="4dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -92,7 +93,7 @@
                         android:text=""
                         android:textColor="@color/text_title"
                         android:textSize="15sp"
-                        android:textStyle="bold"></TextView>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/userDesignation"
@@ -105,7 +106,7 @@
                         android:gravity="start"
                         android:text=""
                         android:textColor="@color/text_title"
-                        android:textSize="12sp"></TextView>
+                        android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
@@ -121,7 +122,7 @@
             android:text="@string/date_range"
             android:textColor="@color/text_title"
             android:textSize="15sp"
-            android:textStyle="bold"></TextView>
+            android:textStyle="bold" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/dateRangeLayout"
@@ -148,9 +149,8 @@
                 android:gravity="start"
                 android:text=""
                 android:textColor="@color/text_title_2"
-                android:textSize="14sp">
+                android:textSize="14sp" />
 
-            </TextView>
         </androidx.cardview.widget.CardView>
 
         <HorizontalScrollView
@@ -159,7 +159,7 @@
             android:scrollbars="none">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -189,9 +189,7 @@
                         android:text="@string/present"
                         android:textColor="@color/text_title"
                         android:textSize="15sp"
-                        android:textStyle="bold">
-
-                    </TextView>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/presentCount"
@@ -201,9 +199,8 @@
                         android:text=""
                         android:textColor="@color/text_title"
                         android:textSize="20sp"
-                        android:textStyle="bold">
+                        android:textStyle="bold" />
 
-                    </TextView>
                 </LinearLayout>
 
                 <LinearLayout
@@ -232,9 +229,7 @@
                         android:text="@string/absent"
                         android:textColor="@color/text_title"
                         android:textSize="15sp"
-                        android:textStyle="bold">
-
-                    </TextView>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/absentCount"
@@ -244,9 +239,8 @@
                         android:text=""
                         android:textColor="@color/text_title"
                         android:textSize="20sp"
-                        android:textStyle="bold">
+                        android:textStyle="bold" />
 
-                    </TextView>
                 </LinearLayout>
 
                 <LinearLayout
@@ -275,9 +269,7 @@
                         android:text="@string/late"
                         android:textColor="@color/text_title"
                         android:textSize="15sp"
-                        android:textStyle="bold">
-
-                    </TextView>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/lateCount"
@@ -287,9 +279,8 @@
                         android:text=""
                         android:textColor="@color/text_title"
                         android:textSize="20sp"
-                        android:textStyle="bold">
+                        android:textStyle="bold" />
 
-                    </TextView>
                 </LinearLayout>
             </LinearLayout>
         </HorizontalScrollView>
@@ -303,10 +294,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/single_attendance_reason_view">
-
-        </androidx.recyclerview.widget.RecyclerView>
+            tools:listitem="@layout/single_attendance_reason_view" />
 
     </LinearLayout>
-
 </RelativeLayout>

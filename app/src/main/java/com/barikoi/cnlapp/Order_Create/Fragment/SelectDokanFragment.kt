@@ -18,8 +18,8 @@ class SelectDokanFragment : Fragment() {
 
         val bundle = this.arguments
         if (bundle != null) {
-            if (bundle.containsKey("from")){
-                if (bundle.getString("from").equals("Order")){
+            if (bundle.containsKey("from")) {
+                if (bundle.getString("from").equals("Order")) {
                     bundle.getSerializable("Order")?.let {
                         CreateOrderFragment.startFragmentWithValue(
                             "Order",
@@ -28,11 +28,11 @@ class SelectDokanFragment : Fragment() {
                             ACTIVITY
                         )
                     }
-                }else{
+                } else {
                     CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
                 }
             }
-        }else{
+        } else {
             CreateOrderFragment.setCurrentFragment(ShopSelectFragment(), ACTIVITY)
         }
 

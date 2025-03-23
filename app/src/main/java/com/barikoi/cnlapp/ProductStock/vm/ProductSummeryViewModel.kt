@@ -33,9 +33,9 @@ class ProductSummeryViewModel @Inject constructor(
         _soSelected.postValue(soID)
     }
 
-    fun getDHList(territoryId: String) {
+    fun getDHList(territoryId: String?, regionId: String?) {
         viewModelScope.launch {
-            productStockRepository.getDHList(territoryId).onStart {
+            productStockRepository.getDHList(territoryId, regionId).onStart {
                 _dbHousesResponse.postValue(ApiState.Loading())
             }.collectLatest {
                 _dbHousesResponse.postValue(it)
