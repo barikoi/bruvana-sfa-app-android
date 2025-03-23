@@ -2,11 +2,14 @@ package com.barikoi.cnlapp.ProductStock
 
 import android.os.Build
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +19,7 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.DbHouse
+import com.barikoi.cnlapp.data.remote.models.Product
 import com.barikoi.cnlapp.databinding.ActivityProductSummaryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Api.TERRITORY_ID
@@ -44,6 +48,10 @@ class ProductSummaryActivity : BaseActivity() {
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
+    private var products: List<Product> = emptyList()
+
+    var isHighToLow = true
+
     var selectedTerritoryId: String? = null
 
     private lateinit var adapter: ProductStockAdapter
@@ -56,6 +64,16 @@ class ProductSummaryActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.toolbar.tvTitle.text = getString(R.string.title_product_summary)
+        if (sharePrefUtils.getString(Api.USER_TYPE) == "SO") {
+            binding.toolbar.tvSUbTitle.text =
+                HtmlCompat.fromHtml(
+                    "<b>DB House: </b> ${sharePrefUtils.getString(Constants.DB_HOUSE)}",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+            binding.toolbar.tvSUbTitle.isVisible = true
+
+        }
+
         binding.toolbar.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -161,19 +179,71 @@ class ProductSummaryActivity : BaseActivity() {
                 )
             }
 
-            viewModel.getProductStock(
-                df.format(sDate) + " 00:00:00",
-                df.format(eDate) + " 23:59:59",
-                null,
-                "1",
-                null,
-                selectedTerritoryId
-            )
+            if (sharePrefUtils.getString(Api.USER_TYPE)
+                    .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE)
+                    .equals("ASM", true)
+            ) {
+                viewModel.getProductStock(
+                    "${getDate().first} 00:00:00",
+                    "${getDate().second} 23:59:59",
+                    "1",
+                    "1",
+                    selectedTerritoryId,
+                    null
+                )
+            } else {
+                viewModel.getProductStock(
+                    "${getDate().first} 00:00:00",
+                    "${getDate().second} 23:59:59",
+                    null,
+                    "1",
+                    null,
+                    sharePrefUtils.getString(Api.USER_ID)
+                )
+            }
 
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
             binding.dateRangeLayout.isEnabled = true
+        }
+
+        binding.llSort.setOnClickListener {
+            val popup = PopupMenu(this@ProductSummaryActivity, binding.llSort)
+            popup.menuInflater.inflate(R.menu.sort_menu_product_summary, popup.menu)
+            popup.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener,
+                PopupMenu.OnMenuItemClickListener {
+                override fun onMenuItemClick(item: MenuItem): Boolean {
+                    when (item.itemId) {
+                        R.id.menu_high_to_low -> {
+                            binding.sortTitle.text =
+                                resources.getString(R.string.high_to_low)
+                            adapter.updateProducts(
+                                products.sortedByDescending { s ->
+                                    s.productiveRoutes
+                                }
+                            )
+
+                            isHighToLow = true
+
+                        }
+
+                        R.id.menu_low_to_high -> {
+                            binding.sortTitle.text =
+                                resources.getString(R.string.low_to_high)
+
+                            adapter.updateProducts(
+                                products.sortedBy { s ->
+                                    s.productiveRoutes
+                                }
+                            )
+                            isHighToLow = false
+                        }
+                    }
+                    return true
+                }
+            })
+            popup.show()
         }
     }
 
@@ -239,8 +309,31 @@ class ProductSummaryActivity : BaseActivity() {
                         binding.progressBar.isVisible = false
                         AppLogger.log("starProductStockObserve:: Success ${it.data}")
 
+                        if (it.data?.products.isNullOrEmpty()) {
+                            toast("Product List is empty")
+                            binding.tvNoProducts.text =
+                                getString(R.string.no_data_found)
+                            return@observe
+                        }
 
-                        adapter.updateProducts(it.data?.products!!)
+                        products = it.data?.products ?: emptyList()
+
+                        if (isHighToLow) {
+                            adapter.updateProducts(it.data?.products!!.sortedByDescending { s ->
+                                s.productiveRoutes
+                            })
+                        } else {
+                            adapter.updateProducts(it.data?.products!!.sortedBy { s ->
+                                s.productiveRoutes
+                            })
+                        }
+
+
+                        binding.tvTotalAmount.text =
+                            getString(
+                                R.string.total_amount,
+                                "${it.data.products.sumOf { s -> s.deliveredAmount }}"
+                            )
                     }
                 }
             }
