@@ -345,4 +345,11 @@
     <string name="please_add_gift">অনুগ্রহ করে উপহার যোগ করুন</string>
     <string name="please_add_image">অনুগ্রহ করে ছবি যোগ করুন</string>
 
+    <string name="high_to_low">উচ্চ থেকে নিম্ন</string>
+    <string name="low_to_high">নিম্ন থেকে উচ্চ</string>
+    <string name="by_das_by">%1$s / %2$s</string>
+    <string name="total_amount">মোট পরিমাণ: %1$s</string>
+    <string name="total_stock_value">মোট স্টকের মূল্য: %1$s</string>
+    <string name="total_stock_count">মোট স্টকের সংখ্যা: %1$s</string>
+
 </resources>
