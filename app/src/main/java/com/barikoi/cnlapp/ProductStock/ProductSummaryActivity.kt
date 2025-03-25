@@ -26,6 +26,7 @@ import com.barikoi.cnlapp.utils.Api.TERRITORY_ID
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
@@ -332,7 +333,7 @@ class ProductSummaryActivity : BaseActivity() {
                         binding.tvTotalAmount.text =
                             getString(
                                 R.string.total_amount,
-                                "${it.data.products.sumOf { s -> s.deliveredAmount }}"
+                                "${it.data.products.sumOf { s -> s.deliveredAmount }}".format()
                             )
                     }
                 }
