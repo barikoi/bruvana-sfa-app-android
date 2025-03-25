@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.ui.text.intl.Locale
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
@@ -36,6 +37,12 @@ fun String?.totalAmountFormatted(): String {
         return "0.00"
     }
     return BigDecimal(this.toDouble()).setScale(2, RoundingMode.HALF_UP)
+        .toString()
+}
+
+fun String.format(): String {
+    return DecimalFormat("#.##")
+        .format(this.toDouble())
         .toString()
 }
 
