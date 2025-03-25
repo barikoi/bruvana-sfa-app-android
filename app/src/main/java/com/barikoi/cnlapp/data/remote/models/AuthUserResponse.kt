@@ -23,7 +23,7 @@ data class AuthUser(
     @SerializedName("db_house_id")
     val dbHouseId: Int,
     @SerializedName("db_house")
-    val dbHouse: String?,
+    val dbHouse: DBHouseAuth?,
     @SerializedName("designation")
     val designation: String?,
     @SerializedName("email")
@@ -60,6 +60,13 @@ data class AuthUser(
 
     @SerializedName("group_id")
     val groupId: String?
+)
+
+data class DBHouseAuth(
+    @SerializedName("id")
+    val id: Int,
+    @SerializedName("db_house_name")
+    val dbHouseName: String
 )
 
 

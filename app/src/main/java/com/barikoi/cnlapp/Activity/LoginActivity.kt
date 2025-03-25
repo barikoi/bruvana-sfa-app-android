@@ -147,7 +147,7 @@ class LoginActivity : BaseActivity() {
 
                             sharePrefUtils.saveString(
                                 Constants.DB_HOUSE,
-                                data.user.dbHouse ?: ""
+                                data.user.dbHouse?.dbHouseName ?: ""
                             )
 
                             sharePrefUtils.saveString(
