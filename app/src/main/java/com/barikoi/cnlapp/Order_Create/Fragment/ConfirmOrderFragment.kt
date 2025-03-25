@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -356,7 +357,12 @@ class ConfirmOrderFragment : Fragment(), OnEditOrderListener, OrderListSuccessLi
         badgeDrawable.setVisible(false)
         if (orderArray.length() > 0) {
             badgeDrawable.number = orderArray.length()
-            badgeDrawable.backgroundColor = mContext!!.resources.getColor(R.color.cnl_color_2)
+            if (mContext != null) {
+                badgeDrawable.backgroundColor = ContextCompat.getColor(
+                    mContext!!,
+                    R.color.cnl_color_2
+                )
+            }
             badgeDrawable.setVisible(true)
             badgeDrawable.maxCharacterCount = 3
             progressBar!!.visibility = View.GONE
