@@ -12,8 +12,8 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.Product
 import com.barikoi.cnlapp.databinding.ProductViewStockBinding
-import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
+import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.performTapHaptic
 import com.bumptech.glide.Glide
 
@@ -54,7 +54,7 @@ class ProductStockAdapter(
             holder.binding.tvPerUnitSold.visibility = View.VISIBLE
             holder.binding.tvPerUnitSold.text = mItem.deliveredQuantity.toString()
             holder.binding.tvPerUnit.text = mItem.unitName
-            holder.binding.tvAmount.text = mItem.deliveredAmount.toString()
+            holder.binding.tvAmount.text = mItem.deliveredAmount.toString().format()
 
             holder.binding.tvSoldQuantity.text =
                 "${holder.itemView.context.resources.getString(R.string.sold_in)} ${mItem.productiveRoutes} ${
@@ -70,7 +70,7 @@ class ProductStockAdapter(
             holder.binding.tvPerUnitSold.text = mItem.deliveredQuantity.toString()
 
             holder.binding.tvAmount.text =
-                (mItem.unitPrice.toDouble() * mItem.currentAvailableStock).toString()
+                (mItem.unitPrice.toDouble() * mItem.currentAvailableStock).toString().format()
 
             holder.binding.tvPerUnit.text = mItem.unitName
             holder.binding.tvSoldQuantity.text =
@@ -85,7 +85,7 @@ class ProductStockAdapter(
             holder.binding.tvPerUnit.text = mItem.unitName
 
             holder.binding.tvAmount.text =
-                (mItem.unitPrice.toDouble() * mItem.currentAvailableStock).toString()
+                (mItem.unitPrice.toDouble() * mItem.currentAvailableStock).toString().format()
 
             holder.binding.tvSoldQuantity.text =
                 "${mItem.productiveOutlets.toString().englishToBanglaNumber()} ${
