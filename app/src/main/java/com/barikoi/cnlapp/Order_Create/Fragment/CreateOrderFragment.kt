@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
@@ -114,6 +115,12 @@ class CreateOrderFragment : Fragment() {
                 //tab.icon = resources.getDrawable(R.drawable.ic_dot)
                 if (position == 1) {
                     tabBadge = tab
+
+                    tabBadge!!.orCreateBadge.setVisible(false)
+                    tabBadge!!.orCreateBadge.backgroundColor = ContextCompat.getColor(
+                        mContext!!,
+                        R.color.cnl_color_2
+                    )
                 }
             }).attach()
         viewPager!!.setCurrentItem(0)
