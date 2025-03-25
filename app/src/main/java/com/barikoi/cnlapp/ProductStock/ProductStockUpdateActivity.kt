@@ -32,6 +32,7 @@ import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
+import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.hideKeyboard
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
@@ -440,7 +441,7 @@ class ProductStockUpdateActivity : BaseActivity() {
                         binding.tvTotalCount.text =
                             getString(
                                 R.string.total_stock_count,
-                                "${it.data.products.sumOf { s -> s.currentAvailableStock }}"
+                                "${it.data.products.sumOf { s -> s.currentAvailableStock }}".format()
                             )
                     }
                 }
