@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.utils
 import com.barikoi.cnlapp.BuildConfig
 
 object Api {
-
     const val USER_ID = "user_id"
     const val USER_TYPE = "user_type"
     const val NAME = "name"
@@ -15,33 +14,34 @@ object Api {
     const val TOKEN = "token"
     const val USER_RANK = "user_rank"
 
-    val SELECTED_SHOP = "selected_shop"
-    val SELECTED_SHOP_ID = "selected_shop_id"
-    val SELECTED_ROUTE_ID = "selected_route_id"
-    val SELECTED_ROUTE_NAME = "selected_route_name"
-    val SELECTED_MARKET_ID = "selected_market_id"
-    val SELECTED_MARKET_NAME = "selected_market_name"
-    val SELECTED_ROUTE_ID_LIST = "selected_route_id_list"
-    val SELECTED_ROUTE_NAME_LIST = "selected_route_name_list"
-    val SELECTED_MARKET_ID_LIST = "selected_market_id_list"
-    val SELECTED_MARKET_NAME_LIST = "selected_market_name_list"
-    val ORDERED_ROUTE_ID = "ordered_route_id"
+    const val SELECTED_SHOP = "selected_shop"
+    const val SELECTED_SHOP_ID = "selected_shop_id"
+    const val SELECTED_ROUTE_ID = "selected_route_id"
+    const val SELECTED_ROUTE_NAME = "selected_route_name"
+    const val SELECTED_MARKET_ID = "selected_market_id"
+    const val SELECTED_MARKET_NAME = "selected_market_name"
+    const val SELECTED_ROUTE_ID_LIST = "selected_route_id_list"
+    const val SELECTED_ROUTE_NAME_LIST = "selected_route_name_list"
+    const val SELECTED_MARKET_ID_LIST = "selected_market_id_list"
+    const val SELECTED_MARKET_NAME_LIST = "selected_market_name_list"
+    const val ORDERED_ROUTE_ID = "ordered_route_id"
 
-    val ROUTE_PAGE_SELECTED = "route_page_selected"
+    const val ROUTE_PAGE_SELECTED = "route_page_selected"
 
-    val START_DATE_ATTENDANCE = "start_date_attendance"
-    val END_DATE_ATTENDANCE = "end_date_attendance"
-    val TOTAL_PRESENT = "total_present"
-    val TOTAL_ABSENT = "total_absent"
-    val TOTAL_LATE = "total_late"
+    const val START_DATE_ATTENDANCE = "start_date_attendance"
+    const val END_DATE_ATTENDANCE = "end_date_attendance"
+    const val TOTAL_PRESENT = "total_present"
+    const val TOTAL_ABSENT = "total_absent"
+    const val TOTAL_LATE = "total_late"
 
-    val START_DATE_ORDER = "start_date_order"
-    val END_DATE_ORDER = "end_date_order"
+    const val START_DATE_ORDER = "start_date_order"
+    const val END_DATE_ORDER = "end_date_order"
 
 
     const val TRACE_GROUP_NAME = "TRACE_GROUP_NAME"
     const val TRACE_GROUP_ID = "TRACE_GROUP_ID"
     const val TRACE_TOKEN = "TRACE_TOKEN"
+
 
     val loginurl = BuildConfig.url_base + "api/v1/login"
     val logouturl = BuildConfig.url_base + "api/v1/logout"
@@ -93,6 +93,7 @@ object Api {
 
     const val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
     const val distance = "https://barikoi.xyz/v1/api/distance/"
+
 
     const val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
     const val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"
