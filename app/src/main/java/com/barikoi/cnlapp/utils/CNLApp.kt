@@ -30,8 +30,7 @@ class CNLApp : Application() {
             options.isEnableAutoSessionTracking = true
         }
 
-        // TODO:: NEED TO CHANGE FOR OTHERS FLAVORS
-        BarikoiTrace.initialize(this, Api.APIKEY)
+        BarikoiTrace.initialize(this, BuildConfig.TRACE_API_KEY)
 
 
 //         OneSignal Initialization
