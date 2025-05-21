@@ -177,7 +177,6 @@ class TodaysCategoryFragment : Fragment() {
     }
 
     private fun createTable(data: ArrayList<Categories>) {
-        AppLogger.log("DATA:: ${data.get(0)}")
         binding.tabLayout.isStretchAllColumns = true
         binding.tabLayout.bringToFront()
         val colorsTxt: Array<String> = mContext!!.resources.getStringArray(R.array.colors)

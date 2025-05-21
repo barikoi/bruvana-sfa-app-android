@@ -12,7 +12,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -37,7 +40,6 @@ import com.barikoi.cnlapp.utils.extension.convertDate
 import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.getDifferenceInMinutes
 import com.barikoi.cnlapp.utils.extension.loadingDialog
-import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -49,6 +51,7 @@ import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.engine.LocationEngine
 import com.mapbox.mapboxsdk.location.engine.LocationEngineCallback
@@ -58,7 +61,10 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
 import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.maps.*
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.maps.UiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -110,7 +116,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         binding.mapView.getMapAsync(this)
 
         binding.isTrace.isVisible = sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
-        binding.isTrace.isVisible = sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")
 
         startRouteObserve()
         startOutletsObserve()
@@ -151,16 +156,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
             binding.spinnerLayoutTO.visibility = View.GONE
         }
 
-        binding.shopCount.setHapticClickListener {
-            val aa = SocketHandler.getSocket()
-            AppLogger.log("SocketHandler:: ${aa.id()}")
-            AppLogger.log("SocketHandler:: ${aa.connected()}")
-            AppLogger.log("SocketHandler:: ${aa.isActive}")
-            AppLogger.log("SocketHandler:: ${aa.isActive}")
-
-            SocketHandler.onConnectError()
-        }
-
         binding.spinnerTO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -169,7 +164,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 )
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                AppLogger.log(getString(R.string.nothing_selected))
+            }
         }
 
         binding.spinnerSO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -184,7 +181,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 }
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                AppLogger.log(getString(R.string.nothing_selected))
+            }
         }
 
         binding.spinnerRoutes.onItemSelectedListener = object :
@@ -212,7 +211,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 }
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                AppLogger.log(getString(R.string.nothing_selected))
+            }
         }
 
         categoryList = arrayListOf("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
@@ -252,7 +253,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 }
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                AppLogger.log(getString(R.string.nothing_selected))
+            }
         }
 
         binding.isTrace.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
@@ -286,8 +289,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 viewModel.getOutletList(routeID, "0", selectedCategory)
             }
         }
-
-
     }
 
     private fun startToObserve() {
@@ -321,7 +322,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         }
 
                         toList = it.data?.toList ?: emptyList()
-                        val toNameList = it.data?.toList?.map { to -> to.toName }!!.toMutableList()
+                        val toNameList = it.data!!.toList.map { to -> to.toName }.toMutableList()
 
                         val adapter = ArrayAdapter(
                             requireContext(),
@@ -472,9 +473,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         } else {
                             binding.shopCount.text =
                                 getString(R.string.outlet_s, it.data?.outlets!!.size)
+
                             it.data.outlets.forEach { outlet ->
                                 plotMarker(outlet, getMarkerIcon())
                             }
+
+                            animateCameraPosition(it.data.outlets)
                         }
 
                     }
@@ -483,34 +487,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-    private fun startSocketGroupsObserve() {
-        lifecycleScope.launch {
-            viewModel.socketGroupResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        binding.progressBar1.isVisible = false
-                        AppLogger.log("startSocketGroupsObserve::Empty")
-                    }
+    private fun animateCameraPosition(data: List<Outlet>) {
+        val boundsBuilder = LatLngBounds.Builder()
+        boundsBuilder.includes(data.map {
+            LatLng(
+                it.latitude.toDouble(),
+                it.longitude.toDouble()
+            )
+        })
+        val bounds = boundsBuilder.build()
 
-                    is ApiState.Error -> {
-                        binding.progressBar1.isVisible = false
-                        AppLogger.log("startSocketGroupsObserve::Error ${it.error}")
-                        toast(networkFailureMessage.handleFailure(it.error!!))
-                    }
-
-                    is ApiState.Loading -> {
-                        binding.progressBar1.isVisible = true
-                        AppLogger.log("startSocketGroupsObserve::Loading")
-                    }
-
-                    is ApiState.Success -> {
-                        binding.progressBar1.isVisible = false
-                        AppLogger.log("startSocketGroupsObserve:: Success ${it.data?.groups}")
-
-                    }
-                }
-            }
-        }
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngBounds(bounds, 100), // 100px padding
+            700, // duration in ms
+            null // optional callback
+        )
     }
 
     private fun startSocketGroupUsersObserve() {
@@ -645,26 +636,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                 .icon(icon)
                 .title(p.outletCategory + ", " + shopName)
         )
-
-        if (!binding.isTrace.isChecked)
-            mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        p.latitude.toDouble(),
-                        p.longitude.toDouble()
-                    ), 12.0
-                )
-            )
-    }
-
-    private fun enableLocation() {
-        if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
-            // Create an instance of LOST location engine
-            //initializeLocationEngine()
-        } else {
-            permissionsManager = PermissionsManager(this)
-            permissionsManager!!.requestLocationPermissions(Activity())
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -695,12 +666,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                     override fun onSuccess(result: LocationEngineResult?) {
                         val lastLocation: Location = result!!.lastLocation!!
-                        if (!lastLocation.equals("null")) {
-                            //setCameraPosition(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 17.0);
-                        } else {
-                            //locationEngine!!.requestLocationUpdates(locationEngineRequest!!, null)
-                            showEnableLocationSetting(requireActivity())
-                        }
+                        showEnableLocationSetting(requireActivity())
                     }
 
                     override fun onFailure(exception: java.lang.Exception) {
@@ -715,7 +681,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         } else {
             permissionsManager = PermissionsManager(this as PermissionsListener)
             permissionsManager!!.requestLocationPermissions(requireActivity())
-            //showEnableLocationSetting(this@CreateShopActivity)
         }
     }
 
@@ -744,19 +709,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-
-    private fun setCameraPosition(location: LatLng, zoom: Double?) {
-        mMap.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    location.latitude,
-                    location.longitude
-                ), zoom!!
-            )
-        )
+    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
+        AppLogger.log("onExplanationNeeded")
+        Toast.makeText(
+            requireContext(),
+            "Location permission is needed to show your location on the map",
+            Toast.LENGTH_LONG
+        ).show()
     }
-
-    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {}
 
     override fun onPermissionResult(granted: Boolean) {
         mMap.getStyle { style ->
@@ -828,27 +788,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         val uiSettings: UiSettings = mapboxMap.uiSettings
         uiSettings.isCompassEnabled = false
         mMap.setMaxZoomPreference(25.5)
+        mMap.setMinZoomPreference(5.0)
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
             AppLogger.log("MAP READY ROUTE CALL")
             sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
-
-        mapboxMap.setMinZoomPreference(12.0)
-
-        binding.fab.setOnClickListener {
-            /*if (locationEngine != null) {
-                val lastLocation = locationEngine!!.lastLocation
-                if (lastLocation != null) {
-                    setCameraPosition(LatLng(lastLocation.latitude, lastLocation.longitude), 15.0)
-                } else {
-                    locationEngine!!.requestLocationUpdates()
-                }
-            } else {
-                enableLocation()
-            }*/
-        }
-
-        //setupWebSocket()
     }
 }

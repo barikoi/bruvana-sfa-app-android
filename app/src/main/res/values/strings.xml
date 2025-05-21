@@ -345,5 +345,6 @@
     <string name="total_amount">Total Amount: %1$s</string>
     <string name="total_stock_value">Total Stock Value: %1$s</string>
     <string name="total_stock_count">Total Stock Count: %1$s</string>
+    <string name="nothing_selected">Nothing selected</string>
 
 </resources>

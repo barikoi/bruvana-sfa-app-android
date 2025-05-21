@@ -10,16 +10,15 @@
 
     <ImageView
         android:id="@+id/imLogo"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
         android:layout_height="200dp"
-        android:layout_gravity="center_horizontal"
         android:contentDescription="@string/logo"
         app:layout_constraintBottom_toTopOf="@+id/tvName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        app:srcCompat="@drawable/cnl_logo" />
+        app:srcCompat="@drawable/company_logo" />
 
     <TextView
         android:id="@+id/tvName"

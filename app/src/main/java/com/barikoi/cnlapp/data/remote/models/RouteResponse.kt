@@ -19,8 +19,6 @@ data class Route(
     val areaName: String,
     @SerializedName("id")
     val id: Int,
-    @SerializedName("is_active")
-    val isActive: Int,
     @SerializedName("route_code")
     val routeCode: String,
     @SerializedName("route_name")

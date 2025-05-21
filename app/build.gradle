@@ -70,6 +70,8 @@ android {
 
             buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
             buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
+            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
+
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
 
             buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
@@ -86,13 +88,37 @@ android {
             applicationId "com.barikoi.cnlappstaging"
             dimension "default"
             versionName "1.2.7.11_1"
-            resValue "string", "app_name", "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             resValue "string", "app_name", "CNL Staging SFA"
             resValue "string", "url_base", "https://cnl.barikoimaps.dev:7090/"
             buildConfigField "String", "url_base", '"https://cnl.barikoimaps.dev:7090/"'
 
             buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
             buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
+            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
+
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
+
+            buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
+            manifestPlaceholders = [
+                    appIcon  : "@mipmap/ic_launcher_2",
+                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
+//                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
+//                    onesignal_google_project_number: 'REMOTE'
+
+            ]
+        }
+
+        bruvanaStaging {
+            applicationId "com.barikoi.bruvanastaging"
+            dimension "default"
+            versionName "1.2.7.11_1"
+            resValue "string", "app_name", "Bruvana Staging SFA"
+            resValue "string", "url_base", "https://bruvana.barikoiretail.com/"
+            buildConfigField "String", "url_base", '"https://bruvana.barikoiretail.com/"'
+
+            buildConfigField "String", "TRACE_USER", project.properties["BRU_TRACE_USER"] as String
+            buildConfigField "String", "TRACE_PASS", project.properties["BRU_TRACE_PASS"] as String
+            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
 
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
             buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
@@ -104,6 +130,30 @@ android {
 
             ]
         }
+
+        bruvana {
+            applicationId "com.barikoi.bruvana"
+            dimension "default"
+            versionName "1.2.7.11_1"
+            resValue "string", "app_name", "Bruvana SFA Staging"
+            resValue "string", "url_base", "https://bruvana.barikoiretail.com/"
+            buildConfigField "String", "url_base", '"https://bruvana.barikoiretail.com/"'
+
+            buildConfigField "String", "TRACE_USER", project.properties["BRU_TRACE_USER"] as String
+            buildConfigField "String", "TRACE_PASS", project.properties["BRU_TRACE_PASS"] as String
+            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
+
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
+            buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
+            manifestPlaceholders = [
+                    appIcon  : "@mipmap/ic_launcher_2",
+                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
+//                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
+//                    onesignal_google_project_number: 'REMOTE'
+
+            ]
+        }
+
         retaildemo {
             applicationId "com.barikoi.retaildemo"
             dimension "default"
@@ -184,7 +234,6 @@ dependencies {
 
     /*map*/
     implementation 'org.maplibre.gl:android-sdk:10.2.0'
-    //implementation 'com.github.maplibre:maplibre-navigation-android:1.1.1'
 
     /*progressbar*/
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
@@ -202,12 +251,7 @@ dependencies {
     implementation 'com.google.android.play:app-update:2.1.0'
 
     /*barikoi trace-sdk*/
-//    implementation 'com.github.barikoi:Barikoitrace-android-sdk:dev-SNAPSHOT'
-//    implementation 'com.github.barikoi:Barikoitrace-android-sdk:39f69bcd69'
-    implementation 'com.github.barikoi:Barikoitrace-android-sdk:f6b8a7f1dd'
-
-//    debugImplementation 'com.balsikandar.android:crashreporter:1.1.0'
-
+    implementation 'com.github.barikoi:Barikoitrace-android-sdk:0.3.0'
 
     // HILT
     implementation "com.google.dagger:hilt-android:2.51.1"
@@ -230,5 +274,5 @@ dependencies {
     implementation("io.coil-kt.coil3:coil:3.0.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
 
-    implementation ("id.zelory:compressor:3.0.1")
+    implementation("id.zelory:compressor:3.0.1")
 }

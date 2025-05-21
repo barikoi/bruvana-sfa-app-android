@@ -187,7 +187,7 @@ object ApiServices {
             }
         }
         request.retryPolicy = DefaultRetryPolicy(
-            60 * 1000, 0,
+            60 * 1000, 60,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         queue.add(request)

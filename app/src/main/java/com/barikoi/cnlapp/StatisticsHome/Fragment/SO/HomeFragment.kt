@@ -214,9 +214,7 @@ class HomeFragment : Fragment() {
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayoutHome.setEnabled(
-                true
-            )
+            binding.dateRangeLayoutHome.isEnabled = true
         }
 
         getSummaryTargets(Api.get_summary + "?start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&user_id=" + userId/*+"&route_id="+routeId*/)

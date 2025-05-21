@@ -38,9 +38,10 @@ object Api {
     val START_DATE_ORDER = "start_date_order"
     val END_DATE_ORDER = "end_date_order"
 
-    const val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
-    const val distance = "https://barikoi.xyz/v1/api/distance/"
-    const val APIKEY = "NDI5MzpIQzBBRjZFQ1ZF"
+
+    const val TRACE_GROUP_NAME = "TRACE_GROUP_NAME"
+    const val TRACE_GROUP_ID = "TRACE_GROUP_ID"
+    const val TRACE_TOKEN = "TRACE_TOKEN"
 
     val loginurl = BuildConfig.url_base + "api/v1/login"
     val logouturl = BuildConfig.url_base + "api/v1/logout"
@@ -89,9 +90,9 @@ object Api {
     /*visit-report*/
     val get_visit_report = BuildConfig.url_base + "api/v1/visited-report"
 
-    const val TRACE_GROUP_NAME = "TRACE_GROUP_NAME"
-    const val TRACE_GROUP_ID = "TRACE_GROUP_ID"
-    const val TRACE_TOKEN = "TRACE_TOKEN"
+
+    const val reverseGeo = "https://barikoi.xyz/v2/api/search/reverse/geocode"
+    const val distance = "https://barikoi.xyz/v1/api/distance/"
 
     const val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
     const val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"

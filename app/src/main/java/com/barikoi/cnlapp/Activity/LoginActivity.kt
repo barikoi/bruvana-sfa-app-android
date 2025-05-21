@@ -78,6 +78,14 @@ class LoginActivity : BaseActivity() {
             viewModel.passwordStateFlow.value = text.toString()
         }
 
+        binding.etSRCode.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollView.post {
+                    binding.scrollView.smoothScrollTo(0, binding.btnLogin.bottom)
+                }
+            }
+        }
+
         lifecycleScope.launch {
             viewModel.isLoginInfoValid.collectLatest {
                 binding.btnLogin.isEnabled = it
