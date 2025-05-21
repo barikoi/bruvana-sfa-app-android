@@ -6,19 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlin.math.roundToInt
 
 class TargetAdapter(private val targets: List<TargetValue>, val from: String) :
     RecyclerView.Adapter<TargetAdapter.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v =
+        return ViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.single_summary_view, parent, false)
-        return ViewHolder(v)
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -28,9 +30,19 @@ class TargetAdapter(private val targets: List<TargetValue>, val from: String) :
         holder.completedAmount.text = targets[position].completed
 
         if (from.equals("TO", true)) {
-            holder.itemView.background.setTint(holder.itemView.resources.getColor(R.color.cnl_color_1))
+            holder.itemView.background.setTint(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.target_bg_color
+                )
+            )
         } else if (from.equals("SO", true)) {
-            holder.itemView.background.setTint(holder.itemView.resources.getColor(R.color.card_blue))
+            holder.itemView.background.setTint(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.card_blue
+                )
+            )
         }
 
         try {
@@ -41,9 +53,9 @@ class TargetAdapter(private val targets: List<TargetValue>, val from: String) :
                 if (targets[position].completed.equals("--:--")) {
                     targets[position].completed = "0"
                 }
-                holder.progressView.max = Math.round(targets[position].targetValue).toInt()
+                holder.progressView.max = targets[position].targetValue.roundToInt().toInt()
                 holder.progressView.setProgress(
-                    Math.round(targets[position].completedValue).toInt(), true
+                    targets[position].completedValue.roundToInt().toInt(), true
                 )
             }
 
