@@ -680,7 +680,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
                     is ApiState.Error -> {
                         AppLogger.log("startApprovalCountObserve::Error ${it.error}")
-                        toast(networkFailureMessage.handleFailure(it.error!!))
+//                        toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
