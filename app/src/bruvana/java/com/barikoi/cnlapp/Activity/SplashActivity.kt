@@ -15,6 +15,7 @@
 //import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
 //import com.barikoi.barikoitrace.models.BarikoiTraceError
 //import com.barikoi.barikoitrace.models.BarikoiTraceUser
+//import com.barikoi.cnlapp.BuildConfig
 //import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 //import com.barikoi.cnlapp.utils.Api
 //import com.barikoi.cnlapp.utils.AppLogger
@@ -45,11 +46,9 @@
 //
 //        binding = ActivitySplashBinding.inflate(layoutInflater)
 //        setContentView(binding.root)
-//
-////        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 //        mAppUpdateManager = AppUpdateManagerFactory.create(this)
 //
-//        BarikoiTrace.initialize(applicationContext, Api.APIKEY)
+//        BarikoiTrace.initialize(applicationContext, BuildConfig.TRACE_API_KEY)
 //
 //        token = sharePrefUtils.getString(Api.TOKEN)
 //
@@ -109,7 +108,6 @@
 //            )
 //            return false
 //        } else {
-////            traceInit()
 //            AppLogger.log("Splash:: request permission if list not empty")
 //            val handler = Handler(Looper.getMainLooper())
 //            handler.postDelayed({
@@ -119,26 +117,6 @@
 //
 //        }
 //        return true
-//    }
-//
-//    private fun traceInit() {
-//        if (token != null && token!!.isNotEmpty()) {
-//            BarikoiTrace.setOrCreateUser(
-//                sharePrefUtils.getString(Api.NAME),
-//                sharePrefUtils.getString(Api.EMAIL),
-//                sharePrefUtils.getString(Api.PHONE),
-//                object : BarikoiTraceUserCallback {
-//                    override fun onFailure(barikoiError: BarikoiTraceError) {
-//                        AppLogger.log(
-//                            "traceInit:: User created onFailure: ${barikoiError.message}"
-//                        )
-//                    }
-//
-//                    override fun onSuccess(traceUser: BarikoiTraceUser) {
-//                        AppLogger.log("traceInit:: User created: $traceUser")
-//                    }
-//                })
-//        }
 //    }
 //
 //    fun init() {
@@ -157,12 +135,6 @@
 //
 //    private fun routeToAppropriatePage(routeOpt: Int) {
 //        when (routeOpt) {
-//            0 -> {
-//                /*val i = Intent(this, SignUpActivity::class.java)
-//                startActivity(i)
-//                finish()*/
-//            }
-//
 //            1 -> {
 //                val i = Intent(this, LoginActivity::class.java)
 //                startActivity(i)
@@ -203,8 +175,6 @@
 //                            """.trimIndent()
 //                        }
 //                    }
-//                    // Show permissionsDenied
-//                    //sendLocation();
 //                    AppLogger.log("result: $requestCode")
 //                    init()
 //                }
