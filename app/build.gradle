@@ -94,7 +94,7 @@ android {
 
             buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
             buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
-            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
+            buildConfigField "String", "TRACE_API_KEY", project.properties["TRACE_API_KEY"] as String
 
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
 
