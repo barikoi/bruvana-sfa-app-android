@@ -14,7 +14,6 @@ import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
