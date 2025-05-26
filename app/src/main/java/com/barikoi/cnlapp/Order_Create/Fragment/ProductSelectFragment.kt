@@ -20,22 +20,39 @@ import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.PopupMenu
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.*
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.NetworkResponse
+import com.android.volley.NoConnectionError
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.TimeoutError
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
@@ -43,25 +60,32 @@ import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
 import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
 import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
+import com.barikoi.cnlapp.Order_Create.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.base.adapter.AdapterImagePickerView
-import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
-import com.barikoi.cnlapp.utils.ApiService.ApiServices
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
-import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentProductSelectBinding
 import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
+import com.barikoi.cnlapp.utils.Api
+import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
+import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
+import com.barikoi.cnlapp.utils.ImageUtils
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.VolleyMultipartRequest
+import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -70,13 +94,20 @@ import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class ProductSelectFragment : Fragment(), OnValueChangeListener {
     private lateinit var binding: FragmentProductSelectBinding
+
+    private val viewModel: ProductSelectViewModel by viewModels()
+
+    @Inject
+    lateinit var networkFailureMessage: NetworkFailureMessage
 
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
@@ -158,10 +189,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         binding.btnAddGift.setOnClickListener {
 
-            addGiftResultLauncher.launch(Intent(
-                requireActivity(),
-                AddGiftActivity::class.java
-            ).apply {
+            addGiftResultLauncher.launch(
+                Intent(
+                    requireActivity(),
+                    AddGiftActivity::class.java
+                ).apply {
                     putExtra("outlet_id", shopId)
                     putExtra("shop_name", shopName)
                     if (giftData.isNotEmpty()) {
@@ -310,7 +342,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                     return@setOnClickListener
 
-                    ViewUtils.viewDialog(mContext!!,
+                    ViewUtils.viewDialog(
+                        mContext!!,
                         "",/*"Are you sure want to save " + str1 + "'s order?"*/
                         builder,
                         object : DialogListener {
@@ -468,6 +501,67 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
     }
 
+    private fun startProductObserve() {
+        lifecycleScope.launch {
+            viewModel.productResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startProductObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startProductObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        binding.progressBar.isVisible = true
+                        AppLogger.log("startProductObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startProductObserve:: Success ${it.data}")
+
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startOrderObserve() {
+        lifecycleScope.launch {
+            viewModel.orderResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startOrderObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startOrderObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        binding.progressBar.isVisible = true
+                        AppLogger.log("startOrderObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startOrderObserve:: Success ${it.data}")
+
+                    }
+                }
+            }
+        }
+    }
+
     @SuppressLint("QueryPermissionsNeeded")
     private fun openCameraForApplicant() {
         val pictureIntent = Intent(
@@ -574,6 +668,11 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        startProductObserve()
+
+        viewModel.getProducts(sharePrefUtils.getString(Api.USER_ID)!!)
+
         val bundle = this.arguments
 
         if (bundle != null) {
@@ -632,7 +731,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }
 
         try {
-            ApiServices.apiGET(Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
+            ApiServices.apiGET(
+                Api.verified_shop_list + "?user_id=" + user_id + "&outlet_id=" + shopId + "&with_last_week_order=1",
                 queue!!,
                 token!!,
                 object : ApiServiceListener {
@@ -824,7 +924,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         return
 
 
-        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shopLongitude + "," + shopLatitude + "/" + currentLongitude + "," + currentLatitude + "?profile=" + profile,
+        ApiServices.apiGET(
+            Api.distance + BuildConfig.TRACE_API_KEY + "/" + shopLongitude + "," + shopLatitude + "/" + currentLongitude + "," + currentLatitude + "?profile=" + profile,
             queue!!,
             token!!,
             object : ApiServiceListener {
@@ -913,7 +1014,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
-        ApiServices.apiGET(Api.reverseGeo + "?key=" + Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+        ApiServices.apiGET(
+            Api.reverseGeo + "?key=" + BuildConfig.TRACE_API_KEY + "&latitude=" + lat + "&longitude=" + lng,
             queue!!,
             token!!,
             object : ApiServiceListener {
@@ -1012,9 +1114,9 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             obj1.put("orders", ordersArray)
 
             if (obj1.length() > 0) {
-                Log.d("ConfirmOrder", "response: " + obj1)
                 if (deliveredQuantity > 0) {
-                    ApiServices.apiJSONObjectPOST(Api.update_saved_order,
+                    ApiServices.apiJSONObjectPOST(
+                        Api.update_saved_order,
                         queue!!,
                         token!!,
                         obj1,
@@ -1028,7 +1130,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                                 val message = response.getString("message")
                                 //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
 
-                                ViewUtils.viewDialogResponse(mContext!!,
+                                ViewUtils.viewDialogResponse(
+                                    mContext!!,
                                     message,
                                     object : DialogListener {
                                         override fun onConfirmed() {
@@ -1059,7 +1162,8 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         })
                 } else {
-                    ViewUtils.viewDialogResponse(mContext!!,
+                    ViewUtils.viewDialogResponse(
+                        mContext!!,
                         "No products selected to order",
                         object : DialogListener {
                             override fun onConfirmed() {
@@ -1156,57 +1260,10 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             if (obj1.length() > 0) {
                 Log.d("ConfirmOrder", "response: $obj1")
                 if (orderedQuantity > 0) {
-                    ApiServices.apiJSONObjectPOST(Api.confirm_order,
-                        queue!!,
-                        token!!,
-                        obj1,
-                        object : ApiServiceListener {
-                            override fun onResponseSuccess(response: String) {}
-
-                            override fun onJSONResponseSuccess(response: JSONObject) {
-                                val message = response.getString("message")
-                                binding.progressBar.visibility = View.GONE
-                                //Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                                appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
-                                appDatabase!!.orderListDao().deleteByShop(shopId!!)
-
-                                ViewUtils.viewDialogResponse(mContext!!,
-                                    message,
-                                    object : DialogListener {
-                                        override fun onConfirmed() {
-                                            CreateOrderFragment.setCurrentFragment(
-                                                ShopSelectFragment(), ACTIVITY
-                                            )
-                                        }
-
-                                        override fun onCanceled() {}
-
-                                    })
-                            }
-
-                            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-
-                            }
-
-                            override fun onResponseFailure(error: VolleyError) {
-                                try {
-                                    ViewUtils.getErrorResponse(error, mContext!!)
-                                    binding.progressBar.visibility = View.GONE
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-
-                            override fun onException(e: Exception) {
-                                try {
-                                    binding.progressBar.visibility = View.GONE
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                        })
+                    saveOrderApiCall(Api.confirm_order, ordersArray)
                 } else {
-                    ViewUtils.viewDialogResponse(mContext!!,
+                    ViewUtils.viewDialogResponse(
+                        mContext!!,
                         getString(R.string.no_products_selected_to_order),
                         object : DialogListener {
                             override fun onConfirmed() {
@@ -1219,6 +1276,82 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
             }
         }
+    }
+
+    private fun saveOrderApiCall(url: String, orderJsonString: JSONArray) {
+        binding.progressBar.visibility = View.VISIBLE
+
+        val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
+
+        if (imageFiles.isNotEmpty()) {
+            for (i in 0 until imageFiles.size) {
+                val fileExist = File(imageFiles[i]).canRead()
+                if (fileExist) {
+                    val imagename = imageFiles[i].substring(
+                        imageFiles[i].lastIndexOf("/")
+                    )
+                    byteparams["image[$i]"] = VolleyMultipartRequest.DataPart(
+                        imagename, ImageUtils.decodeFile(imageFiles[i]), "image/jpeg"
+                    )
+                }
+            }
+        }
+
+
+        val params: MutableMap<String, String> = HashMap()
+        params["orders"] = orderJsonString.toString()
+
+        ApiServices.apiPOSTMultipart(
+            url,
+            queue!!,
+            token!!,
+            params,
+            byteparams,
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {}
+
+                override fun onJSONResponseSuccess(response: JSONObject) {}
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {
+                    val data = JSONObject(String(response.data))
+                    val message = data.getString("message")
+                    binding.progressBar.visibility = View.GONE
+                    appDatabase!!.saveOrderDao().deleteByShop(shopId!!)
+                    appDatabase!!.orderListDao().deleteByShop(shopId!!)
+
+                    ViewUtils.viewDialogResponse(
+                        mContext!!,
+                        message,
+                        object : DialogListener {
+                            override fun onConfirmed() {
+                                CreateOrderFragment.setCurrentFragment(
+                                    ShopSelectFragment(), ACTIVITY
+                                )
+                            }
+
+                            override fun onCanceled() {}
+
+                        })
+                }
+
+                override fun onResponseFailure(error: VolleyError) {
+                    try {
+                        ViewUtils.getErrorResponse(error, mContext!!)
+                        binding.progressBar.visibility = View.GONE
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onException(e: Exception) {
+                    try {
+                        binding.progressBar.visibility = View.GONE
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+            })
     }
 
     private fun submitNoOrder(location: Location) {
@@ -1249,49 +1382,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         if (obj1.length() > 0) {
             Log.d("ConfirmOrder", "response: $obj1")
-            ApiServices.apiJSONObjectPOST(Api.no_order,
-                queue!!,
-                token!!,
-                obj1,
-                object : ApiServiceListener {
-                    override fun onResponseSuccess(response: String) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                        val message = response.getString("message")
-                        binding.progressBar.visibility = View.GONE
-
-                        ViewUtils.viewDialogResponse(mContext!!, message, object : DialogListener {
-                            override fun onConfirmed() {
-                                editor!!.putString(Api.ORDERED_ROUTE_ID, selectedShop!!.route_code)
-                                editor!!.commit()
-                                CreateOrderFragment.setCurrentFragment(
-                                    ShopSelectFragment(), ACTIVITY
-                                )
-                            }
-
-                            override fun onCanceled() {
-                                TODO("Not yet implemented")
-                            }
-
-                        })
-                    }
-
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-
-                    }
-
-                    override fun onResponseFailure(error: VolleyError) {
-                        binding.progressBar.visibility = View.GONE
-                        ViewUtils.getErrorResponse(error, mContext!!)
-                    }
-
-                    override fun onException(e: Exception) {
-                        binding.progressBar.visibility = View.GONE
-                    }
-
-                })
+            saveOrderApiCall(Api.no_order, ordersArray)
         }
     }
 
@@ -1417,7 +1508,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         if (productsList!!.size > 0) {
                             productsList!!.sortByDescending { it.stock_available }
-                            binding.sortTitle.setText(resources.getString(R.string.high_stock))
+                            binding.sortTitle.text = resources.getString(R.string.high_stock)
                             adapter = ProductListAdapter(productsList!!, listener!!)
                             binding.productlist.adapter = adapter
                             adapter!!.notifyDataSetChanged()
@@ -1432,7 +1523,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         }, { error ->
             binding.progressBar.visibility = View.GONE
             if (error is TimeoutError) {
-                //mListerner.onFailure("Request timeout!! Check your internet connection or Contact Admin")
                 Toast.makeText(
                     mContext,
                     "Request timeout!! Check your internet connection or Contact Admin",
@@ -1440,7 +1530,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 ).show()
             }
             if (error is NoConnectionError) {
-                //mListerner.onFailure("Turn on your internet connection and Try again")
                 Toast.makeText(
                     mContext,
                     "Turn on your internet connection and Try again",
@@ -1452,8 +1541,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     val s = String(error.networkResponse.data)
                     Log.d("Routes", "message: $s")
                     val data = JSONObject(s)
-                    //Toast.makeText(mContext.getApplicationContext(), data.getString("message"), Toast.LENGTH_SHORT).show();
-                    //mListerner.onFailure(data.getString("message"))
                     Toast.makeText(mContext, data.getString("message"), Toast.LENGTH_LONG).show()
                 } catch (e: UnsupportedEncodingException) {
                     Sentry.captureException(e)
@@ -1483,8 +1570,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         minimum_order: String/*listItem: ArrayList<ProductStatistics>*/
     ) {
         val dialog = Dialog(mContext)
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
