@@ -27,7 +27,8 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 
 class LastWeekCategoryFragment : Fragment() {
