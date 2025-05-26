@@ -17,6 +17,7 @@ import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
+import com.barikoi.cnlapp.data.remote.models.product.ProductResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -158,4 +159,22 @@ interface ApiService {
     suspend fun getSOByTO(
         @Query("to_id") toId: String,
     ): Response<SoResponseX>
+
+
+    @POST("api/v1/create-order")
+    suspend fun saveOrder(
+        @Body body: RequestBody
+    ): Response<BaseResponse>
+
+    @POST("api/v1/no-orders")
+    suspend fun saveNoOrder(
+        @Body body: RequestBody
+    ): Response<BaseResponse>
+
+    @GET("api/v1/products")
+    suspend fun getAllProducts(
+        @Query("user_id") userId: String,
+        @Query("with_stock") withStock: String = "1",
+        @Query("is_active") withOrder: String = "1",
+    ): Response<ProductResponse>
 }
