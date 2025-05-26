@@ -10,6 +10,10 @@ import com.barikoi.cnlapp.data.remote.repository.AuthRepository
 import com.barikoi.cnlapp.data.remote.repository.AuthRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.OrderRepository
+import com.barikoi.cnlapp.data.remote.repository.OrderRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.ProductRepository
+import com.barikoi.cnlapp.data.remote.repository.ProductRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SoRepository
@@ -65,4 +69,13 @@ object ViewModelModule {
     @Provides
     fun providesSORepository(apiService: ApiService): SoRepository =
         SoRepositoryImpl(apiService)
+
+
+    @Provides
+    fun providesProductRepository(apiService: ApiService): ProductRepository =
+        ProductRepositoryImpl(apiService)
+
+    @Provides
+    fun providesOrderRepository(apiService: ApiService): OrderRepository =
+        OrderRepositoryImpl(apiService)
 }
