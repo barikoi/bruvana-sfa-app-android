@@ -3,7 +3,6 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TableRow
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
@@ -24,13 +22,13 @@ import com.barikoi.cnlapp.databinding.FragmentLastWeekCategoryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
-import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 
 class TodaysCategoryFragment : Fragment() {
