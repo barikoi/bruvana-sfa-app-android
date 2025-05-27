@@ -60,7 +60,11 @@ class AdapterGift(
             holder.binding.tvImageCount.isVisible = false
         } else {
             holder.binding.tvImageCount.isVisible = true
-            holder.binding.tvImageCount.text = "${giftList[position].images?.size} Images Added"
+            holder.binding.tvImageCount.text =
+                holder.binding.tvImageCount.context.getString(
+                    R.string.images_added,
+                    giftList[position].images?.size
+                )
         }
 
         holder.binding.ivGift.load(
