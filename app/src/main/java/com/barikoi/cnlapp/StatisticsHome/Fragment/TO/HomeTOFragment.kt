@@ -47,7 +47,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeTOFragment : Fragment() {
+class  HomeTOFragment : Fragment() {
     private lateinit var binding: FragmentHomeTOBinding
 
     @Inject
