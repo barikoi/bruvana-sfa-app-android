@@ -2,8 +2,6 @@ package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.Resources
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -110,7 +109,8 @@ class HomeFragment : Fragment() {
                                     ).commit()
                                 if (attendanceObj.getString("route_name").isNotEmpty()) {
                                     routeName_selected!!.visibility = View.VISIBLE
-                                    routeName_selected!!.setText(attendanceObj.getString("route_name"))
+                                    routeName_selected!!.text =
+                                        attendanceObj.getString("route_name")
                                 } else {
                                     routeName_selected!!.visibility = View.GONE
                                 }
@@ -173,7 +173,11 @@ class HomeFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("LLL dd", Locale.getDefault())
         binding.tvDateRange.text =
-            resources.getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
+            resources.getString(
+                R.string.date_range_,
+                simpleFormat.format(start),
+                simpleFormat.format(end)
+            )
         val StartDate = df.format(start)
         val EndDate = df.format(end)
 
@@ -198,9 +202,10 @@ class HomeFragment : Fragment() {
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.commit()
             } else {
-                binding.tvDateRange.text = simpleFormat.format(s_date) + " - " + simpleFormat.format(
-                    e_date
-                )
+                binding.tvDateRange.text =
+                    simpleFormat.format(s_date) + " - " + simpleFormat.format(
+                        e_date
+                    )
                 editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
                 editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
                 editor!!.commit()
@@ -597,7 +602,12 @@ class HomeFragment : Fragment() {
         dots.clear()
         for (i in 0 until dotCount) {
             val dot = ImageView(mContext)
-            dot.setImageDrawable(resources.getDrawable(R.drawable.ic_dot_unselected))
+            dot.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_dot_unselected
+                )
+            )
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -609,12 +619,11 @@ class HomeFragment : Fragment() {
     }
 
     fun selectDot(idx: Int, dotCount: Int) {
-        val res: Resources = resources
         for (i in 0 until dots.size) {
-            val drawableId: Int =
+            val drawableId =
                 if (i == idx) R.drawable.ic_dot_selected else R.drawable.ic_dot_unselected
-            val drawable: Drawable = res.getDrawable(drawableId)
-            dots.get(i).setImageDrawable(drawable)
+            val drawable = ContextCompat.getDrawable(requireContext(), drawableId)
+            dots[i].setImageDrawable(drawable)
         }
     }
 
