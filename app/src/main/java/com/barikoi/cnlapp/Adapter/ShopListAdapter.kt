@@ -50,10 +50,6 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         if (!shopList[position].shop_code.equals("null")) holder.shopCode.text =
             shopList[position].shop_code
 
-//        if (!shopList[position].category.equals("null")) holder.shopCategory.text =
-//            holder.itemView.context.getString(R.string.category_, shopList[position].category)
-//        else holder.shopCategory.text = holder.itemView.context.getString(R.string.category_, "")
-
         holder.shopType.text = shopList[position].shop_type
         holder.territoryName.text = shopList[position].territory_name
 
@@ -73,32 +69,17 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val shopName: TextView
-        internal val shopState: ImageView
-        internal val address: TextView
-        internal val shopCode: TextView
-        internal val distributorName: TextView
-        internal val shopType: TextView
-        internal val shopCategory: TextView
-        internal val territoryName: TextView
-        internal val imageShop: ImageView
-        internal val imageNewTag: ImageView
-        internal val btnEdit: ImageView
-
-        init {
-            shopName = itemView.findViewById(R.id.shop_name)
-            shopState = itemView.findViewById(R.id.shop_state)
-            territoryName = itemView.findViewById(R.id.territory_name)
-            address = itemView.findViewById(R.id.address)
-            shopCode = itemView.findViewById(R.id.shop_code)
-            shopType = itemView.findViewById(R.id.shop_type)
-            shopCategory = itemView.findViewById(R.id.shop_category)
-            distributorName = itemView.findViewById(R.id.distributor_name)
-            imageShop = itemView.findViewById(R.id.imageShop)
-            imageNewTag = itemView.findViewById(R.id.imgNewTag)
-            btnEdit = itemView.findViewById(R.id.btn_edit)
-
-        }
+        internal val shopName: TextView = itemView.findViewById(R.id.shop_name)
+        internal val shopState: ImageView = itemView.findViewById(R.id.shop_state)
+        internal val address: TextView = itemView.findViewById(R.id.address)
+        internal val shopCode: TextView = itemView.findViewById(R.id.shop_code)
+        internal val distributorName: TextView = itemView.findViewById(R.id.distributor_name)
+        internal val shopType: TextView = itemView.findViewById(R.id.shop_type)
+        internal val shopCategory: TextView = itemView.findViewById(R.id.shop_category)
+        internal val territoryName: TextView = itemView.findViewById(R.id.territory_name)
+        internal val imageShop: ImageView = itemView.findViewById(R.id.imageShop)
+        internal val imageNewTag: ImageView = itemView.findViewById(R.id.imgNewTag)
+        internal val btnEdit: ImageView = itemView.findViewById(R.id.btn_edit)
     }
 
     override fun getFilter(): Filter {
