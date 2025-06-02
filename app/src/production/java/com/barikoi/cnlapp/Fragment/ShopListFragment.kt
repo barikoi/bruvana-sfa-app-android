@@ -130,9 +130,9 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                 adapter.filter.filter(s)
                 if (s!!.isEmpty()) {
                     val shops: ArrayList<Shops> = ArrayList()
-                    if (shopList!!.size > 0) {
+                    if (shopList!!.isNotEmpty()) {
                         for (i in 0 until shopList!!.size) {
-                            if (routesList!!.size > 0) {
+                            if (routesList!!.isNotEmpty()) {
                                 if (shopList!![i].route_name == routesList!![binding.spinnerRoutes.selectedItemPosition]) {
                                     shops.add(shopList!![i])
                                 }
@@ -169,7 +169,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         binding.createShop.setBackgroundDrawable(gd)
 
         binding.createShop.setOnClickListener {
-            if (routesList!!.size > 0) {
+            if (routesList!!.isNotEmpty()) {
                 startActivityResult.launch(
                     Intent(
                         requireActivity(),
@@ -202,7 +202,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         queue = RequestQueueSingleton.getInstance(requireContext()).getRequestQueue()
         routesList!!.clear()
         val request = StringRequest(Request.Method.GET,
-            Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
+                Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
             { response ->
                 Log.d("RouteFrag", response)
                 try {
