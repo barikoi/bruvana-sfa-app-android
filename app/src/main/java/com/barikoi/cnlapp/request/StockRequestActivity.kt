@@ -23,12 +23,11 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 
 @AndroidEntryPoint
@@ -72,6 +71,10 @@ class StockRequestActivity : BaseActivity() {
 
         binding.rcvStockRequest.layoutManager = LinearLayoutManager(this)
         binding.rcvStockRequest.adapter = adapter
+
+        binding.btnRetry.setHapticClickListener {
+            viewModel.getStockRequests("STOCK", sharePrefUtils.getString(Api.USER_ID)!!)
+        }
 
 
     }
@@ -188,6 +191,8 @@ class StockRequestActivity : BaseActivity() {
 
                     is ApiState.Loading -> {
                         binding.progressBar.isVisible = true
+                        binding.llEmpty.isVisible = false
+
                         AppLogger.log("starStockRequestObserve::Loading")
                     }
 
@@ -195,6 +200,10 @@ class StockRequestActivity : BaseActivity() {
                         binding.refresh.isRefreshing = false
                         binding.progressBar.isVisible = false
                         AppLogger.log("starStockRequestObserve:: Success ${it.data}")
+                        if (it.data?.data != null && it.data.data.isEmpty()) {
+                            binding.llEmpty.isVisible = true
+                            return@observe
+                        }
                         adapter.updateStockRequests(it.data?.data!!)
                     }
                 }
