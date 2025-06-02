@@ -68,6 +68,7 @@ import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
 import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.maps.*
 import com.onesignal.common.AndroidSupportV4Compat.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
@@ -77,9 +78,15 @@ import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
     private lateinit var binding: ActivityCreateShopBinding
+
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
+
 
     private var mapView: MapView? = null
     private var mMap: MapboxMap? = null
@@ -1290,12 +1297,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-//        if (selectedCategory!!.isEmpty()) {
-//            inputOk = false
-//            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
-//                .show()
-//            hideProgress(binding.progressBarShop)
-//        }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
@@ -1472,12 +1473,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             Toast.makeText(applicationContext, "Need to select Shop Type", Toast.LENGTH_LONG).show()
             hideProgress(binding.progressBarShop)
         }
-//        if (selectedCategory!!.isEmpty()) {
-//            inputOk = false
-//            Toast.makeText(applicationContext, "Need to select category outlet", Toast.LENGTH_LONG)
-//                .show()
-//            hideProgress(binding.progressBarShop)
-//        }
         if (latitude == 0.0 || longitude == 0.0) {
             inputOk = false
             Toast.makeText(applicationContext, "Select Shop Location on Map", Toast.LENGTH_LONG)
