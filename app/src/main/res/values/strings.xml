@@ -347,5 +347,6 @@
     <string name="total_stock_count">Total Stock Count: %1$s</string>
     <string name="nothing_selected">Nothing selected</string>
     <string name="images_added">%1$d Images Added</string>
+    <string name="retry">Retry</string>
 
 </resources>

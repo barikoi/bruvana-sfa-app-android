@@ -353,5 +353,6 @@
     <string name="total_stock_count">মোট স্টকের সংখ্যা: %1$s</string>
     <string name="nothing_selected">কিছুই নির্বাচিত নয়</string>
     <string name="images_added">%1$dটি ছবি যোগ হয়েছে</string>
+    <string name="retry">পুনরায় চেষ্টা করুন</string>
 
 </resources>
