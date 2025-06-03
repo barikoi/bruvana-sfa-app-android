@@ -1506,7 +1506,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             }
                         }
 
-                        if (productsList!!.size > 0) {
+                        if (productsList!!.isNotEmpty()) {
                             productsList!!.sortByDescending { it.stock_available }
                             binding.sortTitle.text = resources.getString(R.string.high_stock)
                             adapter = ProductListAdapter(productsList!!, listener!!)
