@@ -204,7 +204,6 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         val request = StringRequest(Request.Method.GET,
                 Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
             { response ->
-                Log.d("RouteFrag", response)
                 try {
                     binding.progressBar2.isVisible = false
                     val data = JSONObject(response)
