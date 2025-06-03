@@ -89,8 +89,8 @@ android {
             dimension "default"
             versionName "1.2.7.11_1"
             resValue "string", "app_name", "CNL Staging SFA"
-            resValue "string", "url_base", "https://cnl.barikoimaps.dev:7090/"
-            buildConfigField "String", "url_base", '"https://cnl.barikoimaps.dev:7090/"'
+            resValue "string", "url_base", "https://cnl.barikoimaps.dev/"
+            buildConfigField "String", "url_base", '"https://cnl.barikoimaps.dev/"'
 
             buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
             buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
