@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Adapter
+package com.barikoi.cnlapp.order_create.Adapter
 
 import android.view.LayoutInflater
 import android.view.View

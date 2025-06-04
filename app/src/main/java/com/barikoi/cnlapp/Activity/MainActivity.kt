@@ -37,7 +37,7 @@ import com.barikoi.cnlapp.Fragment.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
-import com.barikoi.cnlapp.Order_Create.Fragment.CreateOrderFragment
+import com.barikoi.cnlapp.order_create.Fragment.CreateOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ProductStock.ProductSummaryActivity

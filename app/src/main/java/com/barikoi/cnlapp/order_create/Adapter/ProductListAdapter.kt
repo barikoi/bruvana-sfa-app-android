@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Adapter
+package com.barikoi.cnlapp.order_create.Adapter
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
@@ -17,8 +17,8 @@ import android.widget.Toast
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
-import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
+import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
+import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.utils.Api

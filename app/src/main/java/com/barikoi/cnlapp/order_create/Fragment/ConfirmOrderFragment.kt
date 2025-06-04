@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Fragment
+package com.barikoi.cnlapp.order_create.Fragment
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -21,11 +21,11 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderListAdapter
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
-import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
-import com.barikoi.cnlapp.Order_Create.Callback.OrderListSuccessListener
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
+import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderListAdapter
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.order_create.Callback.OrderListSuccessListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.databinding.FragmentConfirmOrderBinding

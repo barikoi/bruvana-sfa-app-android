@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Adapter
+package com.barikoi.cnlapp.order_create.Adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -8,8 +8,8 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
-import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.SingleOutletStatisticsBinding
 import com.barikoi.cnlapp.utils.ViewUtils

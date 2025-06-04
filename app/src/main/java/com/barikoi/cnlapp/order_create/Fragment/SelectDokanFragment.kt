@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Fragment
+package com.barikoi.cnlapp.order_create.Fragment
 
 import android.os.Bundle
 import android.util.Log

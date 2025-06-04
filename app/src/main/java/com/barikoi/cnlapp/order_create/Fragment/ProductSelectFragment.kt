@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Fragment
+package com.barikoi.cnlapp.order_create.Fragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -55,12 +55,12 @@ import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
-import com.barikoi.cnlapp.Order_Create.Callback.OnValueChangeListener
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
-import com.barikoi.cnlapp.Order_Create.RoomDB.SaveOrder
-import com.barikoi.cnlapp.Order_Create.vm.ProductSelectViewModel
+import com.barikoi.cnlapp.order_create.Adapter.ProductListAdapter
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
+import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder
+import com.barikoi.cnlapp.order_create.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter

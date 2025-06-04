@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.vm
+package com.barikoi.cnlapp.order_create.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

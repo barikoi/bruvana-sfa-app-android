@@ -31,7 +31,7 @@ import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.ActivityCreateShopBinding
 import com.barikoi.cnlapp.databinding.DialogConfirmBinding

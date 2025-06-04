@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.RoomDB
+package com.barikoi.cnlapp.order_create.RoomDB
 
 import androidx.room.Dao
 import androidx.room.Insert

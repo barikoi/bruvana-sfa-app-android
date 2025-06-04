@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Order_Create.Fragment
+package com.barikoi.cnlapp.order_create.Fragment
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -21,8 +21,8 @@ import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
-import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
+import com.barikoi.cnlapp.order_create.Adapter.ShopSelectAdapter
+import com.barikoi.cnlapp.order_create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.callback.LocationFetch
