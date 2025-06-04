@@ -23,15 +23,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.android.volley.AuthFailureError
 import com.android.volley.NetworkResponse
 import com.android.volley.NoConnectionError
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
-import com.android.volley.toolbox.StringRequest
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
