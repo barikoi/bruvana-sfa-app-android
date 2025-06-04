@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Order_Create.Fragment.CreateOrderFragment">
+    tools:context=".order_create.Fragment.CreateOrderFragment">
 
     <RelativeLayout
         android:id="@+id/bodyLayout"
