@@ -52,6 +52,7 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
 import com.barikoi.cnlapp.notification.NotificationActivity
+import com.barikoi.cnlapp.order_create.SelectShopFragment
 import com.barikoi.cnlapp.request.StockRequestActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
@@ -266,7 +267,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             binding.appContentMain.userLayout.visibility = View.GONE
             binding.appContentMain.tvTitle.text = resources.getString(R.string.order_collection)
             binding.appContentMain.tvTitle.visibility = View.VISIBLE
-            setCurrentFragment(CreateOrderFragment(), this@MainActivity)
+            setCurrentFragment(SelectShopFragment(), this@MainActivity)
         }
 
         tvApprovalCount =
