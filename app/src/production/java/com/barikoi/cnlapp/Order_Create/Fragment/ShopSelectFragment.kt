@@ -30,6 +30,7 @@ import com.barikoi.cnlapp.databinding.FragmentShopSelectBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.gms.location.*
 import io.sentry.Sentry
 import org.json.JSONException
@@ -380,7 +381,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     private fun getAllRoutes(url: String) {
         routeNameList!!.clear()
         routesList.clear()
-        val request = StringRequest(Request.Method.GET, url,
+        val request = StringRequest(
+            Request.Method.GET, url,
             { response ->
                 try {
                     val data = JSONObject(response)
@@ -454,7 +456,8 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
 
     private fun getShopListByRoute(url: String) {
         binding.progressBar.visibility = View.VISIBLE
-        val request = StringRequest(Request.Method.GET, url,
+        val request = StringRequest(
+            Request.Method.GET, url,
             { response ->
                 try {
                     binding.progressBar.visibility = View.GONE
@@ -535,6 +538,12 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
                                 )
                                 binding.spinnerRoutes.adapter = adapter
                             }
+                        } else {
+                            toast("No shops found in this route")
+
+                            adapter = ShopSelectAdapter(emptyList(), listener!!)
+                            binding.shoplist.adapter = adapter
+                            adapter!!.notifyDataSetChanged()
                         }
 
                     }
