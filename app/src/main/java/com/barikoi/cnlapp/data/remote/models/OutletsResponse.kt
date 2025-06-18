@@ -88,6 +88,10 @@ data class Outlet(
     val ownerName: String,
     @SerializedName("phone")
     val phone: String,
+    @SerializedName("ordered_today")
+    val orderedToday: Int,
+    @SerializedName("is_no_order")
+    val isNoOrder: Int,
     @SerializedName("phone_number")
     val phoneNumber: String,
     @SerializedName("region_code")
