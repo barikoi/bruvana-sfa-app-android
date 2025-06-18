@@ -54,7 +54,7 @@
 
 
     <TextView
-        android:id="@+id/shopName"
+        android:id="@+id/tvShopName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
@@ -68,7 +68,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/ownerName"
+        android:id="@+id/tvOwnerName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
@@ -78,7 +78,7 @@
         android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/isOrderView"
         app:layout_constraintStart_toEndOf="@+id/llShopImage"
-        app:layout_constraintTop_toBottomOf="@+id/shopName"
+        app:layout_constraintTop_toBottomOf="@+id/tvShopName"
         tools:ignore="SmallSp" />
 
     <TextView
@@ -90,7 +90,7 @@
         android:textColor="@color/text_title_2"
         android:textSize="9sp"
         app:layout_constraintStart_toEndOf="@+id/llShopImage"
-        app:layout_constraintTop_toBottomOf="@+id/ownerName"
+        app:layout_constraintTop_toBottomOf="@+id/tvOwnerName"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SmallSp" />
 
