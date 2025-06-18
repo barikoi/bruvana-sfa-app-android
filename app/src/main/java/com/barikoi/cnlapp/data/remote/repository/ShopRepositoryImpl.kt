@@ -15,8 +15,7 @@ import javax.inject.Inject
 interface ShopRepository {
     fun getShopList(
         userId: String,
-        routeId: String,
-        filterWithOutlet: String
+        routeId: String
     ): Flow<ApiState<OutletsResponse>>
 }
 
@@ -26,14 +25,12 @@ class ShopRepositoryImpl @Inject constructor(
     override fun getShopList(
         userId: String,
         routeId: String,
-        filterWithOutlet: String
     ): Flow<ApiState<OutletsResponse>> {
         return flow {
             try {
                 val response = apiService.getOutlets(
                     userId,
-                    routeId,
-                    filterWithOutlet
+                    routeId
                 )
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
