@@ -77,6 +77,12 @@ interface ApiService {
         @Query("outlet_category") outletCategory: String
     ): Response<OutletsResponse>
 
+    @GET("api/v1/outlets")
+    suspend fun getOutlets(
+        @Query("user_id") userId: String,
+        @Query("route_id") routeId: String,
+    ): Response<OutletsResponse>
+
     @POST("api/v1/user-request")
     suspend fun sendStockRequest(@Body body: StockRequestModel): Response<BaseResponse>
 
