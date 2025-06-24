@@ -10,16 +10,24 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.LocationManager
+import android.os.Environment
 import android.provider.Settings
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.View
 import android.view.Window
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.android.volley.NoConnectionError
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
@@ -37,7 +45,12 @@ import com.google.android.gms.tasks.OnTokenCanceledListener
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 import java.io.UnsupportedEncodingException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object ViewUtils {
 
@@ -128,6 +141,17 @@ object ViewUtils {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
+    }
+
+    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
+        // Create an animation instance
+        val an: Animation = RotateAnimation(
+            fromDegrees, toDegrees, (v.width / 2).toFloat(), (v.height / 2).toFloat()
+        )
+        an.duration = 500
+        an.fillAfter = true
+        an.repeatMode = Animation.RESTART
+        v.startAnimation(an)
     }
 
     fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener) {
@@ -270,6 +294,33 @@ object ViewUtils {
                 Toast.makeText(mContext, "Service started!!", Toast.LENGTH_SHORT).show()
                 AppLogger.log("BarikoiTrace" + "is tracking")
             }
+        }
+    }
+
+    @Throws(IOException::class)
+    fun createImageFile(): File {
+        val timeStamp = SimpleDateFormat(
+            "yyyyMMdd_HHmmss", Locale.getDefault()
+        ).format(Date())
+        val imageFileName = "IMG_" + timeStamp + "_"
+        val storageDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+            imageFileName,  /* prefix */
+            ".jpg",  /* suffix */
+            storageDir /* directory */
+        )
+        return image
+    }
+
+    fun createColoredSpan(text: String, colorRes: Int, context: Context): SpannableString {
+        return SpannableString(text).apply {
+            setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, colorRes)),
+                0,
+                length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
     }
 }
