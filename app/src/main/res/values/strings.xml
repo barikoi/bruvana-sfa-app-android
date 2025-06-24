@@ -348,5 +348,11 @@
     <string name="nothing_selected">Nothing selected</string>
     <string name="images_added">%1$d Images Added</string>
     <string name="retry">Retry</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="total_0_0">Total 0.0</string>
+    <string name="product_selecttion">Product Selection</string>
+    <string name="offer">Offer</string>
+    <string name="combo_offer">Combo Offer</string>
 
 </resources>
