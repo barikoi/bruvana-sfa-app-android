@@ -10,12 +10,16 @@ import com.barikoi.cnlapp.data.remote.repository.AuthRepository
 import com.barikoi.cnlapp.data.remote.repository.AuthRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.OfferRepository
+import com.barikoi.cnlapp.data.remote.repository.OfferRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.OrderRepository
 import com.barikoi.cnlapp.data.remote.repository.OrderRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ProductRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.ReverseGeoRepository
+import com.barikoi.cnlapp.data.remote.repository.ReverseGeoRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ShopRepository
 import com.barikoi.cnlapp.data.remote.repository.ShopRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SoRepository
@@ -84,4 +88,12 @@ object ViewModelModule {
     @Provides
     fun providesShopRepository(apiService: ApiService): ShopRepository =
         ShopRepositoryImpl(apiService)
+
+    @Provides
+    fun providesOfferRepository(apiService: ApiService): OfferRepository =
+        OfferRepositoryImpl(apiService)
+
+    @Provides
+    fun providesReverseGeoRepository(apiService: ApiService): ReverseGeoRepository =
+        ReverseGeoRepositoryImpl(apiService)
 }
