@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.barikoi.cnlapp.base.adapter.AdapterImagePickerView
 import com.barikoi.cnlapp.data.remote.models.Gift
-import com.barikoi.cnlapp.databinding.ItemGiftMainBinding
 import com.barikoi.cnlapp.data.remote.models.GiftModel
+import com.barikoi.cnlapp.databinding.ItemGiftMainBinding
 
 class AdapterMainGift(
     private val addClickListener: (Int, Int) -> Unit,

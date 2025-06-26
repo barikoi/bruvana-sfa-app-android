@@ -35,7 +35,6 @@ class AddGiftViewModel @Inject constructor(
 
             }
         }
-
     }
 
     fun saveGift(body: RequestBody) {

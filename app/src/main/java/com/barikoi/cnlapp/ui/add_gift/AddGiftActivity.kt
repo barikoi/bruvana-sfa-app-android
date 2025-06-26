@@ -69,11 +69,9 @@ class AddGiftActivity : BaseActivity() {
 
     private lateinit var adapterImage: AdapterImagePickerView
 
-
     private lateinit var adapterGift: AdapterMainGift
 
     var outletId: String? = null
-
 
     private var imageFilePath: File? = null
 
@@ -82,9 +80,7 @@ class AddGiftActivity : BaseActivity() {
 
     private var giftData: MutableList<GiftModel> = mutableListOf()
 
-
     private var imageFiles: MutableList<String> = mutableListOf()
-
 
     var count = 1
 
@@ -377,7 +373,6 @@ class AddGiftActivity : BaseActivity() {
         }
 
         dialogBinding.btnMinus.setHapticClickListener {
-
             if (count > 1) {
                 count--
             }
@@ -400,19 +395,16 @@ class AddGiftActivity : BaseActivity() {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("outlet_id", outletId!!)
                 .addFormDataPart("for_update", "1")
-
                 .apply {
                     data.forEachIndexed { i, gift ->
                         addFormDataPart("gift_details[$i][type_id]", gift.id.toString())
                     }
                 }
-
                 .apply {
                     data.forEachIndexed { i, gift ->
                         addFormDataPart("gift_details[$i][qty]", gift.qty.toString())
                     }
                 }
-
                 .apply {
                     data.forEachIndexed { mainPos, gift ->
                         gift.images!!.forEachIndexed { childPos, image ->
