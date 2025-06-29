@@ -13,6 +13,11 @@ object Constants {
     const val STOCK = "STOCK"
     const val OUTLET = "OUTLET"
 
+    // Orders
+    const val SHOP_NAME = "SHOP_NAME"
+    const val SHOP_ID = "SHOP_ID"
+    const val SHOP = "SHOP"
+
     const val POST_OFFICE_DATA = "postOfficeData"
     const val PREF_NAME = "BPOCapturePref"
     const val API_ERROR_MESSAGE = "Something went wrong. Please try again..."
@@ -47,7 +52,7 @@ object Constants {
     //    const val MOBILE_REGEX = "^(?:(?:\\+|00)88|01)?\\d{11}\$"
     const val MOBILE_REGEX = "^(?:\\+?88|0088)?01[15-9]\\d{8}\$"
 
-    val  shopType = listOf(
+    val shopType = listOf(
         "General Large Store (A)",
         "General Small Store (B)",
         "Mudi Large Outlet (Grocery Store) (A)",
