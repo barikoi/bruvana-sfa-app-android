@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Location
 import android.location.LocationManager
 import android.os.Environment
 import android.provider.Settings
@@ -322,5 +323,17 @@ object ViewUtils {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
+    }
+
+    fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startPoint = Location("locationA")
+        startPoint.latitude = lat1
+        startPoint.longitude = lon1
+
+        val endPoint = Location("locationB")
+        endPoint.latitude = lat2
+        endPoint.longitude = lon2
+
+        return startPoint.distanceTo(endPoint)
     }
 }
