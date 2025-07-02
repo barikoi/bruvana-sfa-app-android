@@ -257,6 +257,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             val latitude = outlet.getDouble("latitude")
                             val longitude = outlet.getDouble("longitude")
                             val isVerified = outlet.getInt("is_verified")
+                            val kitkatQS = outlet.getString("kitkat_qs")
                             val competitive: List<String>? = Gson().fromJson(
                                 outlet.getString("competitive_products"),
                                 object : TypeToken<List<String>>() {}.type
@@ -288,7 +289,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                     0,
                                     0,
                                     0.0f,
-                                    competitive
+                                    competitive,
+                                    kitkatQS
                                 )
                             )
                         }
