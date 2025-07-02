@@ -53,7 +53,7 @@ class ShopSelectAdapter(val mValues: List<Shops>, val mListener: OnSelectListene
                 true
             )
         ) {
-            holder.binding.tvcategory.text =
+            holder.binding.tvCategory.text =
                 shopList[position].category.get(0).toString().uppercase(Locale.getDefault())
         }
 
