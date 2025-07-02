@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
@@ -51,20 +52,27 @@ class ComboOfferFragment(
         adapterOffer = AdapterOffer(
             onPlusClick = { offer, position ->
                 offer.quantity += 1
-                adapterOffer.updateData(offers)
+                adapterOffer.updateQuantity(offer, position)
                 viewModel.setOffers(offers)
 
             },
             onMinusClick = { offer, position ->
                 if (offer.quantity > 0) {
                     offer.quantity -= 1
-                    adapterOffer.updateData(offers)
+                    adapterOffer.updateQuantity(offer, position)
                     viewModel.setOffers(offers)
                 }
             }
         )
-        binding.rcvOffer.layoutManager = LinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(context)
+        binding.rcvOffer.layoutManager = layoutManager
         binding.rcvOffer.adapter = adapterOffer
+        binding.rcvOffer.itemAnimator = null
+
+//        val itemAnimator =  binding.rcvOffer.itemAnimator
+//        if (itemAnimator is SimpleItemAnimator) {
+//            itemAnimator.supportsChangeAnimations = false
+//        }
     }
 
     private fun startOfferObserve() {
