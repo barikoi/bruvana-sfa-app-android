@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.Order_Create.Adapter.ProductListAdapter
@@ -824,7 +825,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         return
 
 
-        ApiServices.apiGET(Api.distance + Api.APIKEY + "/" + shopLongitude + "," + shopLatitude + "/" + currentLongitude + "," + currentLatitude + "?profile=" + profile,
+        ApiServices.apiGET(Api.distance + BuildConfig.TRACE_API_KEY + "/" + shopLongitude + "," + shopLatitude + "/" + currentLongitude + "," + currentLatitude + "?profile=" + profile,
             queue!!,
             token!!,
             object : ApiServiceListener {
@@ -913,7 +914,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
     }
 
     fun reverseGeoAddress(context: Context, lat: Double, lng: Double) {
-        ApiServices.apiGET(Api.reverseGeo + "?key=" + Api.APIKEY + "&latitude=" + lat + "&longitude=" + lng,
+        ApiServices.apiGET(Api.reverseGeo + "?key=" + BuildConfig.TRACE_API_KEY + "&latitude=" + lat + "&longitude=" + lng,
             queue!!,
             token!!,
             object : ApiServiceListener {
