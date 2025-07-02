@@ -31,14 +31,6 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setIsRecyclable(false)
-        if (!Constants.shopType.contains(shopList[position].shop_type)) {
-            holder.itemView.backgroundTintList =
-                ContextCompat.getColorStateList(holder.itemView.context, R.color.required_field)
-
-        } else {
-            holder.itemView.backgroundTintList =
-                ContextCompat.getColorStateList(holder.itemView.context, R.color.white)
-        }
 
         holder.shopName.text = shopList[position].shop_name
         holder.address.text = shopList[position].address
@@ -47,8 +39,8 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
         } else {
             holder.shopState.visibility = View.GONE
         }
-        if (!shopList[position].shop_code.equals("null")) holder.shopCode.text =
-            shopList[position].shop_code
+        if (!shopList[position].shop_id.equals("null")) holder.shopCode.text =
+            shopList[position].shop_id
 
         holder.shopType.text = shopList[position].shop_type
         holder.territoryName.text = shopList[position].territory_name
