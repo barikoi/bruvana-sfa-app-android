@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
@@ -154,6 +155,11 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
             requireContext()
         )
         binding.rcvProducts.adapter = adapterProductSelection
+
+        val itemAnimator =  binding.rcvProducts.itemAnimator
+        if (itemAnimator is SimpleItemAnimator) {
+            itemAnimator.supportsChangeAnimations = false
+        }
 
         binding.btnAddGift.setOnClickListener {
             addGiftResultLauncher.launch(
