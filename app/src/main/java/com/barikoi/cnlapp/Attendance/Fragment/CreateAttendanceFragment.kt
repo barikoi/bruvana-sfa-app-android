@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.Attendance.Fragment
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.location.Location
 import android.os.Bundle
@@ -32,6 +33,7 @@ import com.barikoi.cnlapp.utils.*
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.extension.formatDateToFullName
+import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.rotateViewAnimation
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -60,6 +62,7 @@ class CreateAttendanceFragment : Fragment() {
     var selectedRoute: String = ""
     var routeId: Int? = null
 
+    private lateinit var checkAttendanceDialog: Dialog
     var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +73,9 @@ class CreateAttendanceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().loadingDialog {
+            checkAttendanceDialog = it
+        }
         init()
     }
 
@@ -221,10 +227,12 @@ class CreateAttendanceFragment : Fragment() {
     }
 
     private fun checkAttendance() {
+        checkAttendanceDialog.show()
         ApiServices.apiGET(
             Api.check_today_attendance,
             mQueue, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
+                    checkAttendanceDialog.dismiss()
                     try {
                         val data = JSONObject(response)
                         AppLogger.log("ATTENDANCE CHECK $data")
@@ -280,10 +288,12 @@ class CreateAttendanceFragment : Fragment() {
                 override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                 override fun onResponseFailure(error: VolleyError) {
+                    checkAttendanceDialog.dismiss()
                     ViewUtils.getErrorResponse(error, requireContext())
                 }
 
                 override fun onException(e: Exception) {
+                    checkAttendanceDialog.dismiss()
                     Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
                 }
             })
