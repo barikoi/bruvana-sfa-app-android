@@ -6,6 +6,8 @@ import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
 import com.barikoi.cnlapp.data.remote.api.TraceApiService
 import com.barikoi.cnlapp.data.remote.repository.AddGiftRepository
 import com.barikoi.cnlapp.data.remote.repository.AddGiftRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.AttendanceRepository
+import com.barikoi.cnlapp.data.remote.repository.AttendanceRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.AuthRepository
 import com.barikoi.cnlapp.data.remote.repository.AuthRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
@@ -96,4 +98,8 @@ object ViewModelModule {
     @Provides
     fun providesReverseGeoRepository(apiService: ApiService): ReverseGeoRepository =
         ReverseGeoRepositoryImpl(apiService)
+
+    @Provides
+    fun providesAttendanceRepository(apiService: ApiService): AttendanceRepository =
+        AttendanceRepositoryImpl(apiService)
 }
