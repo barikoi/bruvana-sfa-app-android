@@ -129,21 +129,12 @@ class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice: String)
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val tvCategory: TextView
-        internal val shopName: TextView
-        internal val lastOrderDate: TextView
-        internal val imageShop: ImageView
-        internal val divider: View
-        internal val btnDetails: AppCompatButton
-
-        init {
-            tvCategory = itemView.findViewById(R.id.tvcategory)
-            shopName = itemView.findViewById(R.id.shopName)
-            imageShop = itemView.findViewById(R.id.imageShop)
-            lastOrderDate = itemView.findViewById(R.id.orderDate)
-            btnDetails = itemView.findViewById(R.id.btnDetails)
-            divider = itemView.findViewById(R.id.divider)
-        }
+        internal val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
+        internal val shopName: TextView = itemView.findViewById(R.id.shopName)
+        internal val lastOrderDate: TextView = itemView.findViewById(R.id.orderDate)
+        internal val imageShop: ImageView = itemView.findViewById(R.id.imageShop)
+        internal val divider: View = itemView.findViewById(R.id.divider)
+        internal val btnDetails: AppCompatButton = itemView.findViewById(R.id.btnDetails)
     }
 
 }
