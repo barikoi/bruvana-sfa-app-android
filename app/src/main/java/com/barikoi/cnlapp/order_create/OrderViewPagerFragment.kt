@@ -621,6 +621,11 @@ class OrderViewPagerFragment : Fragment() {
                         binding.progressBar.isVisible = false
                         AppLogger.log("startOrderObserve:: Success ${it.data}")
 
+                        if (it.data?.message == "stock out") {
+                            toast("Stock out for some products")
+                            return@observe
+                        }
+
                         ViewUtils.viewDialogResponse(
                             requireContext(),
                             it.data?.message ?: "Order saved successfully",
