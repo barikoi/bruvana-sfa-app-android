@@ -17,6 +17,10 @@ class AdapterProductSelection(
     private val decrementListener: (Product, Int) -> Unit
 ) : RecyclerView.Adapter<AdapterProductSelection.ProductViewHolder>(), Filterable {
 
+    init {
+        setHasStableIds(true)
+    }
+
     var productList: List<Product> = emptyList()
     var filterProductList: List<Product> = emptyList()
 
@@ -70,7 +74,11 @@ class AdapterProductSelection(
         val updatedList = filterProductList.toMutableList()
         updatedList[position] = product
         filterProductList = updatedList
-        notifyItemChanged(position)
+        notifyItemChanged(position, product)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return filterProductList[position].id.toLong() // Or any unique long value per item
     }
 
     inner class ProductViewHolder(val binding: ItemProductViewBinding) :
