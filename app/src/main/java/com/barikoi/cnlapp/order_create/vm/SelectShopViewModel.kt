@@ -5,8 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.data.remote.models.BaseResponse
+import com.barikoi.cnlapp.data.remote.models.CheckAttendanceResponse
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
+import com.barikoi.cnlapp.data.remote.repository.AttendanceRepository
 import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.repository.ShopRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SelectShopViewModel @Inject constructor(
     private val routeRepository: RouteRepository,
-    private val shopRepository: ShopRepository
+    private val shopRepository: ShopRepository,
+    private val attendanceRepository: AttendanceRepository
 ) : ViewModel() {
 
     private val _routeResponse = MutableLiveData<ApiState<RouteResponse>>()
@@ -25,6 +29,27 @@ class SelectShopViewModel @Inject constructor(
 
     private val _shopsResponse = MutableLiveData<ApiState<OutletsResponse>>()
     val shopsResponse: LiveData<ApiState<OutletsResponse>> = _shopsResponse
+
+    private val _attendanceResponse = MutableLiveData<ApiState<CheckAttendanceResponse>>()
+    val attendanceResponse: LiveData<ApiState<CheckAttendanceResponse>> = _attendanceResponse
+
+    fun checkAttendance(
+        startDate: String,
+        endDate: String
+    ) {
+        viewModelScope.launch {
+            attendanceRepository.checkAttendance(startDate, endDate)
+                .onStart {
+                    _attendanceResponse.value = ApiState.Loading()
+                }
+                .collect { state ->
+                    _attendanceResponse.value = state
+                }
+        }
+    }
+
+
+
 
     fun getRoutes(userId: String) {
         viewModelScope.launch {
