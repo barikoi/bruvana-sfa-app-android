@@ -20,12 +20,10 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
@@ -280,13 +278,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             confirmDialog(true)
         }
 
-        binding.ivCompetitorSelection.setHapticClickListener {
-            showAlertDialog()
-        }
-
-        binding.etCompetitor.doOnTextChanged { text, start, before, count ->
-
-        }
     }
 
     private fun getShopDetails(shops: Shops) {
@@ -294,7 +285,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         binding.etAddress.setText(shops.address)
         binding.etOwnerName.setText(shops.shop_owner)
         binding.etContactNumber.setText(shops.contact_number)
-        binding.etCompetitor.setText(shops.competitive?.joinToString(", "))
 
         if (!shops.competitive.isNullOrEmpty()) {
             competitiveList = shops.competitive.toMutableList()
@@ -836,61 +826,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         })
     }
 
-    private fun showAlertDialog() {
-        val builder = AlertDialog.Builder(this@CreateShopActivity)
-        builder.setTitle("Select Competitor")
-        builder.setCancelable(false)
-
-        builder.setMultiChoiceItems(
-            competitiveArray,
-            selectedCompetitive
-        ) { _, i, isChecked ->
-            if (isChecked) {
-                competitiveList.add(competitiveArray[i])
-                selectedCompetitive[i] = true
-            } else {
-                competitiveList.remove(competitiveArray[i])
-                selectedCompetitive[i] = false
-            }
-        }
-
-        builder.setPositiveButton(
-            "OK"
-        ) { _, _ ->
-            val stringBuilder = StringBuilder()
-            val etDataList =
-                binding.etCompetitor.text.toString().split(Regex(",\\s*")).toMutableList()
-            val rowData: MutableList<String> = mutableListOf()
-            etDataList.map { et ->
-                if (!competitiveArray.contains(et)) {
-                    rowData.add(et)
-                }
-            }
-            if (rowData.isNotEmpty()) {
-                stringBuilder.append(rowData.joinToString(", "))
-                if (rowData[0].isNotEmpty())
-                    stringBuilder.append(", ")
-            }
-
-            if (binding.etCompetitor.text.isEmpty() || binding.etCompetitor.text.endsWith(",")) {
-                stringBuilder.append(competitiveList.joinToString(", "))
-            } else {
-                stringBuilder.append(competitiveList.joinToString(", "))
-            }
-
-            val uniqueList = stringBuilder.split(Regex(",\\s*")).distinct()
-
-            AppLogger.log("Unique List: $uniqueList")
-
-            binding.etCompetitor.setText(uniqueList.joinToString(", "))
-        }
-
-        builder.setNegativeButton(
-            "Cancel"
-        ) { dialogInterface, _ -> dialogInterface.dismiss() }
-        builder.show()
-    }
-
     private fun getShopCategory() {
         return
         ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
@@ -1275,11 +1210,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etCompetitor.text.trim().isEmpty()) {
-            inputOk = false
-            binding.etOwnerName.error = getString(R.string.this_field_is_required)
-            hideProgress(binding.progressBarShop)
-        }
         if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
@@ -1336,8 +1266,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
-            params["competitive_products"] =
-                Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
             if (isImageAdded) {
                 ApiServices.apiPOSTMultipart(
@@ -1457,11 +1385,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etCompetitor.text.trim().isEmpty()) {
-            inputOk = false
-            binding.etCompetitor.error = getString(R.string.this_field_is_required)
-            hideProgress(binding.progressBarShop)
-        }
         if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
@@ -1526,8 +1449,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
             params["is_closed"] = if (isClosedShop) "1" else "0"
-            params["competitive_products"] =
-                Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
             ApiServices.apiPOSTMultipart(
                 Api.update_shop,

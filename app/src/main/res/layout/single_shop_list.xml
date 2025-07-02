@@ -140,8 +140,8 @@
                 android:layout_margin="4dp"
                 android:drawablePadding="8dp"
                 android:text=""
-                android:textColor="@color/text_title_2"
-                android:textSize="10sp"
+                android:textColor="@color/black"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 app:drawableLeftCompat="@drawable/ic_shop_small" />
 
