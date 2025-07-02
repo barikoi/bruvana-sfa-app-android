@@ -28,5 +28,6 @@ class Shops(
     val isNoOrdered: Int,
     val distance: Float,
     val competitive: List<String>?,
+    val kitkat_qs: String?,
     var needEdit: Boolean = false
 ) : Serializable
