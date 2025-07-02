@@ -1,7 +1,9 @@
 package com.barikoi.cnlapp.data.remote.models
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 data class OutletsResponse(
     @SerializedName("outlets")
@@ -15,6 +17,7 @@ data class OutletsResponse(
 )
 
 
+@Parcelize
 data class Outlet(
     @SerializedName("address")
     val address: String,
@@ -51,7 +54,7 @@ data class Outlet(
     @SerializedName("id")
     val id: Int,
     @SerializedName("images")
-    val images: List<Image>,
+    val images: List<Image>? = emptyList(),
     @SerializedName("is_buyer")
     val isBuyer: Int,
     @SerializedName("is_edited")
@@ -83,7 +86,7 @@ data class Outlet(
     @SerializedName("outlet_updated_at")
     val outletUpdatedAt: String,
     @SerializedName("outlet_verified_at")
-    val outletVerifiedAt: Any,
+    val outletVerifiedAt: String,
     @SerializedName("owner_name")
     val ownerName: String,
     @SerializedName("phone")
@@ -125,13 +128,13 @@ data class Outlet(
     @SerializedName("user_name")
     val userName: String,
     @SerializedName("verified_by_employee_id")
-    val verifiedByEmployeeId: Any,
+    val verifiedByEmployeeId: String,
     @SerializedName("verified_by_user_id")
-    val verifiedByUserId: Any
-)
+    val verifiedByUserId: String
+): Parcelable
 
-
+@Parcelize
 data class Image(
     @SerializedName("image_url")
     val imageUrl: String
-)
+): Parcelable
