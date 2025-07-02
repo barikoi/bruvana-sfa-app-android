@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.Activity
 import DefaultLocaleHelper
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -52,6 +53,7 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
 import com.barikoi.cnlapp.notification.NotificationActivity
+import com.barikoi.cnlapp.order_create.Fragment.SelectDokanFragment
 import com.barikoi.cnlapp.order_create.SelectShopFragment
 import com.barikoi.cnlapp.request.StockRequestActivity
 import com.barikoi.cnlapp.utils.Api
@@ -62,6 +64,7 @@ import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.SwitchMultiButton
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -105,6 +108,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private lateinit var navView: BottomNavigationView
     var queue: RequestQueue? = null
 
+    private lateinit var logoutDialog: Dialog
+
 
     private lateinit var tvApprovalCount: TextView
 
@@ -118,6 +123,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        loadingDialog {
+            logoutDialog = it
+        }
 
         startTraceLoginObserve()
         startTraceAuthUserObserve()
@@ -237,6 +246,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         btnLogout.setOnClickListener {
+            drawer.closeDrawer(GravityCompat.START)
             AlertDialog.Builder(this@MainActivity, R.style.AlertDialog)
                 .setTitle(R.string.logout)
                 .setMessage(R.string.sure_log_out)
@@ -642,19 +652,26 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 when (it) {
                     is ApiState.Empty -> {
                         AppLogger.log("startLogoutObserve::Empty")
+
+                        logoutDialog.show()
                     }
 
                     is ApiState.Error -> {
                         AppLogger.log("startLogoutObserve::Error ${it.error}")
+                        logoutDialog.dismiss()
                         toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startLogoutObserve::Loading")
+                        if (!logoutDialog.isShowing) {
+                            logoutDialog.show()
+                        }
                     }
 
                     is ApiState.Success -> {
                         AppLogger.log("startLogoutObserve:: Success ${it.data}")
+                        logoutDialog.dismiss()
 
                         toast(it.data?.message ?: "")
 
