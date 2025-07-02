@@ -12,9 +12,9 @@
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/_5dp"
         android:text="@string/select_dokan"
         android:textStyle="bold"
-        android:paddingVertical="@dimen/_5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -51,10 +51,10 @@
         android:drawableEnd="@drawable/ic_search"
         android:drawablePadding="8dp"
         android:ems="10"
-        android:padding="10dp"
         android:hint="@string/search_shop"
         android:imeOptions="actionNext"
         android:inputType="textCapWords"
+        android:padding="10dp"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,16 +110,69 @@
         app:layout_constraintTop_toBottomOf="@+id/tvSortTitle"
         tools:listitem="@layout/item_select_shop" />
 
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupAllLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="rcvShopList, tvSortTitle, tvTitle, spinnerLayoutRoute, editTextSearchShop, tvFilter" />
+
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/progressBar"
         style="@style/SpinKitView.Large.ThreeBounce"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:SpinKit_Color="@color/cnl_color_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitleNoRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/no_route_selected_today"
+        android:textColor="@color/text_title"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@+id/btnTryAgain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnTryAgain"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="4dp"
+        android:layout_marginTop="@dimen/_15dp"
+        android:background="@drawable/cardview_bg"
+        android:backgroundTint="@color/color_gray"
+        android:padding="2dp"
+        android:text="@string/refresh"
+        android:textAllCaps="false"
+        android:textColor="@color/text_title"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleNoRoute" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupNoRoute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="btnTryAgain, tvTitleNoRoute" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
