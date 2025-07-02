@@ -25,25 +25,27 @@ data class Product(
     @SerializedName("dp_price")
     val dpPrice: String,
     @SerializedName("dp_price_cartoon")
-    val dpPriceCartoon: String,
+    val dpPriceCartoon: String?,
     @SerializedName("etp_price_cartoon")
-    val etpPriceCartoon: String,
+    val etpPriceCartoon: String?,
     @SerializedName("etp_price_pack_jar")
-    val etpPricePackJar: String,
+    val etpPricePackJar: String?,
     @SerializedName("etp_price_unit")
-    val etpPriceUnit: String,
+    val etpPriceUnit: String?,
     @SerializedName("id")
     val id: Int,
     @SerializedName("images")
     val images: List<Image>,
     @SerializedName("initial_available_stock")
     val initialAvailableStock: Int,
+    @SerializedName("quantity_last_month")
+    val quantityLastMonth: Int,
     @SerializedName("initial_stock")
     val initialStock: Int,
     @SerializedName("is_active")
     val isActive: Int,
     @SerializedName("model_no")
-    val modelNo: Any,
+    val modelNo: String?,
     @SerializedName("pro_code")
     val proCode: String,
     @SerializedName("product_code")
