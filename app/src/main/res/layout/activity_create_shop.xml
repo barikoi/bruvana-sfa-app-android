@@ -356,9 +356,9 @@
                     android:hint="@string/address"
                     android:inputType="textMultiLine"
                     android:maxLines="4"
+                    android:minLines="2"
                     android:paddingStart="16dp"
                     android:paddingTop="16dp"
-                    android:minLines="2"
                     android:paddingEnd="8dp"
                     android:paddingBottom="16dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -416,6 +416,43 @@
                     android:textColor="@color/text_title"
                     android:textColorHint="@color/text_title_2"
                     android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tvFridgeAvailability"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="start"
+                    android:paddingHorizontal="@dimen/_15dp"
+                    android:text="@string/is_there_a_cadbury_or_kitkat_company_fridge_in_the_outlet"
+                    android:textAllCaps="false"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroupFridge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radioYes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/yes" />
+
+                    <RadioButton
+                        android:id="@+id/radioNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/no" />
+                </RadioGroup>
 
             </LinearLayout>
         </ScrollView>
