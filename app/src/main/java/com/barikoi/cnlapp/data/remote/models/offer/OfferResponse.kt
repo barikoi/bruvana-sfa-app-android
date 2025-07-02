@@ -13,15 +13,15 @@ data class Offer(
     @SerializedName("combo_price")
     val comboPrice: String,
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String?,
     @SerializedName("description")
-    val description: String,
+    val description: String?,
     @SerializedName("end_date")
     val endDate: String,
     @SerializedName("id")
     val id: Int,
     @SerializedName("is_active")
-    val isActive: Boolean,
+    val isActive: Boolean?,
     @SerializedName("name")
     val name: String,
     @SerializedName("original_price")
@@ -29,9 +29,9 @@ data class Offer(
     @SerializedName("product_combinations")
     val productCombinations: List<ProductCombination>,
     @SerializedName("start_date")
-    val startDate: String,
+    val startDate: String?,
     @SerializedName("updated_at")
-    val updatedAt: String,
+    val updatedAt: String?,
     var quantity: Int = 0
 )
 
