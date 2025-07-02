@@ -40,7 +40,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.ActivityCreateShopBinding
 import com.barikoi.cnlapp.databinding.DialogConfirmBinding
@@ -134,6 +134,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
     private var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
+
+    private var fridgeAvailability = "no"
 
     private val competitiveArray: Array<String> = arrayOf(
         "Nutella",
@@ -288,6 +290,18 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             updateShop()
         }
 
+        binding.radioGroupFridge.setOnCheckedChangeListener { group, checkedId ->
+            when (checkedId) {
+                R.id.radioYes -> {
+                    fridgeAvailability = "yes"
+                }
+
+                R.id.radioNo -> {
+                    fridgeAvailability = "no"
+                }
+            }
+        }
+
         binding.btnCloseShop.setHapticClickListener {
             if (!isImageAdded) {
                 toast("Please add image for close the shop")
@@ -311,6 +325,20 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         binding.etOwnerName.setText(shops.shop_owner)
         binding.etContactNumber.setText(shops.contact_number)
         binding.etCompetitor.setText(shops.competitive?.joinToString(", "))
+
+        if (shops.kitkat_qs.isNullOrEmpty()) {
+            binding.radioGroupFridge.clearCheck()
+            fridgeAvailability = "no"
+        } else if (shops.kitkat_qs.equals("yes", true)) {
+            binding.radioGroupFridge.check(R.id.radioYes)
+            fridgeAvailability = "yes"
+        } else if (shops.kitkat_qs.equals("no", true)) {
+            binding.radioGroupFridge.check(R.id.radioNo)
+            fridgeAvailability = "no"
+        } else {
+            binding.radioGroupFridge.clearCheck() // if input doesn't match
+            fridgeAvailability = "no"
+        }
 
         if (!shops.competitive.isNullOrEmpty()) {
             competitiveList = shops.competitive.toMutableList()
@@ -1344,6 +1372,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
+            params["kitkat_qs"] = fridgeAvailability
             params["competitive_products"] =
                 Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
@@ -1528,6 +1557,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
             params["is_closed"] = if (isClosedShop) "1" else "0"
+            params["kitkat_qs"] = fridgeAvailability
             params["competitive_products"] =
                 Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
