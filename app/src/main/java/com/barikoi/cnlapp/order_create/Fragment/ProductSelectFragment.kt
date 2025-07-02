@@ -60,7 +60,7 @@ import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
 import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder
-import com.barikoi.cnlapp.order_create.vm.ProductSelectViewModel
+import com.barikoi.cnlapp.order_create.product_selection.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
@@ -737,6 +737,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                 token!!,
                 object : ApiServiceListener {
                     override fun onResponseSuccess(response: String) {
+
                         getPreviousOrders(response)
                     }
 
@@ -848,8 +849,6 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             lastOrderDate,
             minimum_order
         )
-
-
     }
 
     fun getLocation(choice: String) {
@@ -1382,6 +1381,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
         if (obj1.length() > 0) {
             Log.d("ConfirmOrder", "response: $obj1")
+            Log.d("ConfirmOrder", "response: $ordersArray")
             saveOrderApiCall(Api.no_order, ordersArray)
         }
     }
@@ -1576,7 +1576,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
         dialog.setContentView(R.layout.popup_previous_order_list)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
-        val tvoutletCategory = dialog.findViewById<TextView>(R.id.tvcategory)
+        val tvoutletCategory = dialog.findViewById<TextView>(R.id.tvCategory)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
         val tvLastDeliveryDate = dialog.findViewById<TextView>(R.id.lastDeliveryDate)
