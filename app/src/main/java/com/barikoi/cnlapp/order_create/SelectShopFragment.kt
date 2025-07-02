@@ -1,6 +1,8 @@
 package com.barikoi.cnlapp.order_create
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,12 +15,15 @@ import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.databinding.FragmentSelectShopBinding
@@ -26,10 +31,16 @@ import com.barikoi.cnlapp.order_create.Adapter.AdapterSelectShop
 import com.barikoi.cnlapp.order_create.vm.SelectShopViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.ViewUtils.getDistance
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,6 +61,8 @@ class SelectShopFragment : Fragment() {
     private var shopList: List<Outlet> = emptyList()
     private var filterShopList: MutableList<Outlet> = mutableListOf()
 
+    private var loc: Location? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,21 +72,68 @@ class SelectShopFragment : Fragment() {
         return binding.root
     }
 
+    private fun setCurrentFragment(fragment: Fragment, activity: Activity, data: Bundle? = null) {
+        if (data != null) {
+            fragment.arguments = data
+        }
+
+        val fragmentManager = (activity as FragmentActivity).supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.fragmentLayout, fragment)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ViewUtils.getLocation(requireContext(), requireActivity(), object : LocationFetch {
+            override fun onFetchSuccess(location: Location) {
+                loc = location
+            }
+
+            override fun onFailure() {
+                loc = null
+            }
+        })
+
+        startCheckAttendanceObserve()
         startRouteObserve()
         startShopObserve()
-        viewModel.getRoutes(
-            sharePrefUtils.getString(Api.USER_ID)!!
+
+
+        viewModel.checkAttendance(
+            Calendar.getInstance().time.formatDateWithLocale(),
+            Calendar.getInstance().time.formatDateWithLocale()
         )
+
+        binding.btnTryAgain.setHapticClickListener {
+            viewModel.checkAttendance(
+                Calendar.getInstance().time.formatDateWithLocale(),
+                Calendar.getInstance().time.formatDateWithLocale()
+            )
+        }
 
         adapter = AdapterSelectShop { outlet ->
             if (outlet.orderedToday == 1) {
                 toast("You have already ordered from this shop today.")
             } else {
-                toast("Selected shop: ${outlet.outletName}")
+                val dataBundle = Bundle().apply {
+                    putString(Constants.SHOP_NAME, outlet.outletName)
+                    putInt(Constants.SHOP_ID, outlet.id)
+                    putParcelable(Constants.SHOP, outlet)
+                }
+
+                setCurrentFragment(
+                    OrderViewPagerFragment(),
+                    requireActivity(),
+                    dataBundle
+                )
             }
+        }
+
+        binding.editTextSearchShop.doOnTextChanged { text, _, _, _ ->
+            adapter.filter.filter(text)
         }
 
         binding.rcvShopList.layoutManager = LinearLayoutManager(requireContext())
@@ -283,6 +343,62 @@ class SelectShopFragment : Fragment() {
         }
     }
 
+
+    private fun startCheckAttendanceObserve() {
+        lifecycleScope.launch {
+            viewModel.attendanceResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startCheckAttendanceObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startCheckAttendanceObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        binding.progressBar.isVisible = true
+                        AppLogger.log("startCheckAttendanceObserve::Loading")
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar.isVisible = false
+                        AppLogger.log("startCheckAttendanceObserve:: Success ${it.data}")
+
+                        if (it.data!!.attendances.isNotEmpty()) {
+                            if (it.data.attendances.first().checkinTime.isNullOrEmpty()) {
+                                binding.groupNoRoute.isVisible = true
+                                binding.groupAllLayout.isVisible = false
+                            } else {
+                                binding.groupNoRoute.isVisible = false
+                                binding.groupAllLayout.isVisible = true
+
+                                sharePrefUtils.saveString(
+                                    Api.SELECTED_ROUTE_ID,
+                                    it.data.attendances.first().routeId.toString()
+                                )
+                                sharePrefUtils.saveString(
+                                    Api.SELECTED_ROUTE_NAME,
+                                    it.data.attendances.first().routeName!!
+                                )
+
+                                viewModel.getRoutes(
+                                    sharePrefUtils.getString(Api.USER_ID)!!
+                                )
+                            }
+                        } else {
+                            binding.groupNoRoute.isVisible = true
+                            binding.groupAllLayout.isVisible = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun startRouteObserve() {
         lifecycleScope.launch {
             viewModel.routeResponse.observe(viewLifecycleOwner) {
@@ -321,6 +437,12 @@ class SelectShopFragment : Fragment() {
                                 toNameList.toMutableList()
                             )
                             binding.spinnerRoutes.adapter = adapter
+                            binding.spinnerRoutes.setSelection(
+                                toNameList.indexOf(
+                                    sharePrefUtils.getString(Api.SELECTED_ROUTE_NAME)
+                                        ?: toNameList.firstOrNull()
+                                )
+                            )
                         }
                     }
                 }
@@ -359,9 +481,24 @@ class SelectShopFragment : Fragment() {
                             shopList = it.data.outlets
 
                             val distanceSorted = it.data.outlets
-                                .sortedBy { it.orderedToday }
-                                .sortedBy { it.orderedToday }
-                                .sortedBy { it.isNoOrder }
+                                .apply {
+                                    if (loc != null) {
+                                        sortedBy { outlet ->
+                                            getDistance(
+                                                loc!!.latitude,
+                                                loc!!.longitude,
+                                                outlet.latitude.toDouble(),
+                                                outlet.longitude.toDouble()
+                                            )
+                                        }
+                                    }
+                                }
+                                .sortedWith(
+                                    compareBy(
+                                        { it.isNoOrder },      // 1st priority
+                                        { it.orderedToday }    // 2nd priority
+                                    )
+                                )
 
                             adapter.updateData(distanceSorted)
                         }
@@ -370,5 +507,4 @@ class SelectShopFragment : Fragment() {
             }
         }
     }
-
 }
