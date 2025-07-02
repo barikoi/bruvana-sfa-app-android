@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.SystemClock
 import android.view.HapticFeedbackConstants
@@ -17,6 +16,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.barikoi.cnlapp.databinding.DialogLoadingBinding
 import java.util.Locale
+import androidx.core.graphics.drawable.toDrawable
 
 
 fun View.rotateViewAnimation(fromDegrees: Float, toDegrees: Float) {
@@ -81,7 +81,7 @@ fun Context.hideKeyboard(view: View) {
 fun Context.loadingDialog(onShow: (dialog: Dialog) -> Unit) {
     val bindingView = DialogLoadingBinding.inflate(LayoutInflater.from(this))
     val dialog = Dialog(this)
-    dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    dialog.window!!.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
     dialog.setCancelable(true)
     dialog.setContentView(bindingView.root)
     onShow(dialog)
