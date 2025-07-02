@@ -3,17 +3,24 @@ package com.barikoi.cnlapp.order_create.combo
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.barikoi.cnlapp.data.remote.models.offer.Offer
 import com.barikoi.cnlapp.databinding.ItemOfferViewBinding
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 
 class AdapterOffer(
     private val onPlusClick: (Offer, Int) -> Unit,
     private val onMinusClick: (Offer, Int) -> Unit
-) : RecyclerView.Adapter<AdapterOffer.OfferViewHolder>() {
-    private var offers: List<Offer> = emptyList()
+) : ListAdapter<Offer, AdapterOffer.OfferViewHolder>(OfferDiffCallback()) {
+
+    init {
+        setHasStableIds(true)
+    }
+
+    private var offers: MutableList<Offer> = mutableListOf()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -27,6 +34,16 @@ class AdapterOffer(
             )
         )
 
+    }
+
+    override fun onBindViewHolder(holder: OfferViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isNotEmpty()) {
+            holder.binding.tvCount.setText(
+                offers[position].quantity.toString()
+            )
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(
@@ -57,15 +74,20 @@ class AdapterOffer(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateData(newOffers: List<Offer>) {
-        offers = newOffers
+        AppLogger.log("AdapterOffer::updateData newOffers: $newOffers")
+        offers = newOffers.toMutableList()
         notifyDataSetChanged()
     }
 
     fun updateQuantity(offer: Offer, position: Int) {
-        val updated = offers.toMutableList()
-        updated[position] = offer
-        offers = updated
-        notifyItemChanged(position)
+        AppLogger.log("AdapterOffer::updateQuantity position: $position, offer: $offer")
+        offers[position] = offer
+        notifyItemChanged(position, "quantity_updated")
+    }
+
+
+    override fun getItemId(position: Int): Long {
+        return offers[position].id.toLong()
     }
 
     inner class OfferViewHolder(val binding: ItemOfferViewBinding) : ViewHolder(binding.root)
