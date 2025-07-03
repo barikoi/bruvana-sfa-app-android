@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.order_create
+package com.barikoi.cnlapp.ui.create_order.order
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -44,20 +44,14 @@ import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentOrderViewPagerBinding
 import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.order_create.combo.ComboOfferFragment
-import com.barikoi.cnlapp.order_create.product_selection.ProductSelectionFragment
-import com.barikoi.cnlapp.order_create.product_selection.vm.ProductSelectViewModel
-import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity.Companion.IMAGE_QUALITY
-import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity.Companion.MAX_FILE_SIZE
-import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity.Companion.RESOLUTION_HEIGHT
-import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity.Companion.RESOLUTION_WIDTH
+import com.barikoi.cnlapp.ui.create_order.order.product_selection.ProductSelectionFragment
+import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
+import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
-import com.barikoi.cnlapp.utils.ViewUtils.createColoredSpan
-import com.barikoi.cnlapp.utils.ViewUtils.createImageFile
-import com.barikoi.cnlapp.utils.ViewUtils.rotateAnimation
 import com.barikoi.cnlapp.utils.extension.formattedDateTime
 import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
@@ -66,7 +60,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import id.zelory.compressor.Compressor
+import id.zelory.compressor.Compressor.compress
 import id.zelory.compressor.constraint.format
 import id.zelory.compressor.constraint.quality
 import id.zelory.compressor.constraint.resolution
@@ -178,7 +172,7 @@ class OrderViewPagerFragment : Fragment() {
         binding.tvShopName.text = arguments?.getString(Constants.SHOP_NAME)
 
         binding.imgRefresh.setHapticClickListener {
-            rotateAnimation(binding.imgRefresh, 0f, 380f)
+            ViewUtils.rotateAnimation(binding.imgRefresh, 0f, 380f)
 
             ViewUtils.getLocation(requireContext(), requireActivity(), object : LocationFetch {
                 override fun onFetchSuccess(location: Location) {
@@ -245,7 +239,7 @@ class OrderViewPagerFragment : Fragment() {
             distanceValue.let {
                 val colorRes = if (it > 100.0) R.color.status_bounced else R.color.cnl_color_2
                 builder.append(
-                    createColoredSpan(
+                    ViewUtils.createColoredSpan(
                         binding.tvDistance.text.toString(), colorRes, requireContext()
                     )
                 )
@@ -253,7 +247,7 @@ class OrderViewPagerFragment : Fragment() {
 
             builder.append(getString(R.string.away_from))
             builder.append(
-                createColoredSpan(
+                ViewUtils.createColoredSpan(
                     outlet!!.outletName, R.color.cnl_color_1, requireContext()
                 )
             )
@@ -269,7 +263,7 @@ class OrderViewPagerFragment : Fragment() {
             distanceValue.let {
                 val colorRes = if (it > 100.0) R.color.status_bounced else R.color.cnl_color_2
                 builder.append(
-                    createColoredSpan(
+                    ViewUtils.createColoredSpan(
                         binding.tvDistance.text.toString(), colorRes, requireContext()
                     )
                 )
@@ -277,7 +271,7 @@ class OrderViewPagerFragment : Fragment() {
 
             builder.append(getString(R.string.away_from))
             builder.append(
-                createColoredSpan(
+                ViewUtils.createColoredSpan(
                     outlet!!.outletName, R.color.cnl_color_1, requireContext()
                 )
             )
@@ -292,7 +286,7 @@ class OrderViewPagerFragment : Fragment() {
     ) {
         AppLogger.log("saveOrder:: $orderRequest and combos $combos")
         lifecycleScope.launch {
-            val requestBody: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+            val requestBody: RequestBody = MultipartBody.Builder().setType(MultipartBody.Companion.FORM)
                 .addFormDataPart("orders", Gson().toJson(listOf(orderRequest)))
                 .addFormDataPart("combos", Gson().toJson(combos))
                 .apply {
@@ -300,13 +294,16 @@ class OrderViewPagerFragment : Fragment() {
                         addFormDataPart(
                             "image[$pos]", image.substring(
                                 image.lastIndexOf("/")
-                            ), Compressor.compress(
+                            ), compress(
                                 requireActivity(), File(image)
                             ) {
-                                resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT)
-                                quality(IMAGE_QUALITY)
+                                resolution(
+                                    AddGiftActivity.Companion.RESOLUTION_WIDTH,
+                                    AddGiftActivity.Companion.RESOLUTION_HEIGHT
+                                )
+                                quality(AddGiftActivity.Companion.IMAGE_QUALITY)
                                 format(Bitmap.CompressFormat.JPEG)
-                                size(MAX_FILE_SIZE)
+                                size(AddGiftActivity.Companion.MAX_FILE_SIZE)
                             }.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
                         )
                     }
@@ -320,20 +317,23 @@ class OrderViewPagerFragment : Fragment() {
         orderRequest: OrderRequest
     ) {
         lifecycleScope.launch {
-            val requestBody: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+            val requestBody: RequestBody = MultipartBody.Builder().setType(MultipartBody.Companion.FORM)
                 .addFormDataPart("orders", Gson().toJson(listOf(orderRequest)))
                 .apply {
                     imageFiles.forEachIndexed { pos, image ->
                         addFormDataPart(
                             "image[$pos]", image.substring(
                                 image.lastIndexOf("/")
-                            ), Compressor.compress(
+                            ), compress(
                                 requireActivity(), File(image)
                             ) {
-                                resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT)
-                                quality(IMAGE_QUALITY)
+                                resolution(
+                                    AddGiftActivity.Companion.RESOLUTION_WIDTH,
+                                    AddGiftActivity.Companion.RESOLUTION_HEIGHT
+                                )
+                                quality(AddGiftActivity.Companion.IMAGE_QUALITY)
                                 format(Bitmap.CompressFormat.JPEG)
-                                size(MAX_FILE_SIZE)
+                                size(AddGiftActivity.Companion.MAX_FILE_SIZE)
                             }.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
                         )
                     }
@@ -489,7 +489,7 @@ class OrderViewPagerFragment : Fragment() {
         )
 
         binding.tvTotalAmount.text = getString(
-            R.string.total_amount, String.format(Locale.getDefault(), "%.2f", totalAmount)
+            R.string.total_amount, String.Companion.format(Locale.getDefault(), "%.2f", totalAmount)
         )
     }
 
@@ -502,7 +502,7 @@ class OrderViewPagerFragment : Fragment() {
 
         if (pictureIntent.resolveActivity(requireActivity().packageManager) != null) {
             try {
-                imageFilePath = createImageFile()
+                imageFilePath = ViewUtils.createImageFile()
             } catch (e: IOException) {
                 AppLogger.log("openCamera:: $e")
             }

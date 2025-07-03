@@ -1,8 +1,9 @@
-package com.barikoi.cnlapp.order_create.product_selection
+package com.barikoi.cnlapp.ui.create_order.order.product_selection
 
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
@@ -34,7 +35,7 @@ import com.barikoi.cnlapp.data.remote.models.ProductStatistics
 import com.barikoi.cnlapp.data.remote.models.product.Product
 import com.barikoi.cnlapp.databinding.FragmentProductSelectionBinding
 import com.barikoi.cnlapp.order_create.Adapter.OutletProductAdapter
-import com.barikoi.cnlapp.order_create.product_selection.vm.ProductSelectViewModel
+import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
@@ -304,7 +305,7 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
     ) {
         val dialog = Dialog(requireContext())
         dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(android.graphics.Color.TRANSPARENT.toDrawable())
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_previous_order_list)
 

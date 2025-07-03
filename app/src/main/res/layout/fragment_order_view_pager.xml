@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingHorizontal="@dimen/_10sdp"
-    tools:context=".order_create.OrderViewPagerFragment">
+    tools:context=".ui.create_order.order.OrderViewPagerFragment">
 
     <TextView
         android:id="@+id/tvShopName"

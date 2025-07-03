@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.order_create.product_selection
+package com.barikoi.cnlapp.ui.create_order.order.product_selection
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

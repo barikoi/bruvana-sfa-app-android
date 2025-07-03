@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingHorizontal="@dimen/_18sdp"
-    tools:context=".order_create.SelectShopFragment">
+    tools:context=".ui.create_order.select_shop.SelectShopFragment">
 
     <TextView
         android:id="@+id/tvTitle"

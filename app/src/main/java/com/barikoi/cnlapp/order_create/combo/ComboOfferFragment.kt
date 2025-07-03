@@ -8,15 +8,12 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.offer.Offer
 import com.barikoi.cnlapp.databinding.FragmentComboOfferBinding
-import com.barikoi.cnlapp.order_create.product_selection.vm.ProductSelectViewModel
+import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

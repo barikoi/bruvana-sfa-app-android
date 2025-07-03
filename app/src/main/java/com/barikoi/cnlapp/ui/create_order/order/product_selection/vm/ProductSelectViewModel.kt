@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.order_create.product_selection.vm
+package com.barikoi.cnlapp.ui.create_order.order.product_selection.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

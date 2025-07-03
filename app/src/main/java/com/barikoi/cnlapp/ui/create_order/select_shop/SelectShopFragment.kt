@@ -1,11 +1,10 @@
-package com.barikoi.cnlapp.order_create
+package com.barikoi.cnlapp.ui.create_order.select_shop
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +15,7 @@ import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,13 +28,13 @@ import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.databinding.FragmentSelectShopBinding
 import com.barikoi.cnlapp.order_create.Adapter.AdapterSelectShop
-import com.barikoi.cnlapp.order_create.vm.SelectShopViewModel
+import com.barikoi.cnlapp.ui.create_order.select_shop.vm.SelectShopViewModel
+import com.barikoi.cnlapp.ui.create_order.order.OrderViewPagerFragment
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
-import com.barikoi.cnlapp.utils.ViewUtils.getDistance
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
@@ -484,7 +484,7 @@ class SelectShopFragment : Fragment() {
                                 .apply {
                                     if (loc != null) {
                                         sortedBy { outlet ->
-                                            getDistance(
+                                            ViewUtils.getDistance(
                                                 loc!!.latitude,
                                                 loc!!.longitude,
                                                 outlet.latitude.toDouble(),
