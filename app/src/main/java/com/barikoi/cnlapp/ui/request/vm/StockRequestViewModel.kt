@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.request
+package com.barikoi.cnlapp.ui.request.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class StockRequestViewModel @Inject constructor(

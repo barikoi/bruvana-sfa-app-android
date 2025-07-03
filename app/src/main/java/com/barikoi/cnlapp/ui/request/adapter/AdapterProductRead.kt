@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.request
+package com.barikoi.cnlapp.ui.request.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Paint

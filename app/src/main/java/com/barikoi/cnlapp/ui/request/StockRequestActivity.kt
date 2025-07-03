@@ -1,8 +1,7 @@
-package com.barikoi.cnlapp.request
+package com.barikoi.cnlapp.ui.request
 
 import android.app.Dialog
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -28,6 +27,10 @@ import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
+import com.barikoi.cnlapp.ui.request.adapter.AdapterProductRead
+import com.barikoi.cnlapp.ui.request.adapter.AdapterStockRequest
+import com.barikoi.cnlapp.ui.request.vm.StockRequestViewModel
 
 
 @AndroidEntryPoint
@@ -94,7 +97,7 @@ class StockRequestActivity : BaseActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.setCancelable(true)
         dialog.window!!.attributes.windowAnimations = android.R.style.Animation_Dialog
 

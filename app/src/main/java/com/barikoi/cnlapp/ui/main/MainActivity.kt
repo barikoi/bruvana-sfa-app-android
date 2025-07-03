@@ -54,7 +54,7 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
 import com.barikoi.cnlapp.ui.notification.NotificationActivity
 import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
-import com.barikoi.cnlapp.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.request.StockRequestActivity
 import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.ui.main.vm.MainViewModel
 import com.barikoi.cnlapp.utils.Api

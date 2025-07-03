@@ -12,7 +12,7 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityNotificationBinding
-import com.barikoi.cnlapp.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.request.StockRequestActivity
 import com.barikoi.cnlapp.ui.notification.vm.NotificationViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
