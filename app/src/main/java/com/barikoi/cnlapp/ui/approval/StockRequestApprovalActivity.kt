@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.approval
+package com.barikoi.cnlapp.ui.approval
 
 import android.app.Dialog
 import android.graphics.Color
@@ -17,9 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.approval.adapter.AdapterApproval
-import com.barikoi.cnlapp.approval.adapter.AdapterApprove
-import com.barikoi.cnlapp.approval.adapter.StockRequest
+import com.barikoi.cnlapp.ui.approval.adapter.AdapterApproval
+import com.barikoi.cnlapp.ui.approval.adapter.AdapterApprove
+import com.barikoi.cnlapp.ui.approval.adapter.StockRequest
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
@@ -27,6 +27,7 @@ import com.barikoi.cnlapp.data.remote.models.RequestStock
 import com.barikoi.cnlapp.data.remote.models.request.NewStockData
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
 import com.barikoi.cnlapp.databinding.ActivityStockRequestApprovalBinding
+import com.barikoi.cnlapp.ui.approval.vm.StockRequestApprovalViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants

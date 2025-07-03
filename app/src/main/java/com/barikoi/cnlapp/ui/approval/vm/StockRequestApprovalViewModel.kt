@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.approval
+package com.barikoi.cnlapp.ui.approval.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class StockRequestApprovalViewModel @Inject constructor(

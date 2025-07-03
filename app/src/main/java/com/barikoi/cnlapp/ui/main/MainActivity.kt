@@ -47,7 +47,7 @@ import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
 import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment
 import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
 import com.barikoi.cnlapp.VisitReport.VisitReportActivity
-import com.barikoi.cnlapp.approval.StockRequestApprovalActivity
+import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
