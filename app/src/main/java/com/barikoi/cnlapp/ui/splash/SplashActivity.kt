@@ -1,9 +1,9 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ui.splash
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.IntentSender.SendIntentException
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.cnlapp.Activity.LoginActivity
+import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.utils.Api
@@ -62,7 +64,7 @@ class SplashActivity : AppCompatActivity() {
                         RC_APP_UPDATE
                     )
                     AppLogger.log("checkForAppUpdateAvailability")
-                } catch (e: SendIntentException) {
+                } catch (e: IntentSender.SendIntentException) {
                     e.printStackTrace()
                 }
             } else {
@@ -180,7 +182,7 @@ class SplashActivity : AppCompatActivity() {
                         this@SplashActivity,
                         RC_APP_UPDATE
                     )
-                } catch (e: SendIntentException) {
+                } catch (e: IntentSender.SendIntentException) {
                     e.printStackTrace()
                 }
             } else {
