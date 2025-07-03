@@ -43,7 +43,7 @@ import com.barikoi.cnlapp.data.remote.models.request.order.toProductRequestList1
 import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentOrderViewPagerBinding
 import com.barikoi.cnlapp.order_create.Callback.DialogListener
-import com.barikoi.cnlapp.order_create.combo.ComboOfferFragment
+import com.barikoi.cnlapp.ui.create_order.order.combo.ComboOfferFragment
 import com.barikoi.cnlapp.ui.create_order.order.product_selection.ProductSelectionFragment
 import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity

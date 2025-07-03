@@ -1,10 +1,9 @@
-package com.barikoi.cnlapp.order_create.combo
+package com.barikoi.cnlapp.ui.create_order.order.combo
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.barikoi.cnlapp.data.remote.models.offer.Offer
 import com.barikoi.cnlapp.databinding.ItemOfferViewBinding

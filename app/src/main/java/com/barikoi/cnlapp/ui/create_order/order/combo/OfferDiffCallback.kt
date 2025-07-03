@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.order_create.combo
+package com.barikoi.cnlapp.ui.create_order.order.combo
 
 import androidx.recyclerview.widget.DiffUtil
 import com.barikoi.cnlapp.data.remote.models.offer.Offer

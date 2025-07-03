@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.order_create.combo
+package com.barikoi.cnlapp.ui.create_order.order.combo
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

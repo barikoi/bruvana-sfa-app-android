@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".order_create.combo.ComboOfferFragment">
+    tools:context=".ui.create_order.order.combo.ComboOfferFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvOffer"
