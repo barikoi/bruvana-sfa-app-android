@@ -105,13 +105,13 @@
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ProductStock.ProductSummaryActivity"
+            android:name=".ui.product_summary.ProductSummaryActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ProductStock.ProductStockUpdateActivity"
+            android:name=".ui.ProductStock.ProductStockUpdateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"

@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.ProductStock
+package com.barikoi.cnlapp.ui.product_summary
 
 import android.os.Build
 import android.os.Bundle
@@ -13,7 +13,8 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.barikoi.cnlapp.ProductStock.vm.ProductSummeryViewModel
+import com.barikoi.cnlapp.ui.adapter.ProductStockAdapter
+import com.barikoi.cnlapp.ui.product_summary.vm.ProductSummeryViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
@@ -22,7 +23,6 @@ import com.barikoi.cnlapp.data.remote.models.DbHouse
 import com.barikoi.cnlapp.data.remote.models.Product
 import com.barikoi.cnlapp.databinding.ActivityProductSummaryBinding
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.Api.TERRITORY_ID
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
@@ -84,7 +84,8 @@ class ProductSummaryActivity : BaseActivity() {
         starDHObserve()
         starProductStockObserve()
 
-        adapter = ProductStockAdapter(true,
+        adapter = ProductStockAdapter(
+            true,
             sharePrefUtils.getString(Api.USER_TYPE) == "TO",
             {},
             {},
@@ -119,7 +120,7 @@ class ProductSummaryActivity : BaseActivity() {
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("TO", true)) {
             binding.spinnerLayoutRoute.visibility = View.VISIBLE
-            viewModel.getDHList(sharePrefUtils.getString(TERRITORY_ID)!!, null)
+            viewModel.getDHList(sharePrefUtils.getString(Api.TERRITORY_ID)!!, null)
         } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM", true)) {
             binding.spinnerLayoutRoute.visibility = View.VISIBLE
             viewModel.getDHList(null, sharePrefUtils.getString(Constants.REGION_ID)!!)

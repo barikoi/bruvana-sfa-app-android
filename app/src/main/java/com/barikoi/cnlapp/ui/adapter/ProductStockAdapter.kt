@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.ProductStock
+package com.barikoi.cnlapp.ui.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -16,7 +16,6 @@ import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
 import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.performTapHaptic
 import com.bumptech.glide.Glide
-
 
 class ProductStockAdapter(
     private val isSummaryActivity: Boolean?,

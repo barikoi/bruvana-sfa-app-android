@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.ProductStock.Model
+package com.barikoi.cnlapp.OrderSummary.Model
 
 import org.json.JSONArray
 import java.io.Serializable

@@ -39,8 +39,8 @@ import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
-import com.barikoi.cnlapp.ProductStock.ProductStockUpdateActivity
-import com.barikoi.cnlapp.ProductStock.ProductSummaryActivity
+import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
+import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
 import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment

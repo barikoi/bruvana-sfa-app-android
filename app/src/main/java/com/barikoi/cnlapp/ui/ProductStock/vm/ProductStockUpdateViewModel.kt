@@ -1,12 +1,14 @@
-package com.barikoi.cnlapp.ProductStock.vm
+package com.barikoi.cnlapp.ui.ProductStock.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.DbHousesResponse
 import com.barikoi.cnlapp.data.remote.models.ProductStockResponse
+import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -15,15 +17,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductSummeryViewModel @Inject constructor(
+class ProductStockUpdateViewModel @Inject constructor(
     private val productStockRepository: ProductStockRepository
 ) : ViewModel() {
 
     private val _dbHousesResponse = MutableLiveData<ApiState<DbHousesResponse>>()
     val dbHousesResponse: LiveData<ApiState<DbHousesResponse>> = _dbHousesResponse
 
-    private val _productStockResponse = MutableLiveData<ApiState<ProductStockResponse>>()
-    val productStockResponse: LiveData<ApiState<ProductStockResponse>> = _productStockResponse
+    private val _productResponse = MutableLiveData<ApiState<ProductStockResponse>>()
+    val productResponse: LiveData<ApiState<ProductStockResponse>> = _productResponse
+
+
+    private val _productStockRequestResponse = MutableLiveData<ApiState<BaseResponse>>()
+    val productStockRequestResponse: LiveData<ApiState<BaseResponse>> = _productStockRequestResponse
 
 
     private val _soSelected = MutableLiveData<String>()
@@ -43,11 +49,21 @@ class ProductSummeryViewModel @Inject constructor(
         }
     }
 
+    fun sendRequest(body: StockRequestModel) {
+        viewModelScope.launch {
+            productStockRepository.sendStockRequest(body).onStart {
+                _productStockRequestResponse.postValue(ApiState.Loading())
+            }.collectLatest {
+                _productStockRequestResponse.postValue(it)
+            }
+        }
+    }
+
     fun getProductStock(
         startDate: String,
         endDate: String,
-        withStock: String?,
-        withOrder: String?,
+        withStock: String,
+        withOrder: String,
         dbHouseId: String?,
         userId: String?
     ) {
@@ -60,9 +76,9 @@ class ProductSummeryViewModel @Inject constructor(
                 dbHouseId,
                 userId
             ).onStart {
-                _productStockResponse.postValue(ApiState.Loading())
+                _productResponse.postValue(ApiState.Loading())
             }.collectLatest {
-                _productStockResponse.postValue(it)
+                _productResponse.postValue(it)
             }
         }
     }

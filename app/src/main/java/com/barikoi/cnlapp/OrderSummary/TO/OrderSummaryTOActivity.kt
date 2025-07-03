@@ -23,7 +23,7 @@ import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.order_create.RoomDB.OrderList
-import com.barikoi.cnlapp.ProductStock.Model.OrdersSO
+import com.barikoi.cnlapp.OrderSummary.Model.OrdersSO
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
