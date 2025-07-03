@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.order_create.Callback.DialogListener

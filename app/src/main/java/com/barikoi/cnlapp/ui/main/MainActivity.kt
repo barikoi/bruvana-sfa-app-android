@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ui.main
 
 import DefaultLocaleHelper
 import android.annotation.SuppressLint
@@ -31,6 +31,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.cnlapp.ui.route.RouteActivity
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
@@ -54,6 +55,8 @@ import com.barikoi.cnlapp.databinding.ActivityMainBinding
 import com.barikoi.cnlapp.notification.NotificationActivity
 import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.auth.LoginActivity
+import com.barikoi.cnlapp.ui.main.vm.MainViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices

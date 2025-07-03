@@ -19,7 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase

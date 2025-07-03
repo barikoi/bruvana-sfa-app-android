@@ -51,7 +51,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops

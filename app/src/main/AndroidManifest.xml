@@ -47,6 +47,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material"
+            android:name=".ui.create_order.DemoProductActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.add_gift.AddGiftActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
@@ -123,19 +127,19 @@
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activity.RouteActivity"
+            android:name=".ui.route.RouteActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activity.LoginActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".Activity.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar">
@@ -146,7 +150,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"

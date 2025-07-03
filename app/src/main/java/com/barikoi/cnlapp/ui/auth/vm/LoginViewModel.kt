@@ -1,11 +1,10 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ui.auth.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
-import com.barikoi.cnlapp.data.remote.models.BaseResponse2
 import com.barikoi.cnlapp.data.remote.models.LoginResponse
 import com.barikoi.cnlapp.data.remote.repository.AuthRepository
 import com.barikoi.cnlapp.utils.AppLogger

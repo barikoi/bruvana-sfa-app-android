@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ui.auth
 
 import android.app.ProgressDialog
 import android.content.Intent
@@ -11,6 +11,8 @@ import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
 import com.barikoi.barikoitrace.models.BarikoiTraceError
 import com.barikoi.barikoitrace.models.BarikoiTraceUser
+import com.barikoi.cnlapp.ui.auth.vm.LoginViewModel
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
@@ -31,7 +33,6 @@ import io.sentry.protocol.User
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint

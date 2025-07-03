@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Activity
+package com.barikoi.cnlapp.ui.route
 
 
 import android.os.Build

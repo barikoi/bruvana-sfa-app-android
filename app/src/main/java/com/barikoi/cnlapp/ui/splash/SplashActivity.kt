@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import com.barikoi.barikoitrace.BarikoiTrace
-import com.barikoi.cnlapp.Activity.LoginActivity
-import com.barikoi.cnlapp.Activity.MainActivity
+import com.barikoi.cnlapp.ui.auth.LoginActivity
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.utils.Api
