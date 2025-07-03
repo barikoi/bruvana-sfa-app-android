@@ -35,7 +35,7 @@ import com.barikoi.cnlapp.ui.route.RouteActivity
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
-import com.barikoi.cnlapp.Fragment.MapFragment
+import com.barikoi.cnlapp.ui.shop_map.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
@@ -52,7 +52,7 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
-import com.barikoi.cnlapp.notification.NotificationActivity
+import com.barikoi.cnlapp.ui.notification.NotificationActivity
 import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.request.StockRequestActivity
 import com.barikoi.cnlapp.ui.auth.LoginActivity

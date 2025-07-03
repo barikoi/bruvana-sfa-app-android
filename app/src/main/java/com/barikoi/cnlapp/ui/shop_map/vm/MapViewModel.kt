@@ -1,17 +1,17 @@
-package com.barikoi.cnlapp.Fragment
+package com.barikoi.cnlapp.ui.shop_map.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
-import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.RouteResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
 import com.barikoi.cnlapp.data.remote.models.TraceUserResponse
+import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.repository.SoRepository
 import com.barikoi.cnlapp.data.remote.repository.SummaryRepository
 import com.barikoi.cnlapp.data.remote.repository.TraceRepository

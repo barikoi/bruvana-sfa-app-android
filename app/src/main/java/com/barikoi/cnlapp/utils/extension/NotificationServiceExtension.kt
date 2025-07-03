@@ -4,7 +4,7 @@ package com.barikoi.cnlapp.utils.extension
 import android.content.Context
 import android.content.Intent
 import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
-import com.barikoi.cnlapp.notification.NotificationActivity
+import com.barikoi.cnlapp.ui.notification.NotificationActivity
 import com.barikoi.cnlapp.request.StockRequestActivity
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants

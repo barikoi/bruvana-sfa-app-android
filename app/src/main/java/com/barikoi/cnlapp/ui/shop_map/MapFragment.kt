@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION", "UNUSED_VARIABLE")
 
-package com.barikoi.cnlapp.Fragment
+package com.barikoi.cnlapp.ui.shop_map
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -32,6 +32,7 @@ import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.FragmentMapBinding
 import com.barikoi.cnlapp.socket.SocketHandler
 import com.barikoi.cnlapp.socket.model.SocketResponse
+import com.barikoi.cnlapp.ui.shop_map.vm.MapViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.Api.TRACE_GROUP_ID
 import com.barikoi.cnlapp.utils.AppLogger
@@ -67,6 +68,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.UiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -669,7 +671,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         showEnableLocationSetting(requireActivity())
                     }
 
-                    override fun onFailure(exception: java.lang.Exception) {
+                    override fun onFailure(exception: Exception) {
                         Toast.makeText(
                             requireContext(),
                             exception.message,

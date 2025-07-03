@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.notification
+package com.barikoi.cnlapp.ui.notification
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +13,7 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityNotificationBinding
 import com.barikoi.cnlapp.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.notification.vm.NotificationViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants

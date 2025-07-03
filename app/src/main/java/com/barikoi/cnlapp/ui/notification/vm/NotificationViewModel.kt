@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.notification
+package com.barikoi.cnlapp.ui.notification.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.notification
+package com.barikoi.cnlapp.ui.notification
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
