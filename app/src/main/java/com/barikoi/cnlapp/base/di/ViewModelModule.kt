@@ -4,8 +4,8 @@ import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
 import com.barikoi.cnlapp.data.remote.api.TraceApiService
-import com.barikoi.cnlapp.data.remote.repository.AddGiftRepository
-import com.barikoi.cnlapp.data.remote.repository.AddGiftRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.GiftRepository
+import com.barikoi.cnlapp.data.remote.repository.GiftRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.AttendanceRepository
 import com.barikoi.cnlapp.data.remote.repository.AttendanceRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.AuthRepository
@@ -67,8 +67,8 @@ object ViewModelModule {
 
 
     @Provides
-    fun providesGiftRepository(apiService: ApiService): AddGiftRepository =
-        AddGiftRepositoryImpl(apiService)
+    fun providesGiftRepository(apiService: ApiService): GiftRepository =
+        GiftRepositoryImpl(apiService)
 
     @Provides
     fun providesSummaryRepository(apiService: ApiService): SummaryRepository =
