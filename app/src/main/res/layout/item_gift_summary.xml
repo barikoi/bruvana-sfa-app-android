@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/_5dp"
@@ -19,24 +20,37 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tvTotalCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="32"
-        android:padding="@dimen/_8sdp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
         android:layout_marginEnd="@dimen/_15dp"
-        android:backgroundTint="@color/cnl_color_1"
-        android:background="@drawable/rounded_stroke_gift"
+        android:background="@drawable/rounded_stroke_gift_count"
+        android:gravity="center"
+        android:minEms="3"
+        android:paddingVertical="@dimen/_5dp"
+        android:paddingHorizontal="@dimen/_8sdp"
+        android:text="32"
+        android:textColor="#457802"
+        android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/ivExpend"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/ivExpend"
         android:layout_width="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/expand"
+        android:src="@drawable/ic_arrow_down"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_arrow_drop_down"
-        android:layout_height="wrap_content" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/black" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvShopTypeGift"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTotalCount"
+        tools:listitem="@layout/item_shop_type_gift" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
