@@ -361,5 +361,7 @@
     <string name="title_gift_summary">Gift Summary</string>
     <string name="gift_summary">Gift Summary</string>
     <string name="total_items">Total Items</string>
+    <string name="expand">Expand</string>
+    <string name="circle">Circle</string>
 
 </resources>
