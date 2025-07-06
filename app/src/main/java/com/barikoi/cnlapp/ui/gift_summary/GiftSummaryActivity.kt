@@ -104,7 +104,9 @@ class GiftSummaryActivity : AppCompatActivity() {
                 p2: Int,
                 p3: Long
             ) {
-                viewModel.getToList()
+                viewModel.getSoList(
+                    toList[p2].toId.toString()
+                )
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
