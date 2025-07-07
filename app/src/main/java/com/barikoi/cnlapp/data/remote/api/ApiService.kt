@@ -20,6 +20,7 @@ import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
+import com.barikoi.cnlapp.data.remote.models.active.ActiveInactiveUserResponse
 import com.barikoi.cnlapp.data.remote.models.offer.OfferResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
 import com.barikoi.cnlapp.data.remote.models.product.ProductResponse
@@ -199,6 +200,13 @@ interface ApiService {
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
     ): Response<CheckAttendanceResponse>
+
+    @GET("api/v1/get-attendance")
+    suspend fun getActiveInactive(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("with_active_inactive_so") withActiveInactiveSo: String = "1"
+    ): Response<ActiveInactiveUserResponse>
 
     @GET
     suspend fun getReverseGeo(
