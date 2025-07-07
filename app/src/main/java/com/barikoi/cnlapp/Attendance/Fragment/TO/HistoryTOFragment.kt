@@ -1,7 +1,5 @@
 package com.barikoi.cnlapp.Attendance.Fragment.TO
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,11 +12,9 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Attendance.Adapter.TO.HistoryListTOAdapter
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.Attendance.Model.SOList
@@ -31,7 +27,6 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.utils.extension.formatDate

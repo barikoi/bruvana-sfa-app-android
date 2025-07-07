@@ -10,4 +10,5 @@
     <dimen name="_10sdp">10dp</dimen>
     <dimen name="_15dp">15dp</dimen>
     <dimen name="design_fab_image_size" tools:override="true">36dp</dimen>
+    <dimen name="_2dp">2dp</dimen>
 </resources>

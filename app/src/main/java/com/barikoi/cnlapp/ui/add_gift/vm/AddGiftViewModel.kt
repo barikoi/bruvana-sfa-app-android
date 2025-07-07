@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.GiftResponse
-import com.barikoi.cnlapp.data.remote.repository.AddGiftRepository
+import com.barikoi.cnlapp.data.remote.repository.GiftRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddGiftViewModel @Inject constructor(
-    private val addGiftRepository: AddGiftRepository
+    private val giftRepository: GiftRepository
 ) : ViewModel() {
 
 
@@ -28,19 +28,18 @@ class AddGiftViewModel @Inject constructor(
 
     fun getGifts() {
         viewModelScope.launch {
-            addGiftRepository.getGifts().onStart {
+            giftRepository.getGifts().onStart {
                 _giftResponse.value = ApiState.Loading()
             }.collect {
                 _giftResponse.value = it
 
             }
         }
-
     }
 
     fun saveGift(body: RequestBody) {
         viewModelScope.launch {
-            addGiftRepository.saveGifts(body).onStart {
+            giftRepository.saveGifts(body).onStart {
                 _saveGiftResponse.value = ApiState.Loading()
             }.collect {
                 _saveGiftResponse.value = it

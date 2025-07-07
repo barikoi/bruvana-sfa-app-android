@@ -1,16 +1,13 @@
 package com.barikoi.cnlapp.ui.add_gift
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
@@ -18,6 +15,7 @@ import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +32,6 @@ import com.barikoi.cnlapp.databinding.DialogConfirmGiftBinding
 import com.barikoi.cnlapp.ui.add_gift.adapter.AdapterMainGift
 import com.barikoi.cnlapp.ui.add_gift.vm.AddGiftViewModel
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.isViewEnable
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
@@ -72,11 +69,9 @@ class AddGiftActivity : BaseActivity() {
 
     private lateinit var adapterImage: AdapterImagePickerView
 
-
     private lateinit var adapterGift: AdapterMainGift
 
     var outletId: String? = null
-
 
     private var imageFilePath: File? = null
 
@@ -85,9 +80,7 @@ class AddGiftActivity : BaseActivity() {
 
     private var giftData: MutableList<GiftModel> = mutableListOf()
 
-
     private var imageFiles: MutableList<String> = mutableListOf()
-
 
     var count = 1
 
@@ -256,17 +249,9 @@ class AddGiftActivity : BaseActivity() {
     }
 
     private fun processData(data: List<Gift>): List<GiftModel> {
-        Log.d("GiftList", "Received data: ${data.size}") // Debugging log
-
         val groupedData = data.groupBy { it.categoryId }
-        Log.d("GroupedGifts", "Grouped data: $groupedData") // Debugging log
 
-        return groupedData.map { (categoryId, gifts) ->
-            Log.d(
-                "CategoryProcessing",
-                "Processing category: $categoryId with ${gifts.size} gifts"
-            ) // Debugging log
-
+        return groupedData.map { (_, gifts) ->
             GiftModel(
                 title = gifts.first().category.name, // Using category name as title
                 gifts = gifts
@@ -305,11 +290,7 @@ class AddGiftActivity : BaseActivity() {
     private var startCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            AppLogger.log("startCameraNew:: $imageFilePath")
-            AppLogger.log("startCameraNew:: ${result.data}")
-
-            AppLogger.log("IMAGE_PICKER:: ${sharePrefUtils.getString(Constants.IMAGE_PICKER)}")
+        if (result.resultCode == RESULT_OK) {
 
             imageFiles.add(imageFilePath!!.path)
 
@@ -340,7 +321,7 @@ class AddGiftActivity : BaseActivity() {
 
         val dialog = Dialog(this)
         dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(dialogBinding.root)
 
@@ -363,10 +344,6 @@ class AddGiftActivity : BaseActivity() {
         dialogBinding.llImagePickerView.rvImage.adapter = adapterImage
         dialogBinding.llImagePickerView.rvImage.layoutManager = layoutManager
         adapterImage.updateImages(imageFiles)
-
-
-
-
 
         dialogBinding.btnConfirm.setOnClickListener {
             if (imageFiles.isEmpty()) {
@@ -396,7 +373,6 @@ class AddGiftActivity : BaseActivity() {
         }
 
         dialogBinding.btnMinus.setHapticClickListener {
-
             if (count > 1) {
                 count--
             }
@@ -419,19 +395,16 @@ class AddGiftActivity : BaseActivity() {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("outlet_id", outletId!!)
                 .addFormDataPart("for_update", "1")
-
                 .apply {
                     data.forEachIndexed { i, gift ->
                         addFormDataPart("gift_details[$i][type_id]", gift.id.toString())
                     }
                 }
-
                 .apply {
                     data.forEachIndexed { i, gift ->
                         addFormDataPart("gift_details[$i][qty]", gift.qty.toString())
                     }
                 }
-
                 .apply {
                     data.forEachIndexed { mainPos, gift ->
                         gift.images!!.forEachIndexed { childPos, image ->

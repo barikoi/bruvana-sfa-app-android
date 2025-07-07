@@ -47,19 +47,27 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material"
+            android:name=".ui.gift_summary.GiftSummaryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.create_order.DemoProductActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
+        <activity
             android:name=".ui.add_gift.AddGiftActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
-            android:name=".notification.NotificationActivity"
+            android:name=".ui.notification.NotificationActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
-            android:name=".approval.StockRequestApprovalActivity"
+            android:name=".ui.approval.StockRequestApprovalActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
-            android:name=".request.StockRequestActivity"
+            android:name=".ui.request.StockRequestActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
@@ -105,13 +113,13 @@
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ProductStock.ProductSummaryActivity"
+            android:name=".ui.product_summary.ProductSummaryActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ProductStock.ProductStockUpdateActivity"
+            android:name=".ui.ProductStock.ProductStockUpdateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
@@ -123,19 +131,19 @@
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activity.RouteActivity"
+            android:name=".ui.route.RouteActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activity.LoginActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".Activity.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.nostatusbar">
@@ -146,7 +154,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"

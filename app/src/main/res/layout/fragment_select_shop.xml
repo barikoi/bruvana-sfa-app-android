@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/_18sdp"
+    tools:context=".ui.create_order.select_shop.SelectShopFragment">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/_5dp"
+        android:text="@string/select_dokan"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/spinnerLayoutRoute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@drawable/stroke_background"
+        android:backgroundTint="@color/white"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
+
+        <com.barikoi.cnlapp.utils.MoreSpinner
+            android:id="@+id/spinnerRoutes"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:theme="@style/spinnerItemStyle"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+    </RelativeLayout>
+
+    <AutoCompleteTextView
+        android:id="@+id/editTextSearchShop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@drawable/stroke_background"
+        android:backgroundTint="@color/white"
+        android:drawableEnd="@drawable/ic_search"
+        android:drawablePadding="8dp"
+        android:ems="10"
+        android:hint="@string/search_shop"
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:padding="10dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerLayoutRoute" />
+
+    <TextView
+        android:id="@+id/tvFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_corner_lightgray"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="@string/filter"
+        android:textColor="@color/text_title"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:drawableEndCompat="@drawable/ic_filter"
+        app:layout_constraintEnd_toStartOf="@+id/tvSortTitle"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSearchShop" />
+
+    <TextView
+        android:id="@+id/tvSortTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/rounded_corner_lightgray"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="@string/sort_by"
+        android:textColor="@color/text_title"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:drawableEndCompat="@drawable/ic_sort_by"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSearchShop" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvShopList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@color/background_app"
+        android:scrollbarThumbVertical="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSortTitle"
+        tools:listitem="@layout/item_select_shop" />
+
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupAllLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="rcvShopList, tvSortTitle, tvTitle, spinnerLayoutRoute, editTextSearchShop, tvFilter" />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/progressBar"
+        style="@style/SpinKitView.Large.ThreeBounce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:SpinKit_Color="@color/cnl_color_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitleNoRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/no_route_selected_today"
+        android:textColor="@color/text_title"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@+id/btnTryAgain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnTryAgain"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="4dp"
+        android:layout_marginTop="@dimen/_15dp"
+        android:background="@drawable/cardview_bg"
+        android:backgroundTint="@color/color_gray"
+        android:padding="2dp"
+        android:text="@string/refresh"
+        android:textAllCaps="false"
+        android:textColor="@color/text_title"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleNoRoute" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupNoRoute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="btnTryAgain, tvTitleNoRoute" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

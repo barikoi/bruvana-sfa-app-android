@@ -4,14 +4,26 @@ import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.repository.RouteRepository
 import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
 import com.barikoi.cnlapp.data.remote.api.TraceApiService
-import com.barikoi.cnlapp.data.remote.repository.AddGiftRepository
-import com.barikoi.cnlapp.data.remote.repository.AddGiftRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.GiftRepository
+import com.barikoi.cnlapp.data.remote.repository.GiftRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.AttendanceRepository
+import com.barikoi.cnlapp.data.remote.repository.AttendanceRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.AuthRepository
 import com.barikoi.cnlapp.data.remote.repository.AuthRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.OfferRepository
+import com.barikoi.cnlapp.data.remote.repository.OfferRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.OrderRepository
+import com.barikoi.cnlapp.data.remote.repository.OrderRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.ProductRepository
+import com.barikoi.cnlapp.data.remote.repository.ProductRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.ReverseGeoRepository
+import com.barikoi.cnlapp.data.remote.repository.ReverseGeoRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.ShopRepository
+import com.barikoi.cnlapp.data.remote.repository.ShopRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SoRepository
 import com.barikoi.cnlapp.data.remote.repository.SoRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SocketRepository
@@ -55,8 +67,8 @@ object ViewModelModule {
 
 
     @Provides
-    fun providesGiftRepository(apiService: ApiService): AddGiftRepository =
-        AddGiftRepositoryImpl(apiService)
+    fun providesGiftRepository(apiService: ApiService): GiftRepository =
+        GiftRepositoryImpl(apiService)
 
     @Provides
     fun providesSummaryRepository(apiService: ApiService): SummaryRepository =
@@ -65,4 +77,29 @@ object ViewModelModule {
     @Provides
     fun providesSORepository(apiService: ApiService): SoRepository =
         SoRepositoryImpl(apiService)
+
+
+    @Provides
+    fun providesProductRepository(apiService: ApiService): ProductRepository =
+        ProductRepositoryImpl(apiService)
+
+    @Provides
+    fun providesOrderRepository(apiService: ApiService): OrderRepository =
+        OrderRepositoryImpl(apiService)
+
+    @Provides
+    fun providesShopRepository(apiService: ApiService): ShopRepository =
+        ShopRepositoryImpl(apiService)
+
+    @Provides
+    fun providesOfferRepository(apiService: ApiService): OfferRepository =
+        OfferRepositoryImpl(apiService)
+
+    @Provides
+    fun providesReverseGeoRepository(apiService: ApiService): ReverseGeoRepository =
+        ReverseGeoRepositoryImpl(apiService)
+
+    @Provides
+    fun providesAttendanceRepository(apiService: ApiService): AttendanceRepository =
+        AttendanceRepositoryImpl(apiService)
 }

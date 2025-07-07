@@ -22,7 +22,6 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         return ViewHolder(v)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: OutletProductAdapter.ViewHolder, position: Int) {
         val item = products[position]
         holder.productName.setText(item.product_name)
@@ -42,7 +41,7 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val productName: TextView
+        internal val productName: TextView = itemView.findViewById(R.id.productName)
         internal val productType: TextView
         internal val perUnitPrice: TextView
         internal val tvCount: EditText
@@ -50,7 +49,6 @@ class OutletProductAdapter(val products: List<ProductStatistics>) : RecyclerView
         internal val btnMinus: ImageButton
         internal val btnAdd: ImageButton
         init {
-            productName = itemView.findViewById(R.id.productName)
             productType = itemView.findViewById(R.id.tvProductVariation)
             perUnitPrice = itemView.findViewById(R.id.tvPerUnit)
             tvCount = itemView.findViewById(R.id.tvCount)

@@ -1,5 +1,4 @@
 <resources>
-    <!--<string name="app_name">CNL App</string>-->
     <string name="splash_title">Care Nutrition Limited</string>
 
     <!--bottom_nav-->
@@ -124,7 +123,7 @@
     <string name="start_ordering">Start Ordering</string>
     <string name="total">Total-</string>
     <string name="last_order_date">Last order date- %1$s</string>
-    <string name="last_delivery_date">Last delivery date- </string>
+    <string name="last_delivery_date">Last delivery date- %1$s</string>
     <string name="items">Items</string>
     <string name="items_"> %1$s Items</string>
     <string name="ordered_at">Ordered at- </string>
@@ -346,5 +345,23 @@
     <string name="total_stock_value">Total Stock Value: %1$s</string>
     <string name="total_stock_count">Total Stock Count: %1$s</string>
     <string name="nothing_selected">Nothing selected</string>
+    <string name="images_added">%1$d Images Added</string>
+    <string name="retry">Retry</string>
+    <string name="total_0_0">Total 0.0</string>
+    <string name="product_selection">Product Selection</string>
+    <string name="offer">Offer</string>
+    <string name="combo_offer">Combo Offer</string>
+    <string name="in_stock">%1$s in stock</string>
+    <string name="unknown">Unknown</string>
+    <string name="minus_button">Minus Button</string>
+    <string name="plus_button">Plus Button</string>
+    <string name="product_description">1. Nucella chocolate spread - 230 X 3\n2. Nucella chocolate spread - 230\n3. Nucella chocolate spread - 230\n4. Nucella chocolate spread - 230</string>
+    <string name="taka_icon">Taka Icon</string>
+    <string name="is_there_a_cadbury_or_kitkat_company_fridge_in_the_outlet">Is there a Cadbury or KitKat company fridge in the outlet?</string>
+    <string name="title_gift_summary">Gift Summary</string>
+    <string name="gift_summary">Gift Summary</string>
+    <string name="total_items">Total Items</string>
+    <string name="expand">Expand</string>
+    <string name="circle">Circle</string>
 
 </resources>

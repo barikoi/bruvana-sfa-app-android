@@ -25,7 +25,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
-import com.barikoi.cnlapp.Activity.RouteViewModel
+import com.barikoi.cnlapp.ui.route.RouteViewModel
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
@@ -257,6 +257,7 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                             val latitude = outlet.getDouble("latitude")
                             val longitude = outlet.getDouble("longitude")
                             val isVerified = outlet.getInt("is_verified")
+                            val kitkatQS = outlet.getString("kitkat_qs")
                             val competitive: List<String>? = Gson().fromJson(
                                 outlet.getString("competitive_products"),
                                 object : TypeToken<List<String>>() {}.type
@@ -288,7 +289,8 @@ class ShopListFragment : Fragment(), OnEditShopListener {
                                     0,
                                     0,
                                     0.0f,
-                                    competitive
+                                    competitive,
+                                    kitkatQS
                                 )
                             )
                         }

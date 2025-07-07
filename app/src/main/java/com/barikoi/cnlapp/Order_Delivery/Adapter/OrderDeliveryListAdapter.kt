@@ -2,7 +2,6 @@ package com.barikoi.cnlapp.Order_Delivery.Adapter
 
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -13,9 +12,9 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Order_Create.Adapter.ConfirmOrderProductListAdapter
-import com.barikoi.cnlapp.Order_Create.Callback.OnEditOrderListener
-import com.barikoi.cnlapp.Order_Create.RoomDB.OrderList
+import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderProductListAdapter
+import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import java.text.DecimalFormat

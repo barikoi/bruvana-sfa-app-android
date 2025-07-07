@@ -1,5 +1,4 @@
 <resources>
-    <!--<string name="app_name">CNL App</string>-->
     <string name="splash_title">Care Nutrition Limited</string>
 
     <!--bottom_nav-->
@@ -125,7 +124,7 @@
     <string name="start_ordering">অর্ডার করা শুরু করুন</string>
     <string name="total">মোট-</string>
     <string name="last_order_date">সর্বশেষ অর্ডারের তারিখ - %1$s</string>
-    <string name="last_delivery_date">সর্বশেষ ডেলিভারির তারিখ - </string>
+    <string name="last_delivery_date">সর্বশেষ ডেলিভারির তারিখ - %1$s</string>
     <string name="items">আইটেমস</string>
     <string name="items_"> %1$s আইটেমস</string>
     <string name="ordered_at">অর্ডার দেয়া হয়েছে - </string>
@@ -351,5 +350,20 @@
     <string name="total_amount">মোট পরিমাণ: %1$s</string>
     <string name="total_stock_value">মোট স্টকের মূল্য: %1$s</string>
     <string name="total_stock_count">মোট স্টকের সংখ্যা: %1$s</string>
+    <string name="nothing_selected">কিছুই নির্বাচিত নয়</string>
+    <string name="images_added">%1$dটি ছবি যোগ হয়েছে</string>
+    <string name="retry">পুনরায় চেষ্টা করুন</string>
+
+    <string name="total_0_0">মোট ০.০</string>
+    <string name="product_selection">প্রোডাক্ট নির্বাচন</string>
+    <string name="offer">অফার</string>
+    <string name="combo_offer">কম্বো অফার</string>
+    <string name="in_stock">%1$s স্টকে আছে</string>
+    <string name="unknown">অজানা</string>
+    <string name="minus_button">মাইনাস বাটন</string>
+    <string name="plus_button">প্লাস বাটন</string>
+    <string name="product_description">১। নুচেলা চকোলেট স্প্রেড - ২৩৪ x ৩\n২। নুচেলা চকোলেট স্প্রেড - ২৩৪\n৩। নুচেলা চকোলেট স্প্রেড - ২৩৪\n৪। নুচেলা চকোলেট স্প্রেড - ২৩৪</string>
+    <string name="taka_icon">টাকা আইকন</string>
+    <string name="is_there_a_cadbury_or_kitkat_company_fridge_in_the_outlet">আউটলেটে কি ক্যাডবুরি বা কিটক্যাট কোম্পানির ফ্রিজ আছে?</string>
 
 </resources>

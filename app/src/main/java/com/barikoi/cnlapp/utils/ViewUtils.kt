@@ -9,23 +9,32 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Location
 import android.location.LocationManager
+import android.os.Environment
 import android.provider.Settings
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.View
 import android.view.Window
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.android.volley.NoConnectionError
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.barikoitrace.TraceMode
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -37,7 +46,12 @@ import com.google.android.gms.tasks.OnTokenCanceledListener
 import io.sentry.Sentry
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 import java.io.UnsupportedEncodingException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object ViewUtils {
 
@@ -128,6 +142,17 @@ object ViewUtils {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
+    }
+
+    fun rotateAnimation(v: View, fromDegrees: Float, toDegrees: Float) {
+        // Create an animation instance
+        val an: Animation = RotateAnimation(
+            fromDegrees, toDegrees, (v.width / 2).toFloat(), (v.height / 2).toFloat()
+        )
+        an.duration = 500
+        an.fillAfter = true
+        an.repeatMode = Animation.RESTART
+        v.startAnimation(an)
     }
 
     fun viewDialogResponse(mContext: Context, message: String, listener: DialogListener) {
@@ -271,5 +296,44 @@ object ViewUtils {
                 AppLogger.log("BarikoiTrace" + "is tracking")
             }
         }
+    }
+
+    @Throws(IOException::class)
+    fun createImageFile(): File {
+        val timeStamp = SimpleDateFormat(
+            "yyyyMMdd_HHmmss", Locale.getDefault()
+        ).format(Date())
+        val imageFileName = "IMG_" + timeStamp + "_"
+        val storageDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+            imageFileName,  /* prefix */
+            ".jpg",  /* suffix */
+            storageDir /* directory */
+        )
+        return image
+    }
+
+    fun createColoredSpan(text: String, colorRes: Int, context: Context): SpannableString {
+        return SpannableString(text).apply {
+            setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, colorRes)),
+                0,
+                length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    }
+
+    fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startPoint = Location("locationA")
+        startPoint.latitude = lat1
+        startPoint.longitude = lon1
+
+        val endPoint = Location("locationB")
+        endPoint.latitude = lat2
+        endPoint.longitude = lon2
+
+        return startPoint.distanceTo(endPoint)
     }
 }
