@@ -63,7 +63,10 @@ class AdapterGiftSummary : RecyclerView.Adapter<AdapterGiftSummary.GiftSummaryVi
 
     @SuppressLint("NotifyDataSetChanged")
     fun setGiftSummaryList(giftSummaryList: List<GiftSummary>) {
-        this.giftSummaryList = giftSummaryList
+        val updatedList = giftSummaryList.mapIndexed { _, item ->
+            item.copy(isExpanded = true)
+        }
+        this.giftSummaryList = updatedList
         notifyDataSetChanged()
     }
 
