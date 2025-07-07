@@ -6,6 +6,7 @@ import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse2
 import com.barikoi.cnlapp.data.remote.models.CheckAttendanceResponse
 import com.barikoi.cnlapp.data.remote.models.DbHousesResponse
+import com.barikoi.cnlapp.data.remote.models.GIftSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.GiftResponse
 import com.barikoi.cnlapp.data.remote.models.LoginResponse
 import com.barikoi.cnlapp.data.remote.models.NotificationResponse
@@ -153,10 +154,17 @@ interface ApiService {
         @Body body: RequestBody
     ): Response<BaseResponse>
 
+    @GET("api/v1/gift-summary")
+    suspend fun getGIftSummary(
+        @Query("user_id") userId: String,
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?
+    ): Response<GIftSummaryResponse>
+
     @GET("api/v1/get-to")
     suspend fun getTodaySummary(
-        @Query("start_date") startDate: String,
-        @Query("end_date") endDate: String,
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?,
         @Query("today_summary") todaySummary: String?
     ): Response<TodaySummaryResponse>
 

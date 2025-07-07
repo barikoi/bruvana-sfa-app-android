@@ -56,6 +56,7 @@ import com.barikoi.cnlapp.ui.notification.NotificationActivity
 import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.ui.request.StockRequestActivity
 import com.barikoi.cnlapp.ui.auth.LoginActivity
+import com.barikoi.cnlapp.ui.gift_summary.GiftSummaryActivity
 import com.barikoi.cnlapp.ui.main.vm.MainViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
@@ -642,6 +643,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startActivity(Intent(this@MainActivity, StockRequestActivity::class.java))
         } else if (id == R.id.menu_request_approval) {
             startActivity(Intent(this@MainActivity, StockRequestApprovalActivity::class.java))
+        } else if (id == R.id.menu_gift_summary) {
+            startActivity(Intent(this@MainActivity, GiftSummaryActivity::class.java))
         }
         drawer.closeDrawer(GravityCompat.START)
         return true

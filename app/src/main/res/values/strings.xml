@@ -358,5 +358,10 @@
     <string name="product_description">1. Nucella chocolate spread - 230 X 3\n2. Nucella chocolate spread - 230\n3. Nucella chocolate spread - 230\n4. Nucella chocolate spread - 230</string>
     <string name="taka_icon">Taka Icon</string>
     <string name="is_there_a_cadbury_or_kitkat_company_fridge_in_the_outlet">Is there a Cadbury or KitKat company fridge in the outlet?</string>
+    <string name="title_gift_summary">Gift Summary</string>
+    <string name="gift_summary">Gift Summary</string>
+    <string name="total_items">Total Items</string>
+    <string name="expand">Expand</string>
+    <string name="circle">Circle</string>
 
 </resources>
