@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.data.remote.models.GiftSummary
 import com.barikoi.cnlapp.data.remote.models.SoUser
 import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.ActivityGiftSumamryBinding
@@ -21,11 +22,14 @@ import com.barikoi.cnlapp.ui.gift_summary.vm.GiftSummaryViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
 import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
+import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.indexOf
 
@@ -45,8 +49,19 @@ class GiftSummaryActivity : AppCompatActivity() {
 
     private lateinit var toDataDialog: Dialog
 
+    private var formattedStartDate = ""
+    private var formattedEndDate = ""
+
+    val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+        .setTitleText("Select Date Range")
+        .build()
+
     private var toList: List<To> = emptyList()
     private var soList: List<SoUser> = emptyList()
+    private var selectedSO: String? = null
+    private var isSorted = false
+
+    private var gifts: List<GiftSummary> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +70,61 @@ class GiftSummaryActivity : AppCompatActivity() {
 
         loadingDialog {
             toDataDialog = it
+        }
+
+        formattedStartDate = Date().formatDateWithLocale()
+        formattedEndDate = Date().formatDateWithLocale()
+
+        binding.tvDateRange.text =
+            getString(
+                R.string.date_range_,
+                formattedStartDate.formatDateWithLocale(),
+                formattedEndDate.formatDateWithLocale()
+            )
+
+        binding.ivFilter.setHapticClickListener {
+            binding.ivFilter.setBackgroundResource(
+                R.drawable.rounded_stroke_gift_selected
+            )
+            isSorted = !isSorted
+
+            adapterGiftSummary.setGiftSummaryList(
+                if (isSorted) gifts.sortedByDescending { it.total } else gifts.sortedBy { it.total }
+            )
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            binding.swipeRefresh.isRefreshing = false
+            viewModel.getGiftSummary(
+                selectedSO ?: "",
+                "$formattedStartDate 00:00:00",
+                "$formattedEndDate 23:59:59",
+            )
+        }
+
+        binding.llDateRange.setHapticClickListener {
+            dateRangePicker.show(supportFragmentManager, "date_range_picker")
+        }
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDateMillis = selection.first
+            val endDateMillis = selection.second
+
+            formattedStartDate = Date(startDateMillis!!).formatDateWithLocale()
+            formattedEndDate = Date(endDateMillis!!).formatDateWithLocale()
+
+            binding.tvDateRange.text =
+                getString(
+                    R.string.date_range_,
+                    formattedStartDate.formatDateWithLocale(),
+                    formattedEndDate.formatDateWithLocale()
+                )
+
+            viewModel.getGiftSummary(
+                selectedSO!!,
+                "$formattedStartDate 00:00:00",
+                "$formattedEndDate 23:59:59",
+            )
         }
 
         adapterGiftSummary = AdapterGiftSummary()
@@ -121,10 +191,11 @@ class GiftSummaryActivity : AppCompatActivity() {
                 p2: Int,
                 p3: Long
             ) {
+                selectedSO = soList[p2].id.toString()
                 viewModel.getGiftSummary(
-                    soList[p2].id.toString(),
-                    "2025-04-01 00:00:00",
-                    "2025-07-06 00:00:00",
+                    selectedSO!!,
+                    "$formattedStartDate 00:00:00",
+                    "$formattedEndDate 23:59:59",
                 )
             }
 
@@ -264,6 +335,8 @@ class GiftSummaryActivity : AppCompatActivity() {
                     is ApiState.Success -> {
                         AppLogger.log("startGiftSummaryObserve:: Success ${it.data}")
                         toDataDialog.dismiss()
+
+                        gifts = it.data?.gifts ?: emptyList()
 
                         binding.tvTotalItem.text =
                             it.data?.gifts!!.sumOf { q -> q.total }.toString()
