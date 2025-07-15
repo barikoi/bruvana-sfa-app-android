@@ -50,4 +50,14 @@ data class To(
         return BigDecimal(totalOrderedAmount.toDouble()).setScale(2, RoundingMode.HALF_UP)
             .toString()
     }
+
+    fun toUserSummary(): UserSummary {
+        return UserSummary(
+            id = toId.toString(),
+            name = toName,
+            userType = "TO",
+            totalOrders = totalOrders.toDouble(),
+            ads = BigDecimal(ads).setScale(2, RoundingMode.HALF_UP).toDouble()
+        )
+    }
 }
