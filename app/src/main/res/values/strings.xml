@@ -115,6 +115,7 @@
     <string name="ads">ADS</string>
     <string name="rds">RDS</string>
     <string name="bounce">Bounce</string>
+    <string name="bounce_p">Bounce (%)</string>
     <string name="delivery_value">Delivery Value</string>
     <string name="total_delivery_value">Total Delivery Value</string>
     <string name="total_target">Total Target</string>
@@ -367,5 +368,13 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="daily_summary">DAILY SUMMARY</string>
     <string name="user_icon">User Icon</string>
+    <string name="inactive_user">Inactive Users</string>
+    <string name="active_user">Active Users</string>
+    <string name="error">Error</string>
+    <string name="forward">Forward</string>
+    <string name="download_all_challan">Download All Challan</string>
+    <string name="download_icon">Download Icon</string>
+    <string name="summary_details">Summary Details</string>
+    <string name="something_went_wrong_please_try_again">Something went wrong! PLease try again.</string>
 
 </resources>
