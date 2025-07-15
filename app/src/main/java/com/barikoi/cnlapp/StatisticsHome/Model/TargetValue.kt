@@ -9,3 +9,9 @@ data class TargetValue(
     var completed: String,
     var completedValue: Double,
 ) : Serializable
+
+data class TargetAndCompleted(
+    val title: String,
+    var target: String,
+    var completed: String,
+)
