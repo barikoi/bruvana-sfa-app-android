@@ -12,10 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import com.barikoi.barikoitrace.BarikoiTrace
-import com.barikoi.cnlapp.ui.auth.LoginActivity
-import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.databinding.ActivitySplashBinding
+import com.barikoi.cnlapp.ui.auth.LoginActivity
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
@@ -51,6 +51,12 @@ class SplashActivity : AppCompatActivity() {
         token = sharePrefUtils.getString(Api.TOKEN)
 
         binding.progressBar.isVisible = true
+        try {
+            throw Exception("This is a test.")
+        } catch (e: Exception) {
+            Sentry.captureException(e)
+        }
+
 
         mAppUpdateManager.appUpdateInfo.addOnSuccessListener { result ->
             if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
