@@ -20,11 +20,13 @@ import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
-import com.barikoi.cnlapp.data.remote.models.active.ActiveInactiveUserResponse
+import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
+import com.barikoi.cnlapp.data.remote.models.active.OverViewStatsResponse
 import com.barikoi.cnlapp.data.remote.models.offer.OfferResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
 import com.barikoi.cnlapp.data.remote.models.product.ProductResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
+import com.barikoi.cnlapp.data.remote.models.so.SoWithSummaryResponse
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -72,6 +74,14 @@ interface ApiService {
 
     @GET("api/v1/get-so")
     suspend fun getSoList(): Response<SoResponse>
+
+    @GET("api/v1/get-so")
+    suspend fun getSoWithTodaySummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("to_id") withSoStats: String,
+        @Query("today_summary") todaySummary: String? = "1",
+    ): Response<SoWithSummaryResponse>
 
     @GET("api/v1/outlets")
     suspend fun getOutlets(
@@ -212,4 +222,23 @@ interface ApiService {
     suspend fun getReverseGeo(
         @Url url: String,
     ): Response<ReverseGeoResponse>
+
+
+    @GET("api/v1/get-overview-stats")
+    suspend fun getOverViewStatsTO(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("with_to_stats") withToStats: Int = 1,
+        @Query("territory_id") territoryId: String,
+        @Query("user_id") userId: String
+    ): Response<OverViewStatsResponse>
+
+    @GET("api/v1/get-overview-stats")
+    suspend fun getOverViewStatsASM(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("with_asm_stats") withAsmStats: Int = 1,
+        @Query("region_id") regionId: String,
+        @Query("user_id") userId: String
+    ): Response<OverViewStatsResponse>
 }
