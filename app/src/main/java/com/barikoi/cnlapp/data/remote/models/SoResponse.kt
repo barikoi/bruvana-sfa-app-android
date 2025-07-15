@@ -53,4 +53,14 @@ data class SalesOfficer(
     val traceId: String,
     @SerializedName("user_name")
     val userName: String
-)
+) {
+    fun toUserSummary(): UserSummary {
+        return UserSummary(
+            id = id.toString(),
+            name = userName,
+            userType = designation,
+            totalOrders = soOrderedValue,
+            ads = 0.00
+        )
+    }
+}
