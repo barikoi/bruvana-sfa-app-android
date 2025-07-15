@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.GiftSummary
@@ -23,6 +24,8 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.getEndDateTime
+import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
@@ -34,7 +37,7 @@ import javax.inject.Inject
 import kotlin.collections.indexOf
 
 @AndroidEntryPoint
-class GiftSummaryActivity : AppCompatActivity() {
+class GiftSummaryActivity : BaseActivity() {
     private lateinit var binding: ActivityGiftSumamryBinding
 
     private val viewModel: GiftSummaryViewModel by viewModels()
@@ -97,8 +100,8 @@ class GiftSummaryActivity : AppCompatActivity() {
             binding.swipeRefresh.isRefreshing = false
             viewModel.getGiftSummary(
                 selectedSO ?: "",
-                "$formattedStartDate 00:00:00",
-                "$formattedEndDate 23:59:59",
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
             )
         }
 
@@ -122,8 +125,8 @@ class GiftSummaryActivity : AppCompatActivity() {
 
             viewModel.getGiftSummary(
                 selectedSO!!,
-                "$formattedStartDate 00:00:00",
-                "$formattedEndDate 23:59:59",
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
             )
         }
 
@@ -344,7 +347,9 @@ class GiftSummaryActivity : AppCompatActivity() {
                         if (it.data.gifts.isEmpty()) {
                             toast("No gift found")
                             adapterGiftSummary.setGiftSummaryList(emptyList())
+                            binding.includeEmpty.main.isVisible = true
                         } else {
+                            binding.includeEmpty.main.isVisible = false
                             adapterGiftSummary.setGiftSummaryList(it.data.gifts)
                         }
                     }
