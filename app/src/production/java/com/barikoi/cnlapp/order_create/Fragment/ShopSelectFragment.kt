@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Activity.MainActivity
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.order_create.Adapter.ShopSelectAdapter
 import com.barikoi.cnlapp.order_create.Callback.OnSelectListener
@@ -59,7 +58,6 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
     private var editor: SharedPreferences.Editor? = null
 
     private var appDatabase: AppDatabase? = null
-    lateinit var ACTIVITY: MainActivity
     private var mFusedLocationClient: FusedLocationProviderClient? = null
     private var mLocationCallback: LocationCallback? = null
 
@@ -617,14 +615,13 @@ class ShopSelectFragment : Fragment(), OnSelectListener {
         mContext = context
         listener = this
         appDatabase = AppDatabase.getInstance(context)
-        ACTIVITY = context as MainActivity
     }
 
     override fun onShopSelected(shop: Shops) {
         editor!!.putString(Api.SELECTED_SHOP_ID, shop.shop_id)
         editor!!.commit()
         appDatabase!!.saveOrderDao().deleteByShop(shop.shop_id)
-        CreateOrderFragment.startFragmentWithValue("Shop", shop, ProductSelectFragment(), ACTIVITY)
+        CreateOrderFragment.startFragmentWithValue("Shop", shop, ProductSelectFragment(), requireActivity())
     }
 
     override fun onResume() {
