@@ -75,10 +75,10 @@ android {
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
 
             buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
-            buildConfigField 'String', 'sentryDNS', '"https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14"'
+            buildConfigField 'String', 'sentryDNS', '"https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
-                    sentryDNS: "https://adc870f9532d8927d0203a60f35ef9ae@sentry.barikoimaps.dev/14",
+                    sentryDNS: "https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3",
 //                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
 //                    onesignal_google_project_number: 'REMOTE'
 
@@ -98,10 +98,10 @@ android {
 
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
 
-            buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
+            buildConfigField 'String', 'sentryDNS', '"https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
+                    sentryDNS: "https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3",
 //                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
 //                    onesignal_google_project_number: 'REMOTE'
 
@@ -275,4 +275,6 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
 
     implementation("id.zelory:compressor:3.0.1")
+
+    implementation("com.airbnb.android:lottie:6.6.7")
 }
