@@ -15,9 +15,10 @@
         android:drawablePadding="4dp"
         android:gravity="start"
         android:padding="@dimen/_10sdp"
-        android:text="12/12/2025"
+        android:text="@string/das_das"
         android:textColor="@color/text_title_2"
         android:textSize="14sp"
+        android:textStyle="bold"
         app:drawableStartCompat="@drawable/ic_date_range"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -48,7 +49,7 @@
             android:id="@+id/tvActiveTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Active"
+            android:text="@string/active"
             android:textColor="@color/text_title_2"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -60,7 +61,7 @@
             android:id="@+id/tvActiveValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="21"
+            android:text="@string/das_das"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -82,7 +83,7 @@
             android:id="@+id/tvInactiveTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Inactive"
+            android:text="@string/inactive"
             android:textColor="@color/text_title_2"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -94,7 +95,7 @@
             android:id="@+id/tvInactiveValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="21"
+            android:text="@string/das_das"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -112,20 +113,21 @@
         android:layout_marginTop="@dimen/_15dp"
         android:background="@drawable/shape_daily_summary"
         android:gravity="center"
-        android:padding="@dimen/_3sdp"
+        android:paddingVertical="@dimen/_5dp"
         android:text="@string/daily_summary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/llActiveInactive" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvToList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="@dimen/_7dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="@dimen/_7dp"
-        tools:listitem="@layout/item_user"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDailySummary" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDailySummary"
+        tools:listitem="@layout/item_user" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
