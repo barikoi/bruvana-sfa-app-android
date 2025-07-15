@@ -142,10 +142,10 @@
     </style>
 
     <!-- Headline Text Style -->
-    <style name="jtiTextHeadline1" parent="TextAppearance.MaterialComponents.Headline1">
+    <style name="jtiTextHeadline1">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:fontFamily">@font/carter_one_regular</item>
-        <item name="android:textStyle">bold|italic</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/luckiest_guy_regular</item>
     </style>
 </resources>
