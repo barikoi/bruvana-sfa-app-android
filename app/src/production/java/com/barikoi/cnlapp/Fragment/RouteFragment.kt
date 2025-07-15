@@ -9,11 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.barikoi.cnlapp.Activity.RouteViewModel
 import com.barikoi.cnlapp.Adapter.RouteListAdapter
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.FragmentRouteBinding
+import com.barikoi.cnlapp.ui.route.RouteViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
