@@ -1,7 +1,6 @@
 package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,32 +8,32 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.ui.main.MainActivity.Companion.routeName_selected
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.barikoi.cnlapp.databinding.FragmentHomeBinding
+import com.barikoi.cnlapp.ui.main.MainActivity.Companion.routeName_selected
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
-import com.barikoi.cnlapp.utils.extension.AppLocale
+import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -42,26 +41,22 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
 
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    var mContext: Context? = null
-    var mQueue: RequestQueue? = null
+    @Inject
+    lateinit var prefs: SharePrefUtils
+
+    @Inject
+    lateinit var mQueue: RequestQueue
     val dots: ArrayList<ImageView> = ArrayList()
-    var token: String? = ""
     var srId: String? = ""
     var userId: String? = ""
     var routeId: String? = ""
-    var progressBar: ProgressBar? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,12 +69,11 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        progressBar = view.findViewById(R.id.progressBarHomeTO)
+        binding.btnTryAgain.setOnClickListener {
+            checkForAttendanceToday()
+        }
 
         checkForAttendanceToday()
-
-        AppLogger.log("LOCAL AppLocale:: ${AppLocale.getCurrentLocale(requireContext()).displayName}")
     }
 
     private fun checkForAttendanceToday() {
@@ -87,7 +81,7 @@ class HomeFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         ApiServices.apiGET(
             Api.get_attendance + "?start_date=" + df.format(today) + "&end_date=" + df.format(today),
-            mQueue!!, token!!, object : ApiServiceListener {
+            mQueue, prefs.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     try {
                         val obj = JSONObject(response)
@@ -97,16 +91,15 @@ class HomeFragment : Fragment() {
                             binding.bodyLayout.visibility = View.VISIBLE
                             val attendanceObj = attendanceArray.getJSONObject(0)
                             if (!attendanceObj.getString("route_id").equals("null")) {
-                                attendanceObj.getInt("route_id")
-                                attendanceObj.getString("route_name")
-                                editor!!.putString(
+                                prefs.saveString(
                                     Api.SELECTED_ROUTE_ID,
                                     attendanceObj.getInt("route_id").toString()
                                 )
-                                    .putString(
-                                        Api.SELECTED_ROUTE_NAME,
-                                        attendanceObj.getString("route_name")
-                                    ).commit()
+                                prefs.saveString(
+                                    Api.SELECTED_ROUTE_NAME,
+                                    attendanceObj.getString("route_name")
+                                )
+
                                 if (attendanceObj.getString("route_name").isNotEmpty()) {
                                     routeName_selected!!.visibility = View.VISIBLE
                                     routeName_selected!!.text =
@@ -117,30 +110,28 @@ class HomeFragment : Fragment() {
                                 routeId = attendanceObj.getInt("route_id").toString()
                                 if (isAdded) {
                                     init()
+                                } else {
+                                    toast("Fragment is not added")
                                 }
                             } else {
-                                progressBar!!.visibility = View.GONE
+                                binding.progressBarHomeTO.visibility = View.GONE
                                 binding.noRouteCheck.visibility = View.VISIBLE
                                 binding.bodyLayout.visibility = View.GONE
-
-                                binding.btnTryAgain.setOnClickListener {
-                                    checkForAttendanceToday()
-                                }
                             }
 
                         } else {
-                            progressBar!!.visibility = View.GONE
+                            binding.progressBarHomeTO.visibility = View.GONE
                             binding.noRouteCheck.visibility = View.VISIBLE
                             binding.bodyLayout.visibility = View.GONE
-
-                            binding.btnTryAgain.setOnClickListener {
-                                checkForAttendanceToday()
-                            }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Sentry.captureException(e)
-                        progressBar!!.visibility = View.GONE
+                        binding.progressBarHomeTO.visibility = View.GONE
+                        binding.noRouteCheck.visibility = View.VISIBLE
+                        binding.bodyLayout.visibility = View.GONE
+
+                        binding.tvError.text = "Something went wrong! Please try again."
                     }
                 }
 
@@ -151,13 +142,13 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun onResponseFailure(error: VolleyError) {
-                    ViewUtils.getErrorResponse(error, mContext!!)
-                    progressBar!!.visibility = View.GONE
+                    ViewUtils.getErrorResponse(error, requireContext())
+                    binding.progressBarHomeTO.visibility = View.GONE
                 }
 
                 override fun onException(e: Exception) {
-                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
-                    progressBar!!.visibility = View.GONE
+                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
+                    binding.progressBarHomeTO.visibility = View.GONE
                 }
 
             })
@@ -189,26 +180,22 @@ class HomeFragment : Fragment() {
 
         binding.dateRangeLayoutHome.setOnClickListener {
             materialDatePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayoutHome.setEnabled(false)
+            binding.dateRangeLayoutHome.isEnabled = false
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayoutHome.setEnabled(true)
+            binding.dateRangeLayoutHome.isEnabled = true
             val s_date = Date(selection.first!!)
             val e_date = Date(selection.second!!)
             if (s_date.compareTo(e_date) == 0) {
                 binding.tvDateRange.text = simpleFormat.format(s_date)
-                editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.commit()
+                prefs.saveString(Api.START_DATE_ATTENDANCE, df.format(s_date))
+                prefs.saveString(Api.END_DATE_ATTENDANCE, df.format(s_date))
             } else {
                 binding.tvDateRange.text =
-                    simpleFormat.format(s_date) + " - " + simpleFormat.format(
-                        e_date
-                    )
-                editor!!.putString(Api.START_DATE_ATTENDANCE, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ATTENDANCE, df.format(e_date))
-                editor!!.commit()
+                    simpleFormat.format(s_date) + " - " + simpleFormat.format(e_date)
+                prefs.saveString(Api.START_DATE_ATTENDANCE, df.format(s_date))
+                prefs.saveString(Api.END_DATE_ATTENDANCE, df.format(e_date))
             }
 
             getSummaryTargets(
@@ -266,14 +253,14 @@ class HomeFragment : Fragment() {
         var bounce_completed = "--:--"
         var bounceCompletedValue = 0.0
 
-        val dformat = DecimalFormat("#.##")
+        val dFormat = DecimalFormat("#.##")
 
-        ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
+        ApiServices.apiGET(url, mQueue, prefs.getString(Api.TOKEN)!!, object : ApiServiceListener {
             override fun onResponseSuccess(response: String) {
                 try {
                     AppLogger.log("getSummaryTargets:: $response")
                     if (response != null) {
-                        progressBar!!.visibility = View.GONE
+                        binding.progressBarHomeTO.visibility = View.GONE
                         val obj = JSONObject(response)
                         val targetsArray = obj.getJSONArray("targets")
                         val completedArray = obj.getJSONArray("target_completed")
@@ -281,7 +268,7 @@ class HomeFragment : Fragment() {
                             for (i in 0 until targetsArray.length()) {
                                 val targetObj = targetsArray.getJSONObject(i)
                                 if (!targetObj.isNull("target_amount")) {
-                                    total_target = dformat.format(
+                                    total_target = dFormat.format(
                                         targetObj.getString("target_amount").toDouble()
                                     )
                                     totalTargetValue =
@@ -289,16 +276,16 @@ class HomeFragment : Fragment() {
                                 }
                                 if (!targetObj.isNull("target_ads")) {
                                     ads =
-                                        dformat.format(targetObj.getString("target_ads").toDouble())
+                                        dFormat.format(targetObj.getString("target_ads").toDouble())
                                     adsValue = targetObj.getString("target_ads").toDouble()
                                 }
                                 if (!targetObj.isNull("target_rds")) {
                                     rds =
-                                        dformat.format(targetObj.getString("target_rds").toDouble())
+                                        dFormat.format(targetObj.getString("target_rds").toDouble())
                                     rdsValue = targetObj.getString("target_rds").toDouble()
                                 }
                                 if (!targetObj.isNull("target_sku_per_memo")) {
-                                    bpc = dformat.format(
+                                    bpc = dFormat.format(
                                         targetObj.getString("target_sku_per_memo").toDouble()
                                     )
                                     bpcValue =
@@ -306,7 +293,7 @@ class HomeFragment : Fragment() {
                                 }
                                 if (!targetObj.isNull("target_number_of_memo")) {
                                     lpc =
-                                        dformat.format(
+                                        dFormat.format(
                                             targetObj.getString("target_number_of_memo").toDouble()
                                         )
                                     lpcValue =
@@ -314,7 +301,7 @@ class HomeFragment : Fragment() {
                                 }
                                 if (!targetObj.isNull("target_number_of_visits")) {
                                     visited =
-                                        dformat.format(
+                                        dFormat.format(
                                             targetObj.getString("target_number_of_visits")
                                                 .toDouble()
                                         )
@@ -323,12 +310,12 @@ class HomeFragment : Fragment() {
                                 }
                                 if (!targetObj.isNull("target_aiv")) {
                                     aiv =
-                                        dformat.format(targetObj.getString("target_aiv").toDouble())
+                                        dFormat.format(targetObj.getString("target_aiv").toDouble())
                                     aivValue = targetObj.getString("target_aiv").toDouble()
                                 }
                                 if (!targetObj.isNull("threshold_bounce_percentage")) {
                                     bounced =
-                                        dformat.format(
+                                        dFormat.format(
                                             targetObj.getString("threshold_bounce_percentage")
                                                 .toDouble()
                                         )
@@ -344,34 +331,34 @@ class HomeFragment : Fragment() {
                                 val targetObj = completedArray.getJSONObject(i)
                                 if (!targetObj.isNull("revenue")) {
                                     total_target_completed =
-                                        dformat.format(targetObj.getString("revenue").toDouble())
+                                        dFormat.format(targetObj.getString("revenue").toDouble())
                                     totalTargetCompletedValue =
                                         targetObj.getString("revenue").toDouble()
                                 }
                                 if (!targetObj.isNull("ads")) {
                                     ads_completed =
-                                        dformat.format(targetObj.getString("ads").toDouble())
+                                        dFormat.format(targetObj.getString("ads").toDouble())
                                     adsCompletedValue = targetObj.getString("ads").toDouble()
                                 }
                                 if (!targetObj.isNull("rds")) {
                                     rds_completed =
-                                        dformat.format(targetObj.getString("rds").toDouble())
+                                        dFormat.format(targetObj.getString("rds").toDouble())
                                     rdsCompletedValue = targetObj.getString("rds").toDouble()
                                 }
                                 if (!targetObj.isNull("sku_per_memo")) {
                                     bpc_completed =
-                                        dformat.format(
+                                        dFormat.format(
                                             targetObj.getString("sku_per_memo").toDouble()
                                         )
                                     bpcCompletedValue =
                                         targetObj.getString("sku_per_memo").toDouble()
                                 }
                                 if (!targetObj.isNull("number_of_memo")) lpc_completed =
-                                    dformat.format(targetObj.getString("number_of_memo").toDouble())
+                                    dFormat.format(targetObj.getString("number_of_memo").toDouble())
                                 lpcCompletedValue = targetObj.getString("number_of_memo").toDouble()
                                 if (!targetObj.isNull("number_of_visits")) {
                                     visit_completed =
-                                        dformat.format(
+                                        dFormat.format(
                                             targetObj.getString("number_of_visits").toDouble()
                                         )
                                     visitCompletedValue =
@@ -379,12 +366,12 @@ class HomeFragment : Fragment() {
                                 }
                                 if (!targetObj.isNull("aiv")) {
                                     aiv_completed =
-                                        dformat.format(targetObj.getString("aiv").toDouble())
+                                        dFormat.format(targetObj.getString("aiv").toDouble())
                                     aivCompletedValue = targetObj.getString("aiv").toDouble()
                                 }
                                 if (!targetObj.isNull("bounce_amount_percentage")) {
                                     bounce_completed =
-                                        dformat.format(
+                                        dFormat.format(
                                             targetObj.getString("bounce_amount_percentage")
                                                 .toDouble()
                                         )
@@ -476,7 +463,7 @@ class HomeFragment : Fragment() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    progressBar!!.visibility = View.GONE
+                    binding.progressBarHomeTO.visibility = View.GONE
                 }
 
             }
@@ -490,12 +477,12 @@ class HomeFragment : Fragment() {
             }
 
             override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, mContext!!)
-                progressBar!!.visibility = View.GONE
+                ViewUtils.getErrorResponse(error, requireContext())
+                binding.progressBarHomeTO.visibility = View.GONE
             }
 
             override fun onException(e: Exception) {
-                progressBar!!.visibility = View.GONE
+                binding.progressBarHomeTO.visibility = View.GONE
             }
 
         })
@@ -579,7 +566,7 @@ class HomeFragment : Fragment() {
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text = titles[position]
         }.attach()
-        binding.viewPagerSecond.currentItem = 0;
+        binding.viewPagerSecond.currentItem = 0
 
         binding.viewPagerSecond.setUserInputEnabled(false)
         for (i in 0 until binding.viewpagertabSecond.tabCount) {
@@ -588,7 +575,7 @@ class HomeFragment : Fragment() {
             p.setMargins(15, 15, 10, 15)
             tab.requestLayout()
         }
-        Log.d("Fragment", "viewpager current Item: " + binding.viewPagerSecond.getCurrentItem())
+        Log.d("Fragment", "viewpager current Item: " + binding.viewPagerSecond.currentItem)
         binding.viewPagerSecond.registerOnPageChangeCallback(object :
             ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -601,7 +588,7 @@ class HomeFragment : Fragment() {
     fun addDots(dotCount: Int) {
         dots.clear()
         for (i in 0 until dotCount) {
-            val dot = ImageView(mContext)
+            val dot = ImageView(requireContext())
             dot.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
@@ -627,17 +614,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = prefs!!.edit()
-        mContext = context
         mQueue = RequestQueueSingleton.getInstance(context).requestQueue
-        token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
-        userId = prefs!!.getString(Api.USER_ID, "")
-        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+        srId = prefs.getString(Api.EMPLOYEE_ID)
+        userId = prefs.getString(Api.USER_ID)
+        routeId = prefs.getString(Api.SELECTED_ROUTE_ID)
     }
 }
