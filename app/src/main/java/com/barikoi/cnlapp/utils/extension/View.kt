@@ -3,8 +3,10 @@ package com.barikoi.cnlapp.utils.extension
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
+import android.os.Parcelable
 import android.os.SystemClock
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -36,6 +38,15 @@ fun Fragment.toast(message: String) {
 
 fun Activity.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+inline fun <reified T : Parcelable> Intent.getParcelableArrayListCompat(key: String): ArrayList<T>? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableArrayListExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        getParcelableArrayListExtra(key)
+    }
 }
 
 fun View.isViewEnable(isEnable: Boolean) {
