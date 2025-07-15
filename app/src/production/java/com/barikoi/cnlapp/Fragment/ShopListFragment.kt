@@ -25,13 +25,13 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
-import com.barikoi.cnlapp.Activity.RouteViewModel
 import com.barikoi.cnlapp.Adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnEditShopListener
 import com.barikoi.cnlapp.databinding.FragmentShopListBinding
+import com.barikoi.cnlapp.ui.route.RouteViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
