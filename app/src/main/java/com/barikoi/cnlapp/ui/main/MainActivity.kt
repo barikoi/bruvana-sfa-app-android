@@ -198,9 +198,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (userType.equals("TO", true) || userType.equals("ASM", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
-            setCurrentFragment(HomeTOFragment(), this@MainActivity)
+            setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(), this@MainActivity)
         } else {
-            setCurrentFragment(HomeFragment(), this@MainActivity)
+            setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(), this@MainActivity)
         }
 
 
