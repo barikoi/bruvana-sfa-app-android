@@ -9,6 +9,9 @@ data class UserSummary(
     val name: String,
     val userType: String,
     val totalOrders: Double,
-    val ads: Double
+    val ads: Double,
+    val territoryId: Int,
+    val active: Int,
+    val inactive: Int
 ) : Parcelable
 
