@@ -23,12 +23,15 @@ class TargetAdapter(
         )
     }
 
+    @SuppressLint("DefaultLocale")
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onBindViewHolder(holder: TargetAdapterViewHolder, position: Int) {
         holder.setIsRecyclable(false)
         holder.binding.tvTitle.text = targets[position].title
-        holder.binding.tvTargetedAmount.text = targets[position].target
-        holder.binding.tvCompleteAmount.text = targets[position].completed
+        holder.binding.tvTargetedAmount.text =
+            String.format("%,.2f", targets[position].target.toDouble())
+        holder.binding.tvCompleteAmount.text =
+            String.format("%,.2f", targets[position].completed.toDouble())
 
         holder.binding.progressBar.max = targets[position].target.toDouble().roundToInt()
         holder.binding.progressBar.setProgress(
