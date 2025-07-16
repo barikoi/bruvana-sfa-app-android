@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +33,6 @@ import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.gson.annotations.SerializedName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -40,7 +40,11 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment(
+    val userType: String,
+    val tId: String? = null,
+    val userId: String? = null,
+) : Fragment() {
     private lateinit var binding: FragmentHome2Binding
 
     private val viewModel: HomeViewModel by viewModels()
@@ -91,8 +95,6 @@ class HomeFragment : Fragment() {
                         )
                 )
             } else {
-                toast("TO")
-
                 startActivity(
                     Intent(requireContext(), TODetailsActivity::class.java)
                         .putExtra("user_summary", it)
@@ -125,29 +127,7 @@ class HomeFragment : Fragment() {
             formattedStartDate, formattedEndDate
         )
 
-        if (sharePrefUtils.getString(Api.USER_TYPE) == "ASM") {
-            viewModel.getOverViewStatsASM(
-                formattedStartDate, formattedEndDate,
-                sharePrefUtils.getString(Constants.REGION_ID) ?: "",
-                sharePrefUtils.getString(Api.USER_ID) ?: ""
-            )
-
-            viewModel.getTOWIthTodaySummary(
-                formattedStartDate, formattedEndDate
-            )
-
-        } else {
-            viewModel.getOverViewStatsTO(
-                formattedStartDate, formattedEndDate,
-                sharePrefUtils.getString(Constants.TERRITORY_ID) ?: "",
-                sharePrefUtils.getString(Api.USER_ID) ?: ""
-            )
-
-            viewModel.getSOWIthTodaySummary(
-                formattedStartDate, formattedEndDate, sharePrefUtils.getString(Api.USER_ID) ?: ""
-            )
-        }
-
+        initData()
 
         binding.tvDateRange.setHapticClickListener {
             dateRangePicker.show(parentFragmentManager, "date_range_picker")
@@ -206,6 +186,17 @@ class HomeFragment : Fragment() {
                     formattedEndDate.formatDateWithDDMM()
                 )
 
+            initData()
+        }
+
+        startActiveInactiveUserObserve()
+        startOverViewStatsObserve()
+        startToWithTodaySummaryObserve()
+        startSoWithTodaySummaryObserve()
+    }
+
+    private fun initData() {
+        if (userType == "ASM") {
             viewModel.getOverViewStatsASM(
                 formattedStartDate, formattedEndDate,
                 sharePrefUtils.getString(Constants.REGION_ID) ?: "",
@@ -216,16 +207,20 @@ class HomeFragment : Fragment() {
                 formattedStartDate, formattedEndDate
             )
 
-            viewModel.getActiveInactiveUsers(
-                formattedStartDate, formattedEndDate
+        } else {
+            viewModel.getOverViewStatsTO(
+                formattedStartDate, formattedEndDate,
+                tId ?: sharePrefUtils.getString(Constants.TERRITORY_ID) ?: "",
+                userId ?: sharePrefUtils.getString(Api.USER_ID) ?: ""
             )
 
+            viewModel.getSOWIthTodaySummary(
+                formattedStartDate,
+                formattedEndDate,
+                userId ?: sharePrefUtils.getString(Api.USER_ID) ?: ""
+            )
         }
 
-        startActiveInactiveUserObserve()
-        startOverViewStatsObserve()
-        startToWithTodaySummaryObserve()
-        startSoWithTodaySummaryObserve()
     }
 
     private fun startActiveInactiveUserObserve() {
@@ -234,20 +229,24 @@ class HomeFragment : Fragment() {
                 when (it) {
                     is ApiState.Empty -> {
                         AppLogger.log("startActiveInactiveUserObserve::Empty")
+                        binding.llActiveInactive.hideShimmer()
                     }
 
                     is ApiState.Error -> {
                         AppLogger.log("startActiveInactiveUserObserve::Error ${it.error}")
-                        toast(networkFailureMessage.handleFailure(it.error!!))
+                        binding.llActiveInactive.hideShimmer()
 
+                        toast(networkFailureMessage.handleFailure(it.error!!))
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startActiveInactiveUserObserve::Loading")
+                        binding.llActiveInactive.startShimmer()
                     }
 
                     is ApiState.Success -> {
                         AppLogger.log("startActiveInactiveUserObserve:: Success ${it.data}")
+                        binding.llActiveInactive.hideShimmer()
 
                         binding.tvActiveValue.text = it.data!!.active.size.toString()
                         binding.tvInactiveValue.text = it.data.inactive.size.toString()
@@ -338,20 +337,30 @@ class HomeFragment : Fragment() {
                 when (it) {
                     is ApiState.Empty -> {
                         AppLogger.log("startToWithTodaySummaryObserve::Empty")
+                        binding.llShimmerToList.isVisible = false
+                        binding.llShimmerToList.hideShimmer()
                     }
 
                     is ApiState.Error -> {
                         AppLogger.log("startToWithTodaySummaryObserve::Error ${it.error}")
+                        binding.llShimmerToList.isVisible = false
+                        binding.llShimmerToList.hideShimmer()
                         toast(networkFailureMessage.handleFailure(it.error!!))
 
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startToWithTodaySummaryObserve::Loading")
+                        binding.llShimmerToList.isVisible = true
+                        binding.rcvToList.isVisible = false
+                        binding.llShimmerToList.startShimmer()
                     }
 
                     is ApiState.Success -> {
                         AppLogger.log("startToWithTodaySummaryObserve:: Success ${it.data}")
+                        binding.llShimmerToList.isVisible = false
+                        binding.llShimmerToList.hideShimmer()
+                        binding.rcvToList.isVisible = true
 
                         userSummary =
                             it.data!!.toList.map { tow ->
@@ -370,20 +379,28 @@ class HomeFragment : Fragment() {
                 when (it) {
                     is ApiState.Empty -> {
                         AppLogger.log("startSoWithTodaySummaryObserve::Empty")
+                        binding.llShimmerToList.isVisible = false
+                        binding.llShimmerToList.hideShimmer()
                     }
 
                     is ApiState.Error -> {
                         AppLogger.log("startSoWithTodaySummaryObserve::Error ${it.error}")
+                        binding.llShimmerToList.isVisible = false
+                        binding.llShimmerToList.hideShimmer()
                         toast(networkFailureMessage.handleFailure(it.error!!))
 
                     }
 
                     is ApiState.Loading -> {
                         AppLogger.log("startSoWithTodaySummaryObserve::Loading")
+                        binding.llShimmerToList.isVisible = true
+                        binding.llShimmerToList.startShimmer()
                     }
 
                     is ApiState.Success -> {
                         AppLogger.log("startSoWithTodaySummaryObserve:: Success ${it.data}")
+                        binding.llShimmerToList.isVisible = false
+                        binding.llShimmerToList.hideShimmer()
 
 
                         userSummary = it.data!!.soList[0].salesOfficers.map { so ->
