@@ -49,6 +49,15 @@ inline fun <reified T : Parcelable> Intent.getParcelableArrayListCompat(key: Str
     }
 }
 
+inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        getParcelableExtra(key)
+    }
+}
+
 fun View.isViewEnable(isEnable: Boolean) {
     if (isEnable) {
         this.isEnabled = true
