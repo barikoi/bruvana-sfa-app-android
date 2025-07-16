@@ -3,6 +3,7 @@ package com.barikoi.cnlapp.ui.home.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.data.remote.models.UserSummary
 import com.barikoi.cnlapp.databinding.ItemUserBinding
@@ -37,7 +38,20 @@ class AdapterUserListWithSummary(
         with(holder.binding) {
             tvName.text = user.name
             tvUserType.text = user.userType
-            tvOrderValueADS.text = "Order Value: ${user.totalOrders}/ADS: ${String.format("%,.2f", user.ads)}"
+            tvOrderValueADS.text = "${
+                String.format(
+                    "%,.2f",
+                    user.totalOrders
+                )
+            }/${String.format("%,.2f", user.ads)}"
+
+            if (user.userType == "TO") {
+                tvActiveUser.text = user.active.toString()
+                tvInactiveUser.text = user.inactive.toString()
+            } else {
+                tvActiveUser.isVisible = false
+                tvInactiveUser.isVisible = false
+            }
         }
 
         holder.binding.root.setHapticClickListener {
