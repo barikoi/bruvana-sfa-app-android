@@ -60,7 +60,10 @@ data class SalesOfficer(
             name = userName,
             userType = designation,
             totalOrders = soOrderedValue,
-            ads = 0.00
+            ads = 0.00,
+            territoryId = 0,
+            active = 0,
+            inactive = 0
         )
     }
 }
