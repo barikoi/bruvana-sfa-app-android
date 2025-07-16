@@ -198,9 +198,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (userType.equals("TO", true) || userType.equals("ASM", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
-            setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(), this@MainActivity)
+            setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(
+                sharePrefUtils.getString(Api.USER_TYPE)!!
+            ), this@MainActivity)
         } else {
-            setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(), this@MainActivity)
+            setCurrentFragment(HomeFragment(), this@MainActivity)
         }
 
 
@@ -310,7 +312,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.tvTitle.visibility = View.GONE
                     binding.appContentMain.userLayout.visibility = View.VISIBLE
                     if (userType.equals("TO", true) || userType.equals("ASM", true)) {
-                        setCurrentFragment(HomeTOFragment(), this@MainActivity)
+                        setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(sharePrefUtils.getString(Api.USER_TYPE)!!), this@MainActivity)
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
