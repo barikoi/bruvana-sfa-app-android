@@ -4,7 +4,7 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
 import com.barikoi.cnlapp.data.remote.api.ApiService
-import com.barikoi.cnlapp.data.remote.models.BaseResponse
+import com.barikoi.cnlapp.data.remote.models.OutletTypeSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
 import com.barikoi.cnlapp.data.remote.models.active.OverViewStatsResponse
 import com.barikoi.cnlapp.data.remote.models.so.SoWithSummaryResponse
@@ -24,6 +24,15 @@ interface SummaryRepository {
     suspend fun getSoWithTodaySummary(
         startDate: String, endDate: String, toID: String
     ): Flow<ApiState<SoWithSummaryResponse>>
+
+    suspend fun getOutletTypeSummary(
+        startDate: String, endDate: String, userId: String
+    ): Flow<ApiState<OutletTypeSummaryResponse>>
+
+
+    suspend fun getSoSummary(
+        startDate: String, endDate: String, userId: String
+    ): Flow<ApiState<OverViewStatsResponse>>
 
     suspend fun getOverViewStatsTO(
         startDate: String,
@@ -94,6 +103,80 @@ class SummaryRepositoryImpl @Inject constructor(
                             getErrorTypeByHTTPCode(response.code()),
                             errorResponse = Gson().fromJson(
                                 response.errorBody()?.string(), SoWithSummaryResponse::class.java
+                            )
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override suspend fun getOutletTypeSummary(
+        startDate: String,
+        endDate: String,
+        userId: String
+    ): Flow<ApiState<OutletTypeSummaryResponse>> {
+        return flow {
+            try {
+                val response = apiService.getOutletTypeSummary(startDate, endDate, userId)
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code()),
+                            errorResponse = Gson().fromJson(
+                                response.errorBody()?.string(), OutletTypeSummaryResponse::class.java
+                            )
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override suspend fun getSoSummary(
+        startDate: String,
+        endDate: String,
+        userId: String
+    ): Flow<ApiState<OverViewStatsResponse>> {
+        return flow {
+            try {
+                val response = apiService.getSoSummary(startDate, endDate, userId)
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code()),
+                            errorResponse = Gson().fromJson(
+                                response.errorBody()?.string(), OverViewStatsResponse::class.java
                             )
                         )
                     )
