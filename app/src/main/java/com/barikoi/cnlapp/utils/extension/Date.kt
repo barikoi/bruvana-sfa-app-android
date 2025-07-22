@@ -40,6 +40,14 @@ fun String.formatDateWithDDMM(): String {
     return outputFormat.format(date)
 }
 
+fun String.formatDateWithDDMMYYYY(): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // adjust if needed
+    val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+
+    val date = inputFormat.parse(this) ?: return this // fallback to original if parse fails
+    return outputFormat.format(date)
+}
+
 fun Date.formatDate(): String {
     val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
     return df.format(this)
