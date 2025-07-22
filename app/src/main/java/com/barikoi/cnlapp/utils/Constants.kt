@@ -52,6 +52,8 @@ object Constants {
     //    const val MOBILE_REGEX = "^(?:(?:\\+|00)88|01)?\\d{11}\$"
     const val MOBILE_REGEX = "^(?:\\+?88|0088)?01[15-9]\\d{8}\$"
 
+    const val MIME_TYPE_PDF = "application/pdf"
+
     val shopType = listOf(
         "General Large Store (A)",
         "General Small Store (B)",
