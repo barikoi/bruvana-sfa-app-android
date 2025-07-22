@@ -46,8 +46,8 @@
             android:name=".ui.to_details.TODetailsActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
-        <activity
-            android:name=".ui.summary_details.SummaryDetailsActivity"
+       <activity
+            android:name=".ui.summary_details.SummaryDetailsActivity2"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
