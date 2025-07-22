@@ -21,6 +21,8 @@ import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
+import com.barikoi.cnlapp.data.remote.models.OrderResponse
+import com.barikoi.cnlapp.data.remote.models.OutletTypeSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.active.OverViewStatsResponse
 import com.barikoi.cnlapp.data.remote.models.offer.OfferResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
@@ -28,6 +30,8 @@ import com.barikoi.cnlapp.data.remote.models.product.ProductResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
 import com.barikoi.cnlapp.data.remote.models.so.SoWithSummaryResponse
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -36,6 +40,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 interface ApiService {
@@ -82,6 +87,14 @@ interface ApiService {
         @Query("to_id") withSoStats: String,
         @Query("today_summary") todaySummary: String? = "1",
     ): Response<SoWithSummaryResponse>
+
+    @GET("api/v1/get-overview-stats")
+    suspend fun getSoSummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String,
+        @Query("so_stat_for_asm") soStatForAsm: String = "1",
+    ): Response<OverViewStatsResponse>
 
     @GET("api/v1/outlets")
     suspend fun getOutlets(
@@ -223,7 +236,6 @@ interface ApiService {
         @Url url: String,
     ): Response<ReverseGeoResponse>
 
-
     @GET("api/v1/get-overview-stats")
     suspend fun getOverViewStatsTO(
         @Query("start_date") startDate: String,
@@ -241,4 +253,24 @@ interface ApiService {
         @Query("region_id") regionId: String,
         @Query("user_id") userId: String
     ): Response<OverViewStatsResponse>
+
+    @GET("api/v1/outlet-type-summary")
+    suspend fun getOutletTypeSummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("so_id") userId: String
+    ): Response<OutletTypeSummaryResponse>
+
+    @GET("api/v1/orders")
+    suspend fun getOrders(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String
+    ): Response<OrderResponse>
+
+    @Streaming
+    @GET("api/v1/memo-generate")
+    fun downloadChalans(
+        @Query("order_no") orderIds: String
+    ): Call<ResponseBody>
 }
