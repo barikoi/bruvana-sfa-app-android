@@ -47,7 +47,7 @@ data class To(
     @SerializedName("territory_id")
     val territoryId: Int,
     @SerializedName("activeInactiveData")
-    val activeInactiveData: ActiveInactiveData
+    val activeInactiveData: ActiveInactiveData?
 
 ) {
     @SuppressLint("DefaultLocale")
@@ -64,8 +64,8 @@ data class To(
             totalOrders = totalOrders.toDouble(),
             ads = BigDecimal(ads).setScale(2, RoundingMode.HALF_UP).toDouble(),
             territoryId = territoryId,
-            active = activeInactiveData.active,
-            inactive = activeInactiveData.inactive
+            active = activeInactiveData?.active ?: 0,
+            inactive = activeInactiveData?.inactive ?: 0,
         )
     }
 }
