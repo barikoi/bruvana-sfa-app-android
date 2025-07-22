@@ -15,3 +15,8 @@ data class TargetAndCompleted(
     var target: String,
     var completed: String,
 )
+
+data class SoStats(
+    val title: String,
+    var value: String
+)
