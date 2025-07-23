@@ -35,6 +35,7 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.extension.formatDateToFullName
 import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.rotateViewAnimation
+import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import org.json.JSONException
@@ -278,6 +279,8 @@ class CreateAttendanceFragment : Fragment() {
                         }
 
                     } catch (e: Exception) {
+                        checkAttendanceDialog.dismiss()
+                        toast("Error: ${e.message}")
                         Sentry.captureException(e)
                         e.printStackTrace()
                     }
