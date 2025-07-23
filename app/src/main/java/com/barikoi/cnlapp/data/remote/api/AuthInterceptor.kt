@@ -29,7 +29,9 @@ class AuthInterceptor @Inject constructor(
 
         AppLogger.log("REQUEST URL:: ${response.request.url}")
 
-        if (response.code == 401 && response.request.url.toString() != BuildConfig.url_base + "login") {
+        if (response.code == 401 && !response.request.url.toString()
+                .startsWith(BuildConfig.url_base + "api/v1/login")
+        ) {
             AppLogger.log("response.code == 401:: ${response.message}")
 
             // Close the response body
@@ -43,8 +45,6 @@ class AuthInterceptor @Inject constructor(
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
-
-
 
             return response
         } else {
