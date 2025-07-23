@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.VisitReport
+package com.barikoi.cnlapp.visit_report
 
 import android.os.Build
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
@@ -166,21 +167,21 @@ class VisitReportActivity : BaseActivity() {
             isCustomDate = true
             binding.spinnerMenu.setSelection(2)
             binding.dateRangeLayout.isEnabled = true
-            val s_date = Date(selection.first!!)
-            val e_date = Date(selection.second!!)
-            startDate = df.format(s_date)
-            endDate = df.format(e_date)
-            if (s_date.compareTo(e_date) == 0) {
-                binding.tvDateRange.text = s_date.formatFullMonthDateYear()
-                customDate = s_date.formatFullMonthDateYear()
+            val sDate = Date(selection.first!!)
+            val eDate = Date(selection.second!!)
+            startDate = df.format(sDate)
+            endDate = df.format(eDate)
+            if (sDate.compareTo(eDate) == 0) {
+                binding.tvDateRange.text = sDate.formatFullMonthDateYear()
+                customDate = sDate.formatFullMonthDateYear()
             } else {
                 binding.tvDateRange.text = getString(
                     R.string.date_range_,
-                    s_date.formatFullMonthDateYear(),
-                    e_date.formatFullMonthDateYear()
+                    sDate.formatFullMonthDateYear(),
+                    eDate.formatFullMonthDateYear()
                 )
                 customDate =
-                    s_date.formatFullMonthDateYear() + " - " + e_date.formatFullMonthDateYear()
+                    sDate.formatFullMonthDateYear() + " - " + eDate.formatFullMonthDateYear()
             }
 
             if (srId != null) {
@@ -254,11 +255,11 @@ class VisitReportActivity : BaseActivity() {
         }
     }
 
-    private fun getVisitReports(sr_id: String, startDate: String, endDate: String) {
+    private fun getVisitReports(srId: String, startDate: String, endDate: String) {
         val url = if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO", true)) {
-            Api.get_visit_report + "?user_id=" + sr_id + "&start_date=" + startDate + "&end_date=" + endDate
+            Api.get_visit_report + "?user_id=" + srId + "&start_date=" + startDate + "&end_date=" + endDate
         } else {
-            Api.get_visit_report + "?user_id=" + sr_id + "&start_date=" + startDate + "&end_date=" + endDate
+            Api.get_visit_report + "?user_id=" + srId + "&start_date=" + startDate + "&end_date=" + endDate
         }
         binding.progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(
@@ -338,7 +339,7 @@ class VisitReportActivity : BaseActivity() {
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
             val tableRowParams = TableLayout.LayoutParams(
-                TableLayout.LayoutParams.FILL_PARENT,
+                TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT
             )
             val leftMargin = 0
@@ -351,31 +352,37 @@ class VisitReportActivity : BaseActivity() {
             tr.gravity = Gravity.CENTER_VERTICAL
             val c1 = TextView(applicationContext)
             c1.gravity = Gravity.START
-            c1.setTextColor(resources.getColor(R.color.text_title))
+            c1.setTextColor(ContextCompat.getColor(this@VisitReportActivity, R.color.text_title))
             c1.text = data[i].first
             val c2 = TextView(applicationContext)
             c2.gravity = Gravity.END
-            c2.setTextColor(resources.getColor(R.color.text_title))
+            c2.setTextColor(ContextCompat.getColor(this@VisitReportActivity, R.color.text_title))
             c2.text = data[i].second
             c2.gravity = Gravity.CENTER
-            c2.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
+            c2.background = ContextCompat.getDrawable(
+                this@VisitReportActivity,
+                R.drawable.button_white_bg_stroke
+            )
             tr.addView(c1)
             tr.addView(c2)
             tabLayout.addView(tr)
-            tabLayout.background = resources.getDrawable(R.drawable.cardview_bg_stroke_2dp)
+            tabLayout.background = ContextCompat.getDrawable(
+                this@VisitReportActivity,
+                R.drawable.cardview_bg_stroke_2dp
+            )
         }
     }
 
-    private fun createTableOther(data: ArrayList<Pair<String, String>>, tab_Layout: TableLayout) {
-        tab_Layout.isStretchAllColumns = true
-        tab_Layout.bringToFront()
-        tab_Layout.removeAllViews()
-        tab_Layout.visibility = View.VISIBLE
+    private fun createTableOther(data: ArrayList<Pair<String, String>>, tabLayout: TableLayout) {
+        tabLayout.isStretchAllColumns = true
+        tabLayout.bringToFront()
+        tabLayout.removeAllViews()
+        tabLayout.visibility = View.VISIBLE
 
         for (i in 0 until data.size) {
             val tr = TableRow(applicationContext)
             val tableRowParams = TableLayout.LayoutParams(
-                TableLayout.LayoutParams.FILL_PARENT,
+                TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT
             )
             val leftMargin = 0
@@ -388,17 +395,20 @@ class VisitReportActivity : BaseActivity() {
             tr.gravity = Gravity.CENTER_VERTICAL
             val c1 = TextView(applicationContext)
             c1.gravity = Gravity.START
-            c1.setTextColor(resources.getColor(R.color.text_title))
+            c1.setTextColor(ContextCompat.getColor(this@VisitReportActivity, R.color.text_title))
             c1.text = data[i].first
             val c2 = TextView(applicationContext)
             c2.gravity = Gravity.END
-            c2.setTextColor(resources.getColor(R.color.text_title))
+            c2.setTextColor(ContextCompat.getColor(this@VisitReportActivity, R.color.text_title))
             c2.text = data[i].second
             c2.gravity = Gravity.CENTER
             tr.addView(c1)
             tr.addView(c2)
-            tab_Layout.addView(tr)
-            tab_Layout.background = resources.getDrawable(R.drawable.button_white_bg_stroke)
+            tabLayout.addView(tr)
+            tabLayout.background = ContextCompat.getDrawable(
+                this@VisitReportActivity,
+                R.drawable.button_white_bg_stroke
+            )
         }
     }
 }

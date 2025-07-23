@@ -44,9 +44,8 @@ import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
-import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment
 import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
-import com.barikoi.cnlapp.VisitReport.VisitReportActivity
+import com.barikoi.cnlapp.visit_report.VisitReportActivity
 import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState

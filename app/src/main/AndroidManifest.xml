@@ -75,7 +75,7 @@
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
-            android:name=".VisitReport.VisitReportActivity"
+            android:name=".visit_report.VisitReportActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
