@@ -5,6 +5,7 @@ import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
 import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
+import com.barikoi.cnlapp.data.remote.models.OrderResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
 import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
@@ -20,9 +21,16 @@ interface OrderRepository {
         userId: String,
         orderId: String,
     ): Flow<ApiState<PreviousDayOrderResponse>>
+
     fun saveNoOrder(
         body: RequestBody
     ): Flow<ApiState<BaseResponse>>
+
+    fun getOrders(
+        startDate: String,
+        endDate: String,
+        userId: String
+    ): Flow<ApiState<OrderResponse>>
 }
 
 class OrderRepositoryImpl @Inject constructor(
@@ -98,6 +106,40 @@ class OrderRepositoryImpl @Inject constructor(
         return flow {
             try {
                 val response = apiService.saveNoOrder(body)
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code())
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override fun getOrders(
+        startDate: String,
+        endDate: String,
+        userId: String
+    ): Flow<ApiState<OrderResponse>> {
+        return flow {
+            try {
+                val response = apiService.getOrders(startDate, endDate, userId)
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {
