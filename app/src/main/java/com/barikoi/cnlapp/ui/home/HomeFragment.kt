@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +21,7 @@ import com.barikoi.cnlapp.ui.active_inactive.ActiveInactiveActivity
 import com.barikoi.cnlapp.ui.home.adapter.AdapterUserListWithSummary
 import com.barikoi.cnlapp.ui.home.adapter.TargetAdapter
 import com.barikoi.cnlapp.ui.home.vm.HomeViewModel
-import com.barikoi.cnlapp.ui.summary_details.SummaryDetailsActivity
+import com.barikoi.cnlapp.ui.summary_details.SummaryDetailsActivity2
 import com.barikoi.cnlapp.ui.to_details.TODetailsActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
@@ -35,6 +34,7 @@ import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -88,7 +88,7 @@ class HomeFragment(
         adapterUserListWithSummary = AdapterUserListWithSummary {
             if (it.userType == "SO") {
                 startActivity(
-                    Intent(requireContext(), SummaryDetailsActivity::class.java)
+                    Intent(requireContext(), SummaryDetailsActivity2::class.java)
                         .putParcelableArrayListExtra(
                             "user_summary",
                             ArrayList(userSummary)
@@ -117,11 +117,22 @@ class HomeFragment(
 
         targetAdapter.updateData(emptyTargets)
 
+        binding.refresh.setOnRefreshListener {
+            binding.refresh.isRefreshing = false
+            initData()
+        }
 
-        formattedStartDate = Date().formatDateWithLocale()
+
         formattedEndDate = Date().formatDateWithLocale()
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.DAY_OF_MONTH, 1)
+        formattedStartDate = cal.time.formatDateWithLocale()
 
-        binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
+        binding.tvDateRange.text = getString(
+            R.string.date_range_,
+            formattedStartDate.formatDateWithDDMM(),
+            formattedEndDate.formatDateWithDDMM()
+        )
 
         viewModel.getActiveInactiveUsers(
             formattedStartDate, formattedEndDate
@@ -394,12 +405,14 @@ class HomeFragment(
                     is ApiState.Loading -> {
                         AppLogger.log("startSoWithTodaySummaryObserve::Loading")
                         binding.llShimmerToList.isVisible = true
+                        binding.rcvToList.isVisible = false
                         binding.llShimmerToList.startShimmer()
                     }
 
                     is ApiState.Success -> {
                         AppLogger.log("startSoWithTodaySummaryObserve:: Success ${it.data}")
                         binding.llShimmerToList.isVisible = false
+                        binding.rcvToList.isVisible = true
                         binding.llShimmerToList.hideShimmer()
 
 
