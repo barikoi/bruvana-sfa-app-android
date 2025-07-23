@@ -15,7 +15,7 @@ data class OverViewStatsResponse(
 
 data class TargetCompleted(
     @SerializedName("ads")
-    val ads: Double,
+    val ads: Double?,
     @SerializedName("aiv")
     val aiv: String?,
     @SerializedName("bounce_amount_percentage")
@@ -23,11 +23,11 @@ data class TargetCompleted(
     @SerializedName("delivered_value")
     val deliveredValue: Double,
     @SerializedName("number_of_memo")
-    val numberOfMemo: Int,
+    val numberOfMemo: Int?,
     @SerializedName("number_of_visits")
-    val numberOfVisits: Int,
+    val numberOfVisits: Int?,
     @SerializedName("rds")
-    val rds: Double,
+    val rds: Double?,
     @SerializedName("revenue")
     val revenue: String?,
     @SerializedName("sku_per_memo")
