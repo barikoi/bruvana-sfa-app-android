@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_margin="@dimen/_3sdp"
-    android:padding="@dimen/_15dp"
+    android:padding="@dimen/_8sdp"
     android:layout_height="wrap_content">
 
     <TextView
@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginEnd="@dimen/_10sdp"
-        android:text="Today Order Value"
-        android:textStyle="bold"
+        android:text="Order Value"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tvValue"
         app:layout_constraintStart_toStartOf="parent"
