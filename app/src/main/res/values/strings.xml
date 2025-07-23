@@ -353,6 +353,7 @@
     <string name="offer">Offer</string>
     <string name="combo_offer">Combo Offer</string>
     <string name="in_stock">%1$s in stock</string>
+    <string name="taka_sign">৳ %1$s</string>
     <string name="unknown">Unknown</string>
     <string name="minus_button">Minus Button</string>
     <string name="plus_button">Plus Button</string>
@@ -364,8 +365,6 @@
     <string name="total_items">Total Items</string>
     <string name="expand">Expand</string>
     <string name="circle">Circle</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="daily_summary">DAILY SUMMARY</string>
     <string name="user_icon">User Icon</string>
     <string name="inactive_user">Inactive Users</string>
@@ -376,5 +375,6 @@
     <string name="download_icon">Download Icon</string>
     <string name="summary_details">Summary Details</string>
     <string name="something_went_wrong_please_try_again">Something went wrong! PLease try again.</string>
+    <string name="to">TO</string>
 
 </resources>
