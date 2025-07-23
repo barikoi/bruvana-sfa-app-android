@@ -19,7 +19,6 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.AppLogger
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
@@ -40,8 +39,10 @@ class VisitReportActivity : BaseActivity() {
     @Inject
     lateinit var sharePrefUtils: SharePrefUtils
 
+    @Inject
+    lateinit var queue: RequestQueue
+
     var srId: String? = null
-    var queue: RequestQueue? = null
     var startDate: String? = null
     var endDate: String? = null
     private var customDate: String? = null
@@ -55,8 +56,6 @@ class VisitReportActivity : BaseActivity() {
 
         binding = ActivityVisitReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        queue = RequestQueueSingleton.getInstance(applicationContext).requestQueue
 
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -194,14 +193,12 @@ class VisitReportActivity : BaseActivity() {
         materialDatePicker.addOnNegativeButtonClickListener {
             binding.dateRangeLayout.isEnabled = true
         }
-
     }
-
 
     private fun getSOList() {
         ApiServices.apiGET(
             Api.get_all_so_list,
-            queue!!, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
+            queue, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
                 }
@@ -242,7 +239,6 @@ class VisitReportActivity : BaseActivity() {
                         )
                     )
                     soNameList.add(soObj.getString("user_name"))
-
                 }
             }
             val adapter = ArrayAdapter(
@@ -264,7 +260,7 @@ class VisitReportActivity : BaseActivity() {
         binding.progressBar.visibility = View.VISIBLE
         ApiServices.apiGET(
             url,
-            queue!!, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
+            queue, sharePrefUtils.getString(Api.TOKEN)!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     AppLogger.log("getVisitReports:: $response")
                     try {
