@@ -115,7 +115,6 @@
     <string name="ads">ADS</string>
     <string name="rds">RDS</string>
     <string name="bounce">Bounce</string>
-    <string name="bounce_p">Bounce (%)</string>
     <string name="delivery_value">Delivery Value</string>
     <string name="total_delivery_value">Total Delivery Value</string>
     <string name="total_target">Total Target</string>
@@ -353,7 +352,6 @@
     <string name="offer">Offer</string>
     <string name="combo_offer">Combo Offer</string>
     <string name="in_stock">%1$s in stock</string>
-    <string name="taka_sign">৳ %1$s</string>
     <string name="unknown">Unknown</string>
     <string name="minus_button">Minus Button</string>
     <string name="plus_button">Plus Button</string>
@@ -376,5 +374,7 @@
     <string name="summary_details">Summary Details</string>
     <string name="something_went_wrong_please_try_again">Something went wrong! PLease try again.</string>
     <string name="to">TO</string>
+    <string name="taka_sign">৳ %1$s</string>
+    <string name="bounce_p">Bounce (%)</string>
 
 </resources>
