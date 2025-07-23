@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.visit_report
+package com.barikoi.cnlapp.ui.visit_report
 
 import android.os.Build
 import android.os.Bundle
