@@ -44,7 +44,7 @@ import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
-import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
+import com.barikoi.cnlapp.ui.trade_offers.TradeOffersActivity
 import com.barikoi.cnlapp.ui.visit_report.VisitReportActivity
 import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
@@ -82,6 +82,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
+import androidx.core.view.get
 
 
 @AndroidEntryPoint
@@ -142,8 +143,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navView = findViewById(R.id.bottom_nav_view)
 
         navView.background = null
-        navView.menu.getItem(2).isEnabled = false
-        navView.menu.getItem(2).isVisible = false
+        navView.menu[2].isEnabled = false
+        navView.menu[2].isVisible = false
 
         navigationDrawer = findViewById(R.id.nav_view)
         navigationDrawer!!.setNavigationItemSelectedListener(this)
@@ -197,9 +198,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (userType.equals("TO", true) || userType.equals("ASM", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
-            setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(
-                sharePrefUtils.getString(Api.USER_TYPE)!!
-            ), this@MainActivity)
+            setCurrentFragment(
+                com.barikoi.cnlapp.ui.home.HomeFragment(
+                    sharePrefUtils.getString(Api.USER_TYPE)!!
+                ), this@MainActivity
+            )
         } else {
             setCurrentFragment(HomeFragment(), this@MainActivity)
         }
@@ -311,7 +314,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.tvTitle.visibility = View.GONE
                     binding.appContentMain.userLayout.visibility = View.VISIBLE
                     if (userType.equals("TO", true) || userType.equals("ASM", true)) {
-                        setCurrentFragment(com.barikoi.cnlapp.ui.home.HomeFragment(sharePrefUtils.getString(Api.USER_TYPE)!!), this@MainActivity)
+                        setCurrentFragment(
+                            com.barikoi.cnlapp.ui.home.HomeFragment(
+                                sharePrefUtils.getString(
+                                    Api.USER_TYPE
+                                )!!
+                            ), this@MainActivity
+                        )
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
@@ -665,6 +674,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         AppLogger.log("startLogoutObserve::Error ${it.error}")
                         logoutDialog.dismiss()
                         toast(networkFailureMessage.handleFailure(it.error!!))
+
+                        sharePrefUtils.clear()
+                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                        finish()
                     }
 
                     is ApiState.Loading -> {
