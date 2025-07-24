@@ -41,7 +41,8 @@ import io.sentry.Sentry
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class ImageCapture(context: Context?, attrs: AttributeSet?) :
     LinearLayout(context, attrs) {
