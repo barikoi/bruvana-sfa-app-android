@@ -2,8 +2,8 @@ package com.barikoi.cnlapp.data.remote.api
 
 import android.content.Context
 import android.content.Intent
-import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.BuildConfig
+import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
