@@ -44,7 +44,7 @@ data class ActiveInactiveUser(
     @SerializedName("route_name")
     val routeName: String?,
     @SerializedName("updated_at")
-    val updatedAt: String,
+    val updatedAt: String?,
     @SerializedName("user_id")
     val userId: Int,
     @SerializedName("user_name")
