@@ -15,10 +15,10 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import com.barikoi.cnlapp.databinding.DialogLoadingBinding
 import java.util.Locale
-import androidx.core.graphics.drawable.toDrawable
 
 
 fun View.rotateViewAnimation(fromDegrees: Float, toDegrees: Float) {
