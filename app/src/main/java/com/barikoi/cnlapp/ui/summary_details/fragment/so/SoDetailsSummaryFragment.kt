@@ -108,15 +108,27 @@ class SoDetailsSummaryFragment : Fragment(), DateFilterListener {
                         val soStats = listOf(
                             SoStats(
                                 "Order value",
-                                String.format(Locale.getDefault(), "%,.2f", "${it.data!!.targetCompleted[0].revenue ?: 0}")
+                                String.format(
+                                    String.format(
+                                        Locale.getDefault(),
+                                        "%,.2f",
+                                        it.data?.targetCompleted?.getOrNull(0)?.revenue?.toDouble()
+                                            ?: 0.0
+                                    )
+                                )
                             ),
                             SoStats(
                                 "Delivery value",
-                                String.format(Locale.getDefault(), "%,.2f", "${it.data!!.targetCompleted[0].deliveredValue ?: 0}")
+                                String.format(
+                                    Locale.getDefault(),
+                                    "%,.2f",
+                                    it.data?.targetCompleted?.getOrNull(0)?.deliveredValue?.toDouble()
+                                        ?: 0.0
+                                )
                             ),
                             SoStats(
                                 "Number of Visits",
-                                it.data.targetCompleted[0].numberOfVisits.toString()
+                                it.data!!.targetCompleted[0].numberOfVisits.toString()
                             ),
                             SoStats(
                                 "Number of Memo",
@@ -124,15 +136,30 @@ class SoDetailsSummaryFragment : Fragment(), DateFilterListener {
                             ),
                             SoStats(
                                 "SKU Per Memo",
-                                it.data.targetCompleted[0].skuPerMemo ?: "0"
+                                String.format(
+                                    Locale.getDefault(),
+                                    "%,.2f",
+                                    it.data.targetCompleted.getOrNull(0)?.skuPerMemo?.toDouble()
+                                        ?: 0.0
+                                )
                             ),
                             SoStats(
                                 "ADS",
-                                String.format(Locale.getDefault(), "%,.2f", "${it.data.targetCompleted[0].ads ?: 0}")
+                                String.format(
+                                    Locale.getDefault(),
+                                    "%,.2f",
+                                    it.data.targetCompleted.getOrNull(0)?.ads
+                                        ?: 0.0
+                                )
                             ),
                             SoStats(
                                 "RDS",
-                                String.format(Locale.getDefault(), "%,.2f", "${it.data!!.targetCompleted[0].rds ?: 0}")
+                                String.format(
+                                    Locale.getDefault(),
+                                    "%,.2f",
+                                    it.data.targetCompleted.getOrNull(0)?.rds
+                                        ?: 0.0
+                                )
                             ),
                             SoStats(
                                 "Bounce %",
