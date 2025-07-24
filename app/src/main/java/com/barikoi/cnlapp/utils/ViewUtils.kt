@@ -34,9 +34,9 @@ import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.barikoitrace.TraceMode
-import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.LocationFetch
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
