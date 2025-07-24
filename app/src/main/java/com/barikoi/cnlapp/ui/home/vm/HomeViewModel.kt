@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
-import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
 import com.barikoi.cnlapp.data.remote.models.active.OverViewStatsResponse
