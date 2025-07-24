@@ -10,11 +10,11 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
 import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
+import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -37,13 +37,13 @@ class OutletProductDeliveryAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = products[position]
         val appDatabase = AppDatabase.getInstance(holder.itemView.context)
-        holder.productName.setText(item.product_name)
-        holder.productType.setText(item.unit_name)
-        holder.perUnitPrice.setText(item.discounted_unit_price.toString())
+        holder.productName.text = item.product_name
+        holder.productType.text = item.unit_name
+        holder.perUnitPrice.text = item.discounted_unit_price.toString()
         holder.tvCount.setText(item.quantity.toString())
         holder.tvCount.isEnabled = false
-        var dformat = DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
-        holder.subTotal.text = dformat.format(item.total_price).toString()
+        val dFormat = DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+        holder.subTotal.text = dFormat.format(item.total_price).toString()
         if (item.quantity > 0) {
             if (from.equals("PENDING", true)) {
                 holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
@@ -79,12 +79,12 @@ class OutletProductDeliveryAdapter(
             val qtyValue = holder.productCount.text.toString().toInt() - 1
             holder.productCount.setText(qtyValue.toString())
             val subtotal = item.discounted_unit_price * holder.productCount.text.toString().toInt()
-            holder.subTotal.setText(dformat.format(subtotal).toString())
+            holder.subTotal.text = dFormat.format(subtotal).toString()
             item.bounced_quantity = item.bounced_quantity + 1
             item.quantity = holder.productCount.text.toString().toInt()
-            item.total_price = dformat.format(subtotal).toDouble()
+            item.total_price = dFormat.format(subtotal).toDouble()
             val prodList = appDatabase!!.updateOrderDao().getOrdersDB(outletId)
-            if (prodList!!.size > 0) {
+            if (prodList!!.isNotEmpty()) {
                 Log.d(
                     "Product",
                     "item count minus: " + prodList[0].itemsCount + " shopId: " + prodList[0].outletId
@@ -116,24 +116,13 @@ class OutletProductDeliveryAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val productName: TextView
-        internal val productType: TextView
-        internal val perUnitPrice: TextView
-        internal val tvCount: EditText
-        internal val subTotal: TextView
-        internal val btnMinus: ImageButton
-        internal val btnAdd: ImageButton
-        internal val productCount: EditText
-
-        init {
-            productName = itemView.findViewById(R.id.productName)
-            productType = itemView.findViewById(R.id.tvProductVariation)
-            perUnitPrice = itemView.findViewById(R.id.tvPerUnit)
-            tvCount = itemView.findViewById(R.id.tvCount)
-            subTotal = itemView.findViewById(R.id.tvSubTotal)
-            btnMinus = itemView.findViewById(R.id.btnminus)
-            btnAdd = itemView.findViewById(R.id.btnPlus)
-            productCount = itemView.findViewById(R.id.tvCount)
-        }
+        internal val productName: TextView = itemView.findViewById(R.id.productName)
+        internal val productType: TextView = itemView.findViewById(R.id.tvProductVariation)
+        internal val perUnitPrice: TextView = itemView.findViewById(R.id.tvPerUnit)
+        internal val tvCount: EditText = itemView.findViewById(R.id.tvCount)
+        internal val subTotal: TextView = itemView.findViewById(R.id.tvSubTotal)
+        internal val btnMinus: ImageButton = itemView.findViewById(R.id.btnminus)
+        internal val btnAdd: ImageButton = itemView.findViewById(R.id.btnPlus)
+        internal val productCount: EditText = itemView.findViewById(R.id.tvCount)
     }
 }
