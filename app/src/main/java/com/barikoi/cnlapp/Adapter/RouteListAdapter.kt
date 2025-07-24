@@ -1,17 +1,13 @@
 package com.barikoi.cnlapp.Adapter
 
 import android.annotation.SuppressLint
-import android.icu.text.NumberFormat
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.databinding.SingleRouteListBinding
 import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
-import java.util.Locale
 
 class RouteListAdapter :
     RecyclerView.Adapter<RouteListAdapter.RouteViewHolder>() {
