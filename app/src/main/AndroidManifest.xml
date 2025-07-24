@@ -117,7 +117,7 @@
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".TradeOffers.TradeOffersActivity"
+            android:name=".ui.trade_offers.TradeOffersActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material"
