@@ -89,14 +89,12 @@ class OutletTypeSummaryFragment : Fragment(), DateFilterListener {
                         binding.loadingSoStats.isVisible = false
                         binding.rcvOutletType.isVisible = false
                         if (it.data?.msg?.isNotEmpty() == true) {
-                            toast(it.data.msg)
                             binding.llError.isVisible = true
                             binding.tvNoDataFound.text = it.data.msg
                             return@observe
                         }
                         binding.llError.isVisible = true
                         binding.tvNoDataFound.text = networkFailureMessage.handleFailure(it.error!!)
-                        toast(networkFailureMessage.handleFailure(it.error))
                     }
 
                     is ApiState.Loading -> {
