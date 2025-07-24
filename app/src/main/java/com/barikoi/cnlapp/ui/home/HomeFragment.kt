@@ -145,38 +145,25 @@ class HomeFragment(
         }
 
         binding.tvActiveTitle.setHapticClickListener {
-            startActivity(
-                Intent(
-                    requireActivity(), ActiveInactiveActivity::class.java
-                ).putExtra(
-                    "so_status",
-                    getString(
-                        R.string.active_user
-                    )
-                )
-                    .putParcelableArrayListExtra(
-                        "users",
-                        ArrayList(active)
-                    )
+            openActiveInactiveActivity(
+                getString(R.string.active_user), active
+            )
+        }
+        binding.tvActiveValue.setHapticClickListener {
+            openActiveInactiveActivity(
+                getString(R.string.active_user), active
             )
         }
 
         binding.tvInactiveTitle.setHapticClickListener {
-            startActivity(
-                Intent(
-                    requireActivity(), ActiveInactiveActivity::class.java
-                )
-                    .putExtra(
-                        "so_status",
-                        getString(
-                            R.string.inactive_user
-                        )
-                    )
-                    .putParcelableArrayListExtra(
-                        "users",
-                        ArrayList(inactive)
-                    )
+            openActiveInactiveActivity(
+                getString(R.string.inactive_user), inactive
+            )
+        }
 
+        binding.tvInactiveValue.setHapticClickListener {
+            openActiveInactiveActivity(
+                getString(R.string.inactive_user), inactive
             )
         }
 
@@ -204,6 +191,14 @@ class HomeFragment(
         startOverViewStatsObserve()
         startToWithTodaySummaryObserve()
         startSoWithTodaySummaryObserve()
+    }
+
+    private fun openActiveInactiveActivity(status: String, users: List<ActiveInactiveUser>) {
+        startActivity(
+            Intent(requireActivity(), ActiveInactiveActivity::class.java)
+                .putExtra("so_status", status)
+                .putParcelableArrayListExtra("users", ArrayList(users))
+        )
     }
 
     private fun initData() {
