@@ -1,11 +1,10 @@
 package com.barikoi.cnlapp.ui.summary_details.fragment.so
 
-import com.barikoi.cnlapp.R
-
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.SoStats
 import com.barikoi.cnlapp.databinding.ItemSoStatsBinding
 

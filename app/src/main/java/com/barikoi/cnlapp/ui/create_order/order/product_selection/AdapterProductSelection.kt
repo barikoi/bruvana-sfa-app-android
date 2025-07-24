@@ -7,7 +7,6 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.product.Product
 import com.barikoi.cnlapp.databinding.ItemProductViewBinding
 import java.util.Locale
