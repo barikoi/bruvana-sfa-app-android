@@ -13,10 +13,10 @@ import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.databinding.ActivityNoticeBinding
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
