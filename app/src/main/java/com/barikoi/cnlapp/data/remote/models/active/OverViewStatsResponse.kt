@@ -21,7 +21,7 @@ data class TargetCompleted(
     @SerializedName("bounce_amount_percentage")
     val bounceAmountPercentage: Double,
     @SerializedName("delivered_value")
-    val deliveredValue: Double,
+    val deliveredValue: String?,
     @SerializedName("number_of_memo")
     val numberOfMemo: Int?,
     @SerializedName("number_of_visits")
