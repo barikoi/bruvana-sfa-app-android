@@ -34,11 +34,20 @@ class AdapterOutletType : RecyclerView.Adapter<AdapterOutletType.OutletTypeViewH
             tvQty.text = "QTY: " + outletType.totalOutlet.toString()
 
             tvVisitValue.text = outletType.totalVisits.toString()
-            tvOrderValue.text = String.format(Locale.getDefault(), "%,.2f", outletType.orderAmount.toDoubleOrNull() ?: 0.0)
-            tvAivValue.text = String.format(Locale.getDefault(), "%,.2f", outletType.aiv.toDoubleOrNull() ?: 0.0)
+            tvOrderValue.text = String.format(
+                Locale.getDefault(),
+                "%,.2f",
+                outletType.orderAmount.toDoubleOrNull() ?: 0.0
+            )
+            tvAivValue.text =
+                String.format(Locale.getDefault(), "%,.2f", outletType.aiv.toDoubleOrNull() ?: 0.0)
 
-            tvQTYPresenceValue.text = outletType.qtyPresence
-            tvDeliveryValue.text =String.format(Locale.getDefault(), "%,.2f", outletType.deliveryAmount?.toDoubleOrNull() ?: 0.0)
+            tvQTYPresenceValue.text = outletType.qtyPresence ?: "0.00"
+            tvDeliveryValue.text = String.format(
+                Locale.getDefault(),
+                "%,.2f",
+                outletType.deliveryAmount?.toDoubleOrNull() ?: 0.0
+            )
             tvContributionValue.text = outletType.contribution.toString()
         }
 
