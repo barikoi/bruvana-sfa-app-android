@@ -28,8 +28,8 @@ import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.databinding.FragmentSelectShopBinding
 import com.barikoi.cnlapp.order_create.Adapter.AdapterSelectShop
-import com.barikoi.cnlapp.ui.create_order.select_shop.vm.SelectShopViewModel
 import com.barikoi.cnlapp.ui.create_order.order.OrderViewPagerFragment
+import com.barikoi.cnlapp.ui.create_order.select_shop.vm.SelectShopViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
