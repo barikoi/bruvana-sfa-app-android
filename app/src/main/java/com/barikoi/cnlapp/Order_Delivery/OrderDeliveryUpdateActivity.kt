@@ -50,7 +50,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -200,12 +202,12 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                             return@observe
                         }
 
-                        toList = it.data?.toList ?: emptyList()
-                        val toNameList = it.data?.toList?.map { to -> to.toName }
+                        toList = it.data.toList
+                        val toNameList = it.data.toList.map { to -> to.toName }
 
                         val adapter = ArrayAdapter(
                             applicationContext,
-                            android.R.layout.simple_spinner_item, toNameList!!.toMutableList()
+                            android.R.layout.simple_spinner_item, toNameList.toMutableList()
                         )
                         binding.spinnerTO.adapter = adapter
 
@@ -242,9 +244,9 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                             return@observe
                         }
 
-                        soListNew = it.data?.users ?: emptyList()
+                        soListNew = it.data.users
                         val soNameList: MutableList<String> =
-                            it.data?.users?.map { to -> to.userName }!!.toMutableList()
+                            it.data.users.map { to -> to.userName }.toMutableList()
                         soNameList.add(0, "All")
 
                         val adapter = ArrayAdapter(
