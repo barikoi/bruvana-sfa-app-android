@@ -17,7 +17,6 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.barikoi.cnlapp.ui.ProductStock.vm.ProductStockUpdateViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
@@ -27,6 +26,7 @@ import com.barikoi.cnlapp.data.remote.models.Product
 import com.barikoi.cnlapp.data.remote.models.Stock
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.databinding.ActivityProductStockUpdateBinding
+import com.barikoi.cnlapp.ui.ProductStock.vm.ProductStockUpdateViewModel
 import com.barikoi.cnlapp.ui.adapter.ProductStockAdapter
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
