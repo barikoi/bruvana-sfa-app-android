@@ -15,8 +15,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import java.io.File
-import kotlin.apply
-import kotlin.jvm.java
 
 object NotificationUtils {
 
