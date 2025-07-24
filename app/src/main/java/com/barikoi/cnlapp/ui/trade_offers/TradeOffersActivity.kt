@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.TradeOffers
+package com.barikoi.cnlapp.ui.trade_offers
 
 import android.content.SharedPreferences
 import android.os.Build
@@ -8,18 +8,17 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.TradeOffers.Adapter.TradeOfferListAdapter
-import com.barikoi.cnlapp.TradeOffers.Model.ProductAll
-import com.barikoi.cnlapp.TradeOffers.Model.TradeProduct
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.databinding.ActivityTradeOffersBinding
+import com.barikoi.cnlapp.ui.trade_offers.adapter.TradeOfferListAdapter
+import com.barikoi.cnlapp.ui.trade_offers.model.ProductAll
+import com.barikoi.cnlapp.ui.trade_offers.model.TradeProduct
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
