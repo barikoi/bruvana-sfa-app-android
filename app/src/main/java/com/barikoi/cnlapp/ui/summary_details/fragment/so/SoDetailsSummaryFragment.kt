@@ -18,7 +18,6 @@ import com.barikoi.cnlapp.databinding.FragmentSoDetailsSummaryBinding
 import com.barikoi.cnlapp.ui.summary_details.DateFilterListener
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
-import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -85,12 +84,13 @@ class SoDetailsSummaryFragment : Fragment(), DateFilterListener {
                         AppLogger.log("startSoSummaryObserve::Error ${it.error}")
                         binding.loadingSoStats.isVisible = false
                         if (it.data?.message?.isNotEmpty() == true) {
-                            toast(it.data.message)
                             binding.llError.isVisible = true
                             binding.tvNoDataFound.text = it.data.message
                             return@observe
                         }
-                        toast(networkFailureMessage.handleFailure(it.error!!))
+
+                        binding.llError.isVisible = true
+                        binding.tvNoDataFound.text = networkFailureMessage.handleFailure(it.error!!)
 
                     }
 
