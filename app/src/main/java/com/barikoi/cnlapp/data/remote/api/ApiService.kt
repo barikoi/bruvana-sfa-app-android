@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.data.remote.api
 
+import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
 import com.barikoi.cnlapp.data.remote.models.ApproveRequest
 import com.barikoi.cnlapp.data.remote.models.AuthUserResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
@@ -10,6 +11,8 @@ import com.barikoi.cnlapp.data.remote.models.GIftSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.GiftResponse
 import com.barikoi.cnlapp.data.remote.models.LoginResponse
 import com.barikoi.cnlapp.data.remote.models.NotificationResponse
+import com.barikoi.cnlapp.data.remote.models.OrderResponse
+import com.barikoi.cnlapp.data.remote.models.OutletTypeSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.PendingResponse
 import com.barikoi.cnlapp.data.remote.models.ProductStockResponse
@@ -20,9 +23,6 @@ import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
-import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
-import com.barikoi.cnlapp.data.remote.models.OrderResponse
-import com.barikoi.cnlapp.data.remote.models.OutletTypeSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.active.OverViewStatsResponse
 import com.barikoi.cnlapp.data.remote.models.offer.OfferResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
