@@ -202,7 +202,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                             return@observe
                         }
 
-                        toList = it.data.toList
+                        toList = it.data!!.toList
                         val toNameList = it.data.toList.map { to -> to.toName }
 
                         val adapter = ArrayAdapter(
@@ -244,7 +244,7 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
                             return@observe
                         }
 
-                        soListNew = it.data.users
+                        soListNew = it.data!!.users
                         val soNameList: MutableList<String> =
                             it.data.users.map { to -> to.userName }.toMutableList()
                         soNameList.add(0, "All")
