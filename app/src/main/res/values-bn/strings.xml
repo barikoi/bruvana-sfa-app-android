@@ -383,5 +383,11 @@
     <string name="to">প্রতি</string>
     <string name="taka_sign">৳ %1$s</string>
     <string name="bounce_p">বাউন্স (%)</string>
+    <string name="ordered_by_outlets">আউটলেট অনুযায়ী অর্ডার</string>
+    <string name="visit">ভিজিট</string>
+    <string name="qty_presence">পরিমাণ উপস্থিতি:</string>
+    <string name="delivery_value_">ডেলিভারি মূল্য:</string>
+    <string name="contribution">অবদান:</string>
+    <string name="categories">বিভাগসমূহ</string>
 
 </resources>
