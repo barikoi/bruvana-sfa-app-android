@@ -20,12 +20,12 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
-import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Activity.ActiveInactiveActivity
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.barikoi.cnlapp.databinding.FragmentHomeTOBinding
+import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
