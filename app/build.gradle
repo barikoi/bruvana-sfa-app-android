@@ -69,10 +69,10 @@ android {
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
 
             buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
-            buildConfigField 'String', 'sentryDNS', '"https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"'
+            buildConfigField 'String', 'sentryDNS', '"https://e8d5ee6576fa981127ce4a2e93b040ff@sentry.barikoimaps.dev/4"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
-                    sentryDNS: "https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"
+                    sentryDNS: "https://e8d5ee6576fa981127ce4a2e93b040ff@sentry.barikoimaps.dev/4"
             ]
         }
         staging {
@@ -219,7 +219,7 @@ dependencies {
     /*progressbar*/
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
-    implementation 'io.sentry:sentry-android:7.9.0'
+    implementation 'io.sentry:sentry-android:8.17.0'
 
     /*image zoom*/
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
