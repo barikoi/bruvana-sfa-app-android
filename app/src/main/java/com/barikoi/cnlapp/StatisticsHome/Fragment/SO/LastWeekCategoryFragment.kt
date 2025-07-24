@@ -1,54 +1,44 @@
 package com.barikoi.cnlapp.StatisticsHome.Fragment.SO
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TableRow
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.StatisticsHome.Fragment.adapter.AdapterTodayCategory
 import com.barikoi.cnlapp.StatisticsHome.Model.Categories
 import com.barikoi.cnlapp.databinding.FragmentLastWeekCategoryBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class LastWeekCategoryFragment : Fragment() {
     private lateinit var binding: FragmentLastWeekCategoryBinding
 
-    private var prefs: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    var mContext: Context? = null
-    var mQueue: RequestQueue? = null
-    var token: String? = null
-    var srId: String? = ""
-    var userId: String? = ""
-    var routeId: String? = ""
+    @Inject
+    lateinit var sharePrefUtils: SharePrefUtils
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
+    @Inject
+    lateinit var mQueue: RequestQueue
 
-        }
-    }
+    private lateinit var adapterTodayCategory: AdapterTodayCategory
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,6 +50,14 @@ class LastWeekCategoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adapterTodayCategory = AdapterTodayCategory()
+        binding.rcvTodayCategory.layoutManager = LinearLayoutManager(requireContext())
+        binding.rcvTodayCategory.adapter = adapterTodayCategory
+        val dividerItemDecoration = DividerItemDecoration(
+            binding.rcvTodayCategory.context,
+            LinearLayoutManager.VERTICAL // অথবা HORIZONTAL
+        )
+        binding.rcvTodayCategory.addItemDecoration(dividerItemDecoration)
         init()
     }
 
@@ -71,28 +69,27 @@ class LastWeekCategoryFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val StartDate = df.format(start)
         val EndDate = df.format(end)
-        getSummaryCategory(Api.get_last_week_category + "?user_id=" + userId + "&route_id=" + routeId + "&last_week_category=1")
+        getSummaryCategory(
+            Api.get_last_week_category + "?user_id=" + sharePrefUtils.getString(Api.USER_ID) + "&route_id=" + sharePrefUtils.getString(
+                Api.SELECTED_ROUTE_ID
+            ) + "&last_week_category=1"
+        )
     }
 
     private fun getSummaryCategory(url: String) {
-        ApiServices.apiGET(url, mQueue!!, token!!, object : ApiServiceListener {
-            override fun onResponseSuccess(response: String) {
-                try {
-                    binding.progressBar.visibility = View.GONE
-                    if (response != null) {
-                        var dformat = DecimalFormat("#.##")
+        ApiServices.apiGET(
+            url,
+            mQueue,
+            sharePrefUtils.getString(Api.TOKEN)!!,
+            object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    try {
+                        binding.progressBar.visibility = View.GONE
+                        val dFormat = DecimalFormat("#.##")
                         val itemList: ArrayList<Categories> = ArrayList()
                         val obj = JSONObject(response)
                         val categoryArray = obj.getJSONArray("outlet_categories")
                         if (categoryArray.length() > 0) {
-                            itemList.add(
-                                Categories(
-                                    getString(R.string.category),
-                                    getString(R.string.total_outlet),
-                                    getString(R.string.deli_done),
-                                    getString(R.string.deli_value)
-                                )
-                            )
                             for (i in 0 until categoryArray.length()) {
                                 val productObj = categoryArray.getJSONObject(i)
                                 if (!productObj.getString("outlet_category")
@@ -101,14 +98,16 @@ class LastWeekCategoryFragment : Fragment() {
                                 ) {
                                     val outletCatName = productObj.getString("outlet_category")
                                     val outletCount = productObj.getString("total_outlet")
-                                    val orderDone = productObj.getString("outlet_count_delivered")
-                                    val orderValue = dformat.format(
+                                    val orderDone =
+                                        productObj.getString("outlet_count_delivered")
+                                    val orderValue = dFormat.format(
                                         productObj.getString("delivery_value").toDouble()
                                     )
-                                    val sumOutletCount = productObj.getString("sum_total_outlet")
+                                    val sumOutletCount =
+                                        productObj.getString("sum_total_outlet")
                                     val sumOrderDone =
                                         productObj.getString("sum_outlet_count_delivered")
-                                    val sumOrderValue = dformat.format(
+                                    val sumOrderValue = dFormat.format(
                                         productObj.getString("sum_delivery_value").toDouble()
                                     )
 
@@ -119,14 +118,6 @@ class LastWeekCategoryFragment : Fragment() {
                                                 outletCount,
                                                 orderDone,
                                                 orderValue
-                                            )
-                                        )
-                                        itemList.add(
-                                            Categories(
-                                                getString(R.string.total),
-                                                sumOutletCount,
-                                                sumOrderDone,
-                                                sumOrderValue
                                             )
                                         )
                                     } else {
@@ -142,86 +133,31 @@ class LastWeekCategoryFragment : Fragment() {
                                 }
                             }
                         }
-                        createTable(itemList)
+//                        createTable(itemList)
+                        adapterTodayCategory.updateCategories(itemList)
 
 
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        binding.progressBar.visibility = View.GONE
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {}
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, requireContext())
                     binding.progressBar.visibility = View.GONE
                 }
 
-            }
+                override fun onException(e: Exception) {
+                    binding.progressBar.visibility = View.GONE
+                }
 
-            override fun onJSONResponseSuccess(response: JSONObject) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, mContext!!)
-                binding.progressBar.visibility = View.GONE
-            }
-
-            override fun onException(e: Exception) {
-                binding.progressBar.visibility = View.GONE
-            }
-
-        })
-
-    }
-
-    private fun createTable(data: ArrayList<Categories>) {
-        binding.tabLayout.isStretchAllColumns = true
-        binding.tabLayout.bringToFront()
-        val colorsTxt: Array<String> = mContext!!.getResources().getStringArray(R.array.colors)
-        for (i in 0 until data.size) {
-            val tr = TableRow(mContext)
-            val image = ImageView(mContext)
-            image.setImageDrawable(resources.getDrawable(R.drawable.ic_dot))
-            image.drawable.setTint(Color.parseColor(colorsTxt[i]))
-            val c1 = TextView(mContext)
-            c1.gravity = Gravity.START
-            c1.setTextColor(resources.getColor(R.color.text_title))
-            c1.setText(data.get(i).outlet_category)
-            val c2 = TextView(mContext)
-            c2.gravity = Gravity.CENTER
-            c2.setTextColor(resources.getColor(R.color.text_title))
-            c2.setText(data.get(i).total_outlet)
-            val c3 = TextView(mContext)
-            c3.gravity = Gravity.CENTER
-            c3.setTextColor(resources.getColor(R.color.text_title))
-            c3.setText(data.get(i).order_done)
-            val c4 = TextView(mContext)
-            c4.gravity = Gravity.CENTER
-            c4.setTextColor(resources.getColor(R.color.text_title))
-            c4.setText(data.get(i).order_value)
-            if (i == 0 || i == data.size - 1) {
-                image.visibility = View.INVISIBLE
-            }
-            tr.addView(image)
-            tr.addView(c1)
-            tr.addView(c2)
-            tr.addView(c3)
-            tr.addView(c4)
-            binding.tabLayout.addView(tr)
-
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = prefs!!.edit()
-        mContext = context
-        mQueue = RequestQueueSingleton.getInstance(context).requestQueue
-        token = prefs!!.getString(Api.TOKEN, "")
-        srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
-        userId = prefs!!.getString(Api.USER_ID, "")
-        routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+            })
     }
 
 }
