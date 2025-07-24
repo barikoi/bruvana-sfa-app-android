@@ -1,76 +1,62 @@
 package com.barikoi.cnlapp.ui.active_inactive
 
+import com.barikoi.cnlapp.R
+
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUser
 import com.barikoi.cnlapp.databinding.ItemActiveInactiveBinding
+import com.barikoi.cnlapp.utils.extension.formateDateNewFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class AdapterActiveInactive :
-    RecyclerView.Adapter<AdapterActiveInactive.ActiveInactiveViewHolder>() {
+class AdapterActiveInactive(
+    private val status: String
+) : RecyclerView.Adapter<AdapterActiveInactive.ActiveInactiveViewHolder>() {
     private var activeInactiveList: List<ActiveInactiveUser> = emptyList()
 
     override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
+        parent: ViewGroup, viewType: Int
     ): ActiveInactiveViewHolder {
         return ActiveInactiveViewHolder(
             ItemActiveInactiveBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+                LayoutInflater.from(parent.context), parent, false
             )
         )
     }
 
     override fun onBindViewHolder(
-        holder: ActiveInactiveViewHolder,
-        position: Int
+        holder: ActiveInactiveViewHolder, position: Int
     ) {
-        val  activeInactiveUser = activeInactiveList[position]
+        val activeInactiveUser = activeInactiveList[position]
 
-//        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-//        val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.ENGLISH)
-//        val _sdfWatchDate = SimpleDateFormat("dd", Locale.ENGLISH)
-//        val _sdfWatchtime = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
-//
-//        val mItem = histories[position]
-//        if (!mItem.userName.equals("null")){
-//            holder.userName.setText(mItem.userName)
-//        }else{
-//            holder.userName.visibility = View.GONE
-//        }
-//
-//        if (!mItem.lastUpdatedTime.isNullOrEmpty() && !mItem.lastUpdatedTime.equals("null")){
-//            holder.textViewMonth.setText(_sdfWatchMonth.format(oldDate.parse(mItem.lastUpdatedTime)))
-//            holder.textViewDate.setText(_sdfWatchDate.format(oldDate.parse(mItem.lastUpdatedTime)))
-//            holder.updatedTime.setText(_sdfWatchtime.format(oldDate.parse(mItem.lastUpdatedTime)))
-//        }else{
-//            holder.updatedTime.setText("--:--")
-//        }
-//        if (!mItem.imageLink.isNullOrEmpty() && !mItem.imageLink.equals("null")){
-//            Glide.with(holder.itemView.context)
-//                .load(mItem.imageLink)
-//                .into(holder.imageUser)
-//        }else{
-//            holder.imageUser.visibility = View.GONE
-//        }
-//
-//        if (mItem.status.equals("active", true)){
-//            holder.imageStatus.setImageDrawable(holder.itemView.resources.getDrawable(R.drawable.ic_active))
-//        }else{
-//            holder.imageStatus.setImageDrawable(holder.itemView.resources.getDrawable(R.drawable.ic_inactive))
-//        }
-//
-//        if (!mItem.checkInAddress.isNullOrEmpty() && !mItem.checkInAddress.equals("null")){
-//            holder.inAddress.setText(mItem.checkInAddress)
-//        }else{
-//            holder.inAddress.setText("")
-//        }
-        
-        holder.binding.apply {
-            tvName.text = activeInactiveUser.userName
+        holder.binding.tvName.text = activeInactiveUser.userName
+        holder.binding.lastAddress.text = activeInactiveUser.checkinAddress ?: ""
+
+        holder.binding.tvMonth.text =
+            activeInactiveUser.updatedAt?.formateDateNewFormat("LLL") ?: "--:--"
+        holder.binding.tvDate.text =
+            activeInactiveUser.updatedAt?.formateDateNewFormat("dd") ?: "--:--"
+        holder.binding.updatedTime.text =
+            activeInactiveUser.updatedAt?.formateDateNewFormat("hh:mm a") ?: "--:--"
+
+
+        holder.binding.imageUser.load(
+            activeInactiveUser.image?.firstOrNull()?.imageUrl
+        )
+
+        if (status == "Active Users") {
+            holder.binding.imageStatus.setImageDrawable(
+                ContextCompat.getDrawable(holder.itemView.context, R.drawable.ic_active)
+            )
+        } else {
+            holder.binding.imageStatus.setImageDrawable(
+                ContextCompat.getDrawable(holder.itemView.context, R.drawable.ic_inactive)
+            )
         }
 
     }
