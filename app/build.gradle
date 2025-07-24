@@ -240,10 +240,6 @@ dependencies {
 
     implementation 'io.sentry:sentry-android:7.9.0'
 
-    /*glide*/
-    implementation 'com.github.bumptech.glide:glide:4.14.2'
-    kapt 'com.github.bumptech.glide:compiler:4.12.0'
-
     /*image zoom*/
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
@@ -274,11 +270,13 @@ dependencies {
     implementation("io.coil-kt.coil3:coil:3.0.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
 
+    implementation 'androidx.exifinterface:exifinterface:1.4.1' // or latest
+
     implementation("id.zelory:compressor:3.0.1")
 
     implementation("com.airbnb.android:lottie:6.6.7")
 
     implementation "com.facebook.shimmer:shimmer:0.5.0"
 
-    implementation("com.tbuonomo:dotsindicator:4.3")
+    implementation("com.tbuonomo:dotsindicator:5.1.0")
 }
