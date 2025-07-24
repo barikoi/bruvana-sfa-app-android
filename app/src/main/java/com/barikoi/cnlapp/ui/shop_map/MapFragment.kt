@@ -68,7 +68,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.UiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -323,8 +322,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             return@observe
                         }
 
-                        toList = it.data?.toList ?: emptyList()
-                        val toNameList = it.data!!.toList.map { to -> to.toName }.toMutableList()
+                        toList = it.data.toList ?: emptyList()
+                        val toNameList = it.data.toList.map { to -> to.toName }.toMutableList()
 
                         val adapter = ArrayAdapter(
                             requireContext(),
