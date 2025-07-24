@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import coil3.load
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
@@ -31,13 +32,14 @@ import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.utils.extension.formatDate
 import com.barikoi.cnlapp.utils.extension.toast
-import com.bumptech.glide.Glide
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -100,10 +102,10 @@ class SummaryTOFragment : Fragment() {
                         if (p2 > 0) {
                             binding.userLayout.visibility = View.VISIBLE
                             selectedSOId = soList[p2 - 1].id
-                            if (!soList[p2 - 1].imageUrl.equals("null")) {
-                                Glide.with(requireActivity())
-                                    .load(soList[p2 - 1].imageUrl)
-                                    .into(binding.imageUser)
+                            if (soList[p2 - 1].imageUrl != "null") {
+                                binding.imageUser.load(
+                                    soList[p2 - 1].imageUrl
+                                )
                             } else {
                                 binding.imageUser.visibility = View.GONE
                             }
