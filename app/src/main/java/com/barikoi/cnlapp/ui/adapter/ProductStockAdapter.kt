@@ -9,13 +9,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.placeholder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.Product
 import com.barikoi.cnlapp.databinding.ProductViewStockBinding
 import com.barikoi.cnlapp.utils.extension.englishToBanglaNumber
 import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.performTapHaptic
-import com.bumptech.glide.Glide
 
 class ProductStockAdapter(
     private val isSummaryActivity: Boolean?,
@@ -136,10 +138,13 @@ class ProductStockAdapter(
         drawable.start()
 
         if (mItem.images.isNotEmpty()) {
-            Glide.with(holder.itemView.context)
-                .load(mItem.images[0].imageUrl)
-                .placeholder(drawable)
-                .into(holder.binding.imageProduct)
+            holder.binding.imageProduct.load(
+                mItem.images[0].imageUrl,
+                builder = {
+                    crossfade(true)
+                    placeholder(drawable)
+                }
+            )
         } else {
             holder.binding.imageProduct.visibility = View.GONE
         }
