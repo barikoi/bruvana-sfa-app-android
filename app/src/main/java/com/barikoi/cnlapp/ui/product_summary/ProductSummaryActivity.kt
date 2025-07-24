@@ -318,14 +318,14 @@ class ProductSummaryActivity : BaseActivity() {
                             return@observe
                         }
 
-                        products = it.data.products ?: emptyList()
+                        products = it.data?.products ?: emptyList()
 
                         if (isHighToLow) {
-                            adapter.updateProducts(it.data.products!!.sortedByDescending { s ->
+                            adapter.updateProducts(it.data!!.products!!.sortedByDescending { s ->
                                 s.productiveRoutes
                             })
                         } else {
-                            adapter.updateProducts(it.data.products!!.sortedBy { s ->
+                            adapter.updateProducts(it.data!!.products!!.sortedBy { s ->
                                 s.productiveRoutes
                             })
                         }
@@ -334,7 +334,7 @@ class ProductSummaryActivity : BaseActivity() {
                         binding.tvTotalAmount.text =
                             getString(
                                 R.string.total_amount,
-                                "${it.data.products.sumOf { s -> s.deliveredAmount }}".format()
+                                "${it.data!!.products.sumOf { s -> s.deliveredAmount }}".format()
                             )
                     }
                 }
