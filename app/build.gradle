@@ -37,16 +37,10 @@ android {
         }
 
         applicationVariants.all {
-                // this method is use to rename your all apk weather
-                // it may be signed or unsigned(debug apk)
             variant ->
                 variant.outputs.each {
-                        // on below line we are setting a
-                        // name to our apk as GFG.apk
                     output ->
                         def name = "cnl_staging_debug_" + getDateTime() + ".apk"
-                        // on below line we are setting the
-                        // outputFile Name to our apk file.
                         output.outputFileName = name
                 }
         }
@@ -78,10 +72,7 @@ android {
             buildConfigField 'String', 'sentryDNS', '"https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher",
-                    sentryDNS: "https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3",
-//                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
-//                    onesignal_google_project_number: 'REMOTE'
-
+                    sentryDNS: "https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"
             ]
         }
         staging {
@@ -98,13 +89,10 @@ android {
 
             buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
 
-            buildConfigField 'String', 'sentryDNS', '"https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3"'
+            buildConfigField 'String', 'sentryDNS', '"https://cc628b4f44a1b35449c23d4d710d4480@sentry.barikoimaps.dev/5"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://9fed49cb9802ec8f19bcfd933d4e588f@sentry.barikoimaps.dev/3",
-//                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
-//                    onesignal_google_project_number: 'REMOTE'
-
+                    sentryDNS: "https://cc628b4f44a1b35449c23d4d710d4480@sentry.barikoimaps.dev/5"
             ]
         }
 
@@ -124,10 +112,7 @@ android {
             buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
-//                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
-//                    onesignal_google_project_number: 'REMOTE'
-
+                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             ]
         }
 
@@ -147,10 +132,7 @@ android {
             buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
             manifestPlaceholders = [
                     appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13",
-//                    onesignal_app_id               : 'cf8bac16-674e-4f68-b587-63199f1b3053',
-//                    onesignal_google_project_number: 'REMOTE'
-
+                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             ]
         }
 
@@ -159,7 +141,6 @@ android {
             dimension "default"
             versionName "0.0.3"
             resValue "string", "app_name", "Retail Demo SFA"
-            //resValue "string", "url_base", "http://cnl.bkoih3.ml:7040/"
             resValue "string", "url_base", "http://20.24.15.52:2010/"
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher_demo"
