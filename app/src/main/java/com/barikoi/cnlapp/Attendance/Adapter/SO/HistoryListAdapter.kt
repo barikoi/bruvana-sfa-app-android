@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
-import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -44,21 +44,22 @@ class HistoryListAdapter(private val histories: List<HistoryList>) :
         }
 
         if (mItem.routeName.isNotEmpty() && !mItem.routeName.equals("null")) {
-            holder.marketName.text = holder.itemView.resources.getString(R.string.market) + " " + mItem.routeName
+            holder.marketName.text =
+                holder.itemView.resources.getString(R.string.market) + " " + mItem.routeName
         } else {
             holder.marketName.visibility = View.GONE
         }
 
-        if (mItem.imageLink.isNotEmpty() && !mItem.imageLink.equals("null")) {
-            Glide.with(holder.itemView.context)
-                .load(mItem.imageLink)
-                .into(holder.imageUser)
+        if (mItem.imageLink.isNotEmpty() && mItem.imageLink != "null") {
+            holder.imageUser.load(
+                mItem.imageLink
+            )
         } else {
             holder.imageUser.visibility = View.GONE
         }
 
 
-        if (mItem.checkInAddress.isNotEmpty() && !mItem.checkInAddress.equals("null")) {
+        if (mItem.checkInAddress.isNotEmpty() && mItem.checkInAddress != "null") {
             holder.inAddress.text = mItem.checkInAddress
         } else {
             holder.inAddress.text = ""
@@ -70,24 +71,13 @@ class HistoryListAdapter(private val histories: List<HistoryList>) :
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val textViewMonth: TextView
-        internal val textViewDate: TextView
-        internal val marketName: TextView
-        internal val inTime: TextView
-        internal val outTime: TextView
-        internal val inAddress: TextView
-        internal val outAddress: TextView
-        internal val imageUser: ImageView
-
-        init {
-            textViewMonth = itemView.findViewById(R.id.tvMonth)
-            textViewDate = itemView.findViewById(R.id.tvDate)
-            marketName = itemView.findViewById(R.id.marketName)
-            inTime = itemView.findViewById(R.id.inTime)
-            outTime = itemView.findViewById(R.id.outTime)
-            inAddress = itemView.findViewById(R.id.inAddress)
-            outAddress = itemView.findViewById(R.id.outAddress)
-            imageUser = itemView.findViewById(R.id.imageUser)
-        }
+        internal val textViewMonth: TextView = itemView.findViewById(R.id.tvMonth)
+        internal val textViewDate: TextView = itemView.findViewById(R.id.tvDate)
+        internal val marketName: TextView = itemView.findViewById(R.id.marketName)
+        internal val inTime: TextView = itemView.findViewById(R.id.inTime)
+        internal val outTime: TextView = itemView.findViewById(R.id.outTime)
+        internal val inAddress: TextView = itemView.findViewById(R.id.inAddress)
+        internal val outAddress: TextView = itemView.findViewById(R.id.outAddress)
+        internal val imageUser: ImageView = itemView.findViewById(R.id.imageUser)
     }
 }
