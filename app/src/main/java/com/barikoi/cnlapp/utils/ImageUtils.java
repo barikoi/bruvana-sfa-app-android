@@ -16,18 +16,18 @@ public class ImageUtils {
 
     public static byte[] decodeFile(String f) {
         final long mRequestStartTime = System.currentTimeMillis();
-        if(f!=null) {
-            Log.d("imageUtils","filepath: "+f);
+        if (f != null) {
+            Log.d("imageUtils", "filepath: " + f);
             BitmapFactory.Options o = new BitmapFactory.Options();
 
             File imageFile2 = new File(f);
-            Log.d("imageUtils","scale 1: "+imageFile2.length()/1024 +" kb");
+            Log.d("imageUtils", "scale 1: " + imageFile2.length() / 1024 + " kb");
 
             o.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(f, o);
 
             int IMAGE_MAX_SIZE = 1000;
-            int scale=1;
+            int scale = 1;
 
             /*if (imageFile2.length()/1024 > 4000){
                 IMAGE_MAX_SIZE = 600;
@@ -35,12 +35,12 @@ public class ImageUtils {
                 IMAGE_MAX_SIZE = 800;
             }*/
 
-            if(o.outWidth > o.outHeight){
-                scale = o.outWidth/IMAGE_MAX_SIZE;
-                Log.d("imageUtils","Image max size width: "+IMAGE_MAX_SIZE);
-            }else{
-                scale = o.outHeight/IMAGE_MAX_SIZE;
-                Log.d("imageUtils","Image max size height: "+IMAGE_MAX_SIZE);
+            if (o.outWidth > o.outHeight) {
+                scale = o.outWidth / IMAGE_MAX_SIZE;
+                Log.d("imageUtils", "Image max size width: " + IMAGE_MAX_SIZE);
+            } else {
+                scale = o.outHeight / IMAGE_MAX_SIZE;
+                Log.d("imageUtils", "Image max size height: " + IMAGE_MAX_SIZE);
             }
 
             // Decode the image file into a Bitmap sized to fill the View
@@ -52,14 +52,14 @@ public class ImageUtils {
                 scale=Math.min(o.outWidth/IMAGE_MAX_SIZE, o.outHeight);
             }*/
 
-            Log.d("imageUtils","scale: "+scale+ " outw: "+o.outWidth+ " outh: "+o.outHeight);
+            Log.d("imageUtils", "scale: " + scale + " outw: " + o.outWidth + " outh: " + o.outHeight);
             o.inSampleSize = scale;
             o.inJustDecodeBounds = false;
             o.inPurgeable = true;
 
-            Bitmap bitmap = BitmapFactory.decodeFile(f,o);
+            Bitmap bitmap = BitmapFactory.decodeFile(f, o);
 
-            Log.d("imageUtils","bitmapsize "+bitmap.getByteCount()+ " h: "+bitmap.getHeight()+ " w: "+bitmap.getWidth());
+            Log.d("imageUtils", "bitmapsize " + bitmap.getByteCount() + " h: " + bitmap.getHeight() + " w: " + bitmap.getWidth());
             int rotate = 0;
             try {
                 //getContentResolver().notifyChange(photoURI, null);
@@ -67,10 +67,10 @@ public class ImageUtils {
                 ExifInterface exif = new ExifInterface(f);
                 int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 
-                Log.d("Imagepos", "orientationHelper: " +orientation);
-                Log.d("Imagepos", "orientationHelper: " +ExifInterface.ORIENTATION_ROTATE_270);
-                Log.d("Imagepos", "orientationHelper: " +ExifInterface.ORIENTATION_ROTATE_180);
-                Log.d("Imagepos", "orientationHelper: " +ExifInterface.ORIENTATION_ROTATE_90);
+                Log.d("Imagepos", "orientationHelper: " + orientation);
+                Log.d("Imagepos", "orientationHelper: " + ExifInterface.ORIENTATION_ROTATE_270);
+                Log.d("Imagepos", "orientationHelper: " + ExifInterface.ORIENTATION_ROTATE_180);
+                Log.d("Imagepos", "orientationHelper: " + ExifInterface.ORIENTATION_ROTATE_90);
 
                 switch (orientation) {
                     case ExifInterface.ORIENTATION_ROTATE_270:
@@ -90,7 +90,7 @@ public class ImageUtils {
 
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-                Log.d("Imagepos", "fmap: " +bitmap);
+                Log.d("Imagepos", "fmap: " + bitmap);
 
 
             } catch (Exception e) {
@@ -99,14 +99,13 @@ public class ImageUtils {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
 
-            Log.d("imageUtils","imagesize "+byteArrayOutputStream.size()/1024 +" kb");
-            Log.d("imageUtils","imagesize length: "+byteArrayOutputStream.toByteArray().length/1024 +" kb");
-            Log.d("imageUtils","time length: "+(System.currentTimeMillis() - mRequestStartTime)+" miliseconds");
+            Log.d("imageUtils", "imagesize " + byteArrayOutputStream.size() / 1024 + " kb");
+            Log.d("imageUtils", "imagesize length: " + byteArrayOutputStream.toByteArray().length / 1024 + " kb");
+            Log.d("imageUtils", "time length: " + (System.currentTimeMillis() - mRequestStartTime) + " miliseconds");
 
             //Sentry.captureMessage("image convertion time: "+(System.currentTimeMillis() - mRequestStartTime)+" miliseconds");
             return byteArrayOutputStream.toByteArray();
-        }
-        else {
+        } else {
             return null;
         }
 
@@ -166,10 +165,10 @@ public class ImageUtils {
             }
 
         }*/
-        Bitmap img=BitmapFactory.decodeStream(is);
+        Bitmap img = BitmapFactory.decodeStream(is);
         ExifInterface ei = new ExifInterface(is);
         int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        Log.d("orientation", orientation+"");
+        Log.d("orientation", orientation + "");
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 return rotateImage(img, 90);
@@ -189,7 +188,6 @@ public class ImageUtils {
         Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
         return rotatedImg;
     }
-
 
 
 }
