@@ -13,8 +13,6 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.barikoi.cnlapp.ui.adapter.ProductStockAdapter
-import com.barikoi.cnlapp.ui.product_summary.vm.ProductSummeryViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
@@ -22,6 +20,8 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.DbHouse
 import com.barikoi.cnlapp.data.remote.models.Product
 import com.barikoi.cnlapp.databinding.ActivityProductSummaryBinding
+import com.barikoi.cnlapp.ui.adapter.ProductStockAdapter
+import com.barikoi.cnlapp.ui.product_summary.vm.ProductSummeryViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
@@ -318,14 +318,14 @@ class ProductSummaryActivity : BaseActivity() {
                             return@observe
                         }
 
-                        products = it.data?.products ?: emptyList()
+                        products = it.data.products ?: emptyList()
 
                         if (isHighToLow) {
-                            adapter.updateProducts(it.data?.products!!.sortedByDescending { s ->
+                            adapter.updateProducts(it.data.products!!.sortedByDescending { s ->
                                 s.productiveRoutes
                             })
                         } else {
-                            adapter.updateProducts(it.data?.products!!.sortedBy { s ->
+                            adapter.updateProducts(it.data.products!!.sortedBy { s ->
                                 s.productiveRoutes
                             })
                         }
