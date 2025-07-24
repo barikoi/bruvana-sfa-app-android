@@ -2,16 +2,10 @@ package com.barikoi.cnlapp.ui.active_inactive
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUser
 import com.barikoi.cnlapp.databinding.ItemActiveInactiveBinding
-import com.bumptech.glide.Glide
-import kotlinx.android.extensions.LayoutContainer
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class AdapterActiveInactive :
     RecyclerView.Adapter<AdapterActiveInactive.ActiveInactiveViewHolder>() {
