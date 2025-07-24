@@ -9,17 +9,21 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderProductListAdapter
 import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.order_create.RoomDB.OrderList
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.utils.extension.totalAmountFormatted
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class OrderDeliveryListAdapter(
     var mValues: List<OrderList>,
@@ -41,7 +45,7 @@ class OrderDeliveryListAdapter(
         holder.shopName.text = mItem.outletName
         holder.subTotal.text = mItem.grandTotal.totalAmountFormatted()
 
-        if (mItem.brands_array.size > 0) {
+        if (mItem.brands_array.isNotEmpty()) {
             val adapter = ConfirmOrderProductListAdapter(mItem.brands_array)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
@@ -190,25 +194,13 @@ class OrderDeliveryListAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val shopName: TextView
-        internal val routeName: TextView
-        internal val orderAt: TextView
-        internal val subTotal: TextView
-        internal val editItem: ImageView
-        internal val layoutStatus: LinearLayout
-        internal val orderStatus: TextView
-        internal val productList: RecyclerView
-
-        init {
-            shopName = itemView.findViewById(R.id.tvShopName)
-            routeName = itemView.findViewById(R.id.tvRouteName)
-            orderAt = itemView.findViewById(R.id.tvOrderDate)
-            subTotal = itemView.findViewById(R.id.tvSubTotal)
-            productList = itemView.findViewById(R.id.productlist)
-            editItem = itemView.findViewById(R.id.btn_edit)
-            layoutStatus = itemView.findViewById(R.id.layoutStatus2)
-            orderStatus = itemView.findViewById(R.id.tvOrderStatus)
-
-        }
+        internal val shopName: TextView = itemView.findViewById(R.id.tvShopName)
+        internal val routeName: TextView = itemView.findViewById(R.id.tvRouteName)
+        internal val orderAt: TextView = itemView.findViewById(R.id.tvOrderDate)
+        internal val subTotal: TextView = itemView.findViewById(R.id.tvSubTotal)
+        internal val editItem: ImageView = itemView.findViewById(R.id.btn_edit)
+        internal val layoutStatus: LinearLayout = itemView.findViewById(R.id.layoutStatus2)
+        internal val orderStatus: TextView = itemView.findViewById(R.id.tvOrderStatus)
+        internal val productList: RecyclerView = itemView.findViewById(R.id.productlist)
     }
 }
