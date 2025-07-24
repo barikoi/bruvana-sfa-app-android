@@ -4,8 +4,8 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
 import com.barikoi.cnlapp.data.remote.api.ApiService
-import com.barikoi.cnlapp.data.remote.models.CheckAttendanceResponse
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
+import com.barikoi.cnlapp.data.remote.models.CheckAttendanceResponse
 import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow
