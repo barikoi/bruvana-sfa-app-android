@@ -19,6 +19,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -31,32 +32,32 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
-import com.barikoi.cnlapp.ui.route.RouteActivity
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
-import com.barikoi.cnlapp.ui.shop_map.MapFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
-import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
-import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
-import com.barikoi.cnlapp.ui.trade_offers.TradeOffersActivity
-import com.barikoi.cnlapp.ui.visit_report.VisitReportActivity
-import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
-import com.barikoi.cnlapp.ui.notification.NotificationActivity
-import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
-import com.barikoi.cnlapp.ui.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
+import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.ui.auth.LoginActivity
+import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.ui.gift_summary.GiftSummaryActivity
 import com.barikoi.cnlapp.ui.main.vm.MainViewModel
+import com.barikoi.cnlapp.ui.notification.NotificationActivity
+import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
+import com.barikoi.cnlapp.ui.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.route.RouteActivity
+import com.barikoi.cnlapp.ui.shop_map.MapFragment
+import com.barikoi.cnlapp.ui.trade_offers.TradeOffersActivity
+import com.barikoi.cnlapp.ui.visit_report.VisitReportActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -82,7 +83,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
-import androidx.core.view.get
 
 
 @AndroidEntryPoint
