@@ -108,6 +108,7 @@ class OutletTypeSummaryFragment : Fragment(), DateFilterListener {
                     is ApiState.Success -> {
                         AppLogger.log("startOutletTypeSummaryObserve:: Success ${it.data}")
                         binding.loadingSoStats.isVisible = false
+                        binding.rcvOutletType.isVisible = true
                         binding.llError.isVisible = false
 
 
