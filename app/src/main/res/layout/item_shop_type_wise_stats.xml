@@ -39,22 +39,24 @@
             android:id="@+id/tvVisit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:text="@string/visit"
-            app:layout_constraintEnd_toStartOf="@+id/tvOrder"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/tvVisitValue"
+            app:layout_constraintStart_toStartOf="@+id/tvVisitValue"
             app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
         <TextView
             android:id="@+id/tvVisitValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minEms="3"
+            android:text="567890"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/tvVisit"
-            app:layout_constraintStart_toStartOf="@+id/tvVisit"
+            app:layout_constraintEnd_toStartOf="@+id/tvOrderValue"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvVisit" />
 
         <TextView
@@ -63,18 +65,21 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
             android:text="@string/order"
-            app:layout_constraintEnd_toStartOf="@+id/tvAiv"
-            app:layout_constraintStart_toEndOf="@+id/tvVisit"
+            app:layout_constraintEnd_toEndOf="@id/tvOrderValue"
+            app:layout_constraintStart_toStartOf="@id/tvOrderValue"
             app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
         <TextView
             android:id="@+id/tvOrderValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minEms="4"
+            android:text="4567890-"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/tvOrder"
-            app:layout_constraintStart_toStartOf="@+id/tvOrder"
+            app:layout_constraintEnd_toStartOf="@+id/tvAivValue"
+            app:layout_constraintStart_toEndOf="@+id/tvVisitValue"
             app:layout_constraintTop_toBottomOf="@+id/tvOrder" />
 
         <TextView
@@ -82,33 +87,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
             android:text="@string/aiv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvOrder"
+            app:layout_constraintEnd_toEndOf="@+id/tvAivValue"
+            app:layout_constraintStart_toStartOf="@+id/tvAivValue"
             app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
         <TextView
             android:id="@+id/tvAivValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minEms="4"
+            android:text="4567890"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/tvAiv"
-            app:layout_constraintStart_toStartOf="@+id/tvAiv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvOrderValue"
             app:layout_constraintTop_toBottomOf="@+id/tvAiv" />
 
         <ImageView
             android:id="@+id/ivExpend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_20dp"
             android:contentDescription="@string/expand"
             android:padding="@dimen/_10sdp"
             android:src="@drawable/ic_arrow_down"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvAiv"
+            app:layout_constraintTop_toBottomOf="@+id/tvOrderValue"
             app:tint="@color/black" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
