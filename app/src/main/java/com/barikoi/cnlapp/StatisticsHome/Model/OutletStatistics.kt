@@ -2,7 +2,7 @@ package com.barikoi.cnlapp.StatisticsHome.Model
 
 import java.io.Serializable
 
-class OutletStatistics (
+class OutletStatistics(
     val shop_id: String,
     val shop_name: String,
     val shop_code: String,
@@ -10,4 +10,4 @@ class OutletStatistics (
     val category: String,
     val lastOrderDate: String,
     val products: ArrayList<ProductStatistics>
-        ):Serializable
+) : Serializable
