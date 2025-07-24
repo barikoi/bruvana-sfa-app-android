@@ -53,11 +53,16 @@ class ConfirmOrderListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val queue = RequestQueueSingleton.getInstance(holder.itemView.context).getRequestQueue()
-        var dformat = DecimalFormat("#.##")
+        val dformat = DecimalFormat("#.##")
         holder.routeName.text = orderList[position].routeName
         holder.shopName.text = orderList[position].outletName
-        holder.subTotal.text = dformat.format(orderList[position].grandTotal.toDouble()).toString()
+
+        if (orderList[position].grandTotal == "null") {
+            holder.subTotal.text = "0.00"
+        } else {
+            holder.subTotal.text =
+                dformat.format(orderList[position].grandTotal.toDouble()).toString()
+        }
 
         if (orderList[position].brands_array.isNotEmpty()) {
             val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
