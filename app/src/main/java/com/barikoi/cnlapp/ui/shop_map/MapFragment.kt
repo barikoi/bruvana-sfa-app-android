@@ -322,13 +322,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             return@observe
                         }
 
-                        toList = it.data.toList ?: emptyList()
-                        val toNameList = it.data.toList.map { to -> to.toName }.toMutableList()
+                        toList = it.data?.toList ?: emptyList()
+                        val toNameList = it.data?.toList?.map { to -> to.toName }?.toMutableList()
 
                         val adapter = ArrayAdapter(
                             requireContext(),
                             android.R.layout.simple_spinner_item,
-                            toNameList.toMutableList()
+                            toNameList!!.toMutableList()
                         )
                         binding.spinnerTO.adapter = adapter
 
