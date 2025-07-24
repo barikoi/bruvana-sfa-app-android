@@ -51,12 +51,6 @@ class SplashActivity : AppCompatActivity() {
         token = sharePrefUtils.getString(Api.TOKEN)
 
         binding.progressBar.isVisible = true
-        try {
-            throw Exception("This is a test.")
-        } catch (e: Exception) {
-            Sentry.captureException(e)
-        }
-
 
         mAppUpdateManager.appUpdateInfo.addOnSuccessListener { result ->
             if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE

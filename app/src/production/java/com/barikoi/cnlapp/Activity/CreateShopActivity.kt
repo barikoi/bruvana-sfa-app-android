@@ -27,6 +27,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.preference.PreferenceManager
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.BuildConfig
@@ -43,9 +47,6 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -204,9 +205,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             )
             setRoutes(routesList!!, routeNameList!!)
         }
-        //getRoutes()
+
         getShopType()
-        getShopCategory()
         getMarketOpportunity()
         getBuyer()
         getImageFromDB()
@@ -340,11 +340,18 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 p.setMargins(8, 8, 4, 8)
                 Log.d("CreateShopActivity", imageArray.get(i))
                 image.layoutParams = p
-                Glide.with(applicationContext)
-                    .load(imageArray[i])
-                    .override(200, 200)
-                    .transform(CenterCrop(), RoundedCorners(10))
-                    .into(image)
+
+                val radiusInPx = with(image.context) {
+                    resources.displayMetrics.density * 10 // 10dp to px
+                }
+
+                image.load(imageArray[i]) {
+                    crossfade(true)
+                    size(200)
+                    transformations(
+                        RoundedCornersTransformation(radiusInPx)
+                    )
+                }
 
                 // Adds the view to the layout
                 layout.addView(image)
@@ -360,10 +367,22 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         nagDialog.findViewById<Button>(R.id.btnIvClose)
                     val ivPreview =
                         nagDialog.findViewById<ImageView>(R.id.iv_preview_image)
-                    Glide.with(applicationContext)
-                        .load(imageArray[i])
-                        .thumbnail(.2.toFloat())
-                        .into(ivPreview)
+
+                    ivPreview.load(
+                        imageArray[i],
+                        builder = {
+                            crossfade(true)
+                            transformations(
+                                RoundedCornersTransformation(
+                                    10f,
+                                    10f,
+                                    10f,
+                                    10f
+                                )
+                            )
+                        }
+                    )
+
                     btnClose.setOnClickListener { nagDialog.dismiss() }
                     val pAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
@@ -896,131 +915,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             "Cancel"
         ) { dialogInterface, _ -> dialogInterface.dismiss() }
         builder.show()
-    }
-
-    private fun getShopCategory() {
-        return
-        ApiServices.apiGET(Api.get_category_outlet, queue!!, "", object : ApiServiceListener {
-            override fun onResponseSuccess(response: String) {
-                if (response != null) {
-                    try {
-                        val categoryList: ArrayList<String> = ArrayList()
-                        val obj = JSONObject(response)
-                        if (obj.has("outlet_categories") && !obj.isNull("outlet_categories")) {
-                            val categoryArray = obj.getJSONArray("outlet_categories")
-                            if (categoryArray.length() > 0) {
-                                categoryList.add(resources.getString(R.string.select_category_of_outlet))
-                                for (i in 0 until categoryArray.length()) {
-                                    categoryList.add(categoryArray.getString(i))
-                                }
-
-                                val shopCategoryAdapter = object : ArrayAdapter<String>(
-                                    applicationContext,
-                                    android.R.layout.simple_spinner_dropdown_item, categoryList
-                                ) {
-                                    override fun isEnabled(position: Int): Boolean {
-                                        return position != 0
-                                    }
-
-                                    override fun getDropDownView(
-                                        position: Int,
-                                        convertView: View?,
-                                        parent: ViewGroup
-                                    ): View {
-                                        val view: TextView = super.getDropDownView(
-                                            position,
-                                            convertView,
-                                            parent
-                                        ) as TextView
-                                        //set the color of first item in the drop down list to gray
-                                        if (position == 0) {
-                                            view.setTextColor(
-                                                ContextCompat.getColor(
-                                                    this@CreateShopActivity,
-                                                    R.color.text_title_2
-                                                )
-                                            )
-                                            view.visibility = View.GONE
-                                        } else {
-                                            //here it is possible to define color for other items by
-                                            //view.setTextColor(Color.RED)
-                                            view.setTextColor(
-                                                ContextCompat.getColor(
-                                                    this@CreateShopActivity,
-                                                    R.color.black
-                                                )
-                                            )
-                                        }
-                                        return view
-                                    }
-                                }
-                                binding.spinnerCatOutlets.adapter = shopCategoryAdapter
-
-                                binding.spinnerCatOutlets.onItemSelectedListener =
-                                    object : AdapterView.OnItemSelectedListener {
-                                        override fun onItemSelected(
-                                            p0: AdapterView<*>?,
-                                            p1: View?,
-                                            p2: Int,
-                                            p3: Long
-                                        ) {
-                                            if (p2 > 0) {
-                                                val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(
-                                                    ContextCompat.getColor(
-                                                        this@CreateShopActivity,
-                                                        R.color.black
-                                                    )
-                                                )
-                                                selectedCategory = categoryList[p2]
-                                            } else {
-                                                val view1: TextView = p0!!.getChildAt(0) as TextView
-                                                view1.setTextColor(
-                                                    ContextCompat.getColor(
-                                                        this@CreateShopActivity,
-                                                        R.color.text_title_2
-                                                    )
-                                                )
-                                                selectedCategory = ""
-                                            }
-                                        }
-
-                                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                                        }
-                                    }
-                                if (shops != null) {
-                                    categoryList.mapIndexed { pos, s ->
-                                        if (shops!!.category.trim() == s.trim()) {
-                                            binding.spinnerCatOutlets.setSelection(pos)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Sentry.captureException(e)
-                        e.printStackTrace()
-                    }
-                }
-            }
-
-            override fun onJSONResponseSuccess(response: JSONObject) {
-            }
-
-            override fun onNetworkResponseSuccess(response: NetworkResponse) {
-            }
-
-            override fun onResponseFailure(error: VolleyError) {
-                ViewUtils.getErrorResponse(error, applicationContext)
-            }
-
-            override fun onException(e: Exception) {
-                e.printStackTrace()
-                Sentry.captureException(e)
-            }
-
-        })
     }
 
     private fun confirmDialog(isClosedShop: Boolean) {
