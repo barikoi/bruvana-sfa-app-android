@@ -171,17 +171,11 @@ class ConfirmOrderListAdapter(
                 Api.get_chalan_download + "?order_no=" + orderList[position].orderId,
                 holder.itemView.context,
                 object : ApiServiceListener {
-                    override fun onResponseSuccess(response: String) {
-                        TODO("Not yet implemented")
-                    }
+                    override fun onResponseSuccess(response: String) {}
 
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                        TODO("Not yet implemented")
-                    }
+                    override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                        TODO("Not yet implemented")
-                    }
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                     override fun onResponseFailure(error: VolleyError) {
                         ViewUtils.getErrorResponse(error, holder.itemView.context)
@@ -228,29 +222,15 @@ class ConfirmOrderListAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val shopName: TextView
-        internal val routeName: TextView
-        internal val orderAt: TextView
-        internal val subTotal: TextView
-        internal val addMore: TextView
-        internal val editItem: ImageView
-        internal val downloadChalan: ImageView
-        internal val productList: RecyclerView
-        internal val statusLayout: LinearLayout
-        internal val tvOrderStatus: TextView
-
-        init {
-            shopName = itemView.findViewById(R.id.tvShopName)
-            routeName = itemView.findViewById(R.id.tvRouteName)
-            orderAt = itemView.findViewById(R.id.tvOrderDate)
-            subTotal = itemView.findViewById(R.id.tvSubTotal)
-            productList = itemView.findViewById(R.id.productlist)
-            addMore = itemView.findViewById(R.id.tvAddMore)
-            editItem = itemView.findViewById(R.id.btn_edit)
-            downloadChalan = itemView.findViewById(R.id.btn_download)
-            statusLayout = itemView.findViewById(R.id.layoutStatus2)
-            tvOrderStatus = itemView.findViewById(R.id.tvOrderStatus)
-
-        }
+        internal val shopName: TextView = itemView.findViewById(R.id.tvShopName)
+        internal val routeName: TextView = itemView.findViewById(R.id.tvRouteName)
+        internal val orderAt: TextView = itemView.findViewById(R.id.tvOrderDate)
+        internal val subTotal: TextView = itemView.findViewById(R.id.tvSubTotal)
+        internal val addMore: TextView = itemView.findViewById(R.id.tvAddMore)
+        internal val editItem: ImageView = itemView.findViewById(R.id.btn_edit)
+        internal val downloadChalan: ImageView = itemView.findViewById(R.id.btn_download)
+        internal val productList: RecyclerView = itemView.findViewById(R.id.productlist)
+        internal val statusLayout: LinearLayout = itemView.findViewById(R.id.layoutStatus2)
+        internal val tvOrderStatus: TextView = itemView.findViewById(R.id.tvOrderStatus)
     }
 }
