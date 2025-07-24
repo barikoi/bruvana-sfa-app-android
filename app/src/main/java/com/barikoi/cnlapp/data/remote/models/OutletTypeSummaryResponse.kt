@@ -30,7 +30,7 @@ data class OutletTypeData(
     @SerializedName("productive_visits")
     val productiveVisits: Int,
     @SerializedName("qty_presence")
-    val qtyPresence: String,
+    val qtyPresence: String?,
     @SerializedName("total_outlet")
     val totalOutlet: Int,
     @SerializedName("total_visits")
