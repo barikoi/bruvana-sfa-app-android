@@ -24,7 +24,7 @@ class ActiveInactiveActivity : BaseActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        adapterActiveInactive = AdapterActiveInactive()
+        adapterActiveInactive = AdapterActiveInactive(intent.getStringExtra("so_status")!!)
 
         binding.toolbar.tvTitle.text = intent.getStringExtra("so_status")
 
