@@ -246,6 +246,7 @@
 
 
     <string name="category">Category</string>
+    <string name="categories">Categories</string>
     <string name="total_outlet">Total Outlet</string>
     <string name="order_done">Order Done</string>
     <string name="order_value">Order Value</string>
@@ -376,5 +377,6 @@
     <string name="to">TO</string>
     <string name="taka_sign">৳ %1$s</string>
     <string name="bounce_p">Bounce (%)</string>
+    <string name="ordered_by_outlets">Ordered by Outlets</string>
 
 </resources>
