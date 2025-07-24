@@ -21,7 +21,7 @@ import com.barikoi.cnlapp.ui.active_inactive.ActiveInactiveActivity
 import com.barikoi.cnlapp.ui.home.adapter.AdapterUserListWithSummary
 import com.barikoi.cnlapp.ui.home.adapter.TargetAdapter
 import com.barikoi.cnlapp.ui.home.vm.HomeViewModel
-import com.barikoi.cnlapp.ui.summary_details.SummaryDetailsActivity2
+import com.barikoi.cnlapp.ui.summary_details.SummaryDetailsActivity
 import com.barikoi.cnlapp.ui.to_details.TODetailsActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
@@ -88,7 +88,7 @@ class HomeFragment(
         adapterUserListWithSummary = AdapterUserListWithSummary {
             if (it.userType == "SO") {
                 startActivity(
-                    Intent(requireContext(), SummaryDetailsActivity2::class.java)
+                    Intent(requireContext(), SummaryDetailsActivity::class.java)
                         .putParcelableArrayListExtra(
                             "user_summary",
                             ArrayList(userSummary)
