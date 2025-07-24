@@ -8,12 +8,10 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnEditShopListener
-import com.barikoi.cnlapp.utils.Constants
 import java.util.Locale
 
 class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener) :
