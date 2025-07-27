@@ -20,7 +20,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.Order_Delivery.Fragments.BouncedOrderFragment
 import com.barikoi.cnlapp.Order_Delivery.Fragments.DeliveredOrderFragment
@@ -33,6 +32,7 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.SoUser
 import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.ActivityOrderDeliveryUpdateBinding
+import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
