@@ -26,7 +26,7 @@ import com.android.volley.TimeoutError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Activity.CreateShopActivity
 import com.barikoi.cnlapp.ui.route.RouteViewModel
-import com.barikoi.cnlapp.Adapter.ShopListAdapter
+import com.barikoi.cnlapp.ui.adapter.ShopListAdapter
 import com.barikoi.cnlapp.Model.Routes
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
