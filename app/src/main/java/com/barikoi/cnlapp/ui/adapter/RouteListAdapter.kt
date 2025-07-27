@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Adapter
+package com.barikoi.cnlapp.ui.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
