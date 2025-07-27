@@ -104,6 +104,13 @@ fun String.formateDate(): String {
     return dfOutput.format(dfInput.parse(this))
 }
 
+fun String.formateDateYY(): String {
+    val dfInput = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+    val dfOutput = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+
+    return dfOutput.format(dfInput.parse(this))
+}
+
 fun String.formateDateNewFormat(newFormat: String): String {
     val dfInput = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
     val dfOutput = SimpleDateFormat(newFormat, Locale.ENGLISH)
