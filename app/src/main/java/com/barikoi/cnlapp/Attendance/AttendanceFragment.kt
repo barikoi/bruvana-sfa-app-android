@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.fragment.app.Fragment
-import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.Attendance.Fragment.CreateAttendanceFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SO.HistoryFragment
 import com.barikoi.cnlapp.Attendance.Fragment.SO.SummaryFragment
@@ -14,6 +13,7 @@ import com.barikoi.cnlapp.Attendance.Fragment.TO.HistoryTOFragment
 import com.barikoi.cnlapp.Attendance.Fragment.TO.SummaryTOFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.FragmentAttendanceBinding
+import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.google.android.material.tabs.TabLayout
