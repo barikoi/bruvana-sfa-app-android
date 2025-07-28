@@ -67,4 +67,5 @@ data class Product(
     @SerializedName("updated_at")
     val updatedAt: String,
     var qty: Int = 0,
+    var offerId: String? = ""
 )
