@@ -163,7 +163,12 @@ class SoDetailsSummaryFragment : Fragment(), DateFilterListener {
                             ),
                             SoStats(
                                 "Bounce %",
-                                it.data.targetCompleted[0].bounceAmountPercentage.toString()
+                                String.format(
+                                    Locale.getDefault(),
+                                    "%,.2f",
+                                    it.data.targetCompleted.getOrNull(0)?.bounceAmountPercentage
+                                        ?: 0.0
+                                )
                             )
                         )
 
