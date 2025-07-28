@@ -1,25 +1,27 @@
 package com.barikoi.cnlapp.Model
 
+import com.barikoi.cnlapp.data.remote.models.offer.Offer
 import java.io.Serializable
 
-class Products(
-    var product_id: String,
-    val product_name: String,
-    val product_code: String,
-    val unit_price: Double,
-    val discounted_unit_price: Double,
-    val sku_code: String,
-    /*val discount: Double,*/
+data class Products(
+    var productId: String,
+    val productName: String,
+    val productCode: String,
+    val unitPrice: Double,
+    val discountedUnitPrice: Double,
+    val skuCode: String,
     val imageUrl: String,
-    val unit_id: String,
-    val unit_name: String,
-    val unit_code: String,
-    val category_id: String,
-    val category_name: String,
-    val category_code: String,
-    val quantity_last_month: Int,
-    var stock_available: Int,
-    var bounced_quantity: Int,
-    var ordered_quantity: Int,
-    var ordered_total_price: Double
-): Serializable
+    val unitId: String,
+    val unitName: String,
+    val unitCode: String,
+    val categoryId: String,
+    val categoryName: String,
+    val categoryCode: String,
+    val quantityLastMonth: Int,
+    var stockAvailable: Int,
+    var bouncedQuantity: Int,
+    var orderedQuantity: Int,
+    var orderedTotalPrice: Double,
+    var offerID: String? = null,
+    val offers: List<Offer> = emptyList()
+) : Serializable
