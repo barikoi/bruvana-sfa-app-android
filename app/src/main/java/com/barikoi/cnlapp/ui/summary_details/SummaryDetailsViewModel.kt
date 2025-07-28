@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.data.remote.models.DownloadResponse
 import com.barikoi.cnlapp.data.remote.repository.DownloadRepository
 import com.barikoi.cnlapp.data.remote.repository.OrderRepository
@@ -45,6 +46,12 @@ class SummaryDetailsViewModel @Inject constructor(
             ).onStart {
                 _downloadResponse.value = ApiState.Loading()
             }.collect {
+                if (it.data != null && it.data.orders.isEmpty()) {
+                    _downloadResponse.value = ApiState.Error(
+                        Failure.Exception(Throwable("Orders not found"))
+                    )
+                    return@collect
+                }
                 downloadChalan(
                     it.data!!.orders.joinToString(",") { order -> order.orderNo }
                 )
