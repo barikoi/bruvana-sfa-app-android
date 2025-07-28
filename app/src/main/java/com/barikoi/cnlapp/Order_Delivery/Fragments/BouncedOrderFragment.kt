@@ -312,8 +312,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             var grandTotal = 0.0
                             var totalCount = 0
                             for (k in 0 until productItems.size) {
-                                grandTotal = grandTotal + productItems[k].ordered_total_price
-                                totalCount = totalCount + productItems[k].bounced_quantity
+                                grandTotal = grandTotal + productItems[k].orderedTotalPrice
+                                totalCount = totalCount + productItems[k].bouncedQuantity
                             }
                             orderList.add(
                                 OrderList(
@@ -470,27 +470,27 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             for (i in 0 until order.brands_array.size) {
                 brandsStatistics.add(
                     ProductStatistics(
-                        order.brands_array[i].product_id,
-                        order.brands_array[i].product_name,
-                        order.brands_array[i].product_code,
-                        order.brands_array[i].sku_code,
-                        order.brands_array[i].category_code,
-                        order.brands_array[i].category_name,
-                        order.brands_array[i].category_id,
-                        order.brands_array[i].unit_name,
-                        order.brands_array[i].unit_id,
-                        order.brands_array[i].unit_code,
-                        order.brands_array[i].unit_price,
-                        order.brands_array[i].discounted_unit_price,
-                        order.brands_array[i].ordered_total_price,
-                        order.brands_array[i].ordered_quantity,
-                        order.brands_array[i].ordered_quantity,
-                        order.brands_array[i].bounced_quantity,
-                        order.brands_array[i].ordered_total_price
+                        order.brands_array[i].productId,
+                        order.brands_array[i].productName,
+                        order.brands_array[i].productCode,
+                        order.brands_array[i].skuCode,
+                        order.brands_array[i].categoryCode,
+                        order.brands_array[i].categoryName,
+                        order.brands_array[i].categoryId,
+                        order.brands_array[i].unitName,
+                        order.brands_array[i].unitId,
+                        order.brands_array[i].unitCode,
+                        order.brands_array[i].unitPrice,
+                        order.brands_array[i].discountedUnitPrice,
+                        order.brands_array[i].orderedTotalPrice,
+                        order.brands_array[i].orderedQuantity,
+                        order.brands_array[i].orderedQuantity,
+                        order.brands_array[i].bouncedQuantity,
+                        order.brands_array[i].orderedTotalPrice
                     )
                 )
-                grandTotal = grandTotal + order.brands_array[i].ordered_total_price
-                itemCount = itemCount + order.brands_array[i].ordered_quantity
+                grandTotal = grandTotal + order.brands_array[i].orderedTotalPrice
+                itemCount = itemCount + order.brands_array[i].orderedQuantity
             }
             val adapter = OutletProductAdapter(brandsStatistics)
             listView.adapter = adapter
