@@ -43,7 +43,9 @@ data class ProductRequest(
     @SerializedName("unit_name")
     val unitName: String,
     @SerializedName("unit_price")
-    val unitPrice: String
+    val unitPrice: String,
+    @SerializedName("offer_id")
+    val offerId: String
 )
 
 fun Product.toProductRequest(): ProductRequest {
@@ -68,7 +70,8 @@ fun Product.toProductRequest(): ProductRequest {
         unitCode = unitCode,
         unitId = unitId.toString(),
         unitName = unitName,
-        unitPrice = unitPriceStr
+        unitPrice = unitPriceStr,
+        offerId = ""
     )
 }
 
@@ -100,7 +103,8 @@ fun List<Product>.toProductRequestList(
                 unitCode = product.unitCode,
                 unitId = product.unitId.toString(),
                 unitName = product.unitName,
-                unitPrice = product.unitPrice
+                unitPrice = product.unitPrice,
+                offerId = ""
             )
         }
 }
@@ -109,15 +113,18 @@ fun List<Product>.toProductRequestList1(
     offers: List<Offer> = emptyList()
 ): List<ProductRequest> {
     val updatedProductList = this.toMutableList()
+    val offerProductList: MutableList<Product> = mutableListOf()
 
     offers.filter { it.quantity > 0 }.forEach { offer ->
         offer.productCombinations.forEach { combo ->
             val existing = updatedProductList.find { it.id == combo.product.id }
             if (existing != null) {
                 // Product exists → increase quantity
-                val updated = existing.copy(qty = existing.qty + combo.quantity * offer.quantity)
-                val index = updatedProductList.indexOf(existing)
-                updatedProductList[index] = updated
+                val updated = existing.copy(
+                    qty = combo.quantity * offer.quantity,
+                    offerId = offer.id.toString()
+                )
+                offerProductList.add(updated)
             } else {
                 AppLogger.log("Product with ID ${combo.productId} not found in the product list.")
             }
@@ -146,10 +153,36 @@ fun List<Product>.toProductRequestList1(
                 unitCode = product.unitCode,
                 unitId = product.unitId.toString(),
                 unitName = product.unitName,
-                unitPrice = product.unitPrice
+                unitPrice = product.unitPrice,
+                offerId = product.offerId ?: ""
             )
         }
 
+    val offers = offerProductList.map { product ->
+        val orderedAmount = product.discountedUnitPrice * product.qty
+        ProductRequest(
+            bouncedAmount = "0",
+            bouncedQuantity = "0",
+            categoryCode = product.categoryCode,
+            categoryId = product.categoryId.toString(),
+            categoryName = product.categoryName,
+            deliveredAmount = "0",
+            deliveredQuantity = "0",
+            discountedUnitPrice = product.discountedUnitPrice.toString(),
+            orderedAmount = orderedAmount.toString(),
+            orderedQuantity = product.qty.toString(),
+            productCode = product.productCode,
+            productId = product.id.toString(),
+            productName = product.productName,
+            skuCode = product.skuCode,
+            unitCode = product.unitCode,
+            unitId = product.unitId.toString(),
+            unitName = product.unitName,
+            unitPrice = product.unitPrice,
+            offerId = product.offerId ?: ""
+        )
+    }
+
     AppLogger.log("Update Size ${ss.size} ProductRequest:: ${Gson().toJson(ss)}")
-    return ss
+    return ss + offers
 }
