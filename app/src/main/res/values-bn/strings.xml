@@ -389,5 +389,7 @@
     <string name="delivery_value_">ডেলিভারি মূল্য:</string>
     <string name="contribution">অবদান:</string>
     <string name="categories">বিভাগসমূহ</string>
+    <string name="offer_">(offer)</string>
+    <string name="x">X</string>
 
 </resources>

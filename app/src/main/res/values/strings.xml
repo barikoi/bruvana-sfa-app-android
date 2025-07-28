@@ -382,5 +382,7 @@
     <string name="delivery_value_">Delivery Value:</string>
     <string name="contribution">Contribution:</string>
     <string name="categories">Categories</string>
+    <string name="offer_">(offer)</string>
+    <string name="x">X</string>
 
 </resources>
