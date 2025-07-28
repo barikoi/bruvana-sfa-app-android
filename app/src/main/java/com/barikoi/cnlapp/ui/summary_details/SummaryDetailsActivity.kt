@@ -84,13 +84,16 @@ class SummaryDetailsActivity : BaseActivity() {
         binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDMMYYYY()
 
         users = intent.getParcelableArrayListCompat<UserSummary>("user_summary")
+        soCount = intent.getIntExtra("position", 0)
+
         if (users.isNullOrEmpty()) {
             toast("No users found")
             return
         }
 
         binding.tvSOName.text = users?.get(soCount)?.name.toString()
-        binding.ivPrev.isEnabled = soCount == 0
+
+        binding.ivPrev.isEnabled = soCount != 0
 
         binding.ivPrev.setHapticClickListener {
             if (soCount > 0) {
