@@ -10,7 +10,7 @@ import com.barikoi.cnlapp.databinding.ItemUserBinding
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 
 class AdapterUserListWithSummary(
-    private val onUserClick: (UserSummary) -> Unit
+    private val onUserClick: (UserSummary, Int) -> Unit
 ) :
     RecyclerView.Adapter<AdapterUserListWithSummary.UserListWithSummaryViewHolder>() {
     private var users: List<UserSummary> = emptyList()
@@ -55,7 +55,7 @@ class AdapterUserListWithSummary(
         }
 
         holder.binding.root.setHapticClickListener {
-            onUserClick(user)
+            onUserClick(user, position)
         }
     }
 
