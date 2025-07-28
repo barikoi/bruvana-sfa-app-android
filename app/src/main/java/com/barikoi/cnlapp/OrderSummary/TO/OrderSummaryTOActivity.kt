@@ -26,6 +26,7 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.To
+import com.barikoi.cnlapp.data.remote.models.offer.Offer
 import com.barikoi.cnlapp.databinding.ActivityOrderSummaryToBinding
 import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderListAdapter
 import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
@@ -597,7 +598,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                                     brandObj.getString("category_code"), 0, 0,
                                     brandObj.getInt("bounced_quantity"),
                                     brandObj.getInt("ordered_quantity"),
-                                    brandObj.getDouble("ordered_amount")
+                                    brandObj.getDouble("ordered_amount"),
                                 )
                             )
                         }
