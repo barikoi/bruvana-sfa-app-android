@@ -85,10 +85,11 @@ class HomeFragment(
         targetAdapter = TargetAdapter()
         binding.rcvTarget.adapter = targetAdapter
 
-        adapterUserListWithSummary = AdapterUserListWithSummary {
-            if (it.userType == "SO") {
+        adapterUserListWithSummary = AdapterUserListWithSummary {userSum, position ->
+            if (userSum.userType == "SO") {
                 startActivity(
                     Intent(requireContext(), SummaryDetailsActivity::class.java)
+                        .putExtra("position", position)
                         .putParcelableArrayListExtra(
                             "user_summary",
                             ArrayList(userSummary)
@@ -97,7 +98,7 @@ class HomeFragment(
             } else {
                 startActivity(
                     Intent(requireContext(), TODetailsActivity::class.java)
-                        .putExtra("user_summary", it)
+                        .putExtra("user_summary", userSum)
                 )
             }
         }
