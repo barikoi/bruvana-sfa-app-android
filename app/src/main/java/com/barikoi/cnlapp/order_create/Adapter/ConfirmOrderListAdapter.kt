@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.order_create.RoomDB.OrderList
@@ -62,7 +63,30 @@ class ConfirmOrderListAdapter(
         }
 
         if (orderList[position].brands_array.isNotEmpty()) {
-            val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
+            val a: List<Products> = orderList[position].brands_array
+                .filter { it.offerID.isNullOrEmpty() }
+
+            val groupedProducts: List<Products> = orderList[position].brands_array
+                .filter { !it.offerID.isNullOrEmpty() }
+                .groupBy { it.offerID }
+                .filter { it.value.size > 1 }
+                .map { (_, products) ->
+                    val mergedNames =
+                        products.joinToString("\n") { it.productName + " X ${it.orderedQuantity}" }
+                    val first = products.first()
+
+                    // Return a copy of the first product, with productName replaced
+                    first.copy(
+                        productName = mergedNames,
+                        orderedTotalPrice =
+                            if (first.offers.isNotEmpty())
+                                first.offers.find {
+                                    (first.offerID ?: "") == it.id.toString()
+                                }?.comboPrice!!.toDouble() else first.orderedTotalPrice
+                    )
+                }
+
+            val adapter = ConfirmOrderProductListAdapter(a + groupedProducts)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
         }
@@ -261,3 +285,8 @@ class ConfirmOrderListAdapter(
         internal val tvOrderStatus: TextView = itemView.findViewById(R.id.tvOrderStatus)
     }
 }
+
+data class GroupedOfferDisplay(
+    val offerId: String,
+    val productNames: String // joined by newline
+)
