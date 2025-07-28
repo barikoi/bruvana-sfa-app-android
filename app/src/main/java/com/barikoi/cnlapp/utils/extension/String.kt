@@ -2,6 +2,8 @@ package com.barikoi.cnlapp.utils.extension
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.text.intl.Locale
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -45,6 +47,9 @@ fun String.format(): String {
         .format(this.toDouble())
         .toString()
 }
+
+inline fun <reified T> Gson.fromJson(json: String): T =
+    this.fromJson(json, object : TypeToken<T>() {}.type)
 
 @SuppressLint("SimpleDateFormat")
 fun String.convertDate(): String? {
