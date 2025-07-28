@@ -48,45 +48,45 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
         prefs = PreferenceManager.getDefaultSharedPreferences(holder.itemView.context)
 
         holder.stockAvailable.visibility = View.VISIBLE
-        holder.productName.text = productList[position].product_name
-        holder.productUnit.text = productList[position].unit_name
-        holder.perUnitPrice.text = productList[position].discounted_unit_price.toString()
+        holder.productName.text = productList[position].productName
+        holder.productUnit.text = productList[position].unitName
+        holder.perUnitPrice.text = productList[position].discountedUnitPrice.toString()
 
-        if (productList[position].ordered_quantity > 0) {
-            holder.productCount.setText(productList[position].ordered_quantity.toString())
+        if (productList[position].orderedQuantity > 0) {
+            holder.productCount.setText(productList[position].orderedQuantity.toString())
             holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
         } else {
             holder.btnMinus.drawable.setTint(holder.itemView.resources.getColor(R.color.btn_gray_stroke))
         }
 
-        if (productList[position].ordered_total_price > 0.0) {
-            holder.tvSubtoal.text = dformat.format(productList[position].ordered_total_price).toString()
+        if (productList[position].orderedTotalPrice > 0.0) {
+            holder.tvSubtoal.text = dformat.format(productList[position].orderedTotalPrice).toString()
         }
 
-        if (productList[position].stock_available > 0) {
+        if (productList[position].stockAvailable > 0) {
             holder.stockAvailable.text =
-                productList[position].stock_available.toString() + " in stock"
+                productList[position].stockAvailable.toString() + " in stock"
         } else {
             holder.stockAvailable.text = holder.itemView.resources.getString(R.string.stock_out)
         }
 
-        holder.perUnitPrice.text = productList[position].discounted_unit_price.toString()
+        holder.perUnitPrice.text = productList[position].discountedUnitPrice.toString()
 
-        holder.productUnit.text = productList[position].unit_name
+        holder.productUnit.text = productList[position].unitName
 
         holder.btnAdd.drawable.setTint(holder.itemView.resources.getColor(R.color.cnl_color_2))
 
         holder.btnAdd.setOnClickListener {
-            if (productList[position].stock_available > 0) {
+            if (productList[position].stockAvailable > 0) {
                 val qtyValue = holder.productCount.text.toString().toInt() + 1
                 holder.productCount.setText(qtyValue.toString())
-                productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-                productList[position].ordered_total_price =
-                    productList[position].discounted_unit_price * holder.productCount.text.toString()
+                productList[position].orderedQuantity = holder.productCount.text.toString().toInt()
+                productList[position].orderedTotalPrice =
+                    productList[position].discountedUnitPrice * holder.productCount.text.toString()
                         .toInt()
-                productList[position].stock_available = productList[position].stock_available - 1
+                productList[position].stockAvailable = productList[position].stockAvailable - 1
                 holder.stockAvailable.text =
-                    productList[position].stock_available.toString() + " in stock"
+                    productList[position].stockAvailable.toString() + " in stock"
                 val prodList = appDatabase!!.saveOrderDao()
                     .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
                 try {
@@ -98,7 +98,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                         appDatabase.saveOrderDao().update(
                             prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
                             prodList[0].itemsCount + 1,
-                            prodList[0].totalPrice + productList[position].discounted_unit_price
+                            prodList[0].totalPrice + productList[position].discountedUnitPrice
                         )
                     } else {
                         appDatabase.saveOrderDao().insertAll(
@@ -133,13 +133,13 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             ) {
                 val qtyValue = holder.productCount.text.toString().toInt() - 1
                 holder.productCount.setText(qtyValue.toString())
-                productList[position].ordered_quantity = holder.productCount.text.toString().toInt()
-                productList[position].ordered_total_price =
-                    productList[position].discounted_unit_price * holder.productCount.text.toString()
+                productList[position].orderedQuantity = holder.productCount.text.toString().toInt()
+                productList[position].orderedTotalPrice =
+                    productList[position].discountedUnitPrice * holder.productCount.text.toString()
                         .toInt()
-                productList[position].stock_available = productList[position].stock_available + 1
+                productList[position].stockAvailable = productList[position].stockAvailable + 1
                 holder.stockAvailable.text =
-                    productList[position].stock_available.toString() + " in stock"
+                    productList[position].stockAvailable.toString() + " in stock"
                 val prodList = appDatabase!!.saveOrderDao()
                     .getOrdersDB(prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!)
                 if (prodList!!.isNotEmpty()) {
@@ -150,7 +150,7 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
                     appDatabase.saveOrderDao().update(
                         prefs!!.getString(Api.SELECTED_SHOP_ID, "")!!,
                         prodList[0].itemsCount - 1,
-                        prodList[0].totalPrice - productList[position].discounted_unit_price
+                        prodList[0].totalPrice - productList[position].discountedUnitPrice
                     )
                 } else {
                     appDatabase.saveOrderDao().insertAll(
@@ -174,13 +174,13 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if (holder.productCount.text.toString().trim().isNotEmpty()) {
                     val subtotal =
-                        productList[position].discounted_unit_price * holder.productCount.text.toString()
+                        productList[position].discountedUnitPrice * holder.productCount.text.toString()
                             .toInt()
                     holder.tvSubtoal.text = dformat.format(subtotal).toString()
                     totalPrice = subtotal
 
-                    productList[position].ordered_total_price = subtotal
-                    productList[position].ordered_quantity =
+                    productList[position].orderedTotalPrice = subtotal
+                    productList[position].orderedQuantity =
                         holder.productCount.text.toString().toInt()
 
                     if (holder.productCount.text.toString()
@@ -225,8 +225,8 @@ class ProductListAdapter(var mValues: List<Products>, var mListener: OnValueChan
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.product_name.toLowerCase()
-                                .contains(charString.lowercase(Locale.getDefault())) || row.product_name
+                        if (row.productName.toLowerCase()
+                                .contains(charString.lowercase(Locale.getDefault())) || row.productName
                                 .contains(charString)
                         ) {
                             filteredList.add(row)
