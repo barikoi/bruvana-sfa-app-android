@@ -23,6 +23,7 @@ interface AttendanceRepository {
     fun getActiveInactiveUsers(
         startDate: String,
         endDate: String,
+        userId: String
     ): Flow<ApiState<ActiveInactiveUserResponse>>
 }
 
@@ -67,13 +68,15 @@ class AttendanceRepositoryImpl @Inject constructor(
 
     override fun getActiveInactiveUsers(
         startDate: String,
-        endDate: String
+        endDate: String,
+        userId: String
     ): Flow<ApiState<ActiveInactiveUserResponse>> {
         return flow {
             try {
                 val response = apiService.getActiveInactive(
                     startDate = startDate,
-                    endDate = endDate
+                    endDate = endDate,
+                    userId
                 )
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
