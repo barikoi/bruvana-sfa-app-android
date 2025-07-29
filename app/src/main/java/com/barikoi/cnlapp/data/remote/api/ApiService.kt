@@ -228,6 +228,7 @@ interface ApiService {
     suspend fun getActiveInactive(
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
+        @Query("user_id") userId: String,
         @Query("with_active_inactive_so") withActiveInactiveSo: String = "1"
     ): Response<ActiveInactiveUserResponse>
 
