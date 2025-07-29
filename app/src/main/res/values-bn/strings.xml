@@ -391,5 +391,6 @@
     <string name="categories">বিভাগসমূহ</string>
     <string name="offer_">(offer)</string>
     <string name="x">X</string>
+    <string name="are_you_sure_you_want_to_checkout">আপনি কি নিশ্চিত যে আপনি চেকআউট করতে চান?</string>
 
 </resources>
