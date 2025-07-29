@@ -48,12 +48,14 @@ class HomeViewModel @Inject constructor(
 
     fun getActiveInactiveUsers(
         startDate: String = "",
-        endDate: String = ""
+        endDate: String = "",
+        userId: String
     ) {
         viewModelScope.launch {
             attendanceRepository.getActiveInactiveUsers(
                 startDate = startDate,
-                endDate = endDate
+                endDate = endDate,
+                userId
             )
                 .onStart {
                     _activeInactiveResponse.value = ApiState.Loading()
