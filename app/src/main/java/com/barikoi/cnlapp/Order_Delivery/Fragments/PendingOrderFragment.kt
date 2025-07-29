@@ -388,8 +388,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         val outletName = dialog.findViewById<TextView>(R.id.outletName)
         val listView = dialog.findViewById<RecyclerView>(R.id.productList)
         val tvLastOrderDate = dialog.findViewById<TextView>(R.id.lastOrderDate)
-        tvItemCount = dialog.findViewById<TextView>(R.id.itemCount)
-        tvGrandTotal = dialog.findViewById<TextView>(R.id.grandTotal)
+        tvItemCount = dialog.findViewById(R.id.itemCount)
+        tvGrandTotal = dialog.findViewById(R.id.grandTotal)
         val statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
         val radio_group: RadioGroup? = RadioGroup(mContext)
 
@@ -431,7 +431,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         var grandTotal = 0.0
         var itemCount = 0
         val brandsStatistics: ArrayList<ProductStatistics> = ArrayList()
-        if (order.brands_array.size > 0) {
+        if (order.brands_array.isNotEmpty()) {
             brandsStatistics.clear()
             updatedProducts!!.clear()
             for (i in 0 until order.brands_array.size) {
