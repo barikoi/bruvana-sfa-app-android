@@ -52,7 +52,9 @@ data class SalesOfficer(
     @SerializedName("trace_id")
     val traceId: String,
     @SerializedName("user_name")
-    val userName: String
+    val userName: String,
+    @SerializedName("ads")
+    val ads: String?
 ) {
     fun toUserSummary(): UserSummary {
         return UserSummary(
@@ -60,7 +62,7 @@ data class SalesOfficer(
             name = userName,
             userType = designation,
             totalOrders = soOrderedValue,
-            ads = 0.00,
+            ads = (ads ?: "0.0").toDouble(),
             territoryId = 0,
             active = 0,
             inactive = 0
