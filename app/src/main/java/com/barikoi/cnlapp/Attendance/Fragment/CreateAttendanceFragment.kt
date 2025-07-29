@@ -226,15 +226,15 @@ class CreateAttendanceFragment : Fragment() {
     // create a confirm dialog use this function to show a dialog before checking out
     private fun showCheckoutConfirmDialog() {
         AlertDialog.Builder(context)
-            .setTitle("Confirm")
-            .setMessage("Are you sure you want to Checkout?")
-            .setPositiveButton("Checkout") { dialog, _ ->
+            .setTitle(getString(R.string.confirm))
+            .setMessage(getString(R.string.are_you_sure_you_want_to_checkout))
+            .setPositiveButton(getString(R.string.check_out)) { dialog, _ ->
                 dialog.dismiss()
                 getLocation("check_out")
 
                 binding.progressBar.visibility = View.VISIBLE
             }
-            .setNegativeButton("Cancel") { dialog, _ ->
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()
@@ -320,7 +320,7 @@ class CreateAttendanceFragment : Fragment() {
         val imageList: ArrayList<Images?>? =
             appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
 
-        if (imageList!!.size > 0) {
+        if (imageList!!.isNotEmpty()) {
 
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
@@ -365,7 +365,7 @@ class CreateAttendanceFragment : Fragment() {
         val byteParams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
         val imagesList: ArrayList<Images> =
             appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
-        if (imagesList.size > 0) {
+        if (imagesList.isNotEmpty()) {
             val fileExist = File(imagesList[0].filePath).canRead()
             if (fileExist) {
                 val imagename = imagesList[0].filePath.substring(
@@ -727,11 +727,9 @@ class CreateAttendanceFragment : Fragment() {
         if (result.resultCode == RESULT_OK) {
             Log.e("imageUtils", "OnActivity result code 1: $RESULT_OK")
             var imagePosition = 0
-            val imageList: ArrayList<Images?>?
-            imageList =
-                appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
+            val imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
             Log.d("Imagepos", "List: $imageList")
-            imagePosition = if (imageList!!.size > 0) {
+            imagePosition = if (imageList!!.isNotEmpty()) {
                 imageList[imageList.size - 1]!!.position + 1
             } else {
                 imagePosition + 1
