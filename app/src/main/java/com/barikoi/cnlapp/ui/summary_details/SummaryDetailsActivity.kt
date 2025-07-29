@@ -75,7 +75,6 @@ class SummaryDetailsActivity : BaseActivity() {
         }
 
         val cal = Calendar.getInstance()
-        cal.set(Calendar.DAY_OF_MONTH, 1)
 
         formattedStartDate = cal.time.formatDateWithLocale()
         formattedEndDate = Date().formatDateWithLocale()
