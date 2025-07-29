@@ -65,8 +65,9 @@
             android:layout_marginTop="@dimen/_15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:itemCount="3"
+            tools:itemCount="1"
             tools:listitem="@layout/item_shop_type_wise_stats" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
