@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetAndCompleted
@@ -33,7 +32,6 @@ import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -85,7 +83,7 @@ class HomeFragment(
         targetAdapter = TargetAdapter()
         binding.rcvTarget.adapter = targetAdapter
 
-        adapterUserListWithSummary = AdapterUserListWithSummary {userSum, position ->
+        adapterUserListWithSummary = AdapterUserListWithSummary { userSum, position ->
             if (userSum.userType == "SO") {
                 startActivity(
                     Intent(requireContext(), SummaryDetailsActivity::class.java)
@@ -126,7 +124,7 @@ class HomeFragment(
 
         formattedEndDate = Date().formatDateWithLocale()
         val cal = Calendar.getInstance()
-        cal.set(Calendar.DAY_OF_MONTH, 1)
+//        cal.set(Calendar.DAY_OF_MONTH, 1)
         formattedStartDate = cal.time.formatDateWithLocale()
 
         binding.tvDateRange.text = getString(
@@ -135,9 +133,7 @@ class HomeFragment(
             formattedEndDate.formatDateWithDDMM()
         )
 
-        viewModel.getActiveInactiveUsers(
-            formattedStartDate, formattedEndDate
-        )
+
 
         initData()
 
@@ -204,6 +200,11 @@ class HomeFragment(
 
     private fun initData() {
         if (userType == "ASM") {
+            viewModel.getActiveInactiveUsers(
+                formattedStartDate, formattedEndDate,
+                sharePrefUtils.getString(Api.USER_ID) ?: ""
+            )
+
             viewModel.getOverViewStatsASM(
                 formattedStartDate, formattedEndDate,
                 sharePrefUtils.getString(Constants.REGION_ID) ?: "",
@@ -215,209 +216,206 @@ class HomeFragment(
             )
 
         } else {
+            viewModel.getActiveInactiveUsers(
+                formattedStartDate, formattedEndDate,
+                userId!!
+            )
             viewModel.getOverViewStatsTO(
                 formattedStartDate, formattedEndDate,
                 tId ?: sharePrefUtils.getString(Constants.TERRITORY_ID) ?: "",
-                userId ?: sharePrefUtils.getString(Api.USER_ID) ?: ""
+                userId
             )
 
             viewModel.getSOWIthTodaySummary(
                 formattedStartDate,
                 formattedEndDate,
-                userId ?: sharePrefUtils.getString(Api.USER_ID) ?: ""
+                userId
             )
         }
-
     }
 
     private fun startActiveInactiveUserObserve() {
-        lifecycleScope.launch {
-            viewModel.activeInactiveResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startActiveInactiveUserObserve::Empty")
-                        binding.llActiveInactive.hideShimmer()
-                    }
+        viewModel.activeInactiveResponse.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiState.Empty -> {
+                    AppLogger.log("startActiveInactiveUserObserve::Empty")
+                    binding.llActiveInactive.hideShimmer()
+                }
 
-                    is ApiState.Error -> {
-                        AppLogger.log("startActiveInactiveUserObserve::Error ${it.error}")
-                        binding.llActiveInactive.hideShimmer()
+                is ApiState.Error -> {
+                    AppLogger.log("startActiveInactiveUserObserve::Error ${it.error}")
+                    binding.llActiveInactive.hideShimmer()
 
-                        toast(networkFailureMessage.handleFailure(it.error!!))
-                    }
+                    toast(networkFailureMessage.handleFailure(it.error!!))
+                }
 
-                    is ApiState.Loading -> {
-                        AppLogger.log("startActiveInactiveUserObserve::Loading")
-                        binding.llActiveInactive.startShimmer()
-                    }
+                is ApiState.Loading -> {
+                    AppLogger.log("startActiveInactiveUserObserve::Loading")
+                    binding.llActiveInactive.startShimmer()
+                }
 
-                    is ApiState.Success -> {
-                        AppLogger.log("startActiveInactiveUserObserve:: Success ${it.data}")
-                        binding.llActiveInactive.hideShimmer()
+                is ApiState.Success -> {
+                    AppLogger.log("startActiveInactiveUserObserve:: Success ${it.data}")
+                    binding.llActiveInactive.hideShimmer()
 
-                        binding.tvActiveValue.text = it.data!!.active.size.toString()
-                        binding.tvInactiveValue.text = it.data.inactive.size.toString()
+                    binding.tvActiveValue.text = it.data!!.active.size.toString()
+                    binding.tvInactiveValue.text = it.data.inactive.size.toString()
 
-                        active = it.data.active
-                        inactive = it.data.inactive
-                    }
+                    active = it.data.active
+                    inactive = it.data.inactive
                 }
             }
         }
+
     }
 
 
     private fun startOverViewStatsObserve() {
-        lifecycleScope.launch {
-            viewModel.overViewStatsTOResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startOverViewStatsObserve::Empty")
-                    }
+        viewModel.overViewStatsTOResponse.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiState.Empty -> {
+                    AppLogger.log("startOverViewStatsObserve::Empty")
+                }
 
-                    is ApiState.Error -> {
-                        AppLogger.log("startOverViewStatsObserve::Error ${it.error}")
-                        toast(networkFailureMessage.handleFailure(it.error!!))
+                is ApiState.Error -> {
+                    AppLogger.log("startOverViewStatsObserve::Error ${it.error}")
+                    toast(networkFailureMessage.handleFailure(it.error!!))
 
-                    }
+                }
 
-                    is ApiState.Loading -> {
-                        AppLogger.log("startOverViewStatsObserve::Loading")
-                    }
+                is ApiState.Loading -> {
+                    AppLogger.log("startOverViewStatsObserve::Loading")
+                }
 
-                    is ApiState.Success -> {
-                        AppLogger.log("startOverViewStatsObserve:: Success ${it.data}")
+                is ApiState.Success -> {
+                    AppLogger.log("startOverViewStatsObserve:: Success ${it.data}")
 
-                        val targets = listOf(
-                            TargetAndCompleted(
-                                resources.getString(R.string.total_target),
-                                it.data!!.targets[0].targetAmount.toString(),
-                                it.data.targetCompleted[0].revenue ?: "0"
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.ads),
-                                it.data.targets[0].targetAds.toString(),
-                                it.data.targetCompleted[0].ads.toString()
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.rds),
-                                it.data.targets[0].targetRds ?: "0",
-                                it.data.targetCompleted[0].rds.toString()
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.sku_per_memo),
-                                it.data.targets[0].targetSkuPerMemo.toString(),
-                                it.data.targetCompleted[0].skuPerMemo ?: "0"
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.number_of_memo),
-                                it.data.targets[0].targetNumberOfMemo.toString(),
-                                it.data.targetCompleted[0].numberOfMemo.toString()
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.visit_ratio),
-                                it.data.targets[0].targetNumberOfVisits.toString(),
-                                it.data.targetCompleted[0].numberOfVisits.toString()
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.aiv),
-                                it.data.targets[0].targetAiv.toString(),
-                                it.data.targetCompleted[0].aiv ?: "0"
-                            ),
-                            TargetAndCompleted(
-                                resources.getString(R.string.bounce_p),
-                                it.data.targets[0].thresholdBouncePercentage.toString(),
-                                it.data.targetCompleted[0].bounceAmountPercentage.toString()
-                            )
+                    val targets = listOf(
+                        TargetAndCompleted(
+                            resources.getString(R.string.total_target),
+                            it.data!!.targets[0].targetAmount.toString(),
+                            it.data.targetCompleted[0].revenue ?: "0"
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.ads),
+                            it.data.targets[0].targetAds.toString(),
+                            it.data.targetCompleted[0].ads.toString()
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.rds),
+                            it.data.targets[0].targetRds ?: "0",
+                            it.data.targetCompleted[0].rds.toString()
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.sku_per_memo),
+                            it.data.targets[0].targetSkuPerMemo.toString(),
+                            it.data.targetCompleted[0].skuPerMemo ?: "0"
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.number_of_memo),
+                            it.data.targets[0].targetNumberOfMemo.toString(),
+                            it.data.targetCompleted[0].numberOfMemo.toString()
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.visit_ratio),
+                            it.data.targets[0].targetNumberOfVisits.toString(),
+                            it.data.targetCompleted[0].numberOfVisits.toString()
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.aiv),
+                            it.data.targets[0].targetAiv.toString(),
+                            it.data.targetCompleted[0].aiv ?: "0"
+                        ),
+                        TargetAndCompleted(
+                            resources.getString(R.string.bounce_p),
+                            it.data.targets[0].thresholdBouncePercentage.toString(),
+                            it.data.targetCompleted[0].bounceAmountPercentage.toString()
                         )
+                    )
 
-                        targetAdapter.updateData(targets)
-                    }
+                    targetAdapter.updateData(targets)
                 }
             }
         }
+
     }
 
     private fun startToWithTodaySummaryObserve() {
-        lifecycleScope.launch {
-            viewModel.toWithTodaySummaryResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startToWithTodaySummaryObserve::Empty")
-                        binding.llShimmerToList.isVisible = false
-                        binding.llShimmerToList.hideShimmer()
-                    }
+        viewModel.toWithTodaySummaryResponse.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiState.Empty -> {
+                    AppLogger.log("startToWithTodaySummaryObserve::Empty")
+                    binding.llShimmerToList.isVisible = false
+                    binding.llShimmerToList.hideShimmer()
+                }
 
-                    is ApiState.Error -> {
-                        AppLogger.log("startToWithTodaySummaryObserve::Error ${it.error}")
-                        binding.llShimmerToList.isVisible = false
-                        binding.llShimmerToList.hideShimmer()
-                        toast(networkFailureMessage.handleFailure(it.error!!))
+                is ApiState.Error -> {
+                    AppLogger.log("startToWithTodaySummaryObserve::Error ${it.error}")
+                    binding.llShimmerToList.isVisible = false
+                    binding.llShimmerToList.hideShimmer()
+                    toast(networkFailureMessage.handleFailure(it.error!!))
 
-                    }
+                }
 
-                    is ApiState.Loading -> {
-                        AppLogger.log("startToWithTodaySummaryObserve::Loading")
-                        binding.llShimmerToList.isVisible = true
-                        binding.rcvToList.isVisible = false
-                        binding.llShimmerToList.startShimmer()
-                    }
+                is ApiState.Loading -> {
+                    AppLogger.log("startToWithTodaySummaryObserve::Loading")
+                    binding.llShimmerToList.isVisible = true
+                    binding.rcvToList.isVisible = false
+                    binding.llShimmerToList.startShimmer()
+                }
 
-                    is ApiState.Success -> {
-                        AppLogger.log("startToWithTodaySummaryObserve:: Success ${it.data}")
-                        binding.llShimmerToList.isVisible = false
-                        binding.llShimmerToList.hideShimmer()
-                        binding.rcvToList.isVisible = true
+                is ApiState.Success -> {
+                    AppLogger.log("startToWithTodaySummaryObserve:: Success ${it.data}")
+                    binding.llShimmerToList.isVisible = false
+                    binding.llShimmerToList.hideShimmer()
+                    binding.rcvToList.isVisible = true
 
-                        userSummary =
-                            it.data!!.toList.map { tow ->
-                                tow.toUserSummary()
-                            }
-                        adapterUserListWithSummary.updateData(userSummary)
-                    }
+                    userSummary =
+                        it.data!!.toList.map { tow ->
+                            tow.toUserSummary()
+                        }
+                    adapterUserListWithSummary.updateData(userSummary)
                 }
             }
         }
     }
 
     private fun startSoWithTodaySummaryObserve() {
-        lifecycleScope.launch {
-            viewModel.soWithTodaySummaryResponse.observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiState.Empty -> {
-                        AppLogger.log("startSoWithTodaySummaryObserve::Empty")
-                        binding.llShimmerToList.isVisible = false
-                        binding.llShimmerToList.hideShimmer()
+        viewModel.soWithTodaySummaryResponse.observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiState.Empty -> {
+                    AppLogger.log("startSoWithTodaySummaryObserve::Empty")
+                    binding.llShimmerToList.isVisible = false
+                    binding.llShimmerToList.hideShimmer()
+                }
+
+                is ApiState.Error -> {
+                    AppLogger.log("startSoWithTodaySummaryObserve::Error ${it.error}")
+                    binding.llShimmerToList.isVisible = false
+                    binding.llShimmerToList.hideShimmer()
+                    toast(networkFailureMessage.handleFailure(it.error!!))
+
+                }
+
+                is ApiState.Loading -> {
+                    AppLogger.log("startSoWithTodaySummaryObserve::Loading")
+                    binding.llShimmerToList.isVisible = true
+                    binding.rcvToList.isVisible = false
+                    binding.llShimmerToList.startShimmer()
+                }
+
+                is ApiState.Success -> {
+                    AppLogger.log("startSoWithTodaySummaryObserve:: Success ${it.data}")
+                    binding.llShimmerToList.isVisible = false
+                    binding.rcvToList.isVisible = true
+                    binding.llShimmerToList.hideShimmer()
+
+
+                    userSummary = it.data!!.soList[0].salesOfficers.map { so ->
+                        so.toUserSummary()
                     }
 
-                    is ApiState.Error -> {
-                        AppLogger.log("startSoWithTodaySummaryObserve::Error ${it.error}")
-                        binding.llShimmerToList.isVisible = false
-                        binding.llShimmerToList.hideShimmer()
-                        toast(networkFailureMessage.handleFailure(it.error!!))
-
-                    }
-
-                    is ApiState.Loading -> {
-                        AppLogger.log("startSoWithTodaySummaryObserve::Loading")
-                        binding.llShimmerToList.isVisible = true
-                        binding.rcvToList.isVisible = false
-                        binding.llShimmerToList.startShimmer()
-                    }
-
-                    is ApiState.Success -> {
-                        AppLogger.log("startSoWithTodaySummaryObserve:: Success ${it.data}")
-                        binding.llShimmerToList.isVisible = false
-                        binding.rcvToList.isVisible = true
-                        binding.llShimmerToList.hideShimmer()
-
-
-                        userSummary = it.data!!.soList[0].salesOfficers.map { so ->
-                            so.toUserSummary()
-                        }
-
-                        adapterUserListWithSummary.updateData(userSummary)
-                    }
+                    adapterUserListWithSummary.updateData(userSummary)
                 }
             }
         }
