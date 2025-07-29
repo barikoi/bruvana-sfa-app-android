@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -23,6 +22,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
@@ -62,6 +62,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
 
 
 @AndroidEntryPoint
@@ -82,14 +83,14 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     private var grandTotalPrice: Double? = 0.0
     var totalOrderedPrice: String? = null
     var totalOrderedQuantity: String? = null
-    lateinit var ACTIVITY: OrderDeliveryUpdateActivity
+
     var token: String? = null
-    var user_id: String? = null
-    var user_type: String? = null
-    var sr_id: String? = null
-    var route_id: String? = null
-    var territory_id: String? = null
-    var selected_outlet: String? = null
+    var userId: String? = null
+    var userType: String? = null
+    var srId: String? = null
+    var routeId: String? = null
+    var territoryId: String? = null
+    var selectedOutlet: String? = null
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
     var mContext: Context? = null
@@ -112,9 +113,9 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         checkForOrders(
             queue!!,
             token!!,
-            user_id!!,
-            sr_id!!,
-            territory_id!!,
+            userId!!,
+            srId!!,
+            territoryId!!,
             sharePrefUtils.getString(Constants.REGION_ID)!!,
             StartDate!!,
             EndDate!!,
@@ -129,16 +130,16 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapterOrder.filter.filter(s)
                 if (s.isNullOrEmpty()) {
-                    if (sr_id!!.isEmpty()) {
+                    if (srId!!.isEmpty()) {
                         getAllOrders(
-                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
+                            Api.get_saved_order + "?user_id=" + userId + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&territory_id=" + territoryId + "&order_status=PENDING&include_filter_by_user_id=1",
                             queue!!,
                             token!!,
                             mCallback!!
                         )
                     } else {
                         getAllOrders(
-                            Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING",
+                            Api.get_saved_order + "?user_id=" + userId + "&start_date=" + StartDate + " 00:00:00" + "&end_date=" + EndDate + " 23:59:59" + "&order_status=PENDING",
                             queue!!,
                             token!!,
                             mCallback!!
@@ -338,9 +339,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         ViewUtils.getErrorResponse(error, mContext!!)
     }
 
-    override fun onDataSet(StartDate: Date, EndDate: Date) {
-
-    }
+    override fun onDataSet(StartDate: Date, EndDate: Date) {}
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -348,26 +347,25 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         editor = prefs!!.edit()
         token = prefs!!.getString(Api.TOKEN, "")
-        user_type = prefs!!.getString(Api.USER_TYPE, "")
-        if (user_type.equals("TO", true)) {
-            sr_id = ""
-            route_id = ""
-            user_id = OrderDeliveryUpdateActivity.user_id
-        } else if (user_type.equals("ASM", true)) {
-            sr_id = ""
-            route_id = ""
-            user_id = OrderDeliveryUpdateActivity.user_id
+        userType = prefs!!.getString(Api.USER_TYPE, "")
+        if (userType.equals("TO", true)) {
+            srId = ""
+            routeId = ""
+            userId = OrderDeliveryUpdateActivity.user_id
+        } else if (userType.equals("ASM", true)) {
+            srId = ""
+            routeId = ""
+            userId = OrderDeliveryUpdateActivity.user_id
         } else {
-            sr_id = prefs!!.getString(Api.EMPLOYEE_ID, "")
-            route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
-            user_id = prefs!!.getString(Api.USER_ID, "")
+            srId = prefs!!.getString(Api.EMPLOYEE_ID, "")
+            routeId = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
+            userId = prefs!!.getString(Api.USER_ID, "")
         }
-        territory_id = prefs!!.getString(Api.TERRITORY_ID, "")
+        territoryId = prefs!!.getString(Api.TERRITORY_ID, "")
         appDatabase = AppDatabase.getInstance(context)
         mContext = context
         listener = this
         valuelistener = this
-        ACTIVITY = context as OrderDeliveryUpdateActivity
         mCallback = this
 
     }
@@ -380,7 +378,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     fun viewDialog(mContext: Context, order: OrderList) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_order_status_update)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
@@ -391,7 +389,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         tvItemCount = dialog.findViewById(R.id.itemCount)
         tvGrandTotal = dialog.findViewById(R.id.grandTotal)
         val statusGroup = dialog.findViewById<RadioGroup>(R.id.status_group)
-        val radio_group: RadioGroup? = RadioGroup(mContext)
+        val radioGroup: RadioGroup? = RadioGroup(mContext)
 
         val itemRequestValue: List<String> = listOf(
             "PENDING",
@@ -403,25 +401,35 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         itemValue.add(mContext.resources.getString(R.string.pending))
         itemValue.add(mContext.resources.getString(R.string.delivered))
         itemValue.add(mContext.resources.getString(R.string.bounced))
-        radio_group!!.orientation = RadioGroup.HORIZONTAL
+        radioGroup!!.orientation = RadioGroup.HORIZONTAL
         for (i in itemValue.indices) {
             val rbn = RadioButton(mContext)
             rbn.text = itemValue[i]
             rbn.id = i
-            rbn.setTextColor(mContext.resources.getColor(R.color.text_title))
+            rbn.setTextColor(
+                ContextCompat.getColor(
+                    mContext,
+                    R.color.text_title
+                )
+            )
             rbn.buttonTintList =
-                ColorStateList.valueOf(mContext.resources.getColor(R.color.cnl_color_1))
-            radio_group.addView(rbn)
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        mContext,
+                        R.color.cnl_color_1
+                    )
+                )
+            radioGroup.addView(rbn)
         }
-        val checkedid = 0
+        val checkedId = 0
         var isChecked = 0
-        statusGroup.addView(radio_group)
-        radio_group.check(checkedid)
-        radio_group.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
+        statusGroup.addView(radioGroup)
+        radioGroup.check(checkedId)
+        radioGroup.setOnCheckedChangeListener { group, checkedId ->
             isChecked = checkedId
-        })
+        }
 
-        var dformat = DecimalFormat("#.##")
+        val dformat = DecimalFormat("#.##")
         outletName.text = order.outletName
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
         val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
@@ -460,7 +468,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 grandTotal = grandTotal + order.brands_array[i].orderedTotalPrice
                 itemCount = itemCount + order.brands_array[i].orderedQuantity
             }
-            selected_outlet = order.outletId
+            selectedOutlet = order.outletId
             totalItemCount = itemCount
             grandTotalPrice = grandTotal
             orderedProducts!!.addAll(order.brands_array)
@@ -484,15 +492,16 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             adapter.notifyDataSetChanged()
         }
 
-        tvGrandTotal!!.setText(dformat.format(grandTotal).toString())
-        tvItemCount!!.setText(itemCount.toString() + mContext.resources.getString(R.string.items))
+        tvGrandTotal!!.text = dformat.format(grandTotal).toString()
+        tvItemCount!!.text = itemCount.toString() + mContext.resources.getString(R.string.items)
 
         btnClose.setOnClickListener {
             dialog.dismiss()
         }
 
         btnSubmit.setOnClickListener {
-            ViewUtils.viewDialog(mContext,
+            ViewUtils.viewDialog(
+                mContext,
                 mContext.resources.getString(R.string.update_order_dialog),
                 SpannableStringBuilder(),
                 object :
@@ -557,7 +566,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         updatedProducts: ArrayList<ProductStatistics>,
         dialog: Dialog
     ) {
-        if (updatedProducts.size > 0) {
+        if (updatedProducts.isNotEmpty()) {
             var deliveredQuantity = 0
             var deliveredAmount = 0.0
             var bouncedQuantity = 0
@@ -574,8 +583,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             val orderObj = JSONObject()
             orderObj.put("outlet_id", order.outletId)
             orderObj.put("order_no", order.orderId)
-            orderObj.put("user_id", user_id)
-            orderObj.put("employee_id", sr_id)
+            orderObj.put("user_id", userId)
+            orderObj.put("employee_id", srId)
             /*orderObj.put("ordered_at", today)*/
             orderObj.put("delivered_at", today)
             /*orderObj.put("distributor_office_code", order.distOfficeCode)*/
@@ -583,7 +592,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             orderObj.put("total_ordered_quantity", order.totalQuantity)
             orderObj.put("order_status", status)
             val brandsArray = JSONArray()
-            for (i in 0 until updatedProducts!!.size) {
+            for (i in 0 until updatedProducts.size) {
                 val brandObj = JSONObject()
                 if (updatedProducts[i].quantity > 0) {
                     val bounceAmount =
@@ -712,9 +721,9 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                 checkForOrders(
                                     queue!!,
                                     token!!,
-                                    user_id!!,
-                                    sr_id!!,
-                                    territory_id!!,
+                                    userId!!,
+                                    srId!!,
+                                    territoryId!!,
                                     sharePrefUtils.getString(Constants.REGION_ID)!!,
                                     StartDate!!,
                                     EndDate!!,
@@ -749,7 +758,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
 
     override fun onValueChanged(products: Any, position: Int) {
         products as ProductStatistics
-        val prodList = appDatabase!!.updateOrderDao().getOrdersDB(selected_outlet!!)
+        val prodList = appDatabase!!.updateOrderDao().getOrdersDB(selectedOutlet!!)
         val itemCount = prodList!![0].itemsCount
         val grandTotal = prodList[0].totalPrice
         if (itemCount == 1 || itemCount == 0) {
