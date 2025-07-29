@@ -61,7 +61,7 @@ data class To(
             id = toId.toString(),
             name = toName,
             userType = "TO",
-            totalOrders = totalOrders.toDouble(),
+            totalOrders = totalOrderedAmount.toDouble(),
             ads = BigDecimal(ads).setScale(2, RoundingMode.HALF_UP).toDouble(),
             territoryId = territoryId,
             active = activeInactiveData?.active ?: 0,
