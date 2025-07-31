@@ -478,20 +478,31 @@ class SelectShopFragment : Fragment() {
                             toast("No shop found")
                             adapter.updateData(emptyList())
                         } else {
-                            shopList = it.data.outlets
+                            shopList = it.data.outlets.map { outlet ->
+                                if (loc == null) {
+                                    outlet.copy(
+                                        distance = ViewUtils.getDistance(
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        )
+                                    )
+                                } else {
+                                    outlet.copy(
+                                        distance = ViewUtils.getDistance(
+                                            loc!!.latitude,
+                                            loc!!.longitude,
+                                            outlet.latitude.toDouble(),
+                                            outlet.longitude.toDouble()
+                                        )
+                                    )
+                                }
+                            }
 
-                            val distanceSorted = it.data.outlets
-                                .apply {
-                                    if (loc != null) {
-                                        sortedBy { outlet ->
-                                            ViewUtils.getDistance(
-                                                loc!!.latitude,
-                                                loc!!.longitude,
-                                                outlet.latitude.toDouble(),
-                                                outlet.longitude.toDouble()
-                                            )
-                                        }
-                                    }
+                            val distanceSorted = shopList
+                                .sortedBy { outlet ->
+                                    outlet.distance
                                 }
                                 .sortedWith(
                                     compareBy(
