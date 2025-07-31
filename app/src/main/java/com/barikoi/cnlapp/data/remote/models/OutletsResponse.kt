@@ -56,7 +56,7 @@ data class Outlet(
     @SerializedName("nation_id")
     val nationId: Int,
     @SerializedName("outlet_category")
-    val outletCategory: String,
+    val outletCategory: String?,
     @SerializedName("outlet_code")
     val outletCode: String?,
     @SerializedName("outlet_created_at")
