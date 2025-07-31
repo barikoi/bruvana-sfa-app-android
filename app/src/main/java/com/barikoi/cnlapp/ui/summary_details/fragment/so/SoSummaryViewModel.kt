@@ -44,20 +44,4 @@ class SoSummaryViewModel @Inject constructor(
                 }
         }
     }
-
-    fun getOutletTypeSummary(
-        startDate: String,
-        endDate: String,
-        userId: String
-    ) {
-        viewModelScope.launch {
-            summaryRepository.getOutletTypeSummary(
-                startDate, endDate, userId
-            ).onStart {
-                _outletTypeSummaryResponse.value = ApiState.Loading()
-            }.collect {
-                _outletTypeSummaryResponse.value = it
-            }
-        }
-    }
 }
