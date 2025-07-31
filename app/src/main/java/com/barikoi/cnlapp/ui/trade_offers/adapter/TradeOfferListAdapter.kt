@@ -42,7 +42,6 @@ class TradeOfferListAdapter(mValues: List<ProductAll>) :
                 builder = {
                     crossfade(true)
                     placeholder(R.drawable.product)
-                    error(R.drawable.product)
                 }
             )
         } else {
