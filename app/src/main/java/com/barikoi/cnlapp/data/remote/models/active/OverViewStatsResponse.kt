@@ -30,6 +30,8 @@ data class TargetCompleted(
     val rds: Double?,
     @SerializedName("revenue")
     val revenue: String?,
+    @SerializedName("total_ordered_amount")
+    val totalOrderedAmount: String?,
     @SerializedName("sku_per_memo")
     val skuPerMemo: String?
 )
