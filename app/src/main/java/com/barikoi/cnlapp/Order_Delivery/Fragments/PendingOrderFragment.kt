@@ -63,6 +63,8 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import androidx.core.graphics.drawable.toDrawable
+import com.barikoi.cnlapp.utils.extension.format
+import com.barikoi.cnlapp.utils.extension.formateDate
 
 
 @AndroidEntryPoint
@@ -429,12 +431,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             isChecked = checkedId
         }
 
-        val dformat = DecimalFormat("#.##")
         outletName.text = order.outletName
-        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-        val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
-        val orderDate = df.format(oldDate.parse(order.orderedAt))
-        tvLastOrderDate.text = mContext.resources.getString(R.string.last_order_date) + orderDate
+        tvLastOrderDate.text = getString(R.string.last_order_date, order.orderedAt.formateDate())
 
         var grandTotal = 0.0
         var itemCount = 0
@@ -492,7 +490,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             adapter.notifyDataSetChanged()
         }
 
-        tvGrandTotal!!.text = dformat.format(grandTotal).toString()
+        tvGrandTotal!!.text = grandTotal.toString().format()
         tvItemCount!!.text = itemCount.toString() + mContext.resources.getString(R.string.items)
 
         btnClose.setOnClickListener {
