@@ -72,7 +72,7 @@ class CreateAttendanceFragment : Fragment() {
     @Inject
     lateinit var mQueue: RequestQueue
 
-    var appDatabase: ImageDatabase? = null
+    private lateinit var appDatabase: ImageDatabase
     private var isImageAdded = false
     var selectedRoute: String = ""
     var routeId: Int? = null
@@ -263,6 +263,9 @@ class CreateAttendanceFragment : Fragment() {
                                 binding.btnCheckedAlready.isVisible = false
                                 binding.llImagePickerView.isVisible = false
                                 binding.attendanceImagePicker.isVisible = true
+
+
+                                appDatabase.imagesDao()!!.deleteAllImages()
                             } else if (!checkIn.equals("null") && checkOut.equals("null")) {
                                 binding.btnCheckIn.isVisible = false
                                 binding.btnCheckOut.isVisible = true
@@ -282,6 +285,9 @@ class CreateAttendanceFragment : Fragment() {
                                 binding.attendanceImagePicker.isVisible = false
                                 binding.llImagePickerView.isVisible = true
                                 binding.editTextReason.isEnabled = false
+
+
+                                appDatabase.imagesDao()!!.deleteAllImages()
                             }
 
                         } else {
@@ -290,6 +296,8 @@ class CreateAttendanceFragment : Fragment() {
                             binding.btnCheckedAlready.isVisible = false
                             binding.llImagePickerView.isVisible = false
                             binding.attendanceImagePicker.isVisible = true
+
+                            appDatabase.imagesDao()!!.deleteAllImages()
                         }
 
                     } catch (e: Exception) {
@@ -297,7 +305,12 @@ class CreateAttendanceFragment : Fragment() {
                         toast("Error: ${e.message}")
                         Sentry.captureException(e)
                         e.printStackTrace()
+
+
+                        appDatabase.imagesDao()!!.deleteAllImages()
                     }
+
+                    getImageFromDB()
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {}
@@ -318,10 +331,9 @@ class CreateAttendanceFragment : Fragment() {
 
     private fun getImageFromDB() {
         val imageList: ArrayList<Images?>? =
-            appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
+            appDatabase.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
 
         if (imageList!!.isNotEmpty()) {
-
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
                 val fileExist: Boolean = File(imageList[p]!!.filePath).canRead()
@@ -348,23 +360,26 @@ class CreateAttendanceFragment : Fragment() {
 
                     if (imageList[p]!!.position != p + 1) {
                         Executors.newSingleThreadExecutor().execute {
-                            appDatabase!!.imagesDao()!!
+                            appDatabase.imagesDao()!!
                                 .updatePosition(dbPhotoPath, p + 1, "Attendance")
                         }
                     }
 
                 } else {
                     Executors.newSingleThreadExecutor()
-                        .execute { appDatabase!!.imagesDao()!!.deleteImage(p + 1, "Attendance") }
+                        .execute { appDatabase.imagesDao()!!.deleteImage(p + 1, "Attendance") }
                 }
             }
+        }else {
+            isImageAdded = false
+            binding.attendanceImagePicker.removeImages()
         }
     }
 
     fun checkInAttendance(location: Location) {
         val byteParams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
         val imagesList: ArrayList<Images> =
-            appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
+            appDatabase.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
         if (imagesList.isNotEmpty()) {
             val fileExist = File(imagesList[0].filePath).canRead()
             if (fileExist) {
@@ -440,7 +455,7 @@ class CreateAttendanceFragment : Fragment() {
     private fun checkOutAttendance(location: Location) {
         val byteParams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
         val imagesList: List<Images> =
-            appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
+            appDatabase.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images>
         if (imagesList.isNotEmpty()) {
             val fileExist = File(imagesList[0].filePath).canRead()
             if (fileExist) {
@@ -476,7 +491,7 @@ class CreateAttendanceFragment : Fragment() {
                         BarikoiTrace.stopTracking()
                     }
 
-                    appDatabase!!.imagesDao()!!.deleteAllImages()
+                    appDatabase.imagesDao()!!.deleteAllImages()
                     ViewUtils.viewDialogResponse(
                         requireContext(),
                         message,
@@ -727,7 +742,8 @@ class CreateAttendanceFragment : Fragment() {
         if (result.resultCode == RESULT_OK) {
             Log.e("imageUtils", "OnActivity result code 1: $RESULT_OK")
             var imagePosition = 0
-            val imageList = appDatabase!!.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
+            val imageList =
+                appDatabase.imagesDao()!!.getAllImageDB("Attendance") as ArrayList<Images?>?
             Log.d("Imagepos", "List: $imageList")
             imagePosition = if (imageList!!.isNotEmpty()) {
                 imageList[imageList.size - 1]!!.position + 1
@@ -750,7 +766,7 @@ class CreateAttendanceFragment : Fragment() {
                 if (imagePosition > 0) {
                     Log.d("Imagepos", "insert")
                     Executors.newSingleThreadExecutor().execute {
-                        appDatabase!!.imagesDao()!!.insertAll(placeImage)
+                        appDatabase.imagesDao()!!.insertAll(placeImage)
                     }
                     sharePrefUtils.saveString(ApiCall.IMAGE_PATH, "")
                 }
