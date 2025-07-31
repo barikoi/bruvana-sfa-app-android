@@ -21,6 +21,11 @@ interface SummaryRepository {
         startDate: String?, endDate: String?, todaySummary: String?
     ): Flow<ApiState<TodaySummaryResponse>>
 
+
+    suspend fun getTOWithSummary(
+        startDate: String?, endDate: String?
+    ): Flow<ApiState<TodaySummaryResponse>>
+
     suspend fun getSoWithTodaySummary(
         startDate: String, endDate: String, toID: String
     ): Flow<ApiState<SoWithSummaryResponse>>
@@ -58,6 +63,42 @@ class SummaryRepositoryImpl @Inject constructor(
         return flow {
             try {
                 val response = apiService.getTodaySummary(startDate, endDate, todaySummary)
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code()),
+                            errorResponse = Gson().fromJson(
+                                response.errorBody()?.string(), TodaySummaryResponse::class.java
+                            )
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override suspend fun getTOWithSummary(
+        startDate: String?,
+        endDate: String?
+    ): Flow<ApiState<TodaySummaryResponse>> {
+        return flow {
+            try {
+                val response = apiService.getTOSummary(startDate, endDate)
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {
