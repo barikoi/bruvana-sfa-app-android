@@ -28,6 +28,8 @@ import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.formatDateWithDDMM
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.getEndDateTime
+import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -124,7 +126,7 @@ class HomeFragment(
 
         formattedEndDate = Date().formatDateWithLocale()
         val cal = Calendar.getInstance()
-//        cal.set(Calendar.DAY_OF_MONTH, 1)
+        cal.set(Calendar.DAY_OF_MONTH, 1)
         formattedStartDate = cal.time.formatDateWithLocale()
 
         binding.tvDateRange.text = getString(
@@ -206,13 +208,13 @@ class HomeFragment(
             )
 
             viewModel.getOverViewStatsASM(
-                formattedStartDate, formattedEndDate,
+                formattedStartDate.getStartDateTime(), formattedEndDate.getEndDateTime(),
                 sharePrefUtils.getString(Constants.REGION_ID) ?: "",
                 sharePrefUtils.getString(Api.USER_ID) ?: ""
             )
 
-            viewModel.getTOWIthTodaySummary(
-                formattedStartDate, formattedEndDate
+            viewModel.getTOWIthSummary(
+                formattedStartDate.getStartDateTime(), formattedEndDate.getEndDateTime(),
             )
 
         } else {
@@ -221,14 +223,13 @@ class HomeFragment(
                 userId!!
             )
             viewModel.getOverViewStatsTO(
-                formattedStartDate, formattedEndDate,
+                formattedStartDate.getStartDateTime(), formattedEndDate.getEndDateTime(),
                 tId ?: sharePrefUtils.getString(Constants.TERRITORY_ID) ?: "",
                 userId
             )
 
-            viewModel.getSOWIthTodaySummary(
-                formattedStartDate,
-                formattedEndDate,
+            viewModel.getSOWIthSummary(
+                formattedStartDate.getStartDateTime(), formattedEndDate.getEndDateTime(),
                 userId
             )
         }
