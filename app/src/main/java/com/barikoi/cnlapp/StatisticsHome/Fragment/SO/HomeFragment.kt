@@ -515,7 +515,7 @@ class HomeFragment : Fragment() {
             resources.getString(R.string.bounce_list)
         )
         val fragments = ArrayList<Fragment>()
-        fragments.add(TodaysSummaryFragment())
+        fragments.add(TodaySummaryFragment())
         fragments.add(LastWeekSummaryFragment())
         fragments.add(LowStockProductFragment())
         fragments.add(LastWeekProductFragment())
