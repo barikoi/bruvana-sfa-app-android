@@ -112,7 +112,7 @@ class SoDetailsSummaryFragment : Fragment(), DateFilterListener {
                                     String.format(
                                         Locale.getDefault(),
                                         "%,.2f",
-                                        it.data?.targetCompleted?.getOrNull(0)?.revenue?.toDouble()
+                                        it.data?.targetCompleted?.getOrNull(0)?.totalOrderedAmount?.toDouble()
                                             ?: 0.0
                                     )
                                 )
