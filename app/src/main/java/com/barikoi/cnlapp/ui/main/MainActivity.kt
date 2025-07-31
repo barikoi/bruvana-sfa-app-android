@@ -200,7 +200,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             binding.appContentMain.routeNameSelected.visibility = View.GONE
             setCurrentFragment(
                 com.barikoi.cnlapp.ui.home.HomeFragment(
-                    sharePrefUtils.getString(Api.USER_TYPE)!!
+                    userType = sharePrefUtils.getString(Api.USER_TYPE)!!,
+                    userId = sharePrefUtils.getString(Api.USER_ID)
+
                 ), this@MainActivity
             )
         } else {
@@ -217,8 +219,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         tvAppVersion.text = getString(R.string.version, versionName)
         tvHeaderUserName!!.text = userName
         if (sharePrefUtils.getString(Api.EMAIL)!!
-                .isNotEmpty() && !sharePrefUtils.getString(Api.EMAIL)!!
-                .equals("null")
+                .isNotEmpty() && sharePrefUtils.getString(Api.EMAIL)!! != "null"
         ) {
             tvHeaderEmail.visibility = View.VISIBLE
             tvHeaderEmail.text = sharePrefUtils.getString(Api.EMAIL)
@@ -299,6 +300,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navigationDrawer!!.menu.findItem(R.id.menu_product_stock_request).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
 
+        navigationDrawer!!.menu.findItem(R.id.menu_order_summary).isVisible =
+            sharePrefUtils.getString(Api.USER_TYPE) == "SO"
+
         navView.setOnItemSelectedListener { item ->
             if (binding.appContentMain.fabOrder.isVisible) {
                 binding.appContentMain.fabOrder.background.setTint(
@@ -316,9 +320,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     if (userType.equals("TO", true) || userType.equals("ASM", true)) {
                         setCurrentFragment(
                             com.barikoi.cnlapp.ui.home.HomeFragment(
-                                sharePrefUtils.getString(
+                                userType = sharePrefUtils.getString(
                                     Api.USER_TYPE
-                                )!!
+                                )!!,
+                                userId = sharePrefUtils.getString(Api.USER_ID)
                             ), this@MainActivity
                         )
                     } else {
@@ -424,8 +429,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun traceLogin() {
         val parameters: MutableMap<String, String> = HashMap()
-        parameters["email"] = "carenutrition@gmail.com"
-        parameters["password"] = "12345678"
+        parameters["email"] = BuildConfig.TRACE_USER
+        parameters["password"] = BuildConfig.TRACE_PASS
 
         ApiServices.apiPOST(
             Api.traceLogin,
@@ -748,5 +753,4 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
     }
-
 }
