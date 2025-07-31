@@ -201,7 +201,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("A", true)
+                                    !it.outletCategory?.get(0).toString().equals("A", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -218,7 +218,7 @@ class SelectShopFragment : Fragment() {
 
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("B", true)
+                                    !it.outletCategory?.get(0).toString().equals("B", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -232,7 +232,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("C", true)
+                                    !it.outletCategory?.get(0).toString().equals("C", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -245,7 +245,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("D", true)
+                                    !it.outletCategory?.get(0).toString().equals("D", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -258,7 +258,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("E", true)
+                                    !it.outletCategory?.get(0).toString().equals("E", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -271,7 +271,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("F", true)
+                                    !it.outletCategory?.get(0).toString().equals("F", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -284,7 +284,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("P", true)
+                                    !it.outletCategory?.get(0).toString().equals("P", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -297,7 +297,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("M", true)
+                                    !it.outletCategory?.get(0).toString().equals("M", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -310,7 +310,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("W", true)
+                                    !it.outletCategory?.get(0).toString().equals("W", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
