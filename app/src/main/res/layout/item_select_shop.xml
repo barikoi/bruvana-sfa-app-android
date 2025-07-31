@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:padding="@dimen/_10sdp"
+    android:layout_height="wrap_content"
     android:layout_margin="@dimen/_5dp"
     android:background="@drawable/cardview_bg"
-    android:layout_height="wrap_content">
+    android:padding="@dimen/_10sdp">
 
     <RelativeLayout
         android:id="@+id/llShopImage"
@@ -29,6 +29,7 @@
             android:textSize="9sp"
             android:textStyle="bold"
             android:translationZ="90dp"
+            android:visibility="gone"
             tools:ignore="SmallSp" />
 
         <androidx.cardview.widget.CardView
@@ -75,7 +76,7 @@
         android:text="Hello Owner"
         android:textColor="@color/text_title"
         android:textSize="9sp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/isOrderView"
         app:layout_constraintStart_toEndOf="@+id/llShopImage"
         app:layout_constraintTop_toBottomOf="@+id/tvShopName"
@@ -83,15 +84,45 @@
 
     <TextView
         android:id="@+id/orderDate"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text=""
+        android:layout_marginStart="@dimen/_10sdp"
+        android:text="dssdsdds"
         android:textColor="@color/text_title_2"
         android:textSize="9sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/isOrderView"
         app:layout_constraintStart_toEndOf="@+id/llShopImage"
         app:layout_constraintTop_toBottomOf="@+id/tvOwnerName"
-        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:id="@+id/tvOutletId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_5dp"
+        android:drawableStart="@drawable/ic_shop_small"
+        android:drawablePadding="@dimen/_5dp"
+        android:textColor="@color/text_title_2"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/isOrderView"
+        app:layout_constraintStart_toEndOf="@+id/llShopImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvOwnerName"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:id="@+id/tvOutletType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_5dp"
+        android:textColor="@color/text_title"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/llShopImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvOutletId"
         tools:ignore="SmallSp" />
 
     <ImageView
@@ -121,6 +152,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SmallSp" />
-
-
+    
 </androidx.constraintlayout.widget.ConstraintLayout>
