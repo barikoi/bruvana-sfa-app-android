@@ -436,7 +436,11 @@ class ProductStockUpdateActivity : BaseActivity() {
                         binding.tvTotalAmount.text =
                             getString(
                                 R.string.total_stock_value,
-                                "${it.data.products.sumOf { s -> s.currentAvailableStock * s.unitPrice.toDouble() }}"
+                                String.format(
+                                    Locale.getDefault(),
+                                    "%,.2f",
+                                    it.data.products.sumOf { s -> s.currentAvailableStock * s.unitPrice.toDouble() }
+                                )
                             )
 
                         binding.tvTotalCount.text =
