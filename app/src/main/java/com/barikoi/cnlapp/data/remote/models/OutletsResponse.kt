@@ -27,38 +27,22 @@ data class Outlet(
     val areaId: Int,
     @SerializedName("area_name")
     val areaName: String,
-    @SerializedName("created_at")
-    val createdAt: String,
-    @SerializedName("created_by_employee_id")
-    val createdByEmployeeId: String,
-    @SerializedName("created_by_user_id")
-    val createdByUserId: Int,
-    @SerializedName("db_house_address")
-    val dbHouseAddress: String,
-    @SerializedName("db_house_code")
-    val dbHouseCode: String,
-    @SerializedName("db_house_id")
-    val dbHouseId: Int,
-    @SerializedName("db_house_latitude")
-    val dbHouseLatitude: String,
-    @SerializedName("db_house_longitude")
-    val dbHouseLongitude: String,
     @SerializedName("db_house_name")
-    val dbHouseName: String,
+    val dbHouseName: String?,
     @SerializedName("db_house_owner_name")
-    val dbHouseOwnerName: String,
+    val dbHouseOwnerName: String?,
     @SerializedName("db_house_owner_phone_number")
-    val dbHouseOwnerPhoneNumber: String,
+    val dbHouseOwnerPhoneNumber: String?,
     @SerializedName("employee_id")
-    val employeeId: String,
+    val employeeId: String?,
     @SerializedName("id")
     val id: Int,
     @SerializedName("images")
     val images: List<Image>? = emptyList(),
     @SerializedName("is_buyer")
-    val isBuyer: Int,
+    val isBuyer: Int?,
     @SerializedName("is_edited")
-    val isEdited: Int,
+    val isEdited: Int?,
     @SerializedName("is_verified")
     val isVerified: Int,
     @SerializedName("latitude")
@@ -66,7 +50,7 @@ data class Outlet(
     @SerializedName("longitude")
     val longitude: String,
     @SerializedName("market_opportunity")
-    val marketOpportunity: String,
+    val marketOpportunity: String?,
     @SerializedName("minimum_order")
     val minimumOrder: Int,
     @SerializedName("nation_id")
@@ -74,9 +58,9 @@ data class Outlet(
     @SerializedName("outlet_category")
     val outletCategory: String,
     @SerializedName("outlet_code")
-    val outletCode: String,
+    val outletCode: String?,
     @SerializedName("outlet_created_at")
-    val outletCreatedAt: String,
+    val outletCreatedAt: String?,
     @SerializedName("outlet_name")
     val outletName: String,
     @SerializedName("outlet_status")
@@ -84,53 +68,56 @@ data class Outlet(
     @SerializedName("outlet_type")
     val outletType: String,
     @SerializedName("outlet_updated_at")
-    val outletUpdatedAt: String,
+    val outletUpdatedAt: String?,
     @SerializedName("outlet_verified_at")
-    val outletVerifiedAt: String,
+    val outletVerifiedAt: String?,
     @SerializedName("owner_name")
     val ownerName: String,
     @SerializedName("phone")
-    val phone: String,
+    val phone: String?,
     @SerializedName("ordered_today")
     val orderedToday: Int,
     @SerializedName("is_no_order")
     val isNoOrder: Int,
     @SerializedName("phone_number")
-    val phoneNumber: String,
+    val phoneNumber: String?,
     @SerializedName("region_code")
-    val regionCode: String,
+    val regionCode: String?,
     @SerializedName("region_id")
     val regionId: Int,
     @SerializedName("region_name")
-    val regionName: String,
+    val regionName: String?,
     @SerializedName("route_code")
-    val routeCode: String,
+    val routeCode: String?,
     @SerializedName("route_id")
-    val routeId: Int,
+    val routeId: Int?,
     @SerializedName("route_name")
-    val routeName: String,
+    val routeName: String?,
     @SerializedName("shop_id")
-    val shopId: String,
+    val shopId: String?,
     @SerializedName("territory_code")
-    val territoryCode: String,
+    val territoryCode: String?,
     @SerializedName("territory_id")
-    val territoryId: Int,
+    val territoryId: Int?,
     @SerializedName("territory_name")
-    val territoryName: String,
+    val territoryName: String?,
     @SerializedName("updated_at")
-    val updatedAt: String,
+    val updatedAt: String?,
     @SerializedName("updated_by_employee_id")
-    val updatedByEmployeeId: String,
+    val updatedByEmployeeId: String?,
     @SerializedName("updated_by_user_id")
-    val updatedByUserId: Int,
+    val updatedByUserId: Int?,
     @SerializedName("user_id")
-    val userId: Int,
+    val userId: Int?,
     @SerializedName("user_name")
-    val userName: String,
+    val userName: String?,
     @SerializedName("verified_by_employee_id")
-    val verifiedByEmployeeId: String,
+    val verifiedByEmployeeId: String?,
     @SerializedName("verified_by_user_id")
-    val verifiedByUserId: String
+    val verifiedByUserId: String?,
+    @SerializedName("last_ordered_at")
+    val lastOrderedAt: String?,
+    val distance: Float = 0f,
 ): Parcelable
 
 @Parcelize
