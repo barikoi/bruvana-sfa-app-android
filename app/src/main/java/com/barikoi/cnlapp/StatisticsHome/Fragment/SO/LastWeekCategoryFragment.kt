@@ -21,9 +21,6 @@ import com.barikoi.cnlapp.utils.ViewUtils
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -62,13 +59,6 @@ class LastWeekCategoryFragment : Fragment() {
     }
 
     private fun init() {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -7)
-        val end = Calendar.getInstance().time
-        val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val StartDate = df.format(start)
-        val EndDate = df.format(end)
         getSummaryCategory(
             Api.get_last_week_category + "?user_id=" + sharePrefUtils.getString(Api.USER_ID) + "&route_id=" + sharePrefUtils.getString(
                 Api.SELECTED_ROUTE_ID
@@ -102,13 +92,6 @@ class LastWeekCategoryFragment : Fragment() {
                                         productObj.getString("outlet_count_delivered")
                                     val orderValue = dFormat.format(
                                         productObj.getString("delivery_value").toDouble()
-                                    )
-                                    val sumOutletCount =
-                                        productObj.getString("sum_total_outlet")
-                                    val sumOrderDone =
-                                        productObj.getString("sum_outlet_count_delivered")
-                                    val sumOrderValue = dFormat.format(
-                                        productObj.getString("sum_delivery_value").toDouble()
                                     )
 
                                     if (i == categoryArray.length() - 1) {
