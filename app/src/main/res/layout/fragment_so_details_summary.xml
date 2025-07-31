@@ -38,6 +38,7 @@
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                android:paddingHorizontal="@dimen/_15dp"
                 app:layout_constraintBottom_toTopOf="@+id/btnRetry"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
