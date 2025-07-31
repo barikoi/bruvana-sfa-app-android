@@ -9,9 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil3.load
 import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
-import java.text.SimpleDateFormat
-import java.util.Locale
-
+import com.barikoi.cnlapp.utils.extension.formateDateNewFormat
 
 class HistoryListAdapter(private val histories: List<HistoryList>) :
     RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
@@ -23,27 +21,22 @@ class HistoryListAdapter(private val histories: List<HistoryList>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val _sdfWatchMonth = SimpleDateFormat("LLL", Locale.getDefault())
-        val _sdfWatchDate = SimpleDateFormat("dd", Locale.getDefault())
-        val _sdfWatchtime = SimpleDateFormat("hh:mm a", Locale.getDefault())
-
         val mItem = histories[position]
-        if (mItem.enterTime.isNotEmpty() && !mItem.enterTime.equals("null")) {
-            holder.textViewMonth.text = _sdfWatchMonth.format(oldDate.parse(mItem.enterTime))
-            holder.textViewDate.text = _sdfWatchDate.format(oldDate.parse(mItem.enterTime))
-            holder.inTime.text = _sdfWatchtime.format(oldDate.parse(mItem.enterTime))
+        if (mItem.enterTime.isNotEmpty() && mItem.enterTime != "null") {
+            holder.textViewMonth.text = mItem.enterTime.formateDateNewFormat("LLL")
+            holder.textViewDate.text = mItem.enterTime.formateDateNewFormat("dd")
+            holder.inTime.text = mItem.enterTime.formateDateNewFormat("hh:mm a")
         } else {
             holder.inTime.text = "--:--"
         }
 
-        if (mItem.exitTime.isNotEmpty() && !mItem.exitTime.equals("null")) {
-            holder.outTime.text = _sdfWatchtime.format(oldDate.parse(mItem.exitTime))
+        if (mItem.exitTime.isNotEmpty() && mItem.exitTime != "null") {
+            holder.outTime.text = mItem.enterTime.formateDateNewFormat("hh:mm a")
         } else {
             holder.outTime.text = "--:--"
         }
 
-        if (mItem.routeName.isNotEmpty() && !mItem.routeName.equals("null")) {
+        if (mItem.routeName.isNotEmpty() && mItem.routeName != "null") {
             holder.marketName.text =
                 holder.itemView.resources.getString(R.string.market) + " " + mItem.routeName
         } else {
@@ -66,9 +59,7 @@ class HistoryListAdapter(private val histories: List<HistoryList>) :
         }
     }
 
-    override fun getItemCount(): Int {
-        return histories.size
-    }
+    override fun getItemCount(): Int = histories.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val textViewMonth: TextView = itemView.findViewById(R.id.tvMonth)
