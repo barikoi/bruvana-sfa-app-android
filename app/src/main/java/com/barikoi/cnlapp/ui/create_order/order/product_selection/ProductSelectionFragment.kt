@@ -294,6 +294,8 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
 
                         updatedProductsList = it.data!!.products.toMutableList()
                         adapterProductSelection.setProducts(updatedProductsList)
+
+                        viewModel.setProducts(updatedProductsList)
                     }
                 }
             }
