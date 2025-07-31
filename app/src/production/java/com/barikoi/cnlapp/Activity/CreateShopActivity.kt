@@ -80,6 +80,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.isNotEmpty
 
 @AndroidEntryPoint
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
@@ -228,7 +230,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             Mapbox.getInstance(applicationContext)
             val dialog = Dialog(this)
             dialog.setCancelable(false)
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setContentView(R.layout.popup_map_view)
             val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
@@ -696,7 +698,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                                 }
                             }
                         }
-                        if (p0.childCount > 0) {
+                        if (p0.isNotEmpty()) {
                             if (p2 > 0) {
                                 val view1: TextView = p0.getChildAt(0) as TextView
                                 view1.setTextColor(
