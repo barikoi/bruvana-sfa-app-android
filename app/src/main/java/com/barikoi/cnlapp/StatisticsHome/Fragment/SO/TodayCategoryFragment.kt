@@ -63,13 +63,6 @@ class TodayCategoryFragment : Fragment() {
     }
 
     private fun init() {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_WEEK, -7)
-        val end = Calendar.getInstance().time
-        val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val StartDate = df.format(start)
-        val EndDate = df.format(end)
         getSummaryCategory(
             Api.get_last_week_category + "?user_id=" + sharePrefUtils.getString(Api.USER_ID) + "&route_id=" + sharePrefUtils.getString(
                 Api.SELECTED_ROUTE_ID
@@ -87,7 +80,7 @@ class TodayCategoryFragment : Fragment() {
                     try {
                         binding.progressBar.visibility = View.GONE
                         val dFormat = DecimalFormat("#.##")
-                        val itemList: ArrayList<Categories> = ArrayList()
+                        val itemList: MutableList<Categories> = mutableListOf()
                         val obj = JSONObject(response)
                         val categoryArray = obj.getJSONArray("outlet_categories")
                         if (categoryArray.length() > 0) {
@@ -140,6 +133,8 @@ class TodayCategoryFragment : Fragment() {
                                 }
                             }
                         }
+
+                        itemList.removeAll { cat -> !cat.outletCategory.endsWith(")") }
                         adapterTodayCategory.updateCategories(itemList)
                     } catch (e: Exception) {
                         e.printStackTrace()
