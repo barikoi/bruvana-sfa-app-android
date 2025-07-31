@@ -112,15 +112,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getTOWIthTodaySummary(
+    fun getTOWIthSummary(
         startDate: String? = null,
         endDate: String? = null
     ) {
         viewModelScope.launch {
-            summaryRepository.getTodaySummary(
+            summaryRepository.getTOWithSummary(
                 startDate = startDate,
-                endDate = endDate,
-                todaySummary = "1"
+                endDate = endDate
             )
                 .onStart {
                     _toWithTodaySummaryResponse.value = ApiState.Loading()
@@ -131,7 +130,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getSOWIthTodaySummary(
+    fun getSOWIthSummary(
         startDate: String,
         endDate: String,
         toId: String
