@@ -48,7 +48,7 @@ data class Target(
     @SerializedName("target_rds")
     val targetRds: String?,
     @SerializedName("target_sku_per_memo")
-    val targetSkuPerMemo: Int,
+    val targetSkuPerMemo: Double,
     @SerializedName("threshold_bounce_percentage")
     val thresholdBouncePercentage: Int,
     @SerializedName("target_number_of_visits")
