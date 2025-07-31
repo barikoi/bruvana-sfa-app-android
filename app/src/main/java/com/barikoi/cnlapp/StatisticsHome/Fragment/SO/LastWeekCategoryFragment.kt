@@ -116,9 +116,9 @@ class LastWeekCategoryFragment : Fragment() {
                                 }
                             }
                         }
-//                        createTable(itemList)
-                        adapterTodayCategory.updateCategories(itemList)
 
+                        itemList.removeAll { cat -> !cat.outletCategory.endsWith(")") }
+                        adapterTodayCategory.updateCategories(itemList)
 
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -142,5 +142,4 @@ class LastWeekCategoryFragment : Fragment() {
 
             })
     }
-
 }
