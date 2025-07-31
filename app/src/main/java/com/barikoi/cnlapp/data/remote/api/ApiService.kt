@@ -84,8 +84,7 @@ interface ApiService {
     suspend fun getSoWithTodaySummary(
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
-        @Query("to_id") withSoStats: String,
-        @Query("today_summary") todaySummary: String? = "1",
+        @Query("to_id") withSoStats: String
     ): Response<SoWithSummaryResponse>
 
     @GET("api/v1/get-overview-stats")
@@ -190,6 +189,13 @@ interface ApiService {
         @Query("start_date") startDate: String?,
         @Query("end_date") endDate: String?,
         @Query("today_summary") todaySummary: String?
+    ): Response<TodaySummaryResponse>
+
+
+    @GET("api/v1/get-to")
+    suspend fun getTOSummary(
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?
     ): Response<TodaySummaryResponse>
 
     @GET("api/v1/to-wise-so")
