@@ -30,6 +30,7 @@ import com.barikoi.cnlapp.utils.extension.formatDateWithDDMM
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
 import com.barikoi.cnlapp.utils.extension.getEndDateTime
 import com.barikoi.cnlapp.utils.extension.getStartDateTime
+import com.barikoi.cnlapp.utils.extension.setDebouncedClickListener
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -40,11 +41,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class HomeFragment(
-    val userType: String,
-    val tId: String? = null,
-    val userId: String? = null,
-) : Fragment() {
+class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHome2Binding
 
     private val viewModel: HomeViewModel by viewModels()
@@ -58,10 +55,13 @@ class HomeFragment(
     private lateinit var targetAdapter: TargetAdapter
     private lateinit var adapterUserListWithSummary: AdapterUserListWithSummary
 
-
     var active: List<ActiveInactiveUser> = emptyList()
     var userSummary: List<UserSummary> = emptyList()
     var inactive: List<ActiveInactiveUser> = emptyList()
+
+    private lateinit var userType: String
+    private var tId: String? = null
+    private var userId: String? = null
 
 
     private var formattedStartDate = ""
@@ -70,6 +70,36 @@ class HomeFragment(
     val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
         .setTitleText("Select Date Range")
         .build()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            userType = it.getString(ARG_USER_TYPE)!!
+            tId = it.getString(ARG_TID)
+            userId = it.getString(ARG_USER_ID)
+        }
+    }
+
+    companion object {
+        private const val ARG_USER_TYPE = "arg_user_type"
+        private const val ARG_TID = "arg_tid"
+        private const val ARG_USER_ID = "arg_user_id"
+
+        fun newInstance(
+            userType: String,
+            tId: String? = null,
+            userId: String? = null
+        ): HomeFragment {
+            return HomeFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_USER_TYPE, userType)
+                    putString(ARG_TID, tId)
+                    putString(ARG_USER_ID, userId)
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -123,23 +153,24 @@ class HomeFragment(
             initData()
         }
 
-
         formattedEndDate = Date().formatDateWithLocale()
         val cal = Calendar.getInstance()
         cal.set(Calendar.DAY_OF_MONTH, 1)
         formattedStartDate = cal.time.formatDateWithLocale()
 
-        binding.tvDateRange.text = getString(
-            R.string.date_range_,
-            formattedStartDate.formatDateWithDDMM(),
-            formattedEndDate.formatDateWithDDMM()
-        )
-
-
+        if (formattedStartDate == formattedEndDate) {
+            binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
+        } else {
+            binding.tvDateRange.text = getString(
+                R.string.date_range_,
+                formattedStartDate.formatDateWithDDMM(),
+                formattedEndDate.formatDateWithDDMM()
+            )
+        }
 
         initData()
 
-        binding.tvDateRange.setHapticClickListener {
+        binding.tvDateRange.setDebouncedClickListener {
             dateRangePicker.show(parentFragmentManager, "date_range_picker")
         }
 
@@ -176,12 +207,15 @@ class HomeFragment(
             sharePrefUtils.saveString(Api.START_DATE_ATTENDANCE, formattedStartDate)
             sharePrefUtils.saveString(Api.END_DATE_ATTENDANCE, formattedEndDate)
 
-            binding.tvDateRange.text =
-                getString(
+            if (formattedStartDate == formattedEndDate) {
+                binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
+            } else {
+                binding.tvDateRange.text = getString(
                     R.string.date_range_,
                     formattedStartDate.formatDateWithDDMM(),
                     formattedEndDate.formatDateWithDDMM()
                 )
+            }
 
             initData()
         }
@@ -225,12 +259,12 @@ class HomeFragment(
             viewModel.getOverViewStatsTO(
                 formattedStartDate.getStartDateTime(), formattedEndDate.getEndDateTime(),
                 tId ?: sharePrefUtils.getString(Constants.TERRITORY_ID) ?: "",
-                userId
+                userId!!
             )
 
             viewModel.getSOWIthSummary(
                 formattedStartDate.getStartDateTime(), formattedEndDate.getEndDateTime(),
-                userId
+                userId!!
             )
         }
     }
