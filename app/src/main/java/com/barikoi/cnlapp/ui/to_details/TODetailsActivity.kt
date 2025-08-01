@@ -6,6 +6,7 @@ import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.data.remote.models.UserSummary
 import com.barikoi.cnlapp.databinding.ActivityTodetailsBinding
 import com.barikoi.cnlapp.ui.home.HomeFragment
+import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.extension.parcelable
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,10 +27,12 @@ class TODetailsActivity : BaseActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
+        val homeFragment = HomeFragment.newInstance(
+            "TO", user!!.territoryId.toString(), user.id
+        )
 
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.container, HomeFragment("TO", user!!.territoryId.toString(), user.id))
-        fragmentTransaction.commit()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, homeFragment)
+            .commit()
     }
 }
