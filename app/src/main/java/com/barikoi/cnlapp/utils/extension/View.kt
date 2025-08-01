@@ -32,6 +32,18 @@ fun View.rotateViewAnimation(fromDegrees: Float, toDegrees: Float) {
     this.startAnimation(an)
 }
 
+private var lastClickTime = 0L
+
+fun View.setDebouncedClickListener(interval: Long = 600L, onSafeClick: (View) -> Unit) {
+    setOnClickListener { v ->
+        val currentTime = SystemClock.elapsedRealtime()
+        if (currentTime - lastClickTime >= interval) {
+            lastClickTime = currentTime
+            onSafeClick(v)
+        }
+    }
+}
+
 fun Fragment.toast(message: String) {
     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
 }
