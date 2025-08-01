@@ -23,6 +23,8 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +45,7 @@ import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.formateDate
 import com.barikoi.cnlapp.utils.extension.formattedDateTime
+import com.barikoi.cnlapp.utils.extension.getParcelableCompat
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -50,8 +53,8 @@ import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet: Outlet) :
-    Fragment() {
+class ProductSelectionFragment : Fragment() {
+    private val viewModel: ProductSelectViewModel by viewModels({ requireParentFragment() })
     private lateinit var binding: FragmentProductSelectionBinding
 
     @Inject
@@ -65,6 +68,9 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
     private var updatedProductsList: MutableList<Product> = mutableListOf()
 
     private var giftData: String = ""
+
+
+    private lateinit var outlet: Outlet
 
     private val addGiftResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -86,6 +92,18 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
             }
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            outlet = requireArguments().getParcelableCompat(ARG_OUTLET)!!
+
+            AppLogger.log("ProductSelectionFragment::onCreate: ${outlet.outletName}")
+        } ?: run {
+            AppLogger.log("ProductSelectionFragment::onCreate: No outlet provided")
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -93,12 +111,24 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
         return binding.root
     }
 
+    companion object {
+        private const val ARG_OUTLET = "arg_outlet"
+
+        fun newInstance(outlet: Outlet): ProductSelectionFragment {
+            val fragment = ProductSelectionFragment()
+            val args = Bundle()
+            args.putParcelable(ARG_OUTLET, outlet)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getProducts(
-            sharePrefUtils.getString(Api.USER_ID)!!,
-        )
+            viewModel.getProducts(
+                sharePrefUtils.getString(Api.USER_ID)!!,
+            )
 
         viewModel.getPreviousDayOrder(
             sharePrefUtils.getString(Api.USER_ID)!!,
@@ -157,7 +187,7 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
         )
         binding.rcvProducts.adapter = adapterProductSelection
 
-        val itemAnimator =  binding.rcvProducts.itemAnimator
+        val itemAnimator = binding.rcvProducts.itemAnimator
         if (itemAnimator is SimpleItemAnimator) {
             itemAnimator.supportsChangeAnimations = false
         }
@@ -467,7 +497,8 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
 
         when (orderStatus) {
             "PENDING" -> {
-                val strokeColor = ContextCompat.getColor(requireContext(), R.color.status_pending_stroke)
+                val strokeColor =
+                    ContextCompat.getColor(requireContext(), R.color.status_pending_stroke)
                 val fillColor = ContextCompat.getColor(requireContext(), R.color.status_pending)
                 val borderColor = ContextCompat.getColor(requireContext(), R.color.white)
 
@@ -483,7 +514,8 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
             }
 
             "DELIVERED" -> {
-                val strokeColor = ContextCompat.getColor(requireContext(), R.color.status_delivered_stroke)
+                val strokeColor =
+                    ContextCompat.getColor(requireContext(), R.color.status_delivered_stroke)
                 val fillColor = ContextCompat.getColor(requireContext(), R.color.status_delivered)
                 val borderColor = ContextCompat.getColor(requireContext(), R.color.white)
 
@@ -499,7 +531,8 @@ class ProductSelectionFragment(val viewModel: ProductSelectViewModel, val outlet
             }
 
             "CANCELLED" -> {
-                val strokeColor = ContextCompat.getColor(requireContext(), R.color.status_bounced_stroke)
+                val strokeColor =
+                    ContextCompat.getColor(requireContext(), R.color.status_bounced_stroke)
                 val fillColor = ContextCompat.getColor(requireContext(), R.color.status_bounced)
                 val borderColor = ContextCompat.getColor(requireContext(), R.color.white)
 
