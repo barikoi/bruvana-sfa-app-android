@@ -198,13 +198,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (userType.equals("TO", true) || userType.equals("ASM", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
-            setCurrentFragment(
-                com.barikoi.cnlapp.ui.home.HomeFragment(
-                    userType = sharePrefUtils.getString(Api.USER_TYPE)!!,
-                    userId = sharePrefUtils.getString(Api.USER_ID)
 
-                ), this@MainActivity
+            val homeFragment = com.barikoi.cnlapp.ui.home.HomeFragment.newInstance(
+                userType = sharePrefUtils.getString(Api.USER_TYPE)!!,
+                userId = sharePrefUtils.getString(Api.USER_ID)
             )
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentLayout, homeFragment)
+                .commit()
         } else {
             setCurrentFragment(HomeFragment(), this@MainActivity)
         }
@@ -318,14 +320,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.tvTitle.visibility = View.GONE
                     binding.appContentMain.userLayout.visibility = View.VISIBLE
                     if (userType.equals("TO", true) || userType.equals("ASM", true)) {
-                        setCurrentFragment(
-                            com.barikoi.cnlapp.ui.home.HomeFragment(
-                                userType = sharePrefUtils.getString(
-                                    Api.USER_TYPE
-                                )!!,
-                                userId = sharePrefUtils.getString(Api.USER_ID)
-                            ), this@MainActivity
+                        val homeFragment = com.barikoi.cnlapp.ui.home.HomeFragment.newInstance(
+                            userType = sharePrefUtils.getString(Api.USER_TYPE)!!,
+                            userId = sharePrefUtils.getString(Api.USER_ID)
                         )
+
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentLayout, homeFragment)
+                            .commit()
+
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
