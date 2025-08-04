@@ -8,10 +8,12 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.callback.OnEditShopListener
+import com.barikoi.cnlapp.utils.Constants
 import java.util.Locale
 
 class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListener) :
@@ -29,6 +31,15 @@ class ShopListAdapter(var mValues: List<Shops>, var mListener: OnEditShopListene
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setIsRecyclable(false)
+
+        if (!Constants.shopType.contains(shopList[position].shop_type)) {
+            holder.itemView.backgroundTintList =
+                ContextCompat.getColorStateList(holder.itemView.context, R.color.required_field)
+
+        } else {
+            holder.itemView.backgroundTintList =
+                ContextCompat.getColorStateList(holder.itemView.context, R.color.white)
+        }
 
         holder.shopName.text = shopList[position].shop_name
         holder.address.text = shopList[position].address
