@@ -27,7 +27,7 @@ import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.formatDateWithDDMM
-import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
 import com.barikoi.cnlapp.utils.extension.getEndDateTime
 import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.setDebouncedClickListener
@@ -153,10 +153,10 @@ class HomeFragment : Fragment() {
             initData()
         }
 
-        formattedEndDate = Date().formatDateWithLocale()
+        formattedEndDate = Date().formatDateWithLocaleEnglish()
         val cal = Calendar.getInstance()
         cal.set(Calendar.DAY_OF_MONTH, 1)
-        formattedStartDate = cal.time.formatDateWithLocale()
+        formattedStartDate = cal.time.formatDateWithLocaleEnglish()
 
         if (formattedStartDate == formattedEndDate) {
             binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
@@ -201,8 +201,8 @@ class HomeFragment : Fragment() {
             val startDateMillis = selection.first
             val endDateMillis = selection.second
 
-            formattedStartDate = Date(startDateMillis!!).formatDateWithLocale()
-            formattedEndDate = Date(endDateMillis!!).formatDateWithLocale()
+            formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
+            formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
 
             sharePrefUtils.saveString(Api.START_DATE_ATTENDANCE, formattedStartDate)
             sharePrefUtils.saveString(Api.END_DATE_ATTENDANCE, formattedEndDate)
