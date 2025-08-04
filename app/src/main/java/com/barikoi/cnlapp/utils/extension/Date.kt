@@ -17,8 +17,13 @@ import java.util.concurrent.TimeUnit
 /**
  * @return Date format 2024-02-08
  */
-fun Date.formatDateWithLocale(): String {
+fun Date.formatDateWithLocale1(): String {
     val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return df.format(this)
+}
+
+fun Date.formatDateWithLocaleEnglish(): String {
+    val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
     return df.format(this)
 }
 
