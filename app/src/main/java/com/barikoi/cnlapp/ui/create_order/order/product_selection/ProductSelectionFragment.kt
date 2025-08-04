@@ -23,7 +23,6 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +35,6 @@ import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.ProductStatistics
 import com.barikoi.cnlapp.data.remote.models.product.Product
 import com.barikoi.cnlapp.databinding.FragmentProductSelectionBinding
-import com.barikoi.cnlapp.order_create.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.utils.Api
