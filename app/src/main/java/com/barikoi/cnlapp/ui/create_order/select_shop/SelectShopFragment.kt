@@ -35,7 +35,7 @@ import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
-import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -103,14 +103,14 @@ class SelectShopFragment : Fragment() {
 
 
         viewModel.checkAttendance(
-            Calendar.getInstance().time.formatDateWithLocale(),
-            Calendar.getInstance().time.formatDateWithLocale()
+            Calendar.getInstance().time.formatDateWithLocaleEnglish(),
+            Calendar.getInstance().time.formatDateWithLocaleEnglish()
         )
 
         binding.btnTryAgain.setHapticClickListener {
             viewModel.checkAttendance(
-                Calendar.getInstance().time.formatDateWithLocale(),
-                Calendar.getInstance().time.formatDateWithLocale()
+                Calendar.getInstance().time.formatDateWithLocaleEnglish(),
+                Calendar.getInstance().time.formatDateWithLocaleEnglish()
             )
         }
 
