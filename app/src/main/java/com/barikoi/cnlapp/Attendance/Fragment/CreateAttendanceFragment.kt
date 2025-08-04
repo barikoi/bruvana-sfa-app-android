@@ -370,7 +370,7 @@ class CreateAttendanceFragment : Fragment() {
                         .execute { appDatabase.imagesDao()!!.deleteImage(p + 1, "Attendance") }
                 }
             }
-        }else {
+        } else {
             isImageAdded = false
             binding.attendanceImagePicker.removeImages()
         }
