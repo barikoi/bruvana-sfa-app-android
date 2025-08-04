@@ -23,6 +23,7 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
 import com.barikoi.cnlapp.utils.extension.getEndDateTime
 import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.loadingDialog
@@ -73,8 +74,8 @@ class GiftSummaryActivity : BaseActivity() {
             toDataDialog = it
         }
 
-        formattedStartDate = Date().formatDateWithLocale()
-        formattedEndDate = Date().formatDateWithLocale()
+        formattedStartDate = Date().formatDateWithLocaleEnglish()
+        formattedEndDate = Date().formatDateWithLocaleEnglish()
 
         binding.tvDateRange.text =
             getString(
@@ -111,8 +112,8 @@ class GiftSummaryActivity : BaseActivity() {
             val startDateMillis = selection.first
             val endDateMillis = selection.second
 
-            formattedStartDate = Date(startDateMillis!!).formatDateWithLocale()
-            formattedEndDate = Date(endDateMillis!!).formatDateWithLocale()
+            formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
+            formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
 
             binding.tvDateRange.text =
                 getString(
