@@ -18,7 +18,7 @@ import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.NotificationUtils
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.formatDateWithDDMMYYYY
-import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
 import com.barikoi.cnlapp.utils.extension.getEndDateTime
 import com.barikoi.cnlapp.utils.extension.getParcelableArrayListCompat
 import com.barikoi.cnlapp.utils.extension.getStartDateTime
@@ -77,8 +77,8 @@ class SummaryDetailsActivity : BaseActivity() {
         val cal = Calendar.getInstance()
         cal.set(Calendar.DAY_OF_MONTH, 1)
 
-        formattedStartDate = cal.time.formatDateWithLocale()
-        formattedEndDate = Date().formatDateWithLocale()
+        formattedStartDate = cal.time.formatDateWithLocaleEnglish()
+        formattedEndDate = Date().formatDateWithLocaleEnglish()
 
         binding.tvDateRangeStart.text = formattedStartDate.formatDateWithDDMMYYYY()
         binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDMMYYYY()
@@ -130,8 +130,8 @@ class SummaryDetailsActivity : BaseActivity() {
             val startDateMillis = selection.first
             val endDateMillis = selection.second
 
-            formattedStartDate = Date(startDateMillis!!).formatDateWithLocale()
-            formattedEndDate = Date(endDateMillis!!).formatDateWithLocale()
+            formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
+            formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
 
             binding.tvDateRangeStart.text = formattedStartDate.formatDateWithDDMMYYYY()
             binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDMMYYYY()
