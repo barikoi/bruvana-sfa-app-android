@@ -69,7 +69,7 @@ class ConfirmOrderListAdapter(
             val groupedProducts: List<Products> = orderList[position].brands_array
                 .filter { !it.offerID.isNullOrEmpty() }
                 .groupBy { it.offerID }
-                .filter { it.value.size > 1 }
+                .filter { it.value.isNotEmpty() }
                 .map { (_, products) ->
                     val mergedNames =
                         products.joinToString("\n") { it.productName + " X ${it.orderedQuantity}" }
