@@ -1,6 +1,7 @@
 package com.barikoi.cnlapp.ui.active_inactive
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUser
 import com.barikoi.cnlapp.databinding.ActivityActiveInactive2Binding
@@ -33,9 +34,11 @@ class ActiveInactiveActivity : BaseActivity() {
         binding.rcvActiveInactiveUsers.layoutManager =
             androidx.recyclerview.widget.LinearLayoutManager(this)
         binding.rcvActiveInactiveUsers.adapter = adapterActiveInactive
-        if (users != null) {
+        if (users != null && users.isNotEmpty()) {
+            binding.llEmpty.main.isVisible = false
             adapterActiveInactive.updateList(users)
         } else {
+            binding.llEmpty.main.isVisible = true
             AppLogger.log("ActiveInactiveActivity::onCreate users is null")
         }
 
