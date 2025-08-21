@@ -12,9 +12,9 @@ import androidx.preference.PreferenceManager
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.FragmentSummaryBinding
+import com.barikoi.cnlapp.ui.attendance.adapter.so.ReasonListAdapter
 import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener

@@ -17,13 +17,13 @@ import coil3.load
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Attendance.Adapter.SO.ReasonListAdapter
-import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.FragmentSummaryTOBinding
+import com.barikoi.cnlapp.ui.attendance.adapter.so.ReasonListAdapter
+import com.barikoi.cnlapp.ui.attendance.model.SOList
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices

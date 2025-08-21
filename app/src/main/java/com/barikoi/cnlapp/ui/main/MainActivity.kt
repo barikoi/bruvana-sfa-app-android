@@ -32,7 +32,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
-import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.ui.chat.fragment.ChatFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
@@ -47,6 +46,7 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
 import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
 import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
+import com.barikoi.cnlapp.ui.attendance.AttendanceFragment
 import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.ui.gift_summary.GiftSummaryActivity

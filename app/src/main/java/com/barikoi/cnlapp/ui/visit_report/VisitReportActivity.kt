@@ -16,10 +16,10 @@ import androidx.core.view.isVisible
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.Attendance.Model.SOList
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.databinding.ActivityVisitReportBinding
+import com.barikoi.cnlapp.ui.attendance.model.SOList
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices

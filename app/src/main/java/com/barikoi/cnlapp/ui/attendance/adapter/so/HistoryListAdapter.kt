@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil3.load
-import com.barikoi.cnlapp.Attendance.Model.HistoryList
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.ui.attendance.model.HistoryList
 import com.barikoi.cnlapp.utils.extension.formateDateNewFormat
 
 class HistoryListAdapter(private val histories: List<HistoryList>) :
