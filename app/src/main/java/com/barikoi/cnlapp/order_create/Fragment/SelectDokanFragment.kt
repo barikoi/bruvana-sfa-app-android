@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.order_create.ShopSelectFragment
 import com.barikoi.cnlapp.ui.main.MainActivity
 
 class SelectDokanFragment : Fragment() {

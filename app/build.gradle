@@ -14,7 +14,6 @@ android {
         targetSdk 34
         versionCode 23
         multiDexEnabled true
-        flavorDimensions("default")
         resourceConfigurations += ['en', 'bn']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -36,13 +35,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
-        applicationVariants.all {
-            variant ->
-                variant.outputs.each {
-                    output ->
-                        def name = "cnl_staging_debug_" + getDateTime() + ".apk"
-                        output.outputFileName = name
-                }
+        applicationVariants.all { variant ->
+            variant.outputs.each { output ->
+                def flavorName = variant.flavorName ?: "noflavor"
+                def buildType = variant.buildType.name
+                def dateTime = new Date().format('yyyy-MM-dd_HH-mm-ss')
+                def versionName = variant.versionName
+
+                def name = "bruvana_${flavorName}_${buildType}_${dateTime}_${versionName}.apk"
+                output.outputFileName = name
+            }
         }
     }
 
@@ -54,71 +56,13 @@ android {
         jvmTarget = '11'
     }
 
+    flavorDimensions += "environment"
+
+
     productFlavors {
         production {
-            applicationId "com.barikoi.cnlapp"
-            dimension "default"
-            versionName "1.2.8.1"
-            resValue "string", "app_name", "CNL SFA"
-            resValue "string", "url_base", "https://cnl.barikoiretail.com:5623/"
-
-            buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
-            buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
-            buildConfigField "String", "TRACE_API_KEY", project.properties["TRACE_API_KEY"] as String
-
-            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_PROD"] as String
-
-            buildConfigField "String", "url_base", '"https://cnl.barikoiretail.com:5623/"'
-            buildConfigField 'String', 'sentryDNS', '"https://e8d5ee6576fa981127ce4a2e93b040ff@sentry.barikoimaps.dev/4"'
-            manifestPlaceholders = [
-                    appIcon  : "@mipmap/ic_launcher",
-                    sentryDNS: "https://e8d5ee6576fa981127ce4a2e93b040ff@sentry.barikoimaps.dev/4"
-            ]
-        }
-        staging {
-            applicationId "com.barikoi.cnlappstaging"
-            dimension "default"
-            versionName "1.2.8.1_1"
-            resValue "string", "app_name", "CNL Staging SFA"
-            resValue "string", "url_base", "https://cnl.barikoimaps.dev/"
-            buildConfigField "String", "url_base", '"https://cnl.barikoimaps.dev/"'
-
-            buildConfigField "String", "TRACE_USER", project.properties["TRACE_USER"] as String
-            buildConfigField "String", "TRACE_PASS", project.properties["TRACE_PASS"] as String
-            buildConfigField "String", "TRACE_API_KEY", project.properties["TRACE_API_KEY"] as String
-
-            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
-
-            buildConfigField 'String', 'sentryDNS', '"https://cc628b4f44a1b35449c23d4d710d4480@sentry.barikoimaps.dev/5"'
-            manifestPlaceholders = [
-                    appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://cc628b4f44a1b35449c23d4d710d4480@sentry.barikoimaps.dev/5"
-            ]
-        }
-
-        bruvanaStaging {
-            applicationId "com.barikoi.bruvanastaging"
-            dimension "default"
-            versionName "1.2.7.11_1"
-            resValue "string", "app_name", "Bruvana Staging SFA"
-            resValue "string", "url_base", "https://bruvana.barikoiretail.com/"
-            buildConfigField "String", "url_base", '"https://bruvana.barikoiretail.com/"'
-
-            buildConfigField "String", "TRACE_USER", project.properties["BRU_TRACE_USER"] as String
-            buildConfigField "String", "TRACE_PASS", project.properties["BRU_TRACE_PASS"] as String
-            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
-
-            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
-            buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
-            manifestPlaceholders = [
-                    appIcon  : "@mipmap/ic_launcher_2",
-                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
-            ]
-        }
-
-        bruvana {
             applicationId "com.barikoi.bruvana"
-            dimension "default"
+            dimension "environment"
             versionName "1.2.7.11_1"
             resValue "string", "app_name", "Bruvana SFA Staging"
             resValue "string", "url_base", "https://bruvana.barikoiretail.com/"
@@ -135,34 +79,27 @@ android {
                     sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             ]
         }
+        staging {
+            applicationId "com.barikoi.bruvanastaging"
+            dimension "environment"
+            versionName "1.2.7.11_1"
+            resValue "string", "app_name", "Bruvana Staging SFA"
+            resValue "string", "url_base", "https://bruvana.barikoimaps.dev/"
+            buildConfigField "String", "url_base", '"https://bruvana.barikoimaps.dev/"'
 
-        retaildemo {
-            applicationId "com.barikoi.retaildemo"
-            dimension "default"
-            versionName "0.0.3"
-            resValue "string", "app_name", "Retail Demo SFA"
-            resValue "string", "url_base", "http://20.24.15.52:2010/"
+            buildConfigField "String", "TRACE_USER", project.properties["BRU_TRACE_USER"] as String
+            buildConfigField "String", "TRACE_PASS", project.properties["BRU_TRACE_PASS"] as String
+            buildConfigField "String", "TRACE_API_KEY", project.properties["BRU_TRACE_API_KEY"] as String
+
+            buildConfigField "String", "TRACE_BASE_URL", project.properties["TRACE_BASE_URL_STAGING"] as String
+            buildConfigField 'String', 'sentryDNS', '"https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"'
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_demo"
-            ]
-        }
-        lalmairetaildemo {
-            applicationId "com.barikoi.lalmairetaildemo"
-            dimension "default"
-            versionName "0.0.6"
-            resValue "string", "app_name", "Lalmai Demo SFA"
-            resValue "string", "url_base", "https://cnl.barikoiretail.com:4823/"
-            manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_lalmai"
+                    appIcon  : "@mipmap/ic_launcher_2",
+                    sentryDNS: "https://9b5077bb9603abdd8a1562ff914b8790@sentry.barikoimaps.dev/13"
             ]
         }
     }
     sourceSets {
-        retaildemo {
-            java {
-                srcDirs 'src\\retaildemo\\java'
-            }
-        }
         staging {
             java {
                 srcDirs 'src\\staging\\java'
@@ -175,10 +112,6 @@ android {
         }
     }
     namespace 'com.barikoi.cnlapp'
-}
-
-def getDateTime() {
-    return new Date().format('yyyy-MM-dd_HH-mm-ss')
 }
 
 kapt {

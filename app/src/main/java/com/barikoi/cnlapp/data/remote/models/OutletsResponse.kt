@@ -72,7 +72,7 @@ data class Outlet(
     @SerializedName("outlet_verified_at")
     val outletVerifiedAt: String?,
     @SerializedName("owner_name")
-    val ownerName: String,
+    val ownerName: String?,
     @SerializedName("phone")
     val phone: String?,
     @SerializedName("ordered_today")

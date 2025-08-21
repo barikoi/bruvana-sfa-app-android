@@ -27,11 +27,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.preference.PreferenceManager
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.ActivityCreateShopBinding
 import com.barikoi.cnlapp.databinding.DialogConfirmBinding
@@ -43,9 +47,6 @@ import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -333,11 +334,18 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 p.setMargins(8, 8, 4, 8)
                 Log.d("CreateShopActivity", imageArray.get(i))
                 image.layoutParams = p
-                Glide.with(applicationContext)
-                    .load(imageArray[i])
-                    .override(200, 200)
-                    .transform(CenterCrop(), RoundedCorners(10))
-                    .into(image)
+
+                val radiusInPx = with(image.context) {
+                    resources.displayMetrics.density * 10 // 10dp to px
+                }
+
+                image.load(imageArray[i]) {
+                    crossfade(true)
+                    size(200)
+                    transformations(
+                        RoundedCornersTransformation(radiusInPx)
+                    )
+                }
 
                 // Adds the view to the layout
                 layout.addView(image)
@@ -353,10 +361,21 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         nagDialog.findViewById<Button>(R.id.btnIvClose)
                     val ivPreview =
                         nagDialog.findViewById<ImageView>(R.id.iv_preview_image)
-                    Glide.with(applicationContext)
-                        .load(imageArray[i])
-                        .thumbnail(.2.toFloat())
-                        .into(ivPreview)
+
+                    ivPreview.load(
+                        imageArray[i],
+                        builder = {
+                            crossfade(true)
+                            transformations(
+                                RoundedCornersTransformation(
+                                    10f,
+                                    10f,
+                                    10f,
+                                    10f
+                                )
+                            )
+                        }
+                    )
                     btnClose.setOnClickListener { nagDialog.dismiss() }
                     val pAttacher = PhotoViewAttacher(ivPreview)
                     pAttacher.update()
@@ -368,7 +387,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private fun getImageFromDB() {
         appDatabase!!.imagesDao()!!.deleteAllImages()
-        val imageList: ArrayList<Images?>? = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
+        val imageList: ArrayList<Images?>? =
+            appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images?>?
         if (imageList!!.isNotEmpty()) {
             for (p in 0 until imageList.size) {
                 val dbPhotoPath = imageList[p]!!.filePath
@@ -1307,7 +1327,8 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val today = df.format(Calendar.getInstance().time)
             val byteparams: MutableMap<String, VolleyMultipartRequest.DataPart> = HashMap()
-            val imagesList: ArrayList<Images> = appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
+            val imagesList: ArrayList<Images> =
+                appDatabase!!.imagesDao()!!.getAllImageDB("Shop") as ArrayList<Images>
             if (imagesList.isNotEmpty()) {
                 for (i in 0 until imagesList.size) {
                     val fileExist = File(imagesList[i].filePath).canRead()
