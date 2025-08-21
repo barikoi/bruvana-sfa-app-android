@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.ui.attendance.fragment.SO
+package com.barikoi.cnlapp.ui.attendance.fragment.so
 
 import android.content.Context
 import android.content.SharedPreferences
