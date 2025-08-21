@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Attendance
+package com.barikoi.cnlapp.ui.attendance
 
 import android.os.Bundle
 import android.view.LayoutInflater

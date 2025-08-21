@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Chat.Fragment
+package com.barikoi.cnlapp.ui.chat.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater

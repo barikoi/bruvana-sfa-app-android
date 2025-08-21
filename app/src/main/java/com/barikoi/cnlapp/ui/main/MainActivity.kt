@@ -34,7 +34,7 @@ import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
-import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
+import com.barikoi.cnlapp.ui.chat.fragment.ChatFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity

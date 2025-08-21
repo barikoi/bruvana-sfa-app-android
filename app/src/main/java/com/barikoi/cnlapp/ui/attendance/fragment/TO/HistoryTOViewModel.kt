@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Attendance.Fragment.TO
+package com.barikoi.cnlapp.ui.attendance.fragment.TO
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

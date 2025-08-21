@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Attendance.Fragment
+package com.barikoi.cnlapp.ui.attendance.fragment
 
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK

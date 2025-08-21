@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Attendance.Model
+package com.barikoi.cnlapp.ui.attendance.model
 
 import java.io.Serializable
 

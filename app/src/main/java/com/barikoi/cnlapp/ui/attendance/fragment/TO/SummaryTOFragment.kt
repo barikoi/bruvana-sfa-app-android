@@ -1,4 +1,4 @@
-package com.barikoi.cnlapp.Attendance.Fragment.TO
+package com.barikoi.cnlapp.ui.attendance.fragment.TO
 
 import android.annotation.SuppressLint
 import android.os.Build
