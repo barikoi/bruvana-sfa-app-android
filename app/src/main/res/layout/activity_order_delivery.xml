@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_app"
+    tools:context=".ui.order_delivery.OrderDeliveryActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingHorizontal="@dimen/_12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <RelativeLayout
+            android:id="@+id/spinnerLayoutTO"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:padding="4dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.barikoi.cnlapp.utils.MoreSpinner
+                android:id="@+id/spinnerTO"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:theme="@style/spinnerItemStyle"
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/spinnerLayoutSO"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:padding="4dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerLayoutTO">
+
+            <com.barikoi.cnlapp.utils.MoreSpinner
+                android:id="@+id/spinnerSO"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:theme="@style/spinnerItemStyle"
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+        </RelativeLayout>
+
+        <AutoCompleteTextView
+            android:id="@+id/editTextSearchShop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/stroke_background"
+            android:backgroundTint="@color/white"
+            android:drawableEnd="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/color_gray"
+            android:ems="10"
+            android:hint="@string/search_shop"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
+            android:padding="10dp"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerLayoutSO" />
+
+        <TextView
+            android:id="@+id/tvDateRangeLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="start"
+            android:text="@string/date_range"
+            android:textColor="@color/text_title"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextSearchShop" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/dateRangeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_5dp"
+            android:background="@null"
+            android:backgroundTint="@color/white"
+            android:orientation="vertical"
+            app:cardCornerRadius="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDateRangeLabel">
+
+            <TextView
+                android:id="@+id/tvDateRange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="8dp"
+                android:drawablePadding="4dp"
+                android:gravity="start"
+                android:text=""
+                android:textColor="@color/text_title_2"
+                android:textSize="14sp"
+                app:drawableLeftCompat="@drawable/ic_date_range" />
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:id="@+id/layoutTab"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_corner_lightgray"
+            android:backgroundTint="@color/white"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateRangeLayout">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                style="@style/TabLayoutStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:fillViewport="false"
+                app:tabBackground="@drawable/tab_indicator_bg_gray"
+                app:tabGravity="fill"
+                app:tabMinWidth="120dp"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColor="@color/text_title" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tabLayout"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+        </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
