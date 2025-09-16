@@ -63,8 +63,11 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import androidx.core.graphics.drawable.toDrawable
+import com.barikoi.cnlapp.data.remote.models.delivery.Order
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.extension.format
 import com.barikoi.cnlapp.utils.extension.formateDate
+import com.google.gson.Gson
 
 
 @AndroidEntryPoint
@@ -101,6 +104,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     private var listener: OnEditOrderListener? = null
     var valuelistener: OnValueChangeListener? = null
     val orderList: ArrayList<OrderList> = ArrayList()
+
+    var orders: List<Order> = emptyList()
 
     private lateinit var adapterOrder: OrderDeliveryListAdapter
 
@@ -180,7 +185,6 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         ) {
             if (mCallback != null) {
                 if (sr_id.isEmpty()) {
-
                     if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
                         getAllOrders(
                             Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=PENDING&region_id=${regionId}&include_filter_by_asm=1",
@@ -188,6 +192,24 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             token,
                             mCallback!!
                         )
+                    } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("DM")) {
+                        if (user_id.contains(",")) {
+                            getAllOrders(
+                                Api.get_saved_order + "?db_house_id=" + sharePrefUtils.getString(
+                                    Constants.DB_HOUSE_ID
+                                ) + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59",
+                                queue,
+                                token,
+                                mCallback!!
+                            )
+                        } else {
+                            getAllOrders(
+                                Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=PENDING",
+                                queue,
+                                token,
+                                mCallback!!
+                            )
+                        }
                     } else {
                         getAllOrders(
                             Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=PENDING&include_filter_by_user_id=1",
@@ -244,6 +266,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     }
 
     override fun onSuccess(array: JSONArray) {
+        orders = Gson().fromJson(array.toString(), Array<Order>::class.java).toList()
         progressBar!!.visibility = View.GONE
         orderList.clear()
         try {
@@ -354,7 +377,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             srId = ""
             routeId = ""
             userId = OrderDeliveryUpdateActivity.user_id
-        } else if (userType.equals("ASM", true)) {
+        } else if (userType.equals("ASM", true) || userType.equals("DM", true)) {
             srId = ""
             routeId = ""
             userId = OrderDeliveryUpdateActivity.user_id
@@ -581,8 +604,8 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             val orderObj = JSONObject()
             orderObj.put("outlet_id", order.outletId)
             orderObj.put("order_no", order.orderId)
-            orderObj.put("user_id", userId)
-            orderObj.put("employee_id", srId)
+            orderObj.put("user_id", orders.find { it.orderNo == order.orderId }!!.userId)
+            orderObj.put("employee_id", orders.find { it.orderNo == order.orderId }!!.employeeId)
             /*orderObj.put("ordered_at", today)*/
             orderObj.put("delivered_at", today)
             /*orderObj.put("distributor_office_code", order.distOfficeCode)*/
@@ -670,6 +693,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                     Log.d("ConfirmOrder", "response: " + obj1)
                     if (status.equals("DELIVERED", true)) {
                         if (deliveredQuantity > 0) {
+                            AppLogger.log("submitOrder:: $obj1")
                             submitOrder(obj1, dialog)
                         } else {
                             ViewUtils.viewDialogResponse(
@@ -687,6 +711,7 @@ class PendingOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                                 })
                         }
                     } else {
+                        AppLogger.log("submitOrder:: $obj1")
                         submitOrder(obj1, dialog)
                     }
                 } else {
