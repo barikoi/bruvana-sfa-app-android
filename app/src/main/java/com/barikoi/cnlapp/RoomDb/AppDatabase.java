@@ -16,7 +16,7 @@ import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder;
 import com.barikoi.cnlapp.order_create.RoomDB.SaveOrderDao;
 
 
-@Database(entities = {OrderList.class, SaveOrder.class, UpdateOrder.class}, version = 6, exportSchema = false)
+@Database(entities = {OrderList.class, SaveOrder.class, UpdateOrder.class}, version = 7, exportSchema = false)
 @TypeConverters(DataConvertor.class)
 public abstract class AppDatabase extends RoomDatabase {
 
