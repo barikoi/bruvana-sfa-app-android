@@ -52,6 +52,7 @@ import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.ui.gift_summary.GiftSummaryActivity
 import com.barikoi.cnlapp.ui.main.vm.MainViewModel
 import com.barikoi.cnlapp.ui.notification.NotificationActivity
+import com.barikoi.cnlapp.ui.order_delivery.OrderDeliveryActivity
 import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
 import com.barikoi.cnlapp.ui.request.StockRequestActivity
 import com.barikoi.cnlapp.ui.route.RouteActivity
