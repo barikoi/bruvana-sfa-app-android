@@ -31,24 +31,37 @@ class AdapterOutletType : RecyclerView.Adapter<AdapterOutletType.OutletTypeViewH
         val outletType = outletTypeList[position]
         with(holder.binding) {
             tvName.text = outletType.outletType
-            tvQty.text = "QTY: " + outletType.totalOutlet.toString()
+            tvQty.text = holder.binding.tvQty.context.getString(
+                R.string.qty,
+                outletType.totalOutlet.toString()
+            )
 
             tvVisitValue.text = outletType.totalVisits.toString()
             tvOrderValue.text = String.format(
                 Locale.getDefault(),
                 "%,.2f",
-                outletType.orderAmount.toDoubleOrNull() ?: 0.0
+                outletType.grossAmount?.toDoubleOrNull() ?: 0.0
             )
             tvAivValue.text =
                 String.format(Locale.getDefault(), "%,.2f", outletType.aiv.toDoubleOrNull() ?: 0.0)
 
-            tvQTYPresenceValue.text = outletType.qtyPresence ?: "0.00"
+            tvQTYPresenceValue.text = String.format(
+                Locale.getDefault(),
+                "%,.2f",
+                outletType.qtyPresence?.toDoubleOrNull() ?: 0.0
+            )
+
             tvDeliveryValue.text = String.format(
                 Locale.getDefault(),
                 "%,.2f",
                 outletType.deliveryAmount?.toDoubleOrNull() ?: 0.0
             )
-            tvContributionValue.text = outletType.contribution.toString()
+
+            tvContributionValue.text = String.format(
+                Locale.getDefault(),
+                "%,.2f",
+                outletType.contribution?.toDoubleOrNull() ?: 0.0
+            )
         }
 
         if (outletType.isExpanded) {
