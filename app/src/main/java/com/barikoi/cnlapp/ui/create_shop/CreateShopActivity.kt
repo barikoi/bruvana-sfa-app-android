@@ -18,33 +18,49 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.preference.PreferenceManager
 import coil3.load
 import coil3.request.crossfade
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
-import com.android.volley.*
+import com.android.volley.AuthFailureError
+import com.android.volley.NetworkResponse
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.order_create.Callback.DialogListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.ActivityCreateShopBinding
 import com.barikoi.cnlapp.databinding.DialogConfirmBinding
 import com.barikoi.cnlapp.imagecapture.RoomDb.ImageDatabase
 import com.barikoi.cnlapp.imagecapture.RoomDb.Images
 import com.barikoi.cnlapp.imagecapture.Utils.ApiCall
-import com.barikoi.cnlapp.utils.*
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
+import com.barikoi.cnlapp.utils.AppLogger
+import com.barikoi.cnlapp.utils.ImageUtils
+import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.VolleyMultipartRequest
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.github.chrisbanes.photoview.PhotoViewAttacher
@@ -53,7 +69,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.gson.Gson
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -67,7 +82,11 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
 import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.maps.*
+import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.maps.UiSettings
 import com.onesignal.common.AndroidSupportV4Compat.ContextCompat
 import io.sentry.Sentry
 import org.json.JSONException
@@ -76,7 +95,8 @@ import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.Executors
 
 class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
@@ -112,26 +132,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var routesList: ArrayList<String>? = ArrayList()
     var shops: Shops? = null
 
-    private val competitiveArray: Array<String> = arrayOf(
-        "Nutella",
-        "Nocilla",
-        "Chocomo",
-        "Cadbury/Kitkat/Snickers",
-        "Super Kid",
-        "Choco Stix",
-        "Pran chocolate (bar) -Treat & Choco Lord",
-        "Ispi",
-        "Tang",
-        "Taste Me",
-        "Sajeeb Tang",
-        "Foster Clark",
-        "Fruity",
-        "Other Tasty Saline"
-    )
-
-
-    private var competitiveList: MutableList<String> = mutableListOf()
-    private val selectedCompetitive = BooleanArray(competitiveArray.size)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -220,7 +220,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             Mapbox.getInstance(applicationContext)
             val dialog = Dialog(this)
             dialog.setCancelable(false)
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setContentView(R.layout.popup_map_view)
             val btnSubmit = dialog.findViewById<AppCompatButton>(R.id.btnSubmit)
@@ -278,14 +278,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
             confirmDialog(true)
         }
-
-        binding.ivCompetitorSelection.setHapticClickListener {
-            showAlertDialog()
-        }
-
-        binding.etCompetitor.doOnTextChanged { text, start, before, count ->
-
-        }
     }
 
     private fun getShopDetails(shops: Shops) {
@@ -293,15 +285,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         binding.etAddress.setText(shops.address)
         binding.etOwnerName.setText(shops.shop_owner)
         binding.etContactNumber.setText(shops.contact_number)
-        binding.etCompetitor.setText(shops.competitive?.joinToString(", "))
-
-        if (!shops.competitive.isNullOrEmpty()) {
-            competitiveList = shops.competitive.toMutableList()
-
-            competitiveArray.mapIndexed { index, s ->
-                selectedCompetitive[index] = competitiveList.contains(s)
-            }
-        }
 
         latitude = shops.latitude
         longitude = shops.longitude
@@ -330,7 +313,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                 image.maxWidth = 200
                 val p = layout.layoutParams as ViewGroup.MarginLayoutParams
                 p.setMargins(8, 8, 4, 8)
-                Log.d("CreateShopActivity", imageArray.get(i))
                 image.layoutParams = p
 
                 val radiusInPx = with(image.context) {
@@ -854,61 +836,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         })
     }
 
-    private fun showAlertDialog() {
-        val builder = AlertDialog.Builder(this@CreateShopActivity)
-        builder.setTitle("Select Competitor")
-        builder.setCancelable(false)
-
-        builder.setMultiChoiceItems(
-            competitiveArray,
-            selectedCompetitive
-        ) { _, i, isChecked ->
-            if (isChecked) {
-                competitiveList.add(competitiveArray[i])
-                selectedCompetitive[i] = true
-            } else {
-                competitiveList.remove(competitiveArray[i])
-                selectedCompetitive[i] = false
-            }
-        }
-
-        builder.setPositiveButton(
-            "OK"
-        ) { _, _ ->
-            val stringBuilder = StringBuilder()
-            val etDataList =
-                binding.etCompetitor.text.toString().split(Regex(",\\s*")).toMutableList()
-            val rowData: MutableList<String> = mutableListOf()
-            etDataList.map { et ->
-                if (!competitiveArray.contains(et)) {
-                    rowData.add(et)
-                }
-            }
-            if (rowData.isNotEmpty()) {
-                stringBuilder.append(rowData.joinToString(", "))
-                if (rowData[0].isNotEmpty())
-                    stringBuilder.append(", ")
-            }
-
-            if (binding.etCompetitor.text.isEmpty() || binding.etCompetitor.text.endsWith(",")) {
-                stringBuilder.append(competitiveList.joinToString(", "))
-            } else {
-                stringBuilder.append(competitiveList.joinToString(", "))
-            }
-
-            val uniqueList = stringBuilder.split(Regex(",\\s*")).distinct()
-
-            AppLogger.log("Unique List: $uniqueList")
-
-            binding.etCompetitor.setText(uniqueList.joinToString(", "))
-        }
-
-        builder.setNegativeButton(
-            "Cancel"
-        ) { dialogInterface, _ -> dialogInterface.dismiss() }
-        builder.show()
-    }
-
     private fun confirmDialog(isClosedShop: Boolean) {
         val dialogBinding = DialogConfirmBinding.inflate(LayoutInflater.from(this))
 
@@ -1168,11 +1095,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etCompetitor.text.trim().isEmpty()) {
-            inputOk = false
-            binding.etOwnerName.error = getString(R.string.this_field_is_required)
-            hideProgress(binding.progressBarShop)
-        }
         if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
@@ -1230,8 +1152,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["latitude"] = latitude.toString()
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
-            params["competitive_products"] =
-                Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
             if (isImageAdded) {
                 ApiServices.apiPOSTMultipart(
@@ -1351,11 +1271,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             binding.etOwnerName.error = getString(R.string.this_field_is_required)
             hideProgress(binding.progressBarShop)
         }
-        if (binding.etCompetitor.text.trim().isEmpty()) {
-            inputOk = false
-            binding.etCompetitor.error = getString(R.string.this_field_is_required)
-            hideProgress(binding.progressBarShop)
-        }
         if (selectedRoute!!.isEmpty()) {
             inputOk = false
             Toast.makeText(applicationContext, "Need to select Route", Toast.LENGTH_LONG).show()
@@ -1420,8 +1335,6 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             params["longitude"] = longitude.toString()
             params["is_verified"] = inputVerified.toString()
             params["is_closed"] = if (isClosedShop) "1" else "0"
-            params["competitive_products"] =
-                Gson().toJson(binding.etCompetitor.text.split(Regex(",\\s*")).distinct())
 
             ApiServices.apiPOSTMultipart(
                 Api.update_shop,
