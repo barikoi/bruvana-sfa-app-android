@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.ui.home
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,10 +34,8 @@ import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.setDebouncedClickListener
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
-import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
-import java.util.Date
 import javax.inject.Inject
 
 
@@ -66,10 +65,6 @@ class HomeFragment : Fragment() {
 
     private var formattedStartDate = ""
     private var formattedEndDate = ""
-
-    val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
-        .setTitleText("Select Date Range")
-        .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,25 +148,35 @@ class HomeFragment : Fragment() {
             initData()
         }
 
-        formattedEndDate = Date().formatDateWithLocaleEnglish()
         val cal = Calendar.getInstance()
-        cal.set(Calendar.DAY_OF_MONTH, 1)
         formattedStartDate = cal.time.formatDateWithLocaleEnglish()
+        formattedEndDate = cal.time.formatDateWithLocaleEnglish()
 
-        if (formattedStartDate == formattedEndDate) {
-            binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
-        } else {
-            binding.tvDateRange.text = getString(
-                R.string.date_range_,
-                formattedStartDate.formatDateWithDDMM(),
-                formattedEndDate.formatDateWithDDMM()
-            )
-        }
-
+        binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
         initData()
 
         binding.tvDateRange.setDebouncedClickListener {
-            dateRangePicker.show(parentFragmentManager, "date_range_picker")
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(
+                requireActivity(),
+                { _, selectedYear, selectedMonth, selectedDay ->
+//                    "yyyy-MM-dd"
+                    formattedStartDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
+                    formattedEndDate = formattedStartDate
+
+                    binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
+
+
+                    initData()
+                },
+                year, month, day
+            )
+            datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+            datePickerDialog.show()
         }
 
         binding.tvActiveTitle.setHapticClickListener {
@@ -195,29 +200,6 @@ class HomeFragment : Fragment() {
             openActiveInactiveActivity(
                 getString(R.string.inactive_user), inactive
             )
-        }
-
-        dateRangePicker.addOnPositiveButtonClickListener { selection ->
-            val startDateMillis = selection.first
-            val endDateMillis = selection.second
-
-            formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
-            formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
-
-            sharePrefUtils.saveString(Api.START_DATE_ATTENDANCE, formattedStartDate)
-            sharePrefUtils.saveString(Api.END_DATE_ATTENDANCE, formattedEndDate)
-
-            if (formattedStartDate == formattedEndDate) {
-                binding.tvDateRange.text = formattedStartDate.formatDateWithDDMM()
-            } else {
-                binding.tvDateRange.text = getString(
-                    R.string.date_range_,
-                    formattedStartDate.formatDateWithDDMM(),
-                    formattedEndDate.formatDateWithDDMM()
-                )
-            }
-
-            initData()
         }
 
         startActiveInactiveUserObserve()
