@@ -36,14 +36,7 @@ class AdapterUserListWithSummary(
         val user = users[position]
 
         with(holder.binding) {
-            tvName.text = user.name
-            tvUserType.text = user.userType
-            tvOrderValueADS.text = "${
-                String.format(
-                    "%,.2f",
-                    user.totalOrders
-                )
-            }/${String.format("%,.2f", user.ads)}"
+            tvName.text = user.name + " (${user.userType})"
 
             if (user.userType == "TO") {
                 tvActiveUser.text = user.active.toString()
@@ -52,6 +45,12 @@ class AdapterUserListWithSummary(
                 tvActiveUser.isVisible = false
                 tvInactiveUser.isVisible = false
             }
+            tvOrderValue.text = String.format(
+                "%,.2f",
+                user.totalOrders
+            )
+            tvVisitValue.text = user.numberOfVisits.toString()
+            tvMemosValue.text = user.numberOfMemos.toString()
         }
 
         holder.binding.root.setHapticClickListener {
