@@ -140,7 +140,7 @@ class OrderDeliveryListAdapter(
             holder.orderAt.visibility = View.GONE
         }
 
-        if (from.equals("SO", true)) {
+        if (from.equals("SO", true) || from.equals("DM", true)) {
             if (mItem.orderStatus.equals("PENDING")) {
                 holder.editItem.visibility = View.VISIBLE
             } else {
