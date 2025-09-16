@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -59,6 +58,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
 
 @AndroidEntryPoint
 class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
@@ -169,6 +169,25 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             token,
                             mCallback3!!
                         )
+
+                    } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("DM")) {
+                        if (user_id.contains(",")) {
+                            getAllOrders(
+                                Api.get_saved_order + "?db_house_id=" + sharePrefUtils.getString(
+                                    Constants.DB_HOUSE_ID
+                                ) + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59",
+                                queue,
+                                token,
+                                mCallback3!!
+                            )
+                        } else {
+                            getAllOrders(
+                                Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=DELIVERED,CANCELLED",
+                                queue,
+                                token,
+                                mCallback3!!
+                            )
+                        }
 
                     } else {
                         getAllOrders(
@@ -343,14 +362,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 binding.noRouteCheck.visibility = View.VISIBLE
                 binding.bodyLayout.visibility = View.GONE
 
-                binding.btnTryAgain.setOnClickListener {
-                    /*checkforOrders(
-                        queue!!,
-                        token!!,
-                        sr_id!!,
-                        route_id!!
-                    )*/
-                }
+                binding.btnTryAgain.setOnClickListener {}
 
             }
             orderList.sortByDescending {
@@ -369,7 +381,6 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            //Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -395,7 +406,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
-        } else if (user_type.equals("ASM", true)) {
+        } else if (user_type.equals("ASM", true) || user_type.equals("DM", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
@@ -417,7 +428,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     fun viewDialog(mContext: Context, order: OrderList) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_order_status_update)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
@@ -448,14 +459,14 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         var isChecked = 0
         statusGroup.addView(radio_group)
         radio_group.check(checkedid)
-        radio_group.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
+        radio_group.setOnCheckedChangeListener { group, checkedId ->
             isChecked = checkedId
             if (checkedId == 2) {
                 reasonLayout.visibility = View.VISIBLE
             } else {
                 reasonLayout.visibility = View.GONE
             }
-        })
+        }
 
         outletName.text = order.outletName
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
@@ -504,7 +515,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             dialog.dismiss()
         }
         btnSubmit.setOnClickListener {
-            ViewUtils.viewDialog(mContext,
+            ViewUtils.viewDialog(
+                mContext,
                 mContext.resources.getString(R.string.update_order_dialog),
                 SpannableStringBuilder(),
                 object :
@@ -548,7 +560,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         reason: String,
         dialog: Dialog
     ) {
-        if (updatedProducts.size > 0) {
+        if (updatedProducts.isNotEmpty()) {
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             val orderObj = JSONObject()
