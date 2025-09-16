@@ -9,6 +9,8 @@ data class UserSummary(
     val name: String,
     val userType: String,
     val totalOrders: Double,
+    val numberOfMemos: Int,
+    val numberOfVisits: Int,
     val ads: Double,
     val territoryId: Int,
     val active: Int,
