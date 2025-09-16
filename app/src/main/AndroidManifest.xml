@@ -43,6 +43,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.order_delivery.OrderDeliveryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
+        <activity
             android:name=".ui.to_details.TODetailsActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
