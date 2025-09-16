@@ -30,6 +30,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Order_Delivery.Adapter.OrderDeliveryListAdapter
+import com.barikoi.cnlapp.Order_Delivery.Fragments.PendingOrderFragment.Companion.mCallback
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.EndDate
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.StartDate
@@ -160,6 +161,24 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                             token,
                             mCallback2!!
                         )
+                    } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("DM")) {
+                        if (user_id.contains(",")) {
+                            getAllOrders(
+                                Api.get_saved_order + "?db_house_id=" + sharePrefUtils.getString(
+                                    Constants.DB_HOUSE_ID
+                                ) + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59",
+                                queue,
+                                token,
+                                mCallback2!!
+                            )
+                        } else {
+                            getAllOrders(
+                                Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=DELIVERED",
+                                queue,
+                                token,
+                                mCallback2!!
+                            )
+                        }
                     } else {
                         getAllOrders(
                             Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
@@ -340,7 +359,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
-        } else if (user_type.equals("ASM", true)) {
+        } else if (user_type.equals("ASM", true) || user_type.equals("DM", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
