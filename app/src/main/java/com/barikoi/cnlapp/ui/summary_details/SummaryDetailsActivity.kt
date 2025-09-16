@@ -17,7 +17,7 @@ import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.NotificationUtils
 import com.barikoi.cnlapp.utils.SharePrefUtils
-import com.barikoi.cnlapp.utils.extension.formatDateWithDDMMYYYY
+import com.barikoi.cnlapp.utils.extension.formatDateWithDDmmYYYY
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
 import com.barikoi.cnlapp.utils.extension.getEndDateTime
 import com.barikoi.cnlapp.utils.extension.getParcelableArrayListCompat
@@ -25,6 +25,8 @@ import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -54,8 +56,13 @@ class SummaryDetailsActivity : BaseActivity() {
     private var formattedStartDate = ""
     private var formattedEndDate = ""
 
+    val constraints = CalendarConstraints.Builder()
+        .setValidator(DateValidatorPointBackward.now())
+        .build()
+
     val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
         .setTitleText("Select Date Range")
+        .setCalendarConstraints(constraints)
         .build()
 
     var soCount = 0
@@ -75,13 +82,12 @@ class SummaryDetailsActivity : BaseActivity() {
         }
 
         val cal = Calendar.getInstance()
-        cal.set(Calendar.DAY_OF_MONTH, 1)
 
         formattedStartDate = cal.time.formatDateWithLocaleEnglish()
-        formattedEndDate = Date().formatDateWithLocaleEnglish()
+        formattedEndDate =  cal.time.formatDateWithLocaleEnglish()
 
-        binding.tvDateRangeStart.text = formattedStartDate.formatDateWithDDMMYYYY()
-        binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDMMYYYY()
+        binding.tvDateRangeStart.text = formattedStartDate.formatDateWithDDmmYYYY()
+        binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDmmYYYY()
 
         users = intent.getParcelableArrayListCompat<UserSummary>("user_summary")
         soCount = intent.getIntExtra("position", 0)
@@ -133,8 +139,8 @@ class SummaryDetailsActivity : BaseActivity() {
             formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
             formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
 
-            binding.tvDateRangeStart.text = formattedStartDate.formatDateWithDDMMYYYY()
-            binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDMMYYYY()
+            binding.tvDateRangeStart.text = formattedStartDate.formatDateWithDDmmYYYY()
+            binding.tvDateRangeEnd.text = formattedEndDate.formatDateWithDDmmYYYY()
 
             sendDataToViewPagerFragments(
                 Pair(
