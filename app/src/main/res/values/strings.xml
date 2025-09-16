@@ -385,5 +385,6 @@
     <string name="offer_">(offer)</string>
     <string name="x">X</string>
     <string name="are_you_sure_you_want_to_checkout">Are you sure you want to Checkout?</string>
+    <string name="qty">"QTY: %1$s"</string>
 
 </resources>
