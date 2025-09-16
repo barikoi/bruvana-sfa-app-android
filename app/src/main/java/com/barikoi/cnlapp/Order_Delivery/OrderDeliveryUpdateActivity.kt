@@ -1,18 +1,25 @@
 package com.barikoi.cnlapp.Order_Delivery
 
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -30,9 +37,11 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.SoUser
 import com.barikoi.cnlapp.data.remote.models.To
+import com.barikoi.cnlapp.data.remote.models.delivery.DBSoResponse
 import com.barikoi.cnlapp.databinding.ActivityOrderDeliveryUpdateBinding
 import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.ui.attendance.model.SOList
+import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -42,17 +51,20 @@ import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
 import com.barikoi.cnlapp.utils.extension.formatDate
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
+import com.barikoi.cnlapp.utils.extension.formatFullMonthDateYear
+import com.barikoi.cnlapp.utils.extension.loadingDialog
+import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -68,11 +80,25 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
     @Inject
     lateinit var networkFailureMessage: NetworkFailureMessage
 
+
+    val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
+        .setTheme(
+            R.style.ThemeOverlay_App_MaterialCalendar
+        )
+        .setTitleText(R.string.select_a_date)
+
+
+    val materialDatePicker = materialDateBuilder.build()
+
+
     var toList: List<To> = emptyList()
     var soListNew: List<SoUser> = emptyList()
 
 
     var token: String? = null
+
+
+    private lateinit var logoutDialog: Dialog
 
     var sr_id: String? = null
     var territory_id: String? = null
@@ -100,6 +126,54 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
         binding = ActivityOrderDeliveryUpdateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (sharePrefUtils.getString(Api.USER_TYPE) == "DM") {
+            binding.toolbar.btnBack.isVisible = false
+            binding.toolbar.tvSUbTitle.isVisible = true
+            binding.toolbar.btnClose.isVisible = false
+            binding.toolbar.btnMore.isVisible = false
+        }
+        binding.toolbar.tvTitle.text = getString(R.string.order_delivery_update)
+        binding.toolbar.tvSUbTitle.text = sharePrefUtils.getString(Constants.DB_HOUSE)
+        binding.toolbar.btnBack.setHapticClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.toolbar.toolbar.inflateMenu(R.menu.menu_logout)
+
+        binding.toolbar.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_logout -> {
+                    logout()
+
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+
+        loadingDialog {
+            logoutDialog = it
+        }
+
+        binding.dateRangeLayout.setHapticClickListener {
+            materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
+            binding.dateRangeLayout.isEnabled = false
+        }
+
+
+        val c = Calendar.getInstance()
+        c.add(Calendar.DATE, -1)
+        val end = c.time
+        StartDate = end.formatDateWithLocaleEnglish()
+        EndDate = end.formatDateWithLocaleEnglish()
+
+        binding.tvDateRange.text = end.formatFullMonthDateYear()
+
+        setDateFilter()
+        startLogoutObserve()
+
         startToObserve()
         startSOObserve()
 
@@ -119,6 +193,13 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
             binding.spinnerLayoutSO.visibility = View.VISIBLE
             binding.spinnerLayoutTO.visibility = View.GONE
             getSOList()
+        } else if (user_type.equals("DM", true)) {
+            sr_id = ""
+            route_id = ""
+            user_id = ""
+            binding.spinnerLayoutSO.visibility = View.VISIBLE
+            binding.spinnerLayoutTO.visibility = View.GONE
+            getSOListDBWise()
         } else if (user_type.equals("ASM")) {
             sr_id = ""
             route_id = ""
@@ -138,13 +219,9 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
             route_id = prefs!!.getString(Api.SELECTED_ROUTE_ID, "")
             binding.spinnerLayoutSO.visibility = View.GONE
             binding.spinnerLayoutTO.visibility = View.GONE
-            setDateFilter()
-        }
 
-        binding.btnBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            setTabLayoutView()
         }
-
 
         binding.spinnerTO.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @RequiresApi(Build.VERSION_CODES.N)
@@ -160,18 +237,96 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (binding.spinnerSO.adapter.count > 0) {
                     user_id =
-                        if (p2 == 0 && sharePrefUtils.getString(Api.USER_TYPE).equals("ASM")) {
+                        if (p2 == 0 && (sharePrefUtils.getString(Api.USER_TYPE)
+                                .equals("ASM") || sharePrefUtils.getString(Api.USER_TYPE)
+                                .equals("DM"))
+                        ) {
                             soListNew.joinToString(",") { it.id.toString() }
 
                         } else {
-                            soListNew[p2].id.toString()
+                            soListNew[p2 - 1].id.toString()
                         }
 
-                    setDateFilter()
+                    setTabLayoutView()
                 }
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+    }
+
+    fun logout() {
+        AlertDialog.Builder(
+            this@OrderDeliveryUpdateActivity,
+            R.style.AlertDialog
+        )
+            .setTitle(R.string.logout)
+            .setMessage(R.string.sure_log_out)
+            .setPositiveButton(
+                R.string.ok
+            ) { _, _ -> viewModel.logout() }
+            .setNegativeButton(
+                R.string.cancel
+            ) { _, _ -> } // do nothing
+            .setIcon(
+                ContextCompat.getDrawable(
+                    this@OrderDeliveryUpdateActivity,
+                    R.drawable.warning
+                )
+            )
+            .show()
+    }
+
+    private fun startLogoutObserve() {
+        lifecycleScope.launch {
+            viewModel.logoutResponse.observe(this@OrderDeliveryUpdateActivity) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("startLogoutObserve::Empty")
+
+                        logoutDialog.show()
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("startLogoutObserve::Error ${it.error}")
+                        logoutDialog.dismiss()
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+
+                        sharePrefUtils.clear()
+                        startActivity(
+                            Intent(
+                                this@OrderDeliveryUpdateActivity,
+                                LoginActivity::class.java
+                            )
+                        )
+                        finish()
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startLogoutObserve::Loading")
+                        if (!logoutDialog.isShowing) {
+                            logoutDialog.show()
+                        }
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("startLogoutObserve:: Success ${it.data}")
+                        logoutDialog.dismiss()
+
+                        toast(it.data?.message ?: "")
+
+                        sharePrefUtils.clear()
+                        startActivity(
+                            Intent(
+                                this@OrderDeliveryUpdateActivity,
+                                LoginActivity::class.java
+                            )
+                        )
+                        finish()
+
+                    }
+                }
+            }
         }
     }
 
@@ -341,49 +496,28 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
     }
 
     private fun setDateFilter() {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DATE, -1)
-        val end = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-        StartDate = df.format(end)
-        EndDate = df.format(end)
-
-        binding.tvDateRange.text = simpleFormat.format(end)
-
-
-        val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
-        materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText(R.string.select_a_date)
-
-        val materialDatePicker = materialDateBuilder.build()
-
-        binding.dateRangeLayout.setOnClickListener {
-            materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.isEnabled = false
-        }
-
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
             binding.dateRangeLayout.isEnabled = true
-            val s_date = Date(selection.first!!)
-            val e_date = Date(selection.second!!)
-            if (s_date.compareTo(e_date) == 0) {
-                binding.tvDateRange.text = simpleFormat.format(s_date)
-                editor!!.putString(Api.START_DATE_ORDER, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ORDER, df.format(e_date))
+            val sDate = Date(selection.first!!)
+            val eDate = Date(selection.second!!)
+            if (sDate.compareTo(eDate) == 0) {
+                binding.tvDateRange.text = sDate.formatFullMonthDateYear()
+                editor!!.putString(Api.START_DATE_ORDER, sDate.formatDateWithLocaleEnglish())
+                editor!!.putString(Api.END_DATE_ORDER, eDate.formatDateWithLocaleEnglish())
                 editor!!.commit()
             } else {
                 binding.tvDateRange.text = getString(
                     R.string.date_range_,
-                    simpleFormat.format(s_date),
-                    simpleFormat.format(e_date)
+                    sDate.formatFullMonthDateYear(),
+                    eDate.formatFullMonthDateYear()
                 )
-                editor!!.putString(Api.START_DATE_ORDER, df.format(s_date))
-                editor!!.putString(Api.END_DATE_ORDER, df.format(e_date))
+                editor!!.putString(Api.START_DATE_ORDER, sDate.formatDateWithLocaleEnglish())
+                editor!!.putString(Api.END_DATE_ORDER, eDate.formatDateWithLocaleEnglish())
                 editor!!.commit()
             }
-            StartDate = df.format(s_date)
-            EndDate = df.format(e_date)
+
+            StartDate = sDate.formatDateWithLocaleEnglish()
+            EndDate = eDate.formatDateWithLocaleEnglish()
             setTabLayoutView()
 
         }
@@ -400,6 +534,52 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
             queue!!, token!!, object : ApiServiceListener {
                 override fun onResponseSuccess(response: String) {
                     viewSOList(response)
+                }
+
+                override fun onJSONResponseSuccess(response: JSONObject) {}
+
+                override fun onNetworkResponseSuccess(response: NetworkResponse) {}
+
+                override fun onResponseFailure(error: VolleyError) {
+                    ViewUtils.getErrorResponse(error, applicationContext)
+                }
+
+                override fun onException(e: Exception) {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                }
+
+            })
+    }
+
+    private fun getSOListDBWise() {
+        ApiServices.apiGET(
+            "${Api.get_all_so_list_db_wise}?db_house_id=${sharePrefUtils.getString(Constants.DB_HOUSE_ID)}",
+            queue!!, token!!, object : ApiServiceListener {
+                override fun onResponseSuccess(response: String) {
+                    val soList = Gson().fromJson(response, DBSoResponse::class.java)
+
+                    soListNew = soList.users.map {
+                        SoUser(
+                            it.designation,
+                            it.id,
+                            "",
+                            0,
+                            it.userName,
+                        )
+                    }
+
+
+                    val soNameList: ArrayList<String> = ArrayList()
+                    soList.users.forEach {
+                        soNameList.add(it.userName)
+                    }
+                    soNameList.add(0, "All")
+
+                    val adapter = ArrayAdapter(
+                        applicationContext,
+                        android.R.layout.simple_spinner_dropdown_item, soNameList
+                    )
+                    binding.spinnerSO.adapter = adapter
                 }
 
                 override fun onJSONResponseSuccess(response: JSONObject) {}
@@ -454,10 +634,11 @@ class OrderDeliveryUpdateActivity : BaseActivity() {
             }
 
             soListNew = soUsers
+//            soNameList.add(0, "All")
 
             val adapter = ArrayAdapter(
                 applicationContext,
-                android.R.layout.simple_spinner_item, soNameList
+                android.R.layout.simple_spinner_dropdown_item, soNameList
             )
             binding.spinnerSO.adapter = adapter
         } catch (e: Exception) {
