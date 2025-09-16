@@ -83,6 +83,7 @@ object Api {
 
     /*TO Part*/
     val get_all_so_list = base_url+"api/v1/get-so"
+    val get_all_so_list_db_wise = base_url+"api/v1/db-house-wise-so"
     val get_all_to_list = base_url+"api/v1/get-to"
     val get_dh_list = base_url+"api/v1/db-houses"
 
