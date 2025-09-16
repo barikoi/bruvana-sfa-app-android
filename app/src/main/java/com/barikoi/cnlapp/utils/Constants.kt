@@ -54,16 +54,6 @@ object Constants {
 
     const val MIME_TYPE_PDF = "application/pdf"
 
-    val shopType = listOf(
-        "General Large Store (A)",
-        "General Small Store (B)",
-        "Mudi Large Outlet (Grocery Store) (A)",
-        "Mudi Small Outlet (Grocery Store) (B)",
-        "Confectionary/Bakery (B)",
-        "Pharmacy (P)",
-        "Tea Stall (C)"
-    )
-
     fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
         val startPoint = Location("locationA")
         startPoint.latitude = lat1
