@@ -275,6 +275,16 @@ interface ApiService {
         @Query("user_id") userId: String
     ): Response<OrderResponse>
 
+    @GET("api/v1/orders")
+    suspend fun getSavedOrders(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String,
+        @Query("order_status") orderStatus: String,
+        @Query("region_id") regionId: String?,
+        @Query("territory_id") territoryId: String?,
+    ): Response<OrderResponse>
+
     @Streaming
     @GET("api/v1/memo-generate")
     fun downloadChalans(
