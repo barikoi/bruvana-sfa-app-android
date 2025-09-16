@@ -31,6 +31,15 @@ interface OrderRepository {
         endDate: String,
         userId: String
     ): Flow<ApiState<OrderResponse>>
+
+    fun getSavedOrders(
+        startDate: String,
+        endDate: String,
+        userId: String,
+        orderStatus: String,
+        regionId: String?,
+        territoryId: String?,
+    ): Flow<ApiState<OrderResponse>>
 }
 
 class OrderRepositoryImpl @Inject constructor(
@@ -140,6 +149,50 @@ class OrderRepositoryImpl @Inject constructor(
         return flow {
             try {
                 val response = apiService.getOrders(startDate, endDate, userId)
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code())
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override fun getSavedOrders(
+        startDate: String,
+        endDate: String,
+        userId: String,
+        orderStatus: String,
+        regionId: String?,
+        territoryId: String?
+    ): Flow<ApiState<OrderResponse>> {
+        return flow {
+            try {
+                val response = apiService.getSavedOrders(
+                    startDate,
+                    endDate,
+                    userId,
+                    orderStatus,
+                    regionId,
+                    territoryId
+                )
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
                 } else {
