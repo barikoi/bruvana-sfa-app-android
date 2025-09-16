@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.BuildConfig
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.ui.main.MainActivity
@@ -135,9 +136,18 @@ class SplashActivity : AppCompatActivity() {
             }
 
             2 -> {
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
-                finish()
+                if (sharePrefUtils.getString(Api.USER_TYPE) == "DM") {
+                    startActivity(
+                        Intent(
+                            this@SplashActivity,
+                            OrderDeliveryUpdateActivity::class.java
+                        )
+                    )
+                    finish()
+                } else {
+                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    finish()
+                }
             }
         }
     }
