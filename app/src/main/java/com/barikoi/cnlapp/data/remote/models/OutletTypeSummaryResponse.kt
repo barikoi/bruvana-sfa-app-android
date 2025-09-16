@@ -16,11 +16,11 @@ data class OutletTypeData(
     @SerializedName("aiv")
     val aiv: String,
     @SerializedName("contribution")
-    val contribution: Double?,
+    val contribution: String?,
     @SerializedName("delivery_amount")
     val deliveryAmount: String?,
     @SerializedName("gross_amount")
-    val grossAmount: String,
+    val grossAmount: String?,
     @SerializedName("non_productive_visits")
     val nonProductiveVisits: Int,
     @SerializedName("order_amount")
