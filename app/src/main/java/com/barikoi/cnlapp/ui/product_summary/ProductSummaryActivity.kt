@@ -27,7 +27,15 @@ import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.format
+import com.barikoi.cnlapp.utils.extension.formatDate
+import com.barikoi.cnlapp.utils.extension.formatDateWithDDmmYYYY
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
+import com.barikoi.cnlapp.utils.extension.formatFullMonthDateYear
+import com.barikoi.cnlapp.utils.extension.getEndDateTime
+import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.toast
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -58,6 +66,19 @@ class ProductSummaryActivity : BaseActivity() {
     private lateinit var adapter: ProductStockAdapter
     private var dbHouses: List<DbHouse> = emptyList()
 
+
+    val constraints = CalendarConstraints.Builder()
+        .setValidator(DateValidatorPointBackward.now())
+        .build()
+
+    val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+        .setTitleText("Select Date Range")
+        .setCalendarConstraints(constraints)
+        .build()
+
+    private var formattedStartDate = ""
+    private var formattedEndDate = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,7 +100,31 @@ class ProductSummaryActivity : BaseActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        setDateFilter()
+        getDate()
+
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDateMillis = selection.first
+            val endDateMillis = selection.second
+
+            formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
+            formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
+
+            binding.tvDateRange.text = getString(
+                R.string.date_range_,
+                formattedStartDate.formatDateWithDDmmYYYY(),
+                formattedEndDate.formatDateWithDDmmYYYY()
+            )
+
+            apiCall()
+        }
+
+        binding.dateRangeLayout.setOnClickListener {
+            dateRangePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
+        }
+
+        apiCall()
+
 
         starDHObserve()
         starProductStockObserve()
@@ -105,8 +150,8 @@ class ProductSummaryActivity : BaseActivity() {
                         selectedTerritoryId = dbHouses[p2].id.toString()
 
                         viewModel.getProductStock(
-                            "${getDate().first} 00:00:00",
-                            "${getDate().second} 23:59:59",
+                            formattedStartDate.getStartDateTime(),
+                            formattedEndDate.getEndDateTime(),
                             "1",
                             "1",
                             selectedTerritoryId,
@@ -127,87 +172,13 @@ class ProductSummaryActivity : BaseActivity() {
         } else {
             binding.spinnerLayoutRoute.visibility = View.GONE
             viewModel.getProductStock(
-                "${getDate().first} 00:00:00",
-                "${getDate().second} 23:59:59",
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
                 null,
                 "1",
                 null,
                 sharePrefUtils.getString(Api.USER_ID)
             )
-        }
-    }
-
-    private fun getDate(): Pair<String, String> {
-        val c = Calendar.getInstance()
-        c.set(Calendar.DAY_OF_MONTH, 1)
-        val end = Calendar.getInstance().time
-        val start = c.time
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-
-        binding.tvDateRange.text =
-            getString(R.string.date_range_, simpleFormat.format(start), simpleFormat.format(end))
-
-        return Pair(df.format(start), df.format(end))
-    }
-
-
-    private fun setDateFilter() {
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-        val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-
-        val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
-        materialDateBuilder.setTheme(R.style.ThemeOverlay_App_MaterialCalendar)
-        materialDateBuilder.setTitleText(getString(R.string.select_a_date))
-
-        val materialDatePicker = materialDateBuilder.build()
-
-        binding.dateRangeLayout.setOnClickListener {
-            materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.isEnabled = false
-        }
-
-        materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayout.isEnabled = true
-            val sDate = Date(selection.first!!)
-            val eDate = Date(selection.second!!)
-            if (sDate.compareTo(eDate) == 0) {
-                binding.tvDateRange.text = simpleFormat.format(sDate)
-            } else {
-                binding.tvDateRange.text = getString(
-                    R.string.date_range_,
-                    simpleFormat.format(sDate),
-                    simpleFormat.format(eDate)
-                )
-            }
-
-            if (sharePrefUtils.getString(Api.USER_TYPE)
-                    .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE)
-                    .equals("ASM", true)
-            ) {
-                viewModel.getProductStock(
-                    "${getDate().first} 00:00:00",
-                    "${getDate().second} 23:59:59",
-                    "1",
-                    "1",
-                    selectedTerritoryId,
-                    null
-                )
-            } else {
-                viewModel.getProductStock(
-                    "${getDate().first} 00:00:00",
-                    "${getDate().second} 23:59:59",
-                    null,
-                    "1",
-                    null,
-                    sharePrefUtils.getString(Api.USER_ID)
-                )
-            }
-
-        }
-
-        materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayout.isEnabled = true
         }
 
         binding.llSort.setOnClickListener {
@@ -249,6 +220,47 @@ class ProductSummaryActivity : BaseActivity() {
         }
     }
 
+    private fun getDate() {
+        val c = Calendar.getInstance()
+        c.set(Calendar.DAY_OF_MONTH, 1)
+        val end = Calendar.getInstance().time
+        val start = c.time
+
+        formattedStartDate = start.formatDateWithLocaleEnglish()
+        formattedEndDate = end.formatDateWithLocaleEnglish()
+
+        binding.tvDateRange.text = getString(
+            R.string.date_range_,
+            formattedStartDate.formatDateWithDDmmYYYY(),
+            formattedEndDate.formatDateWithDDmmYYYY()
+        )
+    }
+
+    private fun apiCall() {
+        if (sharePrefUtils.getString(Api.USER_TYPE)
+                .equals("TO", true) || sharePrefUtils.getString(Api.USER_TYPE)
+                .equals("ASM", true)
+        ) {
+            viewModel.getProductStock(
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
+                "1",
+                "1",
+                selectedTerritoryId,
+                null
+            )
+        } else {
+            viewModel.getProductStock(
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
+                null,
+                "1",
+                null,
+                sharePrefUtils.getString(Api.USER_ID)
+            )
+        }
+    }
+
     private fun starDHObserve() {
         lifecycleScope.launch {
             viewModel.dbHousesResponse.observe(this@ProductSummaryActivity) {
@@ -278,7 +290,7 @@ class ProductSummaryActivity : BaseActivity() {
                         val dhNameList = it.data.dbHouses.map { dh -> dh.dbHouseName }
                         val adapter = ArrayAdapter(
                             applicationContext,
-                            android.R.layout.simple_spinner_item, dhNameList
+                            android.R.layout.simple_spinner_dropdown_item, dhNameList
                         )
                         binding.spinnerDistributorHouse.adapter = adapter
                     }
