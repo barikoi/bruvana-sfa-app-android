@@ -62,6 +62,11 @@
             android:name=".ui.create_order.DemoProductActivity"
             android:exported="false"
             android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
+
+        <activity
+            android:name=".ui.navigation.NavigationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CNLApp.NoActionBar.Material" />
         <activity
             android:name=".ui.add_gift.AddGiftActivity"
             android:exported="false"
