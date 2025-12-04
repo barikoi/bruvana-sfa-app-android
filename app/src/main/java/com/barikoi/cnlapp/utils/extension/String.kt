@@ -10,6 +10,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
+import kotlin.math.roundToInt
 
 
 fun String.englishToBanglaNumber(): String {
@@ -32,6 +33,20 @@ fun String.englishToBanglaNumber(): String {
         banglaNumber += banglaNumerals[digit.toString()] ?: digit // Use original digit if not found
     }
     return banglaNumber
+}
+
+fun Double.toHourMinuteString(): String {
+    val totalMinutes = this.roundToInt() // round to nearest minute
+    if (totalMinutes <= 0) return "0 min"
+
+    val hours = totalMinutes / 60
+    val minutes = totalMinutes % 60
+
+    return buildString {
+        if (hours > 0) append("$hours hr")
+        if (hours > 0 && minutes > 0) append(" ")
+        if (minutes > 0) append("$minutes min")
+    }
 }
 
 fun String?.totalAmountFormatted(): String {
