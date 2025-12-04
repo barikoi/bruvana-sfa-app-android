@@ -11,8 +11,6 @@ import coil3.load
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUser
 import com.barikoi.cnlapp.databinding.ItemActiveInactiveBinding
 import com.barikoi.cnlapp.utils.extension.formateDateNewFormat
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class AdapterActiveInactive(
     private val status: String
@@ -58,7 +56,6 @@ class AdapterActiveInactive(
                 ContextCompat.getDrawable(holder.itemView.context, R.drawable.ic_inactive)
             )
         }
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
