@@ -41,6 +41,5 @@ class ActiveInactiveActivity : BaseActivity() {
             binding.llEmpty.main.isVisible = true
             AppLogger.log("ActiveInactiveActivity::onCreate users is null")
         }
-
     }
 }
