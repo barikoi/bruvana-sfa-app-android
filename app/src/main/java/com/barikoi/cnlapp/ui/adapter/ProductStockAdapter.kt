@@ -130,8 +130,14 @@ class ProductStockAdapter(
 
         val drawable = CircularProgressDrawable(holder.itemView.context)
         drawable.setColorSchemeColors(
-            holder.itemView.context.resources.getColor(R.color.cnl_color_1),
-            holder.itemView.context.resources.getColor(R.color.cnl_color_2)
+            ContextCompat.getColor(
+                holder.itemView.context,
+                R.color.cnl_color_1
+            ),
+            ContextCompat.getColor(
+                holder.itemView.context,
+                R.color.cnl_color_2
+            )
         )
         drawable.centerRadius = 20f
         drawable.strokeWidth = 6f
