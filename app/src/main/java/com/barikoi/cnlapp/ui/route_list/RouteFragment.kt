@@ -55,11 +55,11 @@ class RouteFragment : Fragment() {
 
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
-            sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it, "1") }
+            sharePrefUtils.getString(Api.USER_ID)?.let { viewModel.getRoutes(it) }
         }
 
         viewModel.soSelected.observe(viewLifecycleOwner) {
-            viewModel.getRoutes(it, "1")
+            viewModel.getRoutes(it,)
         }
 
 
