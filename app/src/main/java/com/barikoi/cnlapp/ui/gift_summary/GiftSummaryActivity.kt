@@ -201,9 +201,7 @@ class GiftSummaryActivity : BaseActivity() {
                 )
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
-            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
     }
 
