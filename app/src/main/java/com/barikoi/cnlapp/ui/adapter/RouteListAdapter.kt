@@ -45,7 +45,7 @@ class RouteListAdapter :
             binding.territoryName.text = route.territoryName
             binding.areaName.text = route.areaName
             binding.routeCode.text = route.routeCode
-            binding.shopCount.text = route.outletCount.englishToBanglaNumber()
+            binding.shopCount.text = route.outletCount?.englishToBanglaNumber()
         }
     }
 }
