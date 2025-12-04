@@ -20,7 +20,7 @@ data class OutletsResponse(
 @Parcelize
 data class Outlet(
     @SerializedName("address")
-    val address: String,
+    val address: String?,
     @SerializedName("area_code")
     val areaCode: String,
     @SerializedName("area_id")
@@ -117,6 +117,8 @@ data class Outlet(
     val verifiedByUserId: String?,
     @SerializedName("last_ordered_at")
     val lastOrderedAt: String?,
+    @SerializedName("visit_status")
+    val visitStatus: String?,
     val distance: Float = 0f,
 ): Parcelable
 
