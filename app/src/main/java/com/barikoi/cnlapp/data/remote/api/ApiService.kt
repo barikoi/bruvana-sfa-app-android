@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.data.remote.api
 
+import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
 import com.barikoi.cnlapp.data.remote.models.ApproveRequest
 import com.barikoi.cnlapp.data.remote.models.AuthUserResponse
@@ -28,6 +29,7 @@ import com.barikoi.cnlapp.data.remote.models.offer.OfferResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
 import com.barikoi.cnlapp.data.remote.models.product.ProductResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
+import com.barikoi.cnlapp.data.remote.models.route.NavigationRouteResponse
 import com.barikoi.cnlapp.data.remote.models.so.SoWithSummaryResponse
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -290,4 +292,13 @@ interface ApiService {
     fun downloadChalans(
         @Query("order_no") orderIds: String
     ): Call<ResponseBody>
+
+    @GET
+    suspend fun getNavigationRoute(
+        @Url url: String,
+        @Query("api_key") apiKey: String = BuildConfig.TRACE_API_KEY,
+        @Query("geometries") geometries: String, // e.g. "geojson"
+        @Query("profile") profile: String, // e.g. "car"
+        @Query("steps") steps: Boolean, // true/false
+    ): Response<NavigationRouteResponse>
 }
