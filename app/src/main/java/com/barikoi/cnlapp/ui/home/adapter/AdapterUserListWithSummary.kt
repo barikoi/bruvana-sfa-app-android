@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.data.remote.models.UserSummary
 import com.barikoi.cnlapp.databinding.ItemUserBinding
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
+import com.barikoi.cnlapp.utils.getUserType
 
 class AdapterUserListWithSummary(
     private val onUserClick: (UserSummary, Int) -> Unit
@@ -36,7 +37,7 @@ class AdapterUserListWithSummary(
         val user = users[position]
 
         with(holder.binding) {
-            tvName.text = user.name + " (${user.userType})"
+            tvName.text = user.name + " (${getUserType(user.userType)})"
 
             if (user.userType == "TO") {
                 tvActiveUser.text = user.active.toString()
