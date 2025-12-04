@@ -51,6 +51,8 @@ object Api {
     val logouturl = base_url + "api/v1/logout"
     val authUserCheck = base_url+ "api/v1/auth/user"
     const val traceLogin = "https://backend.barikoi.com:8888/api/v1/dashboard/login"
+
+    const val route = "https://barikoi.xyz/v2/api/route"
     const val traceAuthCheck = "https://backend.barikoi.com:8888/api/v1/auth/user"
     const val traceLogout = "https://backend.barikoi.com:8888/api/v1/dashboard/logout"
     //val route_outlet_list = base_url+"api/v1/route-list"
