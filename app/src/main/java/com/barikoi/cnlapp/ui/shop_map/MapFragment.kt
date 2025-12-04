@@ -47,27 +47,27 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.gson.Gson
-import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.engine.LocationEngine
-import com.mapbox.mapboxsdk.location.engine.LocationEngineCallback
-import com.mapbox.mapboxsdk.location.engine.LocationEngineRequest
-import com.mapbox.mapboxsdk.location.engine.LocationEngineResult
-import com.mapbox.mapboxsdk.location.modes.CameraMode
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.location.permissions.PermissionsListener
-import com.mapbox.mapboxsdk.location.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.maps.UiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.maplibre.android.annotations.Icon
+import org.maplibre.android.annotations.IconFactory
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.engine.LocationEngine
+import org.maplibre.android.location.engine.LocationEngineCallback
+import org.maplibre.android.location.engine.LocationEngineRequest
+import org.maplibre.android.location.engine.LocationEngineResult
+import org.maplibre.android.location.modes.CameraMode
+import org.maplibre.android.location.modes.RenderMode
+import org.maplibre.android.location.permissions.PermissionsListener
+import org.maplibre.android.location.permissions.PermissionsManager
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.OnMapReadyCallback
+import org.maplibre.android.maps.Style
+import org.maplibre.android.maps.UiSettings
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -84,7 +84,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     private val viewModel: MapViewModel by viewModels()
 
-    private lateinit var mMap: MapboxMap
+    private lateinit var mMap: MapLibreMap
 
     private var locationEngine: LocationEngine? = null
     private var locationEngineRequest: LocationEngineRequest? = null
@@ -220,7 +220,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         categoryList = arrayListOf("All", "A", "B", "C", "D", "E", "F", "P", "MP", "WS")
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item, categoryList
+            android.R.layout.simple_spinner_dropdown_item, categoryList
         )
         binding.spinnerCategory.adapter = adapter
 
@@ -327,7 +327,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
 
                         val adapter = ArrayAdapter(
                             requireContext(),
-                            android.R.layout.simple_spinner_item,
+                            android.R.layout.simple_spinner_dropdown_item,
                             toNameList!!.toMutableList()
                         )
                         binding.spinnerTO.adapter = adapter
@@ -371,7 +371,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                             AppLogger.log("SIZE: ${soNameList.size}")
                             val adapter = ArrayAdapter(
                                 requireContext(),
-                                android.R.layout.simple_spinner_item, soNameList
+                                android.R.layout.simple_spinner_dropdown_item, soNameList
                             )
                             binding.spinnerSO.adapter = adapter
                         } else {
@@ -415,7 +415,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         if (routeNewList.isNotEmpty()) {
                             val adapter = ArrayAdapter(
                                 requireContext(),
-                                android.R.layout.simple_spinner_item,
+                                android.R.layout.simple_spinner_dropdown_item,
                                 routeNames ?: emptyList<String>()
                             )
                             binding.spinnerRoutes.adapter = adapter
@@ -423,7 +423,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
                         } else {
                             val adapter = ArrayAdapter(
                                 requireContext(),
-                                android.R.layout.simple_spinner_item,
+                                android.R.layout.simple_spinner_dropdown_item,
                                 routeNames ?: emptyList<String>()
                             )
                             binding.spinnerRoutes.adapter = adapter
@@ -780,7 +780,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, PermissionsListener {
         binding.mapView.onSaveInstanceState(outState)
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
+    override fun onMapReady(mapboxMap: MapLibreMap) {
         mMap = mapboxMap
         mMap.setStyle(
             Style.Builder().fromUrl(getString(R.string.map_view_styleUrl))
