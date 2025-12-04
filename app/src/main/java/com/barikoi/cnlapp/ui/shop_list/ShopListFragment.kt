@@ -1,51 +1,72 @@
 package com.barikoi.cnlapp.ui.shop_list
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Dialog
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
+import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.android.volley.NoConnectionError
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.TimeoutError
-import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.Model.Routes
-import com.barikoi.cnlapp.Model.Shops
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.callback.OnEditShopListener
+import com.barikoi.cnlapp.base.api.ApiState
+import com.barikoi.cnlapp.base.api.NetworkFailureMessage
+import com.barikoi.cnlapp.callback.LocationFetch
+import com.barikoi.cnlapp.data.remote.models.Outlet
+import com.barikoi.cnlapp.data.remote.models.Route
+import com.barikoi.cnlapp.data.remote.models.route.NavigationRouteResponse
 import com.barikoi.cnlapp.databinding.FragmentShopListBinding
 import com.barikoi.cnlapp.ui.adapter.ShopListAdapter
 import com.barikoi.cnlapp.ui.create_shop.CreateShopActivity
+import com.barikoi.cnlapp.ui.navigation.NavigationActivity
 import com.barikoi.cnlapp.ui.route.RouteViewModel
 import com.barikoi.cnlapp.utils.Api
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
+import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
+import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.toHourMinuteString
+import com.barikoi.cnlapp.utils.extension.toast
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.UnsupportedEncodingException
+import kotlinx.coroutines.launch
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.style.layers.LineLayer
+import org.maplibre.android.style.layers.PropertyFactory.lineCap
+import org.maplibre.android.style.layers.PropertyFactory.lineColor
+import org.maplibre.android.style.layers.PropertyFactory.lineJoin
+import org.maplibre.android.style.layers.PropertyFactory.lineWidth
+import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.LineString
+import java.util.Locale
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
-class ShopListFragment : Fragment(), OnEditShopListener {
+class ShopListFragment : Fragment() {
     private lateinit var binding: FragmentShopListBinding
 
     private val viewModel: RouteViewModel by activityViewModels()
@@ -54,18 +75,23 @@ class ShopListFragment : Fragment(), OnEditShopListener {
     lateinit var sharePrefUtils: SharePrefUtils
 
     @Inject
-    lateinit var queue: RequestQueue
+    lateinit var networkFailureMessage: NetworkFailureMessage
+
+    private var outletList: List<Outlet> = emptyList()
+
+    private var routeListNew: List<Route> = emptyList()
+    private var selectedRoute: Route? = null
 
 
-    private var routesList: ArrayList<String>? = ArrayList()
-    private var allRouteList: ArrayList<Routes>? = ArrayList()
+    private var routesList: List<String> = emptyList()
     private var routeNameList: ArrayList<Pair<String, String>>? = ArrayList()
-    private var shopList: ArrayList<Shops>? = ArrayList()
 
     private lateinit var adapter: ShopListAdapter
 
     private var userId: String? = ""
-    private var listener: OnEditShopListener? = null
+
+    private var latitudeCurrent: Double = 0.0
+    private var longitudeCurrent: Double = 0.0
 
 
     override fun onCreateView(
@@ -75,22 +101,112 @@ class ShopListFragment : Fragment(), OnEditShopListener {
         return binding.root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
+        getLocation()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        startRouteObserve()
+        startOutletObserve()
+        adapter = ShopListAdapter(
+            onEditClickListener = {
+                onEdit(it)
+            },
+            onNavigationRouteClick = {
+                viewModel.getNavigationRoute(
+                    latitudeCurrent.toString(),
+                    longitudeCurrent.toString(),
+                    it.latitude,
+                    it.longitude,
+                    "car",
+                    true,
+                    "geojson"
+                )
+            },
+            onVisitClickListener = {
+                onEdit(it)
+            },
+            sharePrefUtils = sharePrefUtils
+        )
 
-        adapter = ShopListAdapter(ArrayList(), listener!!)
+        binding.chipFilter.chipGroupFilter.setOnCheckedStateChangeListener { group, checkedIds ->
+            if (checkedIds.isNotEmpty()) {
+                val selectedIndex = group.indexOfChild(group.findViewById<Chip>(checkedIds[0]))
+
+                when (selectedIndex) {
+                    0 -> { // All
+                        adapter.updateLocation(latitudeCurrent, longitudeCurrent)
+                        updateAdapter(outletList)
+                    }
+
+                    1 -> { // Authorize
+                        val filteredList = outletList.filter { it.isVerified == 0 }
+                        adapter.updateLocation(latitudeCurrent, longitudeCurrent)
+                        updateAdapter(filteredList)
+                    }
+
+
+                    2 -> { // Verified
+                        val filteredList = outletList.filter { it.isVerified == 1 }
+                        adapter.updateLocation(latitudeCurrent, longitudeCurrent)
+                        updateAdapter(filteredList)
+                    }
+
+                    3 -> { // Rejected
+                        val filteredList = outletList.filter { it.isVerified == 2 }
+                        adapter.updateLocation(latitudeCurrent, longitudeCurrent)
+                        updateAdapter(filteredList)
+                    }
+                }
+            } else {
+                // No chip selected — fallback to "All"
+                adapter.updateLocation(latitudeCurrent, longitudeCurrent)
+                updateAdapter(outletList)
+            }
+        }
+
+        starNavigationRouteObserve()
+
+        binding.shoplist.layoutManager = LinearLayoutManager(requireContext())
+        binding.shoplist.adapter = adapter
 
         binding.shoplist.adapter = adapter
 
-
         viewModel.soSelected.observe(viewLifecycleOwner) {
             userId = it
-            getShopList(it)
+
+            viewModel.getRoutes(
+                it
+            )
         }
 
         if (sharePrefUtils.getString(Api.USER_TYPE).equals("SO")) {
-            getShopList(sharePrefUtils.getString(Api.USER_ID)!!)
+            viewModel.getRoutes(
+                sharePrefUtils.getString(Api.USER_ID)!!
+            )
+        }
+
+        binding.refresh.setOnRefreshListener {
+            binding.etSearch.setText("")
+            viewModel.getOutlets(
+                selectedRoute!!.id.toString(),
+                if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM") ||
+                    sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
+                ) {
+                    userId!!
+                } else {
+                    sharePrefUtils.getString(Api.USER_ID)!!
+                }
+            )
+
+            getLocation()
+
+            binding.refresh.isRefreshing = false
         }
 
         binding.spinnerRoutes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -98,52 +214,44 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             override fun onItemSelected(
                 parent: AdapterView<*>, view: View, position: Int, id: Long
             ) {
+                selectedRoute = routeListNew[position]
+
                 sharePrefUtils.saveString(
                     Api.SELECTED_ROUTE_ID_LIST,
-                    routeNameList!![position].first
+                    routeListNew[position].routeName
                 )
-                sharePrefUtils.saveString(
-                    Api.SELECTED_ROUTE_NAME_LIST, routeNameList!![position].second
-                )
-                val shops: ArrayList<Shops> = ArrayList()
-                for (i in 0 until shopList!!.size) {
-                    if (shopList!![i].route_name == routesList!![position]) {
-                        shops.add(shopList!![i])
-                    }
-                }
-                adapter = ShopListAdapter(shops, listener!!)
-                binding.shoplist.adapter = adapter
-                adapter.notifyDataSetChanged()
 
+                viewModel.getOutlets(
+                    selectedRoute!!.id.toString(),
+                    if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM") ||
+                        sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
+                    ) {
+                        userId!!
+                    } else {
+                        sharePrefUtils.getString(Api.USER_ID)!!
+                    }
+                )
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             @SuppressLint("NotifyDataSetChanged")
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                adapter.filter.filter(s)
+                binding.chipFilter.chipAll.isChecked = true
                 if (s!!.isEmpty()) {
-                    val shops: ArrayList<Shops> = ArrayList()
-                    if (shopList!!.size > 0) {
-                        for (i in 0 until shopList!!.size) {
-                            if (routesList!!.size > 0) {
-                                if (shopList!![i].route_name == routesList!![binding.spinnerRoutes.selectedItemPosition]) {
-                                    shops.add(shopList!![i])
-                                }
-                            }
-
-                        }
-                    }
-                    adapter = ShopListAdapter(shops, listener!!)
-                    binding.shoplist.adapter = adapter
-                    adapter.notifyDataSetChanged()
+                    adapter.updateLocation(
+                        latitudeCurrent,
+                        longitudeCurrent
+                    )
+                    updateAdapter(outletList)
+                    return
                 }
+
+                adapter.filter.filter(s)
 
             }
 
@@ -151,36 +259,304 @@ class ShopListFragment : Fragment(), OnEditShopListener {
 
         })
 
-        val gd = GradientDrawable()
-        gd.setColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.white
-            )
-        )
-        gd.cornerRadius = 5f
-        gd.setStroke(
-            2,
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.cnl_color_2
-            )
-        )
-        binding.createShop.setBackgroundDrawable(gd)
-
         binding.createShop.setOnClickListener {
-            if (routesList!!.size > 0) {
+            if (routeListNew.isNotEmpty()) {
                 startActivityResult.launch(
                     Intent(
                         requireActivity(),
                         CreateShopActivity::class.java
-                    ).putExtra("requestCode", 55).putStringArrayListExtra("routes", routesList)
-                        .putExtra("routeList", routeNameList)
+                    ).putExtra("requestCode", 55)
+                        .putParcelableArrayListExtra(ROUTE_LIST, ArrayList(routeListNew))
                 )
             } else {
                 Toast.makeText(requireContext(), "Routes not Available", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    companion object {
+        const val ROUTE_LIST = "ROUTE_LIST"
+    }
+
+
+    private fun startRouteObserve() {
+        lifecycleScope.launch {
+            viewModel.routeResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        binding.progressBar2.isVisible = false
+                        AppLogger.log("startRouteObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar2.isVisible = false
+                        AppLogger.log("startRouteObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startRouteObserve::Loading")
+                        binding.progressBar2.isVisible = true
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar2.isVisible = false
+                        AppLogger.log("startRouteObserve:: Success ${it.data?.routes}")
+
+                        routeListNew = it.data?.routes ?: emptyList()
+
+                        val routeName = routeListNew.map { route -> route.routeName }
+                        routesList = routeListNew.map { route -> route.routeName }
+
+
+                        routeNameList = ArrayList(routeListNew.map { a-> Pair(a.id.toString(), a.routeName) })
+
+
+                        val adapter = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            routeName
+                        )
+                        binding.spinnerRoutes.adapter = adapter
+
+                        binding.createShop.isVisible = true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startOutletObserve() {
+        lifecycleScope.launch {
+            viewModel.outletResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        binding.progressBar2.isVisible = false
+                        AppLogger.log("startOutletObserve::Empty")
+                    }
+
+                    is ApiState.Error -> {
+                        binding.progressBar2.isVisible = false
+                        AppLogger.log("startOutletObserve::Error ${it.error}")
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("startOutletObserve::Loading")
+                        binding.progressBar2.isVisible = true
+                    }
+
+                    is ApiState.Success -> {
+                        binding.progressBar2.isVisible = false
+                        AppLogger.log("startOutletObserve:: Success ${it.data?.outlets}")
+                        outletList = it.data?.outlets ?: emptyList()
+                        adapter.updateLocation(
+                            latitudeCurrent,
+                            longitudeCurrent
+                        )
+
+                        updateAdapter(outletList)
+
+
+                        val all = outletList.size
+                        val authorize = outletList.count { s -> s.isVerified == 0 }
+                        val verified = outletList.count { s -> s.isVerified == 1 }
+                        val rejected = outletList.count { s -> s.isVerified == 2 }
+
+                        binding.chipFilter.chipAll.text = getString(R.string.all, all.toString())
+                        binding.chipFilter.chipAuthorize.text =
+                            getString(R.string.authorize, authorize.toString())
+                        binding.chipFilter.chipRejected.text =
+                            getString(R.string.rejected, rejected.toString())
+                        binding.chipFilter.chipVerified.text =
+                            getString(R.string.verified_, verified.toString())
+
+                        binding.chipFilter.chipAll.isChecked = true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateAdapter(outletList: List<Outlet>) {
+        val mappedWithDistance = outletList.map {
+            val distance = ViewUtils.getDistance(
+                latitudeCurrent,
+                longitudeCurrent,
+                it.latitude.toDouble(),
+                it.longitude.toDouble()
+            )
+            it.copy(distance = distance)
+        }.sortedBy { it.distance }
+        adapter.updateShopList(mappedWithDistance)
+
+    }
+
+    private fun starNavigationRouteObserve() {
+        lifecycleScope.launch {
+            viewModel.navigationRouteResponse.observe(viewLifecycleOwner) {
+                when (it) {
+                    is ApiState.Empty -> {
+                        AppLogger.log("starNavigationRouteObserve::Empty")
+                        binding.progressBar2.isVisible = false
+                    }
+
+                    is ApiState.Error -> {
+                        AppLogger.log("starNavigationRouteObserve::Error ${it.error}")
+                        binding.progressBar2.isVisible = false
+
+                        toast(networkFailureMessage.handleFailure(it.error!!))
+                    }
+
+                    is ApiState.Loading -> {
+                        AppLogger.log("starNavigationRouteObserve::Loading")
+                        binding.progressBar2.isVisible = true
+                    }
+
+                    is ApiState.Success -> {
+                        AppLogger.log("starNavigationRouteObserve:: Success ${it.data}")
+                        binding.progressBar2.isVisible = false
+
+                        showRouteDialog(it.data!!)
+                    }
+                }
+            }
+        }
+    }
+
+    fun showRouteDialog(routeResponse: NavigationRouteResponse) {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(true)
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.popup_navigation_route_view)
+        val tvTitle = dialog.findViewById<TextView>(R.id.tvTitle)
+        val btnSubmit = dialog.findViewById<MaterialButton>(R.id.btnNavigate)
+        val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
+        val tvDistance = dialog.findViewById<TextView>(R.id.tvDistance)
+        val tvDuration = dialog.findViewById<TextView>(R.id.tvDuration)
+
+        tvTitle.text =
+            getString(
+                R.string.route_distance,
+                routeResponse.waypoints.first().name,
+                routeResponse.waypoints.last().name
+            )
+
+        tvDistance.text = getString(
+            R.string.distance_km,
+            String.format(
+                Locale.ENGLISH, "%.2f",
+                routeResponse.routes[0].distance / 1000
+            )
+        )
+
+        tvDuration.text = routeResponse.routes[0].duration.toHourMinuteString()
+
+        val mapView: MapView = dialog.findViewById(R.id.mapView)
+
+        mapView.getMapAsync { map: MapLibreMap ->
+            map.uiSettings.apply {
+                isAttributionEnabled = false
+                isLogoEnabled = false
+                isCompassEnabled = false
+            }
+
+            map.setStyle(getString(R.string.map_view_styleUrl)) { style ->
+
+                if (routeResponse.routes.isEmpty()) {
+                    return@setStyle
+                }
+
+                val route = routeResponse.routes[0]
+                val geometry = route.geometry
+
+                // Parse the GeoJSON line string
+                val lineString = LineString.fromJson(Gson().toJson(geometry)!!)
+                val routeFeature = Feature.fromGeometry(lineString)
+                val featureCollection = FeatureCollection.fromFeatures(listOf(routeFeature))
+
+                val sourceId = "route-source"
+                val layerId = "route-layer"
+
+                style.addSource(GeoJsonSource(sourceId, featureCollection))
+                style.addLayer(
+                    LineLayer(layerId, sourceId)
+                        .withProperties(
+                            lineColor(Color.BLUE),
+                            lineWidth(5f),
+                            lineCap("round"),
+                            lineJoin("round")
+                        )
+                )
+
+                // Fit camera to route bounds
+                val points = lineString.coordinates()
+                val boundsBuilder = LatLngBounds.Builder()
+                for (p in points) boundsBuilder.include(LatLng(p.latitude(), p.longitude()))
+
+                map.animateCamera(
+                    org.maplibre.android.camera.CameraUpdateFactory.newLatLngBounds(
+                        boundsBuilder.build(),
+                        100
+                    )
+                )
+
+                // Optionally add start & end markers
+                val waypoints = routeResponse.waypoints
+                if (waypoints.size >= 2) {
+                    val start = waypoints.first().location
+                    val end = waypoints.last().location
+
+                    map.addMarker(
+                        org.maplibre.android.annotations.MarkerOptions()
+                            .position(LatLng(start[1], start[0]))
+                            .title("Start")
+                    )
+                    map.addMarker(
+                        org.maplibre.android.annotations.MarkerOptions()
+                            .position(LatLng(end[1], end[0]))
+                            .title("Destination")
+                    )
+                }
+            }
+        }
+
+        mapView.onStart()
+        dialog.setOnDismissListener {
+            mapView.onStop()
+            mapView.onDestroy()
+        }
+
+        btnSubmit.setOnClickListener {
+            dialog.dismiss()
+
+            startActivity(
+                Intent(requireActivity(), NavigationActivity::class.java)
+                    .putExtra("origin_lat", routeResponse.waypoints.first().location[1]) // latitude
+                    .putExtra(
+                        "origin_lng",
+                        routeResponse.waypoints.first().location[0]
+                    ) // longitude
+                    .putExtra(
+                        "destination_lat",
+                        routeResponse.waypoints.last().location[1]
+                    ) // latitude
+                    .putExtra(
+                        "destination_lng",
+                        routeResponse.waypoints.last().location[0]
+                    ) // longitude
+            )
+        }
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+        val window = dialog.window
+        window!!.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private var startActivityResult = registerForActivityResult(
@@ -190,189 +566,37 @@ class ShopListFragment : Fragment(), OnEditShopListener {
             if (sharePrefUtils.getString(Api.USER_TYPE).equals("ASM") ||
                 sharePrefUtils.getString(Api.USER_TYPE).equals("TO")
             ) {
-                getShopList(userId!!)
-            } else getShopList(sharePrefUtils.getString(Api.USER_ID)!!)
+                viewModel.getOutlets(selectedRoute!!.id.toString(), userId!!)
+            } else {
+                viewModel.getOutlets(
+                    selectedRoute!!.id.toString(),
+                    sharePrefUtils.getString(Api.USER_ID)!!
+                )
+            }
         }
     }
 
+    private fun getLocation() {
+        ViewUtils.getLocation(requireContext(), requireActivity(), object : LocationFetch {
+            override fun onFetchSuccess(location: Location) {
+                latitudeCurrent = location.latitude
+                longitudeCurrent = location.longitude
+            }
 
-    private fun getShopList(userId: String) {
-        binding.progressBar2.isVisible = true
-        allRouteList!!.clear()
-        queue = RequestQueueSingleton.getInstance(requireContext()).getRequestQueue()
-        routesList!!.clear()
-        val request = StringRequest(
-            Request.Method.GET,
-            Api.routes_withfilter + "?user_id=" + userId + "&with_outlets=1",
-            { response ->
-                Log.d("RouteFrag", response)
-                try {
-                    binding.progressBar2.isVisible = false
-                    val data = JSONObject(response)
-                    val routesArray = data.getJSONArray("routes")
-                    shopList!!.clear()
-                    routesList!!.clear()
-                    routeNameList!!.clear()
-                    for (i in 0 until routesArray.length()) {
-                        val route = routesArray.getJSONObject(i)
-                        val routeId = route.getString("id")
-                        val routeName = route.getString("route_name")
-                        val routeCode = route.getString("route_code")
-                        val territoryName = route.getString("territory_name")
-                        routesList!!.add(routeName)
-
-                        val routeOutletList = route.getJSONArray("outlets")
-                        for (j in 0 until routeOutletList.length()) {
-                            val outlet = routeOutletList.getJSONObject(j)
-                            var imageUrl = "null"
-                            val imageList: ArrayList<String> = ArrayList()
-                            if (outlet.has("images") && !outlet.isNull("images")) {
-                                val imageArray = outlet.getJSONArray("images")
-                                if (imageArray.length() > 0) {
-                                    val imageObj = imageArray.getJSONObject(0)
-                                    if (imageObj.has("image_url")) {
-                                        imageUrl = imageObj.getString("image_url")
-                                    }
-
-                                    for (p in 0 until imageArray.length()) {
-                                        val imageobj = imageArray.getJSONObject(p)
-                                        if (imageobj.has("image_url")) {
-                                            imageList.add(imageobj.getString("image_url"))
-                                        }
-
-                                    }
-                                }
-
-                            }
-                            val outletId = outlet.getString("id")
-                            val outletName = outlet.getString("outlet_name")
-                            val outletStatus = outlet.getString("outlet_status")
-                            val outletAddress = outlet.getString("address")
-                            val outletCode = outlet.getString("outlet_code")
-                            val outletType = outlet.getString("outlet_type")
-                            val outletCategory = outlet.getString("outlet_category")
-                            val ownerName = outlet.getString("owner_name")
-                            val marketOpportunity = outlet.getString("market_opportunity")
-                            val contactNumber = outlet.getString("phone_number")
-                            val isBuyer = outlet.getInt("is_buyer")
-                            val latitude = outlet.getDouble("latitude")
-                            val longitude = outlet.getDouble("longitude")
-                            val isVerified = outlet.getInt("is_verified")
-                            val competitive: List<String>? = Gson().fromJson(
-                                outlet.getString("competitive_products"),
-                                object : TypeToken<List<String>>() {}.type
-                            )
-
-                            shopList!!.add(
-                                Shops(
-                                    outletId,
-                                    outletName,
-                                    outletStatus,
-                                    outletAddress,
-                                    outletCode,
-                                    outletType,
-                                    outletCategory,
-                                    ownerName,
-                                    "",
-                                    marketOpportunity,
-                                    contactNumber,
-                                    isBuyer,
-                                    imageUrl,
-                                    imageList,
-                                    territoryName,
-                                    latitude,
-                                    longitude,
-                                    routeId,
-                                    routeName,
-                                    "",
-                                    isVerified,
-                                    0,
-                                    0,
-                                    0.0f,
-                                    competitive
-                                )
-                            )
-                        }
-                        Log.d("RouteList", "all 1 " + shopList!!.size.toString())
-                        allRouteList!!.add(
-                            Routes(
-                                routeId, routeCode, routeName, "", "", "", shopList!!
-                            )
-                        )
-                        routeNameList!!.add(
-                            Pair(
-                                routeId, routeName
-                            )
-                        )
-                        binding.createShop.visibility = View.VISIBLE
-                    }
-
-                    val adapter = ArrayAdapter(
-                        requireContext(), android.R.layout.simple_spinner_item, routesList!!
-                    )
-                    binding.spinnerRoutes.adapter = adapter
-
-
-                } catch (e: JSONException) {
-                    Sentry.captureException(e)
-                    e.printStackTrace()
-                }
-
-            },
-            { error ->
-                binding.progressBar2.isVisible = false
-
-                if (error is TimeoutError) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Request timeout!! Check your internet connection or Contact Admin",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                if (error is NoConnectionError) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Turn on your internet connection and Try again",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                if (error?.networkResponse != null) {
-                    try {
-                        val s = String(error.networkResponse.data)
-                        Log.d("Verify", "message: $s")
-                        val data = JSONObject(s)
-                        Toast.makeText(
-                            requireContext(),
-                            data.getString("message"),
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
-                    } catch (e: UnsupportedEncodingException) {
-                        e.printStackTrace()
-                        Sentry.captureException(e)
-                    } catch (e: JSONException) {
-                        Sentry.captureException(e)
-                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                        e.printStackTrace()
-                    }
-                }
-            })
-        queue.add(request)
+            override fun onFailure() {
+                toast("Could not get location")
+            }
+        })
     }
 
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listener = this
-    }
-
-    override fun onEdit(shops: Shops) {
-        if (routesList!!.size > 0) {
+    private fun onEdit(shops: Outlet) {
+        if (routeListNew.isNotEmpty()) {
             startActivityResult.launch(
-                Intent(requireActivity(), CreateShopActivity::class.java).putExtra(
-                    "requestCode",
-                    55
-                ).putExtra("fromEdit", shops).putStringArrayListExtra("routes", routesList)
+                Intent(requireActivity(), CreateShopActivity::class.java)
+                    .putExtra("requestCode", 55)
+                    .putExtra("fromEdit", shops)
+                    .putParcelableArrayListExtra(ROUTE_LIST, ArrayList(routeListNew))
+                    .putStringArrayListExtra("routes", ArrayList(routesList))
                     .putExtra("routeList", routeNameList)
             )
         } else {
