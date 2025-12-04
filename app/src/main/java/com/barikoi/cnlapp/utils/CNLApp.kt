@@ -5,7 +5,6 @@ import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.utils.extension.NotificationOpenedHandler
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.mapbox.mapboxsdk.Mapbox
 import com.onesignal.OneSignal
 import com.onesignal.debug.LogLevel
 import com.onesignal.notifications.IDisplayableNotification
@@ -17,6 +16,7 @@ import io.sentry.android.core.SentryAndroidOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.maplibre.android.MapLibre
 
 
 @HiltAndroidApp
@@ -24,7 +24,7 @@ class CNLApp : Application() {
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
-        Mapbox.getInstance(this)
+        MapLibre.getInstance(this)
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             options.dsn = BuildConfig.sentryDNS
             options.isEnableAutoSessionTracking = true
