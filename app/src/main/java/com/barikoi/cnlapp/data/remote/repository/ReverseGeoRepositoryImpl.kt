@@ -6,6 +6,7 @@ import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
 import com.barikoi.cnlapp.data.remote.api.ApiService
 import com.barikoi.cnlapp.data.remote.models.ReverseGeoResponse
+import com.barikoi.cnlapp.data.remote.models.route.NavigationRouteResponse
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
@@ -19,6 +20,17 @@ interface ReverseGeoRepository {
         lat: String,
         lng: String
     ): Flow<ApiState<ReverseGeoResponse>>
+
+    fun getNavigationRoute(
+        startLatitude: String,
+        startLongitude: String,
+        endLatitude: String,
+        endLongitude: String,
+        profile: String,
+        steps: Boolean,
+        geometries: String
+    ): Flow<ApiState<NavigationRouteResponse>>
+
 }
 
 class ReverseGeoRepositoryImpl @Inject constructor(
@@ -32,6 +44,50 @@ class ReverseGeoRepositoryImpl @Inject constructor(
             try {
                 val response = apiService.getReverseGeo(
                     "${Api.reverseGeo}?key=${BuildConfig.TRACE_API_KEY}&latitude=$lat&longitude=$lng"
+                )
+                if (response.isSuccessful) {
+                    emit(ApiState.Success(response.body()!!))
+                } else {
+                    emit(
+                        ApiState.Error(
+                            getErrorTypeByHTTPCode(response.code())
+                        )
+                    )
+                }
+            } catch (exception: Throwable) {
+                Sentry.captureException(exception)
+
+                when (exception) {
+                    is UnknownHostException -> {
+                        emit(ApiState.Error((Failure.HTTP.NetworkConnection)))
+                    }
+
+                    else -> {
+                        emit(ApiState.Error(Failure.Exception(exception)))
+                    }
+                }
+                AppLogger.log(exception.toString())
+            }
+        }
+    }
+
+    override fun getNavigationRoute(
+        startLatitude: String,
+        startLongitude: String,
+        endLatitude: String,
+        endLongitude: String,
+        profile: String,
+        steps: Boolean,
+        geometries: String
+    ): Flow<ApiState<NavigationRouteResponse>> {
+        return flow {
+            try {
+                val response = apiService.getNavigationRoute(
+                    "${Api.route}/$startLongitude,$startLatitude;$endLongitude,$endLatitude",
+                    BuildConfig.TRACE_API_KEY,
+                    geometries,
+                    profile,
+                    steps
                 )
                 if (response.isSuccessful) {
                     emit(ApiState.Success(response.body()!!))
