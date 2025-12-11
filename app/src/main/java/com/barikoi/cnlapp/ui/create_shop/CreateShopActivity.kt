@@ -591,7 +591,7 @@ class CreateShopActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         routesList: ArrayList<String>,
         routeNameList: ArrayList<Pair<String, String>>
     ) {
-        var storedRoute = sharePrefUtils.getString(Api.SELECTED_ROUTE_NAME_LIST)!!
+        var storedRoute = sharePrefUtils.getString(Api.SELECTED_ROUTE_ID_LIST)!!
         if (binding.spinnerRoutes.adapter == null) {
             val adapter = object : ArrayAdapter<String>(
                 applicationContext,

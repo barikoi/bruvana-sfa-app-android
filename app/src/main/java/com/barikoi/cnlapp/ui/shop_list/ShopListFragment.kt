@@ -267,6 +267,9 @@ class ShopListFragment : Fragment() {
                         CreateShopActivity::class.java
                     ).putExtra("requestCode", 55)
                         .putParcelableArrayListExtra(ROUTE_LIST, ArrayList(routeListNew))
+
+                        .putStringArrayListExtra("routes", ArrayList(routesList))
+                        .putExtra("routeList", routeNameList)
                 )
             } else {
                 Toast.makeText(requireContext(), "Routes not Available", Toast.LENGTH_SHORT).show()
