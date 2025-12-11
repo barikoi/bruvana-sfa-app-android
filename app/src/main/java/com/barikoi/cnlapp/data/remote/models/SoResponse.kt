@@ -36,7 +36,7 @@ data class SalesOfficer(
     @SerializedName("designation")
     val designation: String,
     @SerializedName("num_of_memo")
-    val numOfMemo: String,
+    val numOfMemo: Int,
     @SerializedName("phone")
     val phone: String,
     @SerializedName("productive_outlets")
@@ -52,5 +52,26 @@ data class SalesOfficer(
     @SerializedName("trace_id")
     val traceId: String,
     @SerializedName("user_name")
-    val userName: String
-)
+    val userName: String,
+    @SerializedName("num_of_visits")
+    val numOfVisits: Int,
+    @SerializedName("total_orders")
+    val totalOrders: Int,
+    @SerializedName("ads")
+    val ads: String?
+) {
+    fun toUserSummary(): UserSummary {
+        return UserSummary(
+            id = id.toString(),
+            name = userName,
+            userType = designation,
+            totalOrders = soOrderedValue,
+            numberOfMemos = numOfMemo,
+            numberOfVisits = numOfVisits,
+            ads = (ads ?: "0.0").toDouble(),
+            territoryId = 0,
+            active = 0,
+            inactive = 0
+        )
+    }
+}

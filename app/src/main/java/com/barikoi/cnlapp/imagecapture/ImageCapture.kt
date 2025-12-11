@@ -41,7 +41,8 @@ import io.sentry.Sentry
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class ImageCapture(context: Context?, attrs: AttributeSet?) :
     LinearLayout(context, attrs) {
@@ -208,6 +209,10 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
     }
 
     fun removeImages() {
+        if (imageRecyclerAdapter == null || imageRecyclerAdapter!!.itemCount == 0) {
+            return
+        }
+
         for (i in 0 until imageRecyclerAdapter!!.itemCount) {
             imageRecyclerAdapter!!.removeAt(0)
         }
@@ -522,14 +527,16 @@ class ImageCapture(context: Context?, attrs: AttributeSet?) :
                 // sees the explanation, try again to request the permission.
                 AlertDialog.Builder(activity)
                     .setMessage("Barikoi needs external storage read permission to access gallery photos")
-                    .setPositiveButton(R.string.ok,
+                    .setPositiveButton(
+                        R.string.ok,
                         DialogInterface.OnClickListener { dialog, which ->
                             ActivityCompat.requestPermissions(
                                 activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                                 MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
                             )
                         })
-                    .setNegativeButton(R.string.cancel,
+                    .setNegativeButton(
+                        R.string.cancel,
                         DialogInterface.OnClickListener { dialog, which -> })
                     .create()
                     .show()

@@ -14,9 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.android.volley.RequestQueue
-import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
-import com.barikoi.cnlapp.Fragment.RouteFragment
-import com.barikoi.cnlapp.Fragment.ShopListFragment
+import com.barikoi.cnlapp.ui.route_list.RouteFragment
+import com.barikoi.cnlapp.ui.shop_list.ShopListFragment
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
@@ -24,6 +23,7 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.SoUser
 import com.barikoi.cnlapp.data.remote.models.To
 import com.barikoi.cnlapp.databinding.ActivityRouteBinding
+import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils

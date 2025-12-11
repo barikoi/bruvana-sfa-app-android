@@ -7,16 +7,16 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder;
+import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrderDao;
 import com.barikoi.cnlapp.order_create.RoomDB.DataConvertor;
 import com.barikoi.cnlapp.order_create.RoomDB.OrderList;
 import com.barikoi.cnlapp.order_create.RoomDB.OrderListDao;
 import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder;
 import com.barikoi.cnlapp.order_create.RoomDB.SaveOrderDao;
-import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrder;
-import com.barikoi.cnlapp.Order_Delivery.RoomDB.UpdateOrderDao;
 
 
-@Database(entities = {OrderList.class, SaveOrder.class, UpdateOrder.class}, version = 6, exportSchema = false)
+@Database(entities = {OrderList.class, SaveOrder.class, UpdateOrder.class}, version = 7, exportSchema = false)
 @TypeConverters(DataConvertor.class)
 public abstract class AppDatabase extends RoomDatabase {
 

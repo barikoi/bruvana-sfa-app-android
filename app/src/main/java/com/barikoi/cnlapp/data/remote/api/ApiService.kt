@@ -1,5 +1,7 @@
 package com.barikoi.cnlapp.data.remote.api
 
+import com.barikoi.cnlapp.BuildConfig
+import com.barikoi.cnlapp.data.remote.models.ActiveInactiveUserResponse
 import com.barikoi.cnlapp.data.remote.models.ApproveRequest
 import com.barikoi.cnlapp.data.remote.models.AuthUserResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
@@ -10,6 +12,8 @@ import com.barikoi.cnlapp.data.remote.models.GIftSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.GiftResponse
 import com.barikoi.cnlapp.data.remote.models.LoginResponse
 import com.barikoi.cnlapp.data.remote.models.NotificationResponse
+import com.barikoi.cnlapp.data.remote.models.OrderResponse
+import com.barikoi.cnlapp.data.remote.models.OutletTypeSummaryResponse
 import com.barikoi.cnlapp.data.remote.models.OutletsResponse
 import com.barikoi.cnlapp.data.remote.models.PendingResponse
 import com.barikoi.cnlapp.data.remote.models.ProductStockResponse
@@ -20,11 +24,16 @@ import com.barikoi.cnlapp.data.remote.models.SoResponse
 import com.barikoi.cnlapp.data.remote.models.SoResponseX
 import com.barikoi.cnlapp.data.remote.models.StockRequestModel
 import com.barikoi.cnlapp.data.remote.models.TodaySummaryResponse
+import com.barikoi.cnlapp.data.remote.models.active.OverViewStatsResponse
 import com.barikoi.cnlapp.data.remote.models.offer.OfferResponse
 import com.barikoi.cnlapp.data.remote.models.pre_order.PreviousDayOrderResponse
 import com.barikoi.cnlapp.data.remote.models.product.ProductResponse
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
+import com.barikoi.cnlapp.data.remote.models.route.NavigationRouteResponse
+import com.barikoi.cnlapp.data.remote.models.so.SoWithSummaryResponse
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -33,6 +42,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 interface ApiService {
@@ -71,6 +81,21 @@ interface ApiService {
 
     @GET("api/v1/get-so")
     suspend fun getSoList(): Response<SoResponse>
+
+    @GET("api/v1/get-so")
+    suspend fun getSoWithTodaySummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("to_id") withSoStats: String
+    ): Response<SoWithSummaryResponse>
+
+    @GET("api/v1/get-overview-stats")
+    suspend fun getSoSummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String,
+        @Query("so_stat_for_asm") soStatForAsm: String = "1",
+    ): Response<OverViewStatsResponse>
 
     @GET("api/v1/outlets")
     suspend fun getOutlets(
@@ -168,6 +193,13 @@ interface ApiService {
         @Query("today_summary") todaySummary: String?
     ): Response<TodaySummaryResponse>
 
+
+    @GET("api/v1/get-to")
+    suspend fun getTOSummary(
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?
+    ): Response<TodaySummaryResponse>
+
     @GET("api/v1/to-wise-so")
     suspend fun getSOByTO(
         @Query("to_id") toId: String,
@@ -200,8 +232,73 @@ interface ApiService {
         @Query("end_date") endDate: String,
     ): Response<CheckAttendanceResponse>
 
+    @GET("api/v1/get-attendance")
+    suspend fun getActiveInactive(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String,
+        @Query("with_active_inactive_so") withActiveInactiveSo: String = "1"
+    ): Response<ActiveInactiveUserResponse>
+
     @GET
     suspend fun getReverseGeo(
         @Url url: String,
     ): Response<ReverseGeoResponse>
+
+    @GET("api/v1/get-overview-stats")
+    suspend fun getOverViewStatsTO(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("with_to_stats") withToStats: Int = 1,
+        @Query("territory_id") territoryId: String,
+        @Query("user_id") userId: String
+    ): Response<OverViewStatsResponse>
+
+    @GET("api/v1/get-overview-stats")
+    suspend fun getOverViewStatsASM(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("with_asm_stats") withAsmStats: Int = 1,
+        @Query("region_id") regionId: String,
+        @Query("user_id") userId: String
+    ): Response<OverViewStatsResponse>
+
+    @GET("api/v1/outlet-type-summary")
+    suspend fun getOutletTypeSummary(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("so_id") userId: String
+    ): Response<OutletTypeSummaryResponse>
+
+    @GET("api/v1/orders")
+    suspend fun getOrders(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String
+    ): Response<OrderResponse>
+
+    @GET("api/v1/orders")
+    suspend fun getSavedOrders(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("user_id") userId: String,
+        @Query("order_status") orderStatus: String,
+        @Query("region_id") regionId: String?,
+        @Query("territory_id") territoryId: String?,
+    ): Response<OrderResponse>
+
+    @Streaming
+    @GET("api/v1/memo-generate")
+    fun downloadChalans(
+        @Query("order_no") orderIds: String
+    ): Call<ResponseBody>
+
+    @GET
+    suspend fun getNavigationRoute(
+        @Url url: String,
+        @Query("api_key") apiKey: String = BuildConfig.TRACE_API_KEY,
+        @Query("geometries") geometries: String, // e.g. "geojson"
+        @Query("profile") profile: String, // e.g. "car"
+        @Query("steps") steps: Boolean, // true/false
+    ): Response<NavigationRouteResponse>
 }

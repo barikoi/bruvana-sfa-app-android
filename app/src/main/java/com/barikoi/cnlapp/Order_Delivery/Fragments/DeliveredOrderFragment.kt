@@ -15,7 +15,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -24,11 +29,8 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.order_create.Callback.DialogListener
-import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
-import com.barikoi.cnlapp.order_create.Callback.OrderListSuccessListener
-import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Delivery.Adapter.OrderDeliveryListAdapter
+import com.barikoi.cnlapp.Order_Delivery.Fragments.PendingOrderFragment.Companion.mCallback
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.EndDate
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.StartDate
@@ -38,6 +40,10 @@ import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.databinding.FragmentDeliveredOrderBinding
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.order_create.Callback.OrderListSuccessListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -51,7 +57,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -154,6 +161,24 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
                             token,
                             mCallback2!!
                         )
+                    } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("DM")) {
+                        if (user_id.contains(",")) {
+                            getAllOrders(
+                                Api.get_saved_order + "?db_house_id=" + sharePrefUtils.getString(
+                                    Constants.DB_HOUSE_ID
+                                ) + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59",
+                                queue,
+                                token,
+                                mCallback2!!
+                            )
+                        } else {
+                            getAllOrders(
+                                Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=DELIVERED",
+                                queue,
+                                token,
+                                mCallback2!!
+                            )
+                        }
                     } else {
                         getAllOrders(
                             Api.get_saved_order + "?user_id=" + user_id + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&territory_id=" + territory_id + "&order_status=DELIVERED&include_filter_by_user_id=1",
@@ -334,7 +359,7 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
-        } else if (user_type.equals("ASM", true)) {
+        } else if (user_type.equals("ASM", true) || user_type.equals("DM", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
@@ -406,27 +431,27 @@ class DeliveredOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrder
             for (i in 0 until order.brands_array.size) {
                 brandsStatistics.add(
                     ProductStatistics(
-                        order.brands_array[i].product_id,
-                        order.brands_array[i].product_name,
-                        order.brands_array[i].product_code,
-                        order.brands_array[i].sku_code,
-                        order.brands_array[i].category_code,
-                        order.brands_array[i].category_name,
-                        order.brands_array[i].category_id,
-                        order.brands_array[i].unit_name,
-                        order.brands_array[i].unit_id,
-                        order.brands_array[i].unit_code,
-                        order.brands_array[i].unit_price,
-                        order.brands_array[i].discounted_unit_price,
-                        order.brands_array[i].ordered_total_price,
-                        order.brands_array[i].ordered_quantity,
-                        order.brands_array[i].ordered_quantity,
-                        order.brands_array[i].bounced_quantity,
-                        order.brands_array[i].ordered_total_price
+                        order.brands_array[i].productId,
+                        order.brands_array[i].productName,
+                        order.brands_array[i].productCode,
+                        order.brands_array[i].skuCode,
+                        order.brands_array[i].categoryCode,
+                        order.brands_array[i].categoryName,
+                        order.brands_array[i].categoryId,
+                        order.brands_array[i].unitName,
+                        order.brands_array[i].unitId,
+                        order.brands_array[i].unitCode,
+                        order.brands_array[i].unitPrice,
+                        order.brands_array[i].discountedUnitPrice,
+                        order.brands_array[i].orderedTotalPrice,
+                        order.brands_array[i].orderedQuantity,
+                        order.brands_array[i].orderedQuantity,
+                        order.brands_array[i].bouncedQuantity,
+                        order.brands_array[i].orderedTotalPrice
                     )
                 )
-                grandTotal = grandTotal + order.brands_array[i].ordered_total_price
-                itemCount = itemCount + order.brands_array[i].ordered_quantity
+                grandTotal = grandTotal + order.brands_array[i].orderedTotalPrice
+                itemCount = itemCount + order.brands_array[i].orderedQuantity
             }
             val adapter = OutletProductAdapter(brandsStatistics)
             listView.adapter = adapter

@@ -43,11 +43,38 @@ data class To(
     @SerializedName("total_orders")
     val totalOrders: Int,
     @SerializedName("unique_outlet_count")
-    val uniqueOutletCount: Int
-) {
+    val uniqueOutletCount: Int,
+    @SerializedName("territory_id")
+    val territoryId: Int,
+    @SerializedName("activeInactiveData")
+    val activeInactiveData: ActiveInactiveData?,
+
+    ) {
     @SuppressLint("DefaultLocale")
     fun totalAmountFormatted(): String {
         return BigDecimal(totalOrderedAmount.toDouble()).setScale(2, RoundingMode.HALF_UP)
             .toString()
     }
+
+    fun toUserSummary(): UserSummary {
+        return UserSummary(
+            id = toId.toString(),
+            name = toName,
+            userType = "TO",
+            totalOrders = totalOrderedAmount.toDouble(),
+            ads = BigDecimal(ads).setScale(2, RoundingMode.HALF_UP).toDouble(),
+            territoryId = territoryId,
+            active = activeInactiveData?.active ?: 0,
+            inactive = activeInactiveData?.inactive ?: 0,
+            numberOfMemos = totalOrders,
+            numberOfVisits = numOfVisits
+        )
+    }
 }
+
+data class ActiveInactiveData(
+    @SerializedName("active")
+    val active: Int,
+    @SerializedName("inactive")
+    val inactive: Int
+)

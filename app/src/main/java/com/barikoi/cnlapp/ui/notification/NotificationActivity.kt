@@ -7,13 +7,13 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityNotificationBinding
-import com.barikoi.cnlapp.ui.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.ui.notification.vm.NotificationViewModel
+import com.barikoi.cnlapp.ui.request.StockRequestActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants

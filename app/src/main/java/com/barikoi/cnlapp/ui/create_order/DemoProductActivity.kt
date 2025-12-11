@@ -1,10 +1,7 @@
 package com.barikoi.cnlapp.ui.create_order
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.offer.Offer

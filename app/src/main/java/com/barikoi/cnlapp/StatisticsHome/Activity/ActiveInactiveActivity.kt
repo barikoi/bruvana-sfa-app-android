@@ -116,7 +116,7 @@ class ActiveInactiveActivity : AppCompatActivity() {
                             }
 
                             val adapter = ActiveInactiveAdapter(itemList)
-                            binding.soList.adapter = adapter
+                            binding.rcvActiveInactiveUsers.adapter = adapter
                             adapter!!.notifyDataSetChanged()
 
 

@@ -363,5 +363,61 @@
     <string name="total_items">Total Items</string>
     <string name="expand">Expand</string>
     <string name="circle">Circle</string>
+    <string name="daily_summary">DAILY SUMMARY</string>
+    <string name="user_icon">User Icon</string>
+    <string name="inactive_user">Inactive Users</string>
+    <string name="active_user">Active Users</string>
+    <string name="error">Error</string>
+    <string name="forward">Forward</string>
+    <string name="download_all_challan">Download All Challan</string>
+    <string name="download_icon">Download Icon</string>
+    <string name="summary_details">Summary Details</string>
+    <string name="something_went_wrong_please_try_again">Something went wrong! PLease try again.</string>
+    <string name="to">TO</string>
+    <string name="taka_sign">৳ %1$s</string>
+    <string name="bounce_p">Bounce (%)</string>
+    <string name="ordered_by_outlets">Ordered by Outlets</string>
+    <string name="visit">Visit</string>
+    <string name="qty_presence">QTY Presence:</string>
+    <string name="delivery_value_">Delivery Value:</string>
+    <string name="contribution">Contribution:</string>
+    <string name="categories">Categories</string>
+    <string name="offer_">(offer)</string>
+    <string name="x">X</string>
+    <string name="are_you_sure_you_want_to_checkout">Are you sure you want to Checkout?</string>
+    <string name="qty">"QTY: %1$s"</string>
+
+    <string name="route_distance">%1$s → %2$s</string>
+
+    <string name="distance_km">%1$sKM</string>
+
+    <string name="distance">Distance</string>
+    <string name="duration">Duration</string>
+
+    <string name="start_navigation">Start</string>
+
+    <string name="please_add_a_remark_explaining_the_reason_for_rejection">Please add a remark explaining the reason for rejection.</string>
+    <string name="please_add_a_remark_explaining_the_reason_for_vist">Please add a remark explaining the reason for Visit.</string>
+    <string name="all">All (%1$s)</string>
+    <string name="authorize">Authorize (%1$s)</string>
+    <string name="rejected">Rejected (%1$s)</string>
+    <string name="success">Success</string>
+    <string name="fail">Fail</string>
+    <string name="photos_added_format">%1$d Photos Added</string>
+    <string name="owner_name_">Owner Name: %1$s</string>
+
+    <string name="authorize_">Authorize</string>
+    <string name="rejected_">Rejected</string>
+    <string name="remark_is_required">Remark is required</string>
+    <string name="start_visit">Start Visit</string>
+    <string name="verified_">Verified (%1$s)</string>
+    <string name="title_visit">Visit</string>
+    <string name="owner">Owner:</string>
+    <string name="unable_to_fetch_location">Unable to fetch Location</string>
+    <string name="visited">Visited</string>
+    <string name="please_enter_valid_phone_number">Please enter valid phone number.</string>
+    <string name="you_are_too_far_from_the_outlet_to_mark_visit_your_current_distance_is_meters">You are too far from the outlet to mark visit. Your current distance is %1$s meters.</string>
+    <string name="marker">marker</string>
+
 
 </resources>

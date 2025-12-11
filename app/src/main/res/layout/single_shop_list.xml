@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="5dp"
     android:background="@drawable/cardview_bg"
     android:backgroundTint="@color/white"
     android:orientation="vertical"
-    android:padding="4dp"
+    android:padding="10dp"
     android:weightSum="5">
 
     <LinearLayout
@@ -24,14 +24,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:contentDescription="@string/shop_image"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_new_tag"
                 android:translationZ="90dp"
                 android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_margin="4dp"
                 android:background="@color/white"
                 android:gravity="center"
@@ -42,6 +43,7 @@
                     android:id="@+id/imageShop"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:contentDescription="@string/shop_image"
                     android:scaleType="fitXY"
                     android:src="@drawable/shop" />
 
@@ -63,20 +65,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:layout_toStartOf="@+id/btn_edit"
+                    android:layout_toStartOf="@+id/btnEdit"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/shop_name"
-                        android:layout_width="0dp"
+                        style="@style/TextAppearance.Material3.BodyLarge"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="4dp"
                         android:layout_weight="5"
                         android:drawablePadding="8dp"
-                        android:inputType="textMultiLine"
-                        android:text=""
                         android:textColor="@color/text_title"
-                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:drawableStartCompat="@drawable/ic_shop_small" />
 
@@ -87,21 +87,23 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="4dp"
                         android:layout_weight=".5"
+                        android:contentDescription="@string/das_das"
                         android:src="@drawable/ic_dot"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         app:tint="@color/cnl_color_2" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/btn_edit"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:id="@+id/btnEdit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="4dp"
                     android:background="@drawable/cardview_bg_stroke_2dp"
                     android:backgroundTint="@color/white"
+                    android:contentDescription="@string/edit"
                     android:padding="2dp"
                     android:src="@drawable/ic_edit"
                     android:visibility="visible" />
@@ -110,107 +112,182 @@
 
             <TextView
                 android:id="@+id/address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="@dimen/_5dp"
+                android:layout_weight="1"
                 android:drawablePadding="8dp"
                 android:text=""
                 android:textColor="@color/text_title_2"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 app:drawableStartCompat="@drawable/ic_location_shop" />
 
-            <TextView
-                android:id="@+id/distributor_name"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:drawablePadding="8dp"
-                android:text="@string/distributor"
-                android:textColor="@color/text_title_2"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_owner" />
+                android:layout_marginHorizontal="@dimen/_5dp">
 
-            <TextView
-                android:id="@+id/shop_code"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:drawablePadding="8dp"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:drawableLeftCompat="@drawable/ic_shop_small" />
+                <TextView
+                    android:id="@+id/tvDistance"
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:drawablePadding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:drawableStartCompat="@drawable/distance_svgrepo_com"
+                    app:layout_constraintEnd_toStartOf="@+id/ivRoute"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/shop_category"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text=""
-                android:textColor="@color/text_title_2"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/shopCode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:drawablePadding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:drawableLeftCompat="@drawable/ic_shop_small"
+                    app:layout_constraintEnd_toStartOf="@+id/ivRoute"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDistance" />
+
+                <ImageButton
+                    android:id="@+id/ivRoute"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/route"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_directions_"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/blue_cnl" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginTop="@dimen/_10sdp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/llOutletType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
             android:background="@drawable/button_bg_green_stroke"
-            android:backgroundTint="@color/cnl_color_2">
+            android:backgroundTint="@color/cnl_color_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/shop_type"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:background="@drawable/button_bg_green_stroke"
                 android:gravity="center"
+                android:maxLines="2"
+                android:paddingVertical="@dimen/_3sdp"
+                android:maxWidth="150dp"
                 android:paddingHorizontal="@dimen/_5dp"
                 android:text="@string/shop_type"
                 android:textColor="@color/white"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llTerritory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="@dimen/_5dp"
             android:background="@drawable/button_bg_stroke"
-            android:backgroundTint="@color/btn_color_dark">
+            android:backgroundTint="@color/btn_color_dark"
+            android:maxHeight="@dimen/_100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/view"
+            app:layout_constraintStart_toEndOf="@+id/llOutletType"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/territory_name"
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
+                android:id="@+id/territoryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:background="@drawable/button_bg_stroke"
                 android:gravity="center"
-                android:paddingLeft="8dp"
-                android:paddingTop="4dp"
-                android:paddingRight="8dp"
-                android:paddingBottom="4dp"
+                android:maxLines="2"
+                android:paddingVertical="@dimen/_3sdp"
+                android:maxWidth="150dp"
+                android:paddingHorizontal="@dimen/_5dp"
                 android:text="@string/territory_name"
                 android:textColor="@color/white"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
-    </LinearLayout>
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnVisit"
+            app:layout_constraintStart_toEndOf="@+id/llTerritory"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/authorize_"
+            android:visibility="gone"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:drawablePadding="@dimen/_3sdp"
+            android:paddingHorizontal="@dimen/_5dp"
+            android:paddingVertical="@dimen/_3sdp"
+            android:textColor="#FF9800"
+            android:background="@drawable/shape_order_status"
+            android:backgroundTint="#2FFF9800"
+            app:drawableStartCompat="@drawable/outline_verified_off_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVisit"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:textStyle="bold"
+            android:layout_gravity="end"
+            android:backgroundTint="@color/colorVisited"
+            android:drawableStart="@drawable/order"
+            android:text="@string/visit"
+            android:visibility="visible"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/view"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

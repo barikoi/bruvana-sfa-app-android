@@ -20,16 +20,17 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderListAdapter
-import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
-import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.OrderSummary.Model.OrdersSO
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.To
+import com.barikoi.cnlapp.data.remote.models.offer.Offer
 import com.barikoi.cnlapp.databinding.ActivityOrderSummaryToBinding
+import com.barikoi.cnlapp.order_create.Adapter.ConfirmOrderListAdapter
+import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -597,7 +598,7 @@ class OrderSummaryTOActivity : BaseActivity(), OnEditOrderListener {
                                     brandObj.getString("category_code"), 0, 0,
                                     brandObj.getInt("bounced_quantity"),
                                     brandObj.getInt("ordered_quantity"),
-                                    brandObj.getDouble("ordered_amount")
+                                    brandObj.getDouble("ordered_amount"),
                                 )
                             )
                         }

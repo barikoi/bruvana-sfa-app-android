@@ -1,0 +1,20 @@
+package com.barikoi.cnlapp.ui.attendance.model
+
+import java.io.Serializable
+
+class HistoryList (
+        val userName: String,
+        val userId: String,
+        val attendanceId: String,
+        val enterTime: String,
+        val exitTime: String,
+        val isLate: Int,
+        val isAbsent: Int,
+        val checkInAddress: String,
+        val latitude: Double,
+        val longitude: Double,
+        val imageLink: String,
+        val lateReason: String,
+        val routeId: String,
+        val routeName: String
+        ):Serializable

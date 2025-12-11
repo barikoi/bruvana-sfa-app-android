@@ -19,7 +19,7 @@ data class Product(
     @SerializedName("current_stock")
     val currentStock: Int,
     @SerializedName("discount_amount")
-    val discountAmount: String,
+    val discountAmount: String?,
     @SerializedName("discounted_unit_price")
     val discountedUnitPrice: Double,
     @SerializedName("dp_price")
@@ -67,4 +67,5 @@ data class Product(
     @SerializedName("updated_at")
     val updatedAt: String,
     var qty: Int = 0,
+    var offerId: String? = ""
 )

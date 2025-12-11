@@ -8,23 +8,50 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 /**
  * @return Date format 2024-02-08
  */
-fun Date.formatDateWithLocale(): String {
+fun Date.formatDateWithLocale1(): String {
     val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return df.format(this)
 }
 
+fun Date.formatDateWithLocaleEnglish(): String {
+    val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+    return df.format(this)
+}
+
 fun String.formatDateWithLocale(): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // adjust if needed
+    val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+
+    val date = inputFormat.parse(this) ?: return this // fallback to original if parse fails
+    return outputFormat.format(date)
+}
+
+fun String.formatDateWithDDmmYYYY(): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // adjust if needed
+    val outputFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+
+    val date = inputFormat.parse(this) ?: return this // fallback to original if parse fails
+    return outputFormat.format(date)
+}
+
+fun String.formatDateWithDDMM(): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // adjust if needed
+    val outputFormat = SimpleDateFormat("d MMMM", Locale.getDefault())
+
+    val date = inputFormat.parse(this) ?: return this // fallback to original if parse fails
+    return outputFormat.format(date)
+}
+
+fun String.formatDateWithDDMMYYYY(): String {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // adjust if needed
     val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
 
@@ -90,6 +117,20 @@ fun String.formateDate(): String {
     return dfOutput.format(dfInput.parse(this))
 }
 
+fun String.formateDateYY(): String {
+    val dfInput = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+    val dfOutput = SimpleDateFormat("dd LLL yy", Locale.ENGLISH)
+
+    return dfOutput.format(dfInput.parse(this))
+}
+
+fun String.formateDateNewFormat(newFormat: String): String {
+    val dfInput = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+    val dfOutput = SimpleDateFormat(newFormat, Locale.ENGLISH)
+
+    return dfOutput.format(dfInput.parse(this))
+}
+
 
 fun getDifferenceInMinutes(date1: String): Long {
     AppLogger.log("Date1:: $date1")
@@ -135,4 +176,12 @@ fun String.isoToReadableDate(): String {
 fun Calendar.formattedDateTime(): String {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
     return dateFormat.format(this.time)
+}
+
+fun String.getStartDateTime(): String {
+    return "$this 00:00:00"
+}
+
+fun String.getEndDateTime(): String {
+    return "$this 23:59:59"
 }

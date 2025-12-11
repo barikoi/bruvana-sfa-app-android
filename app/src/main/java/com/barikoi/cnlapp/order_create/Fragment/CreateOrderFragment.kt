@@ -18,10 +18,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.ui.main.MainActivity
-import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.databinding.FragmentCreateOrderBinding
+import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices

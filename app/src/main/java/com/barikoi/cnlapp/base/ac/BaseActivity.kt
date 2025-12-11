@@ -1,5 +1,6 @@
 package com.barikoi.cnlapp.base.ac
 
+import DefaultLocaleHelper
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 

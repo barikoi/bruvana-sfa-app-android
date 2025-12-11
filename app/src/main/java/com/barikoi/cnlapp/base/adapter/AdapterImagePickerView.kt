@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import coil3.load
 import com.barikoi.cnlapp.databinding.ItemImageBinding
-import com.bumptech.glide.Glide
 
 class AdapterImagePickerView(
     private val onImageCloseClick: (Int) -> Unit
@@ -34,9 +34,9 @@ class AdapterImagePickerView(
     }
 
     override fun onBindViewHolder(holder: ImagePickerViewHolder, position: Int) {
-        Glide.with(holder.itemView.context)
-            .load(images[position])
-            .into(holder.binding.ivPicImage)
+        holder.binding.ivPicImage.load(
+            images[position]
+        )
 
         holder.binding.ivClose.setOnClickListener {
             onImageCloseClick(position)

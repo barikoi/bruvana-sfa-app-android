@@ -1,6 +1,5 @@
 package com.barikoi.cnlapp.data.remote.repository
 
-import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.Failure
 import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
@@ -9,7 +8,6 @@ import com.barikoi.cnlapp.data.remote.models.AuthUserResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse
 import com.barikoi.cnlapp.data.remote.models.BaseResponse2
 import com.barikoi.cnlapp.data.remote.models.LoginResponse
-import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.google.gson.Gson
 import io.sentry.Sentry

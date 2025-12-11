@@ -19,17 +19,17 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.NetworkResponse
 import com.android.volley.VolleyError
+import com.barikoi.cnlapp.Model.Products
+import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
 import com.barikoi.cnlapp.order_create.RoomDB.OrderList
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
-import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils
+import com.barikoi.cnlapp.utils.extension.format
+import com.barikoi.cnlapp.utils.extension.formateDateYY
 import org.json.JSONObject
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 import java.util.Locale
 
 class ConfirmOrderListAdapter(
@@ -53,30 +53,54 @@ class ConfirmOrderListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val queue = RequestQueueSingleton.getInstance(holder.itemView.context).getRequestQueue()
-        var dformat = DecimalFormat("#.##")
         holder.routeName.text = orderList[position].routeName
         holder.shopName.text = orderList[position].outletName
-        holder.subTotal.text = dformat.format(orderList[position].grandTotal.toDouble()).toString()
+
+        if (orderList[position].grandTotal == "null") {
+            holder.subTotal.text = "0.00"
+        } else {
+            holder.subTotal.text = orderList[position].grandTotal.toDouble().toString().format()
+        }
 
         if (orderList[position].brands_array.isNotEmpty()) {
-            val adapter = ConfirmOrderProductListAdapter(orderList[position].brands_array)
+            val a: List<Products> = orderList[position].brands_array
+                .filter { it.offerID.isNullOrEmpty() }
+
+            val groupedProducts: List<Products> = orderList[position].brands_array
+                .filter { !it.offerID.isNullOrEmpty() }
+                .groupBy { it.offerID }
+                .filter { it.value.isNotEmpty() }
+                .map { (_, products) ->
+                    val mergedNames =
+                        products.joinToString("\n") { it.productName + " X ${it.orderedQuantity}" }
+                    val first = products.first()
+
+                    // Return a copy of the first product, with productName replaced
+                    first.copy(
+                        productName = mergedNames,
+                        orderedTotalPrice =
+                            if (first.offers.isNotEmpty())
+                                first.offers.find {
+                                    (first.offerID ?: "") == it.id.toString()
+                                }?.comboPrice!!.toDouble() else first.orderedTotalPrice
+                    )
+                }
+
+            val adapter = ConfirmOrderProductListAdapter(a + groupedProducts)
             holder.productList.adapter = adapter
             adapter.notifyDataSetChanged()
         }
 
-        if (!orderList[position].orderedAt.equals("null")) {
+        if (orderList[position].orderedAt != "null") {
             holder.orderAt.visibility = View.VISIBLE
-            val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
-            val df = SimpleDateFormat("dd LLL yy", Locale.getDefault())
-            val orderDate = df.format(oldDate.parse(orderList[position].orderedAt))
+            val orderDate = orderList[position].orderedAt.formateDateYY()
             val builder = SpannableStringBuilder()
             val str1 =
                 SpannableString(holder.itemView.context.resources.getString(R.string.ordered_at))
             builder.append(str1)
             val str2 = SpannableString(orderDate)
             builder.append(str2)
-            if (!orderList[position].distance.equals("null")) {
+            if (orderList[position].distance != "null") {
                 val str3 = SpannableString(holder.itemView.context.getString(R.string.away_from))
                 val boldSpan3 = StyleSpan(Typeface.BOLD)
                 str3.setSpan(
@@ -84,9 +108,9 @@ class ConfirmOrderListAdapter(
                 )
                 builder.append(str3)
                 val suffix = if (orderList[position].distance.toDouble() / 1000 < 1) {
-                    dformat.format(orderList[position].distance.toDouble()) + "m"
+                    orderList[position].distance.toDouble().toString().format() + "m"
                 } else {
-                    dformat.format(orderList[position].distance.toDouble() / 1000) + "km"
+                    (orderList[position].distance.toDouble() / 1000).toString().format() + "km"
                 }
                 val strDistance = SpannableString(suffix)
                 if (orderList[position].distance.toDouble() > 500) {
@@ -133,30 +157,62 @@ class ConfirmOrderListAdapter(
             mListener.onEdit(orderList[position])
         }
 
-        if (from.equals("summary")) {
+        if (from == "summary") {
             holder.editItem.visibility = View.GONE
             holder.downloadChalan.visibility = View.GONE
             holder.addMore.visibility = View.INVISIBLE
-            if (!orderList[position].orderStatus.equals("null")) {
+            if (orderList[position].orderStatus != "null") {
                 holder.statusLayout.visibility = View.VISIBLE
-                if (orderList[position].orderStatus.equals("PENDING")) {
+                if (orderList[position].orderStatus == "PENDING") {
                     holder.tvOrderStatus.text =
                         holder.itemView.resources.getString(R.string.pending)
-                    holder.statusLayout.background.setTint(holder.itemView.resources.getColor(R.color.status_pending_stroke))
+                    holder.statusLayout.background.setTint(
+                        ContextCompat.getColor(
+                            holder.itemView.context,
+                            R.color.status_pending_stroke
+                        )
+                    )
                     val gd = GradientDrawable()
-                    gd.setColor(holder.itemView.resources.getColor(R.color.status_pending))
+                    gd.setColor(
+                        ContextCompat.getColor(
+                            holder.itemView.context,
+                            R.color.status_pending
+                        )
+                    )
                     gd.cornerRadius = 5f
-                    gd.setStroke(2, holder.itemView.resources.getColor(R.color.white))
-                    holder.tvOrderStatus.setBackgroundDrawable(gd)
-                } else if (orderList[position].orderStatus.equals("DELIVERED")) {
+                    gd.setStroke(
+                        2,
+                        ContextCompat.getColor(
+                            holder.itemView.context,
+                            R.color.white
+                        )
+                    )
+                    holder.tvOrderStatus.background = gd
+                } else if (orderList[position].orderStatus == "DELIVERED") {
                     holder.tvOrderStatus.text =
                         holder.itemView.resources.getString(R.string.delivered)
-                    holder.statusLayout.background.setTint(holder.itemView.resources.getColor(R.color.status_delivered_stroke))
+                    holder.statusLayout.background.setTint(
+                        ContextCompat.getColor(
+                            holder.itemView.context,
+                            R.color.status_delivered_stroke
+                        )
+                    )
                     val gd = GradientDrawable()
-                    gd.setColor(holder.itemView.resources.getColor(R.color.status_delivered))
+                    gd.setColor(
+                        ContextCompat.getColor(
+                            holder.itemView.context,
+                            R.color.status_delivered
+                        )
+                    )
                     gd.cornerRadius = 5f
-                    gd.setStroke(2, holder.itemView.resources.getColor(R.color.white))
-                    holder.tvOrderStatus.setBackgroundDrawable(gd)
+                    gd.setStroke(
+                        2,
+                        ContextCompat.getColor(
+                            holder.itemView.context,
+                            R.color.white
+                        )
+                    )
+                    holder.tvOrderStatus.background = gd
                 }
             }
         }
@@ -166,17 +222,11 @@ class ConfirmOrderListAdapter(
                 Api.get_chalan_download + "?order_no=" + orderList[position].orderId,
                 holder.itemView.context,
                 object : ApiServiceListener {
-                    override fun onResponseSuccess(response: String) {
-                        TODO("Not yet implemented")
-                    }
+                    override fun onResponseSuccess(response: String) {}
 
-                    override fun onJSONResponseSuccess(response: JSONObject) {
-                        TODO("Not yet implemented")
-                    }
+                    override fun onJSONResponseSuccess(response: JSONObject) {}
 
-                    override fun onNetworkResponseSuccess(response: NetworkResponse) {
-                        TODO("Not yet implemented")
-                    }
+                    override fun onNetworkResponseSuccess(response: NetworkResponse) {}
 
                     override fun onResponseFailure(error: VolleyError) {
                         ViewUtils.getErrorResponse(error, holder.itemView.context)
@@ -203,7 +253,7 @@ class ConfirmOrderListAdapter(
                     orderList = mValues
                 } else {
                     for (row in mValues) {
-                        if (row.outletName.toLowerCase()
+                        if (row.outletName.lowercase()
                                 .contains(charString.lowercase(Locale.getDefault()))
                         ) {
                             filteredList.add(row)
@@ -223,29 +273,20 @@ class ConfirmOrderListAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val shopName: TextView
-        internal val routeName: TextView
-        internal val orderAt: TextView
-        internal val subTotal: TextView
-        internal val addMore: TextView
-        internal val editItem: ImageView
-        internal val downloadChalan: ImageView
-        internal val productList: RecyclerView
-        internal val statusLayout: LinearLayout
-        internal val tvOrderStatus: TextView
-
-        init {
-            shopName = itemView.findViewById(R.id.tvShopName)
-            routeName = itemView.findViewById(R.id.tvRouteName)
-            orderAt = itemView.findViewById(R.id.tvOrderDate)
-            subTotal = itemView.findViewById(R.id.tvSubTotal)
-            productList = itemView.findViewById(R.id.productlist)
-            addMore = itemView.findViewById(R.id.tvAddMore)
-            editItem = itemView.findViewById(R.id.btn_edit)
-            downloadChalan = itemView.findViewById(R.id.btn_download)
-            statusLayout = itemView.findViewById(R.id.layoutStatus2)
-            tvOrderStatus = itemView.findViewById(R.id.tvOrderStatus)
-
-        }
+        internal val shopName: TextView = itemView.findViewById(R.id.tvShopName)
+        internal val routeName: TextView = itemView.findViewById(R.id.tvRouteName)
+        internal val orderAt: TextView = itemView.findViewById(R.id.tvOrderDate)
+        internal val subTotal: TextView = itemView.findViewById(R.id.tvSubTotal)
+        internal val addMore: TextView = itemView.findViewById(R.id.tvAddMore)
+        internal val editItem: ImageView = itemView.findViewById(R.id.btn_edit)
+        internal val downloadChalan: ImageView = itemView.findViewById(R.id.btn_download)
+        internal val productList: RecyclerView = itemView.findViewById(R.id.productlist)
+        internal val statusLayout: LinearLayout = itemView.findViewById(R.id.layoutStatus2)
+        internal val tvOrderStatus: TextView = itemView.findViewById(R.id.tvOrderStatus)
     }
 }
+
+data class GroupedOfferDisplay(
+    val offerId: String,
+    val productNames: String // joined by newline
+)

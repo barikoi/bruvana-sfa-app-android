@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        app:font="@font/carter_one_regular"
+        app:fontStyle="normal"
+        app:fontWeight="900" />
+
+</font-family>

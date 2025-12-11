@@ -28,14 +28,14 @@ import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.data.remote.models.Route
 import com.barikoi.cnlapp.databinding.FragmentSelectShopBinding
 import com.barikoi.cnlapp.order_create.Adapter.AdapterSelectShop
-import com.barikoi.cnlapp.ui.create_order.select_shop.vm.SelectShopViewModel
 import com.barikoi.cnlapp.ui.create_order.order.OrderViewPagerFragment
+import com.barikoi.cnlapp.ui.create_order.select_shop.vm.SelectShopViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.ViewUtils
-import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -103,14 +103,14 @@ class SelectShopFragment : Fragment() {
 
 
         viewModel.checkAttendance(
-            Calendar.getInstance().time.formatDateWithLocale(),
-            Calendar.getInstance().time.formatDateWithLocale()
+            Calendar.getInstance().time.formatDateWithLocaleEnglish(),
+            Calendar.getInstance().time.formatDateWithLocaleEnglish()
         )
 
         binding.btnTryAgain.setHapticClickListener {
             viewModel.checkAttendance(
-                Calendar.getInstance().time.formatDateWithLocale(),
-                Calendar.getInstance().time.formatDateWithLocale()
+                Calendar.getInstance().time.formatDateWithLocaleEnglish(),
+                Calendar.getInstance().time.formatDateWithLocaleEnglish()
             )
         }
 
@@ -201,7 +201,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("A", true)
+                                    !it.outletCategory?.get(0).toString().equals("A", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -218,7 +218,7 @@ class SelectShopFragment : Fragment() {
 
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("B", true)
+                                    !it.outletCategory?.get(0).toString().equals("B", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -232,7 +232,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("C", true)
+                                    !it.outletCategory?.get(0).toString().equals("C", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -245,7 +245,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("D", true)
+                                    !it.outletCategory?.get(0).toString().equals("D", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -258,7 +258,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("E", true)
+                                    !it.outletCategory?.get(0).toString().equals("E", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -271,7 +271,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("F", true)
+                                    !it.outletCategory?.get(0).toString().equals("F", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -284,7 +284,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("P", true)
+                                    !it.outletCategory?.get(0).toString().equals("P", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -297,7 +297,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("M", true)
+                                    !it.outletCategory?.get(0).toString().equals("M", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -310,7 +310,7 @@ class SelectShopFragment : Fragment() {
                             filterShopList.addAll(shopList)
                             try {
                                 filterShopList.removeIf {
-                                    !it.outletCategory[0].toString().equals("W", true)
+                                    !it.outletCategory?.get(0).toString().equals("W", true)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -478,20 +478,31 @@ class SelectShopFragment : Fragment() {
                             toast("No shop found")
                             adapter.updateData(emptyList())
                         } else {
-                            shopList = it.data.outlets
+                            shopList = it.data.outlets.map { outlet ->
+                                if (loc == null) {
+                                    outlet.copy(
+                                        distance = ViewUtils.getDistance(
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        )
+                                    )
+                                } else {
+                                    outlet.copy(
+                                        distance = ViewUtils.getDistance(
+                                            loc!!.latitude,
+                                            loc!!.longitude,
+                                            outlet.latitude.toDouble(),
+                                            outlet.longitude.toDouble()
+                                        )
+                                    )
+                                }
+                            }
 
-                            val distanceSorted = it.data.outlets
-                                .apply {
-                                    if (loc != null) {
-                                        sortedBy { outlet ->
-                                            ViewUtils.getDistance(
-                                                loc!!.latitude,
-                                                loc!!.longitude,
-                                                outlet.latitude.toDouble(),
-                                                outlet.longitude.toDouble()
-                                            )
-                                        }
-                                    }
+                            val distanceSorted = shopList
+                                .sortedBy { outlet ->
+                                    outlet.distance
                                 }
                                 .sortedWith(
                                     compareBy(

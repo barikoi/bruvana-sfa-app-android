@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background_app"
     android:orientation="vertical"
-    tools:context=".order_create.Fragment.ShopSelectFragment">
+    tools:context=".order_create.ShopSelectFragment">
 
     <RelativeLayout
         android:id="@+id/shopLayout"

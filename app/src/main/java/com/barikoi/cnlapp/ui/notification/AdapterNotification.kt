@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.Notification
 import com.barikoi.cnlapp.databinding.ItemNotificationBinding
-import com.barikoi.cnlapp.utils.Constants
 import com.barikoi.cnlapp.utils.extension.formatHumanReadableDate
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 

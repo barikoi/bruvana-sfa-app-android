@@ -6,7 +6,6 @@ import com.barikoi.cnlapp.base.api.getErrorTypeByHTTPCode
 import com.barikoi.cnlapp.data.remote.api.TraceApiService
 import com.barikoi.cnlapp.data.remote.models.SocketGroupResponse
 import com.barikoi.cnlapp.data.remote.models.TraceUserResponse
-import com.barikoi.cnlapp.data.remote.models.request.TraceGroupBody
 import com.barikoi.cnlapp.utils.AppLogger
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow

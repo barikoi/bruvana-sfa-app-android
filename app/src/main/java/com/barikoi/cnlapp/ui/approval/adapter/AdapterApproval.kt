@@ -6,6 +6,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.core.view.isVisible
@@ -50,7 +51,11 @@ class AdapterApproval(
     override fun onBindViewHolder(holder: ShopRequestViewHolder, position: Int) {
         val text = buildSpannedString {
             bold { append(shopRequests[position].requestFromUser.userName) }.setSpan(
-                ForegroundColorSpan(holder.binding.root.context.resources.getColor(R.color.cnl_color_1)),
+                ForegroundColorSpan(
+                    ContextCompat.getColor(
+                        holder.binding.root.context, R.color.cnl_color_1
+                    )
+                ),
                 0, this.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )

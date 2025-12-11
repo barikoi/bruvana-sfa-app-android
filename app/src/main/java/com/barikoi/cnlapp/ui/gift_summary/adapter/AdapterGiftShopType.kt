@@ -4,12 +4,8 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.GiftData
-import com.barikoi.cnlapp.data.remote.models.GiftSummary
-import com.barikoi.cnlapp.databinding.ItemGiftSummaryBinding
 import com.barikoi.cnlapp.databinding.ItemShopTypeGiftBinding
-import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 
 class AdapterGiftShopType : RecyclerView.Adapter<AdapterGiftShopType.GiftShopTypeViewHolder>() {
     private var giftShopTypeList: List<GiftData> =

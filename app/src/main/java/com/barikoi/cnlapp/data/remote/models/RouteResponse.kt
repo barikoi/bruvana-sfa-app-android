@@ -1,7 +1,9 @@
 package com.barikoi.cnlapp.data.remote.models
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 data class RouteResponse(
     @SerializedName("message")
@@ -12,6 +14,7 @@ data class RouteResponse(
     val statusCode: Int
 )
 
+@Parcelize
 data class Route(
     @SerializedName("area_id")
     val areaId: Int,
@@ -24,11 +27,11 @@ data class Route(
     @SerializedName("route_name")
     val routeName: String,
     @SerializedName("outlet_count")
-    val outletCount: String,
+    val outletCount: String?,
     @SerializedName("territory_id")
     val territoryId: Int,
     @SerializedName("territory_name")
     val territoryName: String,
     @SerializedName("user_id")
     val userId: Int
-)
+) : Parcelable

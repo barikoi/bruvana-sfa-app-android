@@ -3,8 +3,10 @@ package com.barikoi.cnlapp.utils.extension
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
+import android.os.Parcelable
 import android.os.SystemClock
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -13,10 +15,10 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import com.barikoi.cnlapp.databinding.DialogLoadingBinding
 import java.util.Locale
-import androidx.core.graphics.drawable.toDrawable
 
 
 fun View.rotateViewAnimation(fromDegrees: Float, toDegrees: Float) {
@@ -30,12 +32,42 @@ fun View.rotateViewAnimation(fromDegrees: Float, toDegrees: Float) {
     this.startAnimation(an)
 }
 
+private var lastClickTime = 0L
+
+fun View.setDebouncedClickListener(interval: Long = 600L, onSafeClick: (View) -> Unit) {
+    setOnClickListener { v ->
+        val currentTime = SystemClock.elapsedRealtime()
+        if (currentTime - lastClickTime >= interval) {
+            lastClickTime = currentTime
+            onSafeClick(v)
+        }
+    }
+}
+
 fun Fragment.toast(message: String) {
     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
 }
 
 fun Activity.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+inline fun <reified T : Parcelable> Intent.getParcelableArrayListCompat(key: String): ArrayList<T>? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableArrayListExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        getParcelableArrayListExtra(key)
+    }
+}
+
+inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        getParcelableExtra(key)
+    }
 }
 
 fun View.isViewEnable(isEnable: Boolean) {

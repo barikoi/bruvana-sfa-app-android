@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.summary_details.fragment.so.SoDetailsSummaryFragment">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/llDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_15dp"
+        android:layout_marginTop="@dimen/_15dp"
+        android:elevation="@dimen/_15dp"
+        android:minHeight="350dp"
+        app:cardCornerRadius="@dimen/_8sdp"
+        app:cardElevation="@dimen/_15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/llError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/llOutletType"
+            app:layout_constraintEnd_toEndOf="@+id/llOutletType"
+            app:layout_constraintStart_toStartOf="@+id/llOutletType"
+            app:layout_constraintTop_toTopOf="@+id/llOutletType">
+
+            <TextView
+                android:id="@+id/tvNoDataFound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_data_found"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="@dimen/_15dp"
+                app:layout_constraintBottom_toTopOf="@+id/btnRetry"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/retry"
+                app:backgroundTint="@color/cnl_color_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvNoDataFound" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvSoStats"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:itemCount="4"
+            tools:listitem="@layout/item_so_stats" />
+    </androidx.cardview.widget.CardView>
+
+    <ProgressBar
+        android:id="@+id/loadingSoStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_15dp"
+        android:layout_marginTop="@dimen/_15dp"
+        android:elevation="@dimen/_15dp"
+        app:cardCornerRadius="@dimen/_8sdp"
+        app:cardElevation="@dimen/_15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/llDetails"
+        app:layout_constraintEnd_toEndOf="@+id/llDetails"
+        app:layout_constraintStart_toStartOf="@+id/llDetails"
+        app:layout_constraintTop_toTopOf="@+id/llDetails" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

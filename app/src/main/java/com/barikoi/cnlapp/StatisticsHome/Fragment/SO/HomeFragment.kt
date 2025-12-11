@@ -19,12 +19,12 @@ import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
-import com.barikoi.cnlapp.ui.main.MainActivity.Companion.routeName_selected
-import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Adapter.TargetAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.TargetValue
 import com.barikoi.cnlapp.databinding.FragmentHomeBinding
+import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.ui.main.MainActivity.Companion.routeName_selected
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -515,11 +515,11 @@ class HomeFragment : Fragment() {
             resources.getString(R.string.bounce_list)
         )
         val fragments = ArrayList<Fragment>()
-        fragments.add(TodaysSummaryFragment())
+        fragments.add(TodaySummaryFragment())
         fragments.add(LastWeekSummaryFragment())
         fragments.add(LowStockProductFragment())
         fragments.add(LastWeekProductFragment())
-        fragments.add(TodaysCategoryFragment())
+        fragments.add(TodayCategoryFragment())
         fragments.add(LastWeekCategoryFragment())
         fragments.add(LastWeekDeliveryFragment())
         fragments.add(LastWeekBounceFragment())

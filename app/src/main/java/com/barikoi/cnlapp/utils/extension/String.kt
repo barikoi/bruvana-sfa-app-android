@@ -2,12 +2,15 @@ package com.barikoi.cnlapp.utils.extension
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.text.intl.Locale
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
+import kotlin.math.roundToInt
 
 
 fun String.englishToBanglaNumber(): String {
@@ -32,6 +35,20 @@ fun String.englishToBanglaNumber(): String {
     return banglaNumber
 }
 
+fun Double.toHourMinuteString(): String {
+    val totalMinutes = this.roundToInt() // round to nearest minute
+    if (totalMinutes <= 0) return "0 min"
+
+    val hours = totalMinutes / 60
+    val minutes = totalMinutes % 60
+
+    return buildString {
+        if (hours > 0) append("$hours hr")
+        if (hours > 0 && minutes > 0) append(" ")
+        if (minutes > 0) append("$minutes min")
+    }
+}
+
 fun String?.totalAmountFormatted(): String {
     if (this == null || this == "null" || this == "") {
         return "0.00"
@@ -45,6 +62,9 @@ fun String.format(): String {
         .format(this.toDouble())
         .toString()
 }
+
+inline fun <reified T> Gson.fromJson(json: String): T =
+    this.fromJson(json, object : TypeToken<T>() {}.type)
 
 @SuppressLint("SimpleDateFormat")
 fun String.convertDate(): String? {

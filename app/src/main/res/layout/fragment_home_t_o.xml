@@ -93,7 +93,7 @@
                 android:layout_marginRight="8dp"
                 android:background="@color/background_app"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"

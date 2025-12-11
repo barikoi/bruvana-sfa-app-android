@@ -19,6 +19,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -31,33 +32,33 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.barikoi.barikoitrace.BarikoiTrace
-import com.barikoi.cnlapp.ui.route.RouteActivity
-import com.barikoi.cnlapp.Attendance.AttendanceFragment
 import com.barikoi.cnlapp.BuildConfig
-import com.barikoi.cnlapp.Chat.Fragment.ChatFragment
-import com.barikoi.cnlapp.ui.shop_map.MapFragment
+import com.barikoi.cnlapp.ui.chat.fragment.ChatFragment
 import com.barikoi.cnlapp.Notice.NoticeActivity
 import com.barikoi.cnlapp.OrderSummary.SO.OrderSummaryActivity
 import com.barikoi.cnlapp.OrderSummary.TO.OrderSummaryTOActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
-import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
-import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Fragment.SO.HomeFragment
-import com.barikoi.cnlapp.StatisticsHome.Fragment.TO.HomeTOFragment
-import com.barikoi.cnlapp.TradeOffers.TradeOffersActivity
-import com.barikoi.cnlapp.VisitReport.VisitReportActivity
-import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityMainBinding
-import com.barikoi.cnlapp.ui.notification.NotificationActivity
-import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
-import com.barikoi.cnlapp.ui.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.ProductStock.ProductStockUpdateActivity
+import com.barikoi.cnlapp.ui.approval.StockRequestApprovalActivity
+import com.barikoi.cnlapp.ui.attendance.AttendanceFragment
 import com.barikoi.cnlapp.ui.auth.LoginActivity
+import com.barikoi.cnlapp.ui.create_order.select_shop.SelectShopFragment
 import com.barikoi.cnlapp.ui.gift_summary.GiftSummaryActivity
 import com.barikoi.cnlapp.ui.main.vm.MainViewModel
+import com.barikoi.cnlapp.ui.notification.NotificationActivity
+import com.barikoi.cnlapp.ui.order_delivery.OrderDeliveryActivity
+import com.barikoi.cnlapp.ui.product_summary.ProductSummaryActivity
+import com.barikoi.cnlapp.ui.request.StockRequestActivity
+import com.barikoi.cnlapp.ui.route.RouteActivity
+import com.barikoi.cnlapp.ui.shop_map.MapFragment
+import com.barikoi.cnlapp.ui.trade_offers.TradeOffersActivity
+import com.barikoi.cnlapp.ui.visit_report.VisitReportActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -143,8 +144,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navView = findViewById(R.id.bottom_nav_view)
 
         navView.background = null
-        navView.menu.getItem(2).isEnabled = false
-        navView.menu.getItem(2).isVisible = false
+        navView.menu[2].isEnabled = false
+        navView.menu[2].isVisible = false
 
         navigationDrawer = findViewById(R.id.nav_view)
         navigationDrawer!!.setNavigationItemSelectedListener(this)
@@ -198,7 +199,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (userType.equals("TO", true) || userType.equals("ASM", true)) {
             binding.appContentMain.routeNameSelected.visibility = View.GONE
-            setCurrentFragment(HomeTOFragment(), this@MainActivity)
+
+            val homeFragment = com.barikoi.cnlapp.ui.home.HomeFragment.newInstance(
+                userType = sharePrefUtils.getString(Api.USER_TYPE)!!,
+                userId = sharePrefUtils.getString(Api.USER_ID)
+            )
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentLayout, homeFragment)
+                .commit()
         } else {
             setCurrentFragment(HomeFragment(), this@MainActivity)
         }
@@ -213,8 +222,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         tvAppVersion.text = getString(R.string.version, versionName)
         tvHeaderUserName!!.text = userName
         if (sharePrefUtils.getString(Api.EMAIL)!!
-                .isNotEmpty() && !sharePrefUtils.getString(Api.EMAIL)!!
-                .equals("null")
+                .isNotEmpty() && sharePrefUtils.getString(Api.EMAIL)!! != "null"
         ) {
             tvHeaderEmail.visibility = View.VISIBLE
             tvHeaderEmail.text = sharePrefUtils.getString(Api.EMAIL)
@@ -295,6 +303,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navigationDrawer!!.menu.findItem(R.id.menu_product_stock_request).isVisible =
             sharePrefUtils.getString(Api.USER_TYPE) == "SO"
 
+        navigationDrawer!!.menu.findItem(R.id.menu_order_summary).isVisible =
+            sharePrefUtils.getString(Api.USER_TYPE) == "SO"
+
         navView.setOnItemSelectedListener { item ->
             if (binding.appContentMain.fabOrder.isVisible) {
                 binding.appContentMain.fabOrder.background.setTint(
@@ -310,7 +321,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.appContentMain.tvTitle.visibility = View.GONE
                     binding.appContentMain.userLayout.visibility = View.VISIBLE
                     if (userType.equals("TO", true) || userType.equals("ASM", true)) {
-                        setCurrentFragment(HomeTOFragment(), this@MainActivity)
+                        val homeFragment = com.barikoi.cnlapp.ui.home.HomeFragment.newInstance(
+                            userType = sharePrefUtils.getString(Api.USER_TYPE)!!,
+                            userId = sharePrefUtils.getString(Api.USER_ID)
+                        )
+
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentLayout, homeFragment)
+                            .commit()
+
                     } else {
                         setCurrentFragment(HomeFragment(), this@MainActivity)
                     }
@@ -414,8 +433,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun traceLogin() {
         val parameters: MutableMap<String, String> = HashMap()
-        parameters["email"] = "carenutrition@gmail.com"
-        parameters["password"] = "12345678"
+        parameters["email"] = BuildConfig.TRACE_USER
+        parameters["password"] = BuildConfig.TRACE_PASS
 
         ApiServices.apiPOST(
             Api.traceLogin,
@@ -664,6 +683,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         AppLogger.log("startLogoutObserve::Error ${it.error}")
                         logoutDialog.dismiss()
                         toast(networkFailureMessage.handleFailure(it.error!!))
+
+                        sharePrefUtils.clear()
+                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                        finish()
                     }
 
                     is ApiState.Loading -> {
@@ -734,5 +757,4 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
     }
-
 }

@@ -8,6 +8,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +19,9 @@ import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.RequestStock
 import com.barikoi.cnlapp.databinding.ActivityStockRequestBinding
+import com.barikoi.cnlapp.ui.request.adapter.AdapterProductRead
+import com.barikoi.cnlapp.ui.request.adapter.AdapterStockRequest
+import com.barikoi.cnlapp.ui.request.vm.StockRequestViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
@@ -27,10 +31,6 @@ import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.core.graphics.drawable.toDrawable
-import com.barikoi.cnlapp.ui.request.adapter.AdapterProductRead
-import com.barikoi.cnlapp.ui.request.adapter.AdapterStockRequest
-import com.barikoi.cnlapp.ui.request.vm.StockRequestViewModel
 
 
 @AndroidEntryPoint

@@ -11,12 +11,13 @@ import com.barikoi.barikoitrace.BarikoiTrace
 import com.barikoi.barikoitrace.callback.BarikoiTraceUserCallback
 import com.barikoi.barikoitrace.models.BarikoiTraceError
 import com.barikoi.barikoitrace.models.BarikoiTraceUser
-import com.barikoi.cnlapp.ui.auth.vm.LoginViewModel
-import com.barikoi.cnlapp.ui.main.MainActivity
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.databinding.ActivityLoginBinding
+import com.barikoi.cnlapp.ui.auth.vm.LoginViewModel
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
@@ -228,8 +229,20 @@ class LoginActivity : BaseActivity() {
 
                         toast("Login Successful")
 
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
+                        if (sharePrefUtils.getString(Api.USER_TYPE) == "DM") {
+                            startActivity(
+                                Intent(
+                                    this@LoginActivity,
+                                    OrderDeliveryUpdateActivity::class.java
+                                )
+                            )
+                            finish()
+                        } else {
+                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                            finish()
+                        }
+
+
                     }
                 }
             }

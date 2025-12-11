@@ -7,52 +7,9 @@
     android:background="@color/background_app"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:elevation="0dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/background_app"
-            app:contentInsetEnd="0dp"
-            app:contentInsetLeft="0dp"
-            app:contentInsetRight="0dp"
-            app:contentInsetStart="0dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <ImageButton
-                    android:id="@+id/btnBack"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/back"
-                    android:src="@drawable/ic_back" />
-
-                <TextView
-                    android:id="@+id/tvTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:gravity="center"
-                    android:text="@string/order_delivery_update"
-                    android:textColor="@color/text_title"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
-
-            </RelativeLayout>
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <RelativeLayout
         android:id="@+id/spinnerLayoutTO"

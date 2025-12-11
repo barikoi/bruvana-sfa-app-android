@@ -33,11 +33,11 @@
     <color name="colorprimarytemp">#43bc5d</color>
     <color name="colorAccent">#3cee83</color>
 
-    <color name="cnl_color_1">#F79A59</color>
+    <color name="cnl_color_1">#2c3691</color>
     <color name="cnl_color_2">#0D9347</color>
 
 
-    <color name="target_bg_color">#F79A59</color>
+    <color name="target_bg_color">#8DD8FF</color>
 
     <color name="card_selected_bg">#D9D9D9</color>
     <color name="btn_color_light">#F89B59</color>
@@ -66,6 +66,18 @@
     <color name="color_brown">#D4B782</color>
     <color name="color_light_brown">#F0DBB1</color>
 
+
+    <color name="verified_bg">#4E38B06C</color>
+    <color name="verified_text_color">#00451D</color>
+
+
+    <color name="authorize_bg">#2FFF9800</color>
+    <color name="authorize_text_color">#FF9800</color>
+
+    <color name="rejected_bg">#94EE6666</color>
+    <color name="rejected_text_color">#F40101</color>
+    <color name="colorVisited">#0171FF</color>
+
     <string-array name="colors">
         <item>#7ECF71</item>
         <item>#CE6200</item>
@@ -80,5 +92,15 @@
         <item>#4C6D8B</item>
         <item>#4C6D8B</item>
     </string-array>
+
+    <color name="chip_checked_text">#FFFFFF</color>
+    <color name="chip_unchecked_text">#1F2937</color> <!-- gray-800 -->
+    <color name="chip_checked_bg">#0B69FF</color>    <!-- primary blue -->
+    <color name="chip_unchecked_bg">#F3F4F6</color>  <!-- gray-100 -->
+
+    <color name="text_secondary">#757575</color>
+    <color name="divider_light">#DDDDDD</color>
+
+
 
 </resources>

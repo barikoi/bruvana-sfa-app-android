@@ -28,7 +28,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.barikoi.cnlapp.Adapter.ViewPagerAdapter
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.base.adapter.AdapterImagePickerView
 import com.barikoi.cnlapp.base.api.ApiState
@@ -43,10 +42,11 @@ import com.barikoi.cnlapp.data.remote.models.request.order.toProductRequestList1
 import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentOrderViewPagerBinding
 import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.ui.adapter.ViewPagerAdapter
+import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.ui.create_order.order.combo.ComboOfferFragment
 import com.barikoi.cnlapp.ui.create_order.order.product_selection.ProductSelectionFragment
 import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
-import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.Constants
@@ -192,8 +192,8 @@ class OrderViewPagerFragment : Fragment() {
         )
 
         val fragments = ArrayList<Fragment>()
-        fragments.add(ProductSelectionFragment(viewModel, outlet!!))
-        fragments.add(ComboOfferFragment(viewModel))
+        fragments.add(ProductSelectionFragment.newInstance(outlet!!))
+        fragments.add(ComboOfferFragment())
         binding.viewPager.adapter = ViewPagerAdapter(childFragmentManager, lifecycle, fragments)
 
         TabLayoutMediator(
@@ -228,7 +228,6 @@ class OrderViewPagerFragment : Fragment() {
         }
 
         binding.btnSaveOrder.setHapticClickListener {
-            // Check if the selected 0 qty product
             if (!products.any { product -> product.qty > 0 } && !offers.any { offer -> offer.quantity > 0 }) {
                 toast("Please select at least one product")
                 return@setHapticClickListener
@@ -286,28 +285,29 @@ class OrderViewPagerFragment : Fragment() {
     ) {
         AppLogger.log("saveOrder:: $orderRequest and combos $combos")
         lifecycleScope.launch {
-            val requestBody: RequestBody = MultipartBody.Builder().setType(MultipartBody.Companion.FORM)
-                .addFormDataPart("orders", Gson().toJson(listOf(orderRequest)))
-                .addFormDataPart("combos", Gson().toJson(combos))
-                .apply {
-                    imageFiles.forEachIndexed { pos, image ->
-                        addFormDataPart(
-                            "image[$pos]", image.substring(
-                                image.lastIndexOf("/")
-                            ), compress(
-                                requireActivity(), File(image)
-                            ) {
-                                resolution(
-                                    AddGiftActivity.Companion.RESOLUTION_WIDTH,
-                                    AddGiftActivity.Companion.RESOLUTION_HEIGHT
-                                )
-                                quality(AddGiftActivity.Companion.IMAGE_QUALITY)
-                                format(Bitmap.CompressFormat.JPEG)
-                                size(AddGiftActivity.Companion.MAX_FILE_SIZE)
-                            }.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
-                        )
-                    }
-                }.build()
+            val requestBody: RequestBody =
+                MultipartBody.Builder().setType(MultipartBody.Companion.FORM)
+                    .addFormDataPart("orders", Gson().toJson(listOf(orderRequest)))
+                    .addFormDataPart("combos", Gson().toJson(combos))
+                    .apply {
+                        imageFiles.forEachIndexed { pos, image ->
+                            addFormDataPart(
+                                "image[$pos]", image.substring(
+                                    image.lastIndexOf("/")
+                                ), compress(
+                                    requireActivity(), File(image)
+                                ) {
+                                    resolution(
+                                        AddGiftActivity.Companion.RESOLUTION_WIDTH,
+                                        AddGiftActivity.Companion.RESOLUTION_HEIGHT
+                                    )
+                                    quality(AddGiftActivity.Companion.IMAGE_QUALITY)
+                                    format(Bitmap.CompressFormat.JPEG)
+                                    size(AddGiftActivity.Companion.MAX_FILE_SIZE)
+                                }.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
+                            )
+                        }
+                    }.build()
 
             viewModel.saveOrder(requestBody)
         }
@@ -317,27 +317,28 @@ class OrderViewPagerFragment : Fragment() {
         orderRequest: OrderRequest
     ) {
         lifecycleScope.launch {
-            val requestBody: RequestBody = MultipartBody.Builder().setType(MultipartBody.Companion.FORM)
-                .addFormDataPart("orders", Gson().toJson(listOf(orderRequest)))
-                .apply {
-                    imageFiles.forEachIndexed { pos, image ->
-                        addFormDataPart(
-                            "image[$pos]", image.substring(
-                                image.lastIndexOf("/")
-                            ), compress(
-                                requireActivity(), File(image)
-                            ) {
-                                resolution(
-                                    AddGiftActivity.Companion.RESOLUTION_WIDTH,
-                                    AddGiftActivity.Companion.RESOLUTION_HEIGHT
-                                )
-                                quality(AddGiftActivity.Companion.IMAGE_QUALITY)
-                                format(Bitmap.CompressFormat.JPEG)
-                                size(AddGiftActivity.Companion.MAX_FILE_SIZE)
-                            }.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
-                        )
-                    }
-                }.build()
+            val requestBody: RequestBody =
+                MultipartBody.Builder().setType(MultipartBody.Companion.FORM)
+                    .addFormDataPart("orders", Gson().toJson(listOf(orderRequest)))
+                    .apply {
+                        imageFiles.forEachIndexed { pos, image ->
+                            addFormDataPart(
+                                "image[$pos]", image.substring(
+                                    image.lastIndexOf("/")
+                                ), compress(
+                                    requireActivity(), File(image)
+                                ) {
+                                    resolution(
+                                        AddGiftActivity.Companion.RESOLUTION_WIDTH,
+                                        AddGiftActivity.Companion.RESOLUTION_HEIGHT
+                                    )
+                                    quality(AddGiftActivity.Companion.IMAGE_QUALITY)
+                                    format(Bitmap.CompressFormat.JPEG)
+                                    size(AddGiftActivity.Companion.MAX_FILE_SIZE)
+                                }.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
+                            )
+                        }
+                    }.build()
 
             viewModel.saveNoOrder(requestBody)
         }

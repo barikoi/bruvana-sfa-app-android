@@ -6,11 +6,11 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.data.remote.models.GiftSummary
@@ -23,6 +23,9 @@ import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
 import com.barikoi.cnlapp.utils.extension.formatDateWithLocale
+import com.barikoi.cnlapp.utils.extension.formatDateWithLocaleEnglish
+import com.barikoi.cnlapp.utils.extension.getEndDateTime
+import com.barikoi.cnlapp.utils.extension.getStartDateTime
 import com.barikoi.cnlapp.utils.extension.loadingDialog
 import com.barikoi.cnlapp.utils.extension.setHapticClickListener
 import com.barikoi.cnlapp.utils.extension.toast
@@ -31,10 +34,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
-import kotlin.collections.indexOf
 
 @AndroidEntryPoint
-class GiftSummaryActivity : AppCompatActivity() {
+class GiftSummaryActivity : BaseActivity() {
     private lateinit var binding: ActivityGiftSumamryBinding
 
     private val viewModel: GiftSummaryViewModel by viewModels()
@@ -72,8 +74,8 @@ class GiftSummaryActivity : AppCompatActivity() {
             toDataDialog = it
         }
 
-        formattedStartDate = Date().formatDateWithLocale()
-        formattedEndDate = Date().formatDateWithLocale()
+        formattedStartDate = Date().formatDateWithLocaleEnglish()
+        formattedEndDate = Date().formatDateWithLocaleEnglish()
 
         binding.tvDateRange.text =
             getString(
@@ -97,8 +99,8 @@ class GiftSummaryActivity : AppCompatActivity() {
             binding.swipeRefresh.isRefreshing = false
             viewModel.getGiftSummary(
                 selectedSO ?: "",
-                "$formattedStartDate 00:00:00",
-                "$formattedEndDate 23:59:59",
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
             )
         }
 
@@ -110,8 +112,8 @@ class GiftSummaryActivity : AppCompatActivity() {
             val startDateMillis = selection.first
             val endDateMillis = selection.second
 
-            formattedStartDate = Date(startDateMillis!!).formatDateWithLocale()
-            formattedEndDate = Date(endDateMillis!!).formatDateWithLocale()
+            formattedStartDate = Date(startDateMillis!!).formatDateWithLocaleEnglish()
+            formattedEndDate = Date(endDateMillis!!).formatDateWithLocaleEnglish()
 
             binding.tvDateRange.text =
                 getString(
@@ -122,8 +124,8 @@ class GiftSummaryActivity : AppCompatActivity() {
 
             viewModel.getGiftSummary(
                 selectedSO!!,
-                "$formattedStartDate 00:00:00",
-                "$formattedEndDate 23:59:59",
+                formattedStartDate.getStartDateTime(),
+                formattedEndDate.getEndDateTime(),
             )
         }
 
@@ -199,9 +201,7 @@ class GiftSummaryActivity : AppCompatActivity() {
                 )
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
-            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
     }
 
@@ -344,7 +344,9 @@ class GiftSummaryActivity : AppCompatActivity() {
                         if (it.data.gifts.isEmpty()) {
                             toast("No gift found")
                             adapterGiftSummary.setGiftSummaryList(emptyList())
+                            binding.includeEmpty.main.isVisible = true
                         } else {
+                            binding.includeEmpty.main.isVisible = false
                             adapterGiftSummary.setGiftSummaryList(it.data.gifts)
                         }
                     }

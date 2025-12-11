@@ -20,12 +20,15 @@ import androidx.preference.PreferenceManager
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.Order_Create.Adapter.ShopSelectAdapter
-import com.barikoi.cnlapp.Order_Create.Callback.OnSelectListener
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.FragmentShopSelectBinding
+import com.barikoi.cnlapp.order_create.Adapter.ShopSelectAdapter
+import com.barikoi.cnlapp.order_create.Callback.OnSelectListener
+import com.barikoi.cnlapp.order_create.Fragment.ConfirmOrderFragment
+import com.barikoi.cnlapp.order_create.Fragment.CreateOrderFragment
+import com.barikoi.cnlapp.order_create.Fragment.ProductSelectFragment
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.RequestQueueSingleton
 import com.barikoi.cnlapp.utils.ViewUtils

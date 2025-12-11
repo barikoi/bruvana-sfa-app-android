@@ -365,5 +365,33 @@
     <string name="product_description">১। নুচেলা চকোলেট স্প্রেড - ২৩৪ x ৩\n২। নুচেলা চকোলেট স্প্রেড - ২৩৪\n৩। নুচেলা চকোলেট স্প্রেড - ২৩৪\n৪। নুচেলা চকোলেট স্প্রেড - ২৩৪</string>
     <string name="taka_icon">টাকা আইকন</string>
     <string name="is_there_a_cadbury_or_kitkat_company_fridge_in_the_outlet">আউটলেটে কি ক্যাডবুরি বা কিটক্যাট কোম্পানির ফ্রিজ আছে?</string>
+    <string name="title_gift_summary">উপহার সারসংক্ষেপ</string>
+    <string name="gift_summary">উপহার সারসংক্ষেপ</string>
+    <string name="total_items">মোট আইটেম</string>
+    <string name="expand">প্রসারিত করুন</string>
+    <string name="circle">বৃত্ত</string>
+    <string name="daily_summary">দৈনিক সারসংক্ষেপ</string>
+    <string name="user_icon">ব্যবহারকারীর আইকন</string>
+    <string name="inactive_user">নিষ্ক্রিয় ব্যবহারকারী</string>
+    <string name="active_user">সক্রিয় ব্যবহারকারী</string>
+    <string name="error">ত্রুটি</string>
+    <string name="forward">ফরওয়ার্ড</string>
+    <string name="download_all_challan">সব চালান ডাউনলোড করুন</string>
+    <string name="download_icon">ডাউনলোড আইকন</string>
+    <string name="summary_details">সারসংক্ষেপের বিবরণ</string>
+    <string name="something_went_wrong_please_try_again">কিছু ভুল হয়েছে! অনুগ্রহ করে আবার চেষ্টা করুন।</string>
+    <string name="to">থেকে</string>
+    <string name="taka_sign">৳ %1$s</string>
+    <string name="bounce_p">বাউন্স (%)</string>
+    <string name="ordered_by_outlets">আউটলেট অনুযায়ী অর্ডার</string>
+    <string name="visit">ভিজিট</string>
+    <string name="qty_presence">পরিমাণ উপস্থিতি:</string>
+    <string name="delivery_value_">ডেলিভারি মূল্য:</string>
+    <string name="contribution">অবদান:</string>
+    <string name="categories">বিভাগসমূহ</string>
+    <string name="offer_">(offer)</string>
+    <string name="x">X</string>
+    <string name="are_you_sure_you_want_to_checkout">আপনি কি নিশ্চিত যে আপনি চেকআউট করতে চান?</string>
+    <string name="qty">"QTY: %1$s"</string>
 
 </resources>

@@ -14,10 +14,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.placeholder
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.StatisticsHome.Model.OutletStatistics
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
-import com.bumptech.glide.Glide
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,46 +27,51 @@ import java.util.Locale
 
 class OutletAdapter(val outlets: List<OutletStatistics>, var fromChoice: String) :
     RecyclerView.Adapter<OutletAdapter.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OutletAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.single_outlet_statistics, parent, false)
         return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: OutletAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = outlets[position]
         holder.divider.visibility = View.VISIBLE
-        if (!item.category.equals("null", true) && item.category.length > 0) {
+        if (!item.category.equals("null", true) && item.category.isNotEmpty()) {
             holder.tvCategory.visibility = View.VISIBLE
-            holder.tvCategory.setText(item.category.get(0).toString().uppercase(Locale.ENGLISH))
+            holder.tvCategory.text = item.category[0].toString().uppercase(Locale.ENGLISH)
         } else {
             holder.tvCategory.visibility = View.GONE
         }
 
-        holder.shopName.setText(item.shop_name)
-        if (!item.lastOrderDate.equals("null")) {
+        holder.shopName.text = item.shop_name
+        if (item.lastOrderDate != "null") {
             val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
             val df = SimpleDateFormat("dd LLL yyyy", Locale.ENGLISH)
             val orderDate = df.format(oldDate.parse(item.lastOrderDate))
-            holder.lastOrderDate.setText(holder.itemView.context.resources.getString(R.string.last_order_date) + orderDate)
+            holder.lastOrderDate.text =
+                holder.itemView.context.resources.getString(R.string.last_order_date) + orderDate
         }
-        if (fromChoice.equals("bounce")) {
+        if (fromChoice == "bounce") {
             holder.btnDetails.text = holder.itemView.context.getString(R.string.bounce_item)
         } else {
             holder.btnDetails.text = holder.itemView.context.getString(R.string.details)
         }
 
-        if (!item.shop_image.isNullOrEmpty() && !item.shop_image.equals("null")) {
-            Glide.with(holder.itemView.context)
-                .load(item.shop_image)
-                .error(R.drawable.shop)
-                .into(holder.imageShop)
+        if (item.shop_image.isNotEmpty() && item.shop_image != "null") {
+            holder.imageShop.load(
+                item.shop_image,
+                builder = {
+                    crossfade(true)
+                    placeholder(R.drawable.shop)
+                    error(R.drawable.shop)
+                }
+            )
+
         } else {
             //holder.imageProduct.visibility = View.INVISIBLE
         }
 
         holder.btnDetails.setOnClickListener {
-
             viewDialog(holder.itemView.context, item.shop_name, item.lastOrderDate, item.products)
         }
 

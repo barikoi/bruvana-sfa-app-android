@@ -1,15 +1,16 @@
 package com.barikoi.cnlapp.base.di
 
+import android.content.Context
 import com.barikoi.cnlapp.data.remote.api.ApiService
-import com.barikoi.cnlapp.data.remote.repository.RouteRepository
-import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
 import com.barikoi.cnlapp.data.remote.api.TraceApiService
-import com.barikoi.cnlapp.data.remote.repository.GiftRepository
-import com.barikoi.cnlapp.data.remote.repository.GiftRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.AttendanceRepository
 import com.barikoi.cnlapp.data.remote.repository.AttendanceRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.AuthRepository
 import com.barikoi.cnlapp.data.remote.repository.AuthRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.DownloadRepository
+import com.barikoi.cnlapp.data.remote.repository.DownloadRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.GiftRepository
+import com.barikoi.cnlapp.data.remote.repository.GiftRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepository
 import com.barikoi.cnlapp.data.remote.repository.NotificationRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.OfferRepository
@@ -22,6 +23,8 @@ import com.barikoi.cnlapp.data.remote.repository.ProductStockRepository
 import com.barikoi.cnlapp.data.remote.repository.ProductStockRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ReverseGeoRepository
 import com.barikoi.cnlapp.data.remote.repository.ReverseGeoRepositoryImpl
+import com.barikoi.cnlapp.data.remote.repository.RouteRepository
+import com.barikoi.cnlapp.data.remote.repository.RouteRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.ShopRepository
 import com.barikoi.cnlapp.data.remote.repository.ShopRepositoryImpl
 import com.barikoi.cnlapp.data.remote.repository.SoRepository
@@ -36,6 +39,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -102,4 +106,8 @@ object ViewModelModule {
     @Provides
     fun providesAttendanceRepository(apiService: ApiService): AttendanceRepository =
         AttendanceRepositoryImpl(apiService)
+
+    @Provides
+    fun providesDownloadRepository(apiService: ApiService, @ApplicationContext context: Context): DownloadRepository =
+        DownloadRepositoryImpl(apiService, context)
 }

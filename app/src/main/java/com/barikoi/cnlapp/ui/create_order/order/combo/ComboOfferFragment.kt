@@ -1,11 +1,13 @@
 package com.barikoi.cnlapp.ui.create_order.order.combo
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.barikoi.cnlapp.base.api.ApiState
@@ -18,11 +20,11 @@ import com.barikoi.cnlapp.utils.extension.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.getValue
 
 @AndroidEntryPoint
-class ComboOfferFragment(
-    private var viewModel: ProductSelectViewModel
-) : Fragment() {
+class ComboOfferFragment : Fragment() {
+    private val viewModel: ProductSelectViewModel by viewModels({ requireParentFragment() })
     private lateinit var binding: FragmentComboOfferBinding
 
     private lateinit var adapterOffer: AdapterOffer

@@ -12,10 +12,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import com.barikoi.barikoitrace.BarikoiTrace
+import com.barikoi.cnlapp.BuildConfig
+import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
+import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.ui.auth.LoginActivity
 import com.barikoi.cnlapp.ui.main.MainActivity
-import com.barikoi.cnlapp.BuildConfig
-import com.barikoi.cnlapp.databinding.ActivitySplashBinding
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
 import com.barikoi.cnlapp.utils.SharePrefUtils
@@ -24,7 +25,6 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
@@ -136,9 +136,18 @@ class SplashActivity : AppCompatActivity() {
             }
 
             2 -> {
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
-                finish()
+                if (sharePrefUtils.getString(Api.USER_TYPE) == "DM") {
+                    startActivity(
+                        Intent(
+                            this@SplashActivity,
+                            OrderDeliveryUpdateActivity::class.java
+                        )
+                    )
+                    finish()
+                } else {
+                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    finish()
+                }
             }
         }
     }
@@ -190,8 +199,6 @@ class SplashActivity : AppCompatActivity() {
             }
         }
         mAppUpdateManager.appUpdateInfo.addOnFailureListener {
-            Sentry.captureMessage("checkForAppUpdate onFailure onResume")
-            AppLogger.log("checkForAppUpdate onFailure $it")
             checkPermissions()
         }
 

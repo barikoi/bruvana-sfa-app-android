@@ -2,7 +2,6 @@ package com.barikoi.cnlapp.ui.approval
 
 import android.app.Dialog
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -17,9 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.barikoi.cnlapp.R
-import com.barikoi.cnlapp.ui.approval.adapter.AdapterApproval
-import com.barikoi.cnlapp.ui.approval.adapter.AdapterApprove
-import com.barikoi.cnlapp.ui.approval.adapter.StockRequest
 import com.barikoi.cnlapp.base.ac.BaseActivity
 import com.barikoi.cnlapp.base.api.ApiState
 import com.barikoi.cnlapp.base.api.NetworkFailureMessage
@@ -27,6 +23,9 @@ import com.barikoi.cnlapp.data.remote.models.RequestStock
 import com.barikoi.cnlapp.data.remote.models.request.NewStockData
 import com.barikoi.cnlapp.data.remote.models.request.StockApprovalRequest
 import com.barikoi.cnlapp.databinding.ActivityStockRequestApprovalBinding
+import com.barikoi.cnlapp.ui.approval.adapter.AdapterApproval
+import com.barikoi.cnlapp.ui.approval.adapter.AdapterApprove
+import com.barikoi.cnlapp.ui.approval.adapter.StockRequest
 import com.barikoi.cnlapp.ui.approval.vm.StockRequestApprovalViewModel
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.AppLogger
@@ -44,6 +43,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
 
 @AndroidEntryPoint
 class StockRequestApprovalActivity : BaseActivity() {
@@ -120,7 +120,7 @@ class StockRequestApprovalActivity : BaseActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.setCancelable(true)
         dialog.window!!.attributes.windowAnimations = android.R.style.Animation_Dialog
 
@@ -429,7 +429,6 @@ class StockRequestApprovalActivity : BaseActivity() {
     }
 
     private fun setDateFilter() {
-        val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val simpleFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
 
         val materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker()
@@ -440,11 +439,11 @@ class StockRequestApprovalActivity : BaseActivity() {
 
         binding.dateRangeLayout.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-            binding.dateRangeLayout.setEnabled(false)
+            binding.dateRangeLayout.isEnabled = false
         }
 
         materialDatePicker.addOnPositiveButtonClickListener { selection ->
-            binding.dateRangeLayout.setEnabled(true)
+            binding.dateRangeLayout.isEnabled = true
             val sDate = Date(selection.first!!)
             val eDate = Date(selection.second!!)
             if (sDate.compareTo(eDate) == 0) {
@@ -469,9 +468,7 @@ class StockRequestApprovalActivity : BaseActivity() {
         }
 
         materialDatePicker.addOnNegativeButtonClickListener {
-            binding.dateRangeLayout.setEnabled(
-                true
-            )
+            binding.dateRangeLayout.isEnabled = true
         }
     }
 }

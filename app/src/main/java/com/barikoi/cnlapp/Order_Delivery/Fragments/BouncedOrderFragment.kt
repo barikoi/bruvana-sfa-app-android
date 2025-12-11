@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -14,7 +13,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -23,10 +29,6 @@ import com.android.volley.NetworkResponse
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.barikoi.cnlapp.Model.Products
-import com.barikoi.cnlapp.order_create.Callback.DialogListener
-import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
-import com.barikoi.cnlapp.order_create.Callback.OrderListSuccessListener
-import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.Order_Delivery.Adapter.OrderDeliveryListAdapter
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity
 import com.barikoi.cnlapp.Order_Delivery.OrderDeliveryUpdateActivity.Companion.EndDate
@@ -37,6 +39,10 @@ import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
 import com.barikoi.cnlapp.StatisticsHome.Model.ProductStatistics
 import com.barikoi.cnlapp.databinding.FragmentBouncedOrderBinding
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.OnEditOrderListener
+import com.barikoi.cnlapp.order_create.Callback.OrderListSuccessListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -49,8 +55,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
 
 @AndroidEntryPoint
 class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderListener {
@@ -161,6 +169,25 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             token,
                             mCallback3!!
                         )
+
+                    } else if (sharePrefUtils.getString(Api.USER_TYPE).equals("DM")) {
+                        if (user_id.contains(",")) {
+                            getAllOrders(
+                                Api.get_saved_order + "?db_house_id=" + sharePrefUtils.getString(
+                                    Constants.DB_HOUSE_ID
+                                ) + "&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59",
+                                queue,
+                                token,
+                                mCallback3!!
+                            )
+                        } else {
+                            getAllOrders(
+                                Api.get_saved_order + "?user_id=" + user_id +/*"&route_id="+route_id+*/"&start_date=" + start + " 00:00:00" + "&end_date=" + end + " 23:59:59" + "&order_status=DELIVERED,CANCELLED",
+                                queue,
+                                token,
+                                mCallback3!!
+                            )
+                        }
 
                     } else {
                         getAllOrders(
@@ -304,8 +331,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                             var grandTotal = 0.0
                             var totalCount = 0
                             for (k in 0 until productItems.size) {
-                                grandTotal = grandTotal + productItems[k].ordered_total_price
-                                totalCount = totalCount + productItems[k].bounced_quantity
+                                grandTotal = grandTotal + productItems[k].orderedTotalPrice
+                                totalCount = totalCount + productItems[k].bouncedQuantity
                             }
                             orderList.add(
                                 OrderList(
@@ -335,14 +362,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
                 binding.noRouteCheck.visibility = View.VISIBLE
                 binding.bodyLayout.visibility = View.GONE
 
-                binding.btnTryAgain.setOnClickListener {
-                    /*checkforOrders(
-                        queue!!,
-                        token!!,
-                        sr_id!!,
-                        route_id!!
-                    )*/
-                }
+                binding.btnTryAgain.setOnClickListener {}
 
             }
             orderList.sortByDescending {
@@ -361,7 +381,6 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            //Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -387,7 +406,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
-        } else if (user_type.equals("ASM", true)) {
+        } else if (user_type.equals("ASM", true) || user_type.equals("DM", true)) {
             sr_id = ""
             route_id = ""
             user_id = OrderDeliveryUpdateActivity.user_id
@@ -409,7 +428,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
     fun viewDialog(mContext: Context, order: OrderList) {
         val dialog = Dialog(mContext)
         dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_order_status_update)
         val btnClose = dialog.findViewById<ImageButton>(R.id.btnClose)
@@ -440,14 +459,14 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         var isChecked = 0
         statusGroup.addView(radio_group)
         radio_group.check(checkedid)
-        radio_group.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group, checkedId ->
+        radio_group.setOnCheckedChangeListener { group, checkedId ->
             isChecked = checkedId
             if (checkedId == 2) {
                 reasonLayout.visibility = View.VISIBLE
             } else {
                 reasonLayout.visibility = View.GONE
             }
-        })
+        }
 
         outletName.text = order.outletName
         val oldDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
@@ -462,27 +481,27 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             for (i in 0 until order.brands_array.size) {
                 brandsStatistics.add(
                     ProductStatistics(
-                        order.brands_array[i].product_id,
-                        order.brands_array[i].product_name,
-                        order.brands_array[i].product_code,
-                        order.brands_array[i].sku_code,
-                        order.brands_array[i].category_code,
-                        order.brands_array[i].category_name,
-                        order.brands_array[i].category_id,
-                        order.brands_array[i].unit_name,
-                        order.brands_array[i].unit_id,
-                        order.brands_array[i].unit_code,
-                        order.brands_array[i].unit_price,
-                        order.brands_array[i].discounted_unit_price,
-                        order.brands_array[i].ordered_total_price,
-                        order.brands_array[i].ordered_quantity,
-                        order.brands_array[i].ordered_quantity,
-                        order.brands_array[i].bounced_quantity,
-                        order.brands_array[i].ordered_total_price
+                        order.brands_array[i].productId,
+                        order.brands_array[i].productName,
+                        order.brands_array[i].productCode,
+                        order.brands_array[i].skuCode,
+                        order.brands_array[i].categoryCode,
+                        order.brands_array[i].categoryName,
+                        order.brands_array[i].categoryId,
+                        order.brands_array[i].unitName,
+                        order.brands_array[i].unitId,
+                        order.brands_array[i].unitCode,
+                        order.brands_array[i].unitPrice,
+                        order.brands_array[i].discountedUnitPrice,
+                        order.brands_array[i].orderedTotalPrice,
+                        order.brands_array[i].orderedQuantity,
+                        order.brands_array[i].orderedQuantity,
+                        order.brands_array[i].bouncedQuantity,
+                        order.brands_array[i].orderedTotalPrice
                     )
                 )
-                grandTotal = grandTotal + order.brands_array[i].ordered_total_price
-                itemCount = itemCount + order.brands_array[i].ordered_quantity
+                grandTotal = grandTotal + order.brands_array[i].orderedTotalPrice
+                itemCount = itemCount + order.brands_array[i].orderedQuantity
             }
             val adapter = OutletProductAdapter(brandsStatistics)
             listView.adapter = adapter
@@ -496,7 +515,8 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
             dialog.dismiss()
         }
         btnSubmit.setOnClickListener {
-            ViewUtils.viewDialog(mContext,
+            ViewUtils.viewDialog(
+                mContext,
                 mContext.resources.getString(R.string.update_order_dialog),
                 SpannableStringBuilder(),
                 object :
@@ -540,7 +560,7 @@ class BouncedOrderFragment : Fragment(), OrderListSuccessListener, OnEditOrderLi
         reason: String,
         dialog: Dialog
     ) {
-        if (updatedProducts.size > 0) {
+        if (updatedProducts.isNotEmpty()) {
             val obj1 = JSONObject()
             val ordersArray = JSONArray()
             val orderObj = JSONObject()

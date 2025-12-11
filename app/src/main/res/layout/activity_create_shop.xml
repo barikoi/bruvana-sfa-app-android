@@ -297,50 +297,6 @@
 
                 </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@drawable/cardview_bg_required"
-                    android:orientation="horizontal"
-                    android:paddingStart="@dimen/_5dp"
-                    android:paddingEnd="@dimen/_5dp">
-
-                    <EditText
-                        android:id="@+id/etCompetitor"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:autofillHints="no"
-                        android:background="@null"
-                        android:gravity="center_vertical"
-                        android:hint="@string/competitor_name"
-                        android:inputType="textMultiLine"
-                        android:maxLines="4"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="16dp"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/text_title"
-                        android:textColorHint="@color/text_title_2"
-                        android:textSize="15sp" />
-
-                    <ImageView
-                        android:id="@+id/ivCompetitorSelection"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:contentDescription="@string/competitor_selection"
-                        android:padding="@dimen/_10sdp"
-                        app:srcCompat="@drawable/ic_arrow_drop_down" />
-
-                </LinearLayout>
-
                 <EditText
                     android:id="@+id/etAddress"
                     android:layout_width="match_parent"
@@ -416,43 +372,6 @@
                     android:textColor="@color/text_title"
                     android:textColorHint="@color/text_title_2"
                     android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/tvFridgeAvailability"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:gravity="start"
-                    android:paddingHorizontal="@dimen/_15dp"
-                    android:text="@string/is_there_a_cadbury_or_kitkat_company_fridge_in_the_outlet"
-                    android:textAllCaps="false"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <RadioGroup
-                    android:id="@+id/radioGroupFridge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radioYes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/yes" />
-
-                    <RadioButton
-                        android:id="@+id/radioNo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/no" />
-                </RadioGroup>
 
             </LinearLayout>
         </ScrollView>

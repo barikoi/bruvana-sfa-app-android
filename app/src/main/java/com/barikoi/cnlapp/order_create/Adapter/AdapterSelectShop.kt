@@ -7,10 +7,10 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.barikoi.cnlapp.Model.Shops
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.data.remote.models.Outlet
 import com.barikoi.cnlapp.databinding.ItemSelectShopBinding
+import com.barikoi.cnlapp.utils.extension.formateDate
 import java.util.Locale
 
 class AdapterSelectShop(
@@ -51,6 +51,18 @@ class AdapterSelectShop(
 
         holder.binding.btnDetails.setOnClickListener {
             onSelectShopListener(filterShopList[position])
+        }
+
+        holder.binding.tvOutletId.text = filterShopList[position].id.toString()
+        holder.binding.tvOutletType.text = filterShopList[position].outletType
+
+
+        if (!filterShopList[position].lastOrderedAt.isNullOrEmpty()) {
+            holder.binding.orderDate.text =
+                holder.itemView.context.resources.getString(
+                    R.string.last_order_date,
+                    shopList[position].lastOrderedAt!!.formateDate()
+                )
         }
     }
 

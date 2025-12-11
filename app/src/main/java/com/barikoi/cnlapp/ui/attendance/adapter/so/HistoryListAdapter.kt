@@ -1,0 +1,74 @@
+package com.barikoi.cnlapp.ui.attendance.adapter.so
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import coil3.load
+import com.barikoi.cnlapp.R
+import com.barikoi.cnlapp.ui.attendance.model.HistoryList
+import com.barikoi.cnlapp.utils.extension.formateDateNewFormat
+
+class HistoryListAdapter(private val histories: List<HistoryList>) :
+    RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val v = LayoutInflater.from(parent.context)
+            .inflate(R.layout.single_attendance_history, parent, false)
+        return ViewHolder(v)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val mItem = histories[position]
+        if (mItem.enterTime.isNotEmpty() && mItem.enterTime != "null") {
+            holder.textViewMonth.text = mItem.enterTime.formateDateNewFormat("LLL")
+            holder.textViewDate.text = mItem.enterTime.formateDateNewFormat("dd")
+            holder.inTime.text = mItem.enterTime.formateDateNewFormat("hh:mm a")
+        } else {
+            holder.inTime.text = "--:--"
+        }
+
+        if (mItem.exitTime.isNotEmpty() && mItem.exitTime != "null") {
+            holder.outTime.text = mItem.enterTime.formateDateNewFormat("hh:mm a")
+        } else {
+            holder.outTime.text = "--:--"
+        }
+
+        if (mItem.routeName.isNotEmpty() && mItem.routeName != "null") {
+            holder.marketName.text =
+                holder.itemView.resources.getString(R.string.market) + " " + mItem.routeName
+        } else {
+            holder.marketName.visibility = View.GONE
+        }
+
+        if (mItem.imageLink.isNotEmpty() && mItem.imageLink != "null") {
+            holder.imageUser.load(
+                mItem.imageLink
+            )
+        } else {
+            holder.imageUser.visibility = View.GONE
+        }
+
+
+        if (mItem.checkInAddress.isNotEmpty() && mItem.checkInAddress != "null") {
+            holder.inAddress.text = mItem.checkInAddress
+        } else {
+            holder.inAddress.text = ""
+        }
+    }
+
+    override fun getItemCount(): Int = histories.size
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        internal val textViewMonth: TextView = itemView.findViewById(R.id.tvMonth)
+        internal val textViewDate: TextView = itemView.findViewById(R.id.tvDate)
+        internal val marketName: TextView = itemView.findViewById(R.id.marketName)
+        internal val inTime: TextView = itemView.findViewById(R.id.inTime)
+        internal val outTime: TextView = itemView.findViewById(R.id.outTime)
+        internal val inAddress: TextView = itemView.findViewById(R.id.inAddress)
+        internal val outAddress: TextView = itemView.findViewById(R.id.outAddress)
+        internal val imageUser: ImageView = itemView.findViewById(R.id.imageUser)
+    }
+}

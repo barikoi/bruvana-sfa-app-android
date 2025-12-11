@@ -54,12 +54,12 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="8dp"
-                    android:drawableStart="@drawable/ic_date_range"
                     android:drawablePadding="4dp"
                     android:gravity="start"
                     android:text=""
                     android:textColor="@color/text_title_2"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_date_range" />
 
             </LinearLayout>
         </RelativeLayout>
@@ -122,6 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:gravity="center_horizontal"
+                android:visibility="gone"
                 android:orientation="horizontal" />
 
         </RelativeLayout>

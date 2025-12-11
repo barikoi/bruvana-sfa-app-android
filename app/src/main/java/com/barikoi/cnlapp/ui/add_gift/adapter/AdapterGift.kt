@@ -100,6 +100,5 @@ class AdapterGift(
         holder.binding.btnMinus.setHapticClickListener {
             decrementClickListener.invoke(position)
         }
-
     }
 }

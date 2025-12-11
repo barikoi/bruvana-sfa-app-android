@@ -51,16 +51,9 @@ import com.android.volley.RequestQueue
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
-import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.BuildConfig
 import com.barikoi.cnlapp.Model.Products
 import com.barikoi.cnlapp.Model.Shops
-import com.barikoi.cnlapp.order_create.Adapter.ProductListAdapter
-import com.barikoi.cnlapp.order_create.Callback.DialogListener
-import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
-import com.barikoi.cnlapp.order_create.RoomDB.OrderList
-import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder
-import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
 import com.barikoi.cnlapp.R
 import com.barikoi.cnlapp.RoomDb.AppDatabase
 import com.barikoi.cnlapp.StatisticsHome.Adapter.OutletProductAdapter
@@ -71,7 +64,15 @@ import com.barikoi.cnlapp.base.api.NetworkFailureMessage
 import com.barikoi.cnlapp.callback.LocationFetch
 import com.barikoi.cnlapp.databinding.DialogConfirmOrderBinding
 import com.barikoi.cnlapp.databinding.FragmentProductSelectBinding
+import com.barikoi.cnlapp.order_create.Adapter.ProductListAdapter
+import com.barikoi.cnlapp.order_create.Callback.DialogListener
+import com.barikoi.cnlapp.order_create.Callback.OnValueChangeListener
+import com.barikoi.cnlapp.order_create.RoomDB.OrderList
+import com.barikoi.cnlapp.order_create.RoomDB.SaveOrder
+import com.barikoi.cnlapp.order_create.ShopSelectFragment
 import com.barikoi.cnlapp.ui.add_gift.AddGiftActivity
+import com.barikoi.cnlapp.ui.create_order.order.product_selection.vm.ProductSelectViewModel
+import com.barikoi.cnlapp.ui.main.MainActivity
 import com.barikoi.cnlapp.utils.Api
 import com.barikoi.cnlapp.utils.ApiService.ApiServiceListener
 import com.barikoi.cnlapp.utils.ApiService.ApiServices
@@ -215,7 +216,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     when (item.itemId) {
                         R.id.menu_ztoa -> {
                             productsList!!.sortByDescending {
-                                it.product_name
+                                it.productName
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
@@ -228,7 +229,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         R.id.menu_atoz -> {
                             productsList!!.sortBy {
-                                it.product_name
+                                it.productName
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
@@ -240,7 +241,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         R.id.menu_mostfrequent -> {
                             productsList!!.sortByDescending {
-                                it.quantity_last_month
+                                it.quantityLastMonth
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
@@ -253,7 +254,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         R.id.menu_lowstock -> {
                             productsList!!.sortBy {
-                                it.stock_available
+                                it.stockAvailable
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
@@ -265,7 +266,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
 
                         R.id.menu_highstock -> {
                             productsList!!.sortByDescending {
-                                it.stock_available
+                                it.stockAvailable
                             }
                             if (productsList!!.size > 0) {
                                 adapter = ProductListAdapter(productsList!!, listener!!)
@@ -696,7 +697,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                     totalCount = selectedOrder!!.totalQuantity.toInt()
                     var itemCountt = 0
                     for (i in 0 until selectedOrder!!.brands_array.size) {
-                        itemCountt = itemCountt + selectedOrder!!.brands_array[i].ordered_quantity
+                        itemCountt = itemCountt + selectedOrder!!.brands_array[i].orderedQuantity
                     }
 
                     if (itemCountt == 1 || itemCountt == 0) {
@@ -1080,31 +1081,31 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             val brandsArray = JSONArray()
             for (j in 0 until addedProducts!!.size) {
                 val brandObj = JSONObject()
-                if (addedProducts!![j].ordered_quantity > 0) {
-                    brandObj.put("product_id", addedProducts!![j].product_id)
-                    brandObj.put("product_code", addedProducts!![j].product_code)
-                    brandObj.put("product_name", addedProducts!![j].product_name)
-                    brandObj.put("sku_code", addedProducts!![j].sku_code)
-                    brandObj.put("unit_id", addedProducts!![j].unit_id)
-                    brandObj.put("unit_name", addedProducts!![j].unit_name)
-                    brandObj.put("unit_code", addedProducts!![j].unit_code)
-                    brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                if (addedProducts!![j].orderedQuantity > 0) {
+                    brandObj.put("product_id", addedProducts!![j].productId)
+                    brandObj.put("product_code", addedProducts!![j].productCode)
+                    brandObj.put("product_name", addedProducts!![j].productName)
+                    brandObj.put("sku_code", addedProducts!![j].skuCode)
+                    brandObj.put("unit_id", addedProducts!![j].unitId)
+                    brandObj.put("unit_name", addedProducts!![j].unitName)
+                    brandObj.put("unit_code", addedProducts!![j].unitCode)
+                    brandObj.put("unit_price", addedProducts!![j].unitPrice.toString())
                     brandObj.put(
-                        "discounted_unit_price", addedProducts!![j].discounted_unit_price.toString()
+                        "discounted_unit_price", addedProducts!![j].discountedUnitPrice.toString()
                     )
-                    brandObj.put("category_id", addedProducts!![j].category_id)
-                    brandObj.put("category_name", addedProducts!![j].category_name)
-                    brandObj.put("category_code", addedProducts!![j].category_code)
-                    brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("category_id", addedProducts!![j].categoryId)
+                    brandObj.put("category_name", addedProducts!![j].categoryName)
+                    brandObj.put("category_code", addedProducts!![j].categoryCode)
+                    brandObj.put("ordered_quantity", addedProducts!![j].orderedQuantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
                     brandObj.put(
-                        "ordered_amount", addedProducts!![j].ordered_total_price.toString()
+                        "ordered_amount", addedProducts!![j].orderedTotalPrice.toString()
                     )
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
-                    deliveredQuantity = deliveredQuantity + addedProducts!![j].ordered_quantity
+                    deliveredQuantity = deliveredQuantity + addedProducts!![j].orderedQuantity
                 }
 
             }
@@ -1212,32 +1213,32 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             //val brandList = orderList[i].brands_array
             for (j in 0 until addedProducts!!.size) {
                 val brandObj = JSONObject()
-                if (addedProducts!![j].ordered_quantity > 0) {
-                    brandObj.put("product_id", addedProducts!![j].product_id)
-                    brandObj.put("product_code", addedProducts!![j].product_code)
-                    brandObj.put("product_name", addedProducts!![j].product_name)
-                    brandObj.put("sku_code", addedProducts!![j].sku_code)
-                    brandObj.put("unit_id", addedProducts!![j].unit_id)
-                    brandObj.put("unit_name", addedProducts!![j].unit_name)
-                    brandObj.put("unit_code", addedProducts!![j].unit_code)
-                    brandObj.put("unit_price", addedProducts!![j].unit_price.toString())
+                if (addedProducts!![j].orderedQuantity > 0) {
+                    brandObj.put("product_id", addedProducts!![j].productId)
+                    brandObj.put("product_code", addedProducts!![j].productCode)
+                    brandObj.put("product_name", addedProducts!![j].productName)
+                    brandObj.put("sku_code", addedProducts!![j].skuCode)
+                    brandObj.put("unit_id", addedProducts!![j].unitId)
+                    brandObj.put("unit_name", addedProducts!![j].unitName)
+                    brandObj.put("unit_code", addedProducts!![j].unitCode)
+                    brandObj.put("unit_price", addedProducts!![j].unitPrice.toString())
                     brandObj.put(
-                        "discounted_unit_price", addedProducts!![j].discounted_unit_price.toString()
+                        "discounted_unit_price", addedProducts!![j].discountedUnitPrice.toString()
                     )
-                    brandObj.put("category_id", addedProducts!![j].category_id)
-                    brandObj.put("category_name", addedProducts!![j].category_name)
-                    brandObj.put("category_code", addedProducts!![j].category_code)
-                    brandObj.put("ordered_quantity", addedProducts!![j].ordered_quantity.toString())
+                    brandObj.put("category_id", addedProducts!![j].categoryId)
+                    brandObj.put("category_name", addedProducts!![j].categoryName)
+                    brandObj.put("category_code", addedProducts!![j].categoryCode)
+                    brandObj.put("ordered_quantity", addedProducts!![j].orderedQuantity.toString())
                     brandObj.put("delivered_quantity", "0")
                     brandObj.put("bounced_quantity", "0")
                     brandObj.put(
-                        "ordered_amount", addedProducts!![j].ordered_total_price.toString()
+                        "ordered_amount", addedProducts!![j].orderedTotalPrice.toString()
                     )
                     brandObj.put("delivered_amount", "0")
                     brandObj.put("bounced_amount", "0")
                     brandsArray.put(brandObj)
-                    orderedQuantity = orderedQuantity + addedProducts!![j].ordered_quantity
-                    orderedAmount = orderedAmount + addedProducts!![j].ordered_total_price
+                    orderedQuantity = orderedQuantity + addedProducts!![j].orderedQuantity
+                    orderedAmount = orderedAmount + addedProducts!![j].orderedTotalPrice
                 }
 
             }
@@ -1455,21 +1456,21 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             if (selectedOrder != null) {
                                 //var orderlistDB = appDatabase!!.orderListDao().getOrdersDB(selectedOrder!!.outletId.toString())
                                 val exist = selectedOrder!!.brands_array.find {
-                                    it.product_id == productId
+                                    it.productId == productId
                                 }
 
                                 if (exist != null) {
-                                    orderedQty = exist.ordered_quantity
-                                    orderedTotalPrice = exist.ordered_total_price
+                                    orderedQty = exist.orderedQuantity
+                                    orderedTotalPrice = exist.orderedTotalPrice
                                 }
                             } else if (addedProducts!!.size > 0) {
                                 val exist = addedProducts?.find {
-                                    it.product_id == productId
+                                    it.productId == productId
                                 }
 
                                 if (exist != null) {
-                                    orderedQty = exist.ordered_quantity
-                                    orderedTotalPrice = exist.ordered_total_price
+                                    orderedQty = exist.orderedQuantity
+                                    orderedTotalPrice = exist.orderedTotalPrice
                                 }
                             }
                             val products = Products(
@@ -1496,7 +1497,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                             productsList!!.add(products)
                             if (orderedQty > 0) {
                                 val exist = addedProducts?.find {
-                                    it.product_id == productId
+                                    it.productId == productId
                                 }
 
                                 if (exist == null) {
@@ -1507,7 +1508,7 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
                         }
 
                         if (productsList!!.isNotEmpty()) {
-                            productsList!!.sortByDescending { it.stock_available }
+                            productsList!!.sortByDescending { it.stockAvailable }
                             binding.sortTitle.text = resources.getString(R.string.high_stock)
                             adapter = ProductListAdapter(productsList!!, listener!!)
                             binding.productlist.adapter = adapter
@@ -1927,55 +1928,55 @@ class ProductSelectFragment : Fragment(), OnValueChangeListener {
             Log.d("Product", "addedProducts size: " + addedProducts!!.size)
             //val exists = products.product_id in arrayOf(addedProducts)
             val exists = addedProducts?.find {
-                it.product_id == products.product_id
+                it.productId == products.productId
             }
             Log.d("Product", "addedProducts size: $exists")
             if (exists != null) {
                 addedProducts!!.remove(exists)
                 addedProducts!!.add(
                     Products(
-                        products.product_id,
-                        products.product_name,
-                        products.product_code,
-                        products.unit_price,
-                        products.discounted_unit_price,
-                        products.sku_code,
+                        products.productId,
+                        products.productName,
+                        products.productCode,
+                        products.unitPrice,
+                        products.discountedUnitPrice,
+                        products.skuCode,
                         products.imageUrl,
-                        products.unit_id,
-                        products.unit_name,
-                        products.unit_code,
-                        products.category_id,
-                        products.category_name,
-                        products.category_code,
-                        products.quantity_last_month,
-                        products.stock_available,
-                        products.bounced_quantity,
-                        products.ordered_quantity,
-                        products.ordered_total_price
+                        products.unitId,
+                        products.unitName,
+                        products.unitCode,
+                        products.categoryId,
+                        products.categoryName,
+                        products.categoryCode,
+                        products.quantityLastMonth,
+                        products.stockAvailable,
+                        products.bouncedQuantity,
+                        products.orderedQuantity,
+                        products.orderedTotalPrice
                     )
                 )
                 Log.d("Product", "addedProducts size 2: " + addedProducts!!.size)
             } else {
                 addedProducts!!.add(
                     Products(
-                        products.product_id,
-                        products.product_name,
-                        products.product_code,
-                        products.unit_price,
-                        products.discounted_unit_price,
-                        products.sku_code,
+                        products.productId,
+                        products.productName,
+                        products.productCode,
+                        products.unitPrice,
+                        products.discountedUnitPrice,
+                        products.skuCode,
                         products.imageUrl,
-                        products.unit_id,
-                        products.unit_name,
-                        products.unit_code,
-                        products.category_id,
-                        products.category_name,
-                        products.category_code,
-                        products.quantity_last_month,
-                        products.stock_available,
-                        products.bounced_quantity,
-                        products.ordered_quantity,
-                        products.ordered_total_price
+                        products.unitId,
+                        products.unitName,
+                        products.unitCode,
+                        products.categoryId,
+                        products.categoryName,
+                        products.categoryCode,
+                        products.quantityLastMonth,
+                        products.stockAvailable,
+                        products.bouncedQuantity,
+                        products.orderedQuantity,
+                        products.orderedTotalPrice
                     )
                 )
                 Log.d("Product", "addedProducts size 3: " + addedProducts!!.size)
